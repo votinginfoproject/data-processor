@@ -1,0 +1,6 @@
+{:aws {:creds {:access-key "AAAA..."
+               :secret-key "sb3nfo..."}
+       :s3 {:bucket "bucket-name"}
+       :sqs {:region #aws/region "US_WEST_2"
+             :queue "vip-processor-queue"
+             :fail-queue "vip-processor-fail-queue"}}}
