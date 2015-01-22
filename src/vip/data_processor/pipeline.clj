@@ -1,5 +1,6 @@
 (ns vip.data-processor.pipeline
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log]
+            [clojure.stacktrace :as stacktrace]))
 
 (defn try-validation [validation ctx]
   (try
@@ -18,11 +19,14 @@
           (recur (assoc next-ctx :pipeline (rest (:pipeline ctx))))))
       ctx)))
 
-;;; TODO: throw exception (if there is one) so that squishy will put
-;;; the message that started this whole process on the fail queue
 (defn process [pipeline initial-input]
   (let [ctx {:input initial-input
              :pipeline pipeline}
         result (run-pipeline ctx)]
     (log/info result)
+    (when-let [ex (:exception result)]
+      (log/error (with-out-str (stacktrace/print-stack-trace ex)))
+      (throw (ex-info "Exception during processing" {:exception ex
+                                                     :initial-ctx ctx
+                                                     :final-ctx result})))
     result))
