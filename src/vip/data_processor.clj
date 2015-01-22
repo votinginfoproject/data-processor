@@ -1,17 +1,17 @@
 (ns vip.data-processor
-  (:require [clojure.edn :as edn]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [democracyworks.squishy :as sqs]
-            [vip.data-processor.s3 :as s3])
+            [vip.data-processor.pipeline :as pipeline]
+            [vip.data-processor.validation.transforms :as t])
   (:gen-class))
 
-(defn process-file [message]
-  (let [{:keys [filename]} (edn/read-string (:body message))
-        file (s3/download filename)]
-    (log/info "Downloaded" (pr-str file))))
+(def pipeline
+  [t/read-edn-sqs-message
+   t/assert-filename
+   t/download-from-s3])
 
 (defn consume []
-  (sqs/consume-messages (sqs/client) process-file))
+  (sqs/consume-messages (sqs/client) (partial pipeline/process pipeline)))
 
 (defn -main [& args]
   (log/info "VIP Data Processor starting up.")
