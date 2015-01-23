@@ -20,3 +20,12 @@
     (if (zip-file? path)
       (assoc ctx :input (unzip-file path))
       (assoc ctx :stop (str path " is not a zip file!")))))
+
+(defn extracted-contents [ctx]
+  (let [path (:input ctx)]
+    (assoc ctx :input
+           (-> path
+               (.resolve "data")
+               .toFile
+               .listFiles
+               seq))))

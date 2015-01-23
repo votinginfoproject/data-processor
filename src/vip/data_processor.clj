@@ -10,7 +10,8 @@
   [t/read-edn-sqs-message
    t/assert-filename
    t/download-from-s3
-   zip/unzip])
+   zip/unzip
+   zip/extracted-contents])
 
 (defn consume []
   (sqs/consume-messages (sqs/client) (partial pipeline/process pipeline)))
