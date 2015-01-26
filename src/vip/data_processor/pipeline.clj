@@ -21,8 +21,8 @@
 
 (defn process [pipeline initial-input]
   (let [ctx {:input initial-input
-             :warnings []
-             :errors []
+             :warnings {}
+             :errors {}
              :pipeline pipeline}
         result (run-pipeline ctx)]
     (log/info result)

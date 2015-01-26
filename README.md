@@ -34,3 +34,43 @@ $ docker run -e AWS_ACCESS_KEY=**your aws key** \
              -e SQS_FAIL_QUEUE=**your sqs failure queue** \
              vip-data-processor
 ```
+
+## Developing
+
+The processing pipeline is defined as a sequence of functions that
+take and return a processing context. The processing context is a map
+containing an `:input`, further processing functions as `:pipeline`,
+and maps containing `:warnings` and `:errors`.
+
+Any processing function may add a `:stop` key to the processing
+context which will halt the processing pipeline, returning the current
+context as the final result.
+
+Setting an `:exception` key will cause the processing pipeline to
+throw its value (thereby placing a message on the failed processing
+queue).
+
+A processing function may alter the `:input` key for further
+processing functions (e.g., `validation.transforms/download-from-s3`,
+which transforms an `:input` describing the location of a file on S3,
+downloads that file, and associates the file object to the `:input`
+key). Such functions can be called *transforms*.
+
+A processing function may alter the `:pipeline` key, as well, allowing
+for branching within a processing pipeline (e.g., XML and CSV files
+will need to be transformed differently into a database
+representation). Such functions can be called *branches*.
+
+Processing functions that do not alter the `:input` or `:pipeline`
+keys can be called *validations*.
+
+When parallel processing steps of the pipeline are implemented, only
+*validations* will be able to participate.
+
+The `:warnings` and `:errors` keys are meant for messages a client
+would find useful but which don't necessarily need to stop processing
+from continuing. For example, illegal values in a data set would
+prohibit the data set from being acceptable, but further processing
+may be able to be accomplished to find more issues a client could
+correct without having their data rejected each time at the first
+problem.
