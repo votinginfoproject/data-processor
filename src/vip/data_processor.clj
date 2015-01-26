@@ -11,7 +11,8 @@
    t/assert-filename
    t/download-from-s3
    zip/unzip
-   zip/extracted-contents])
+   zip/extracted-contents
+   t/xml-csv-branch])
 
 (defn consume []
   (sqs/consume-messages (sqs/client) (partial pipeline/process pipeline)))
