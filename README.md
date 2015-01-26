@@ -74,3 +74,7 @@ prohibit the data set from being acceptable, but further processing
 may be able to be accomplished to find more issues a client could
 correct without having their data rejected each time at the first
 problem.
+
+Uncaught exceptions in a processing function will result in a `:stop`
+key on the processing context and the exception being added as the
+`:exception`.

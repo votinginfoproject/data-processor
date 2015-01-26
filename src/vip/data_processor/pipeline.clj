@@ -19,7 +19,12 @@
           (recur (assoc next-ctx :pipeline (rest (:pipeline ctx))))))
       ctx)))
 
-(defn process [pipeline initial-input]
+(defn process
+  "A pipeline is a sequence of functions that take and return a
+  `processing context`. The `initial-input` will be placed as the
+  `:input` on the processing context for the first function in the
+  pipeline."
+  [pipeline initial-input]
   (let [ctx {:input initial-input
              :warnings {}
              :errors {}
