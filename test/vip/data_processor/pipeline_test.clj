@@ -44,4 +44,7 @@
     (let [intial-input 0
           pipeline [incrementor incrementor incrementor]
           result (process pipeline intial-input)]
-      (is (= {:input 3 :pipeline []} result)))))
+      (is (= {:input 3
+              :pipeline []
+              :warnings {}
+              :errors {}} result)))))
