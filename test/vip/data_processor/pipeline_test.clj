@@ -37,7 +37,8 @@
       (is (:stop result))
       (is (:exception result))
       (is (= 1 (:input result)))
-      (is (= [thrower incrementor] (:pipeline result))))))
+      (is (= thrower (:thrown-by result)))
+      (is (= [incrementor] (:pipeline result))))))
 
 (deftest process-test
   (testing "Builds the context and executes the pipeline"

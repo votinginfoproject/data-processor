@@ -8,16 +8,19 @@
     (catch Throwable e
       (log/error e)
       (assoc ctx :stop "Exception caught"
+                 :thrown-by validation
                  :exception e))))
 
 (defn run-pipeline [c]
   (loop [ctx c]
-    (if-let [next-step (-> ctx :pipeline first)]
-      (let [next-ctx (try-validation next-step ctx)]
-        (if (:stop next-ctx)
-          next-ctx
-          (recur (assoc next-ctx :pipeline (rest (:pipeline ctx))))))
-      ctx)))
+    (let [pipeline (:pipeline ctx)]
+      (if-let [next-step (first pipeline)]
+        (let [ctx-with-rest-pipeline (assoc ctx :pipeline (rest pipeline))
+              next-ctx (try-validation next-step ctx-with-rest-pipeline)]
+          (if (:stop next-ctx)
+            next-ctx
+            (recur next-ctx)))
+        ctx))))
 
 (defn process
   "A pipeline is a sequence of functions that take and return a
