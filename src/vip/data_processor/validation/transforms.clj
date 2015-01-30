@@ -2,7 +2,8 @@
   (:require [clojure.edn :as edn]
             [clojure.set :as set]
             [clojure.string :as s]
-            [vip.data-processor.s3 :as s3]))
+            [vip.data-processor.s3 :as s3]
+            [vip.data-processor.validation.csv :as csv]))
 
 (defn read-edn-sqs-message [ctx]
   (assoc ctx :input (edn/read-string (get-in ctx [:input :body]))))
@@ -21,7 +22,7 @@
   [(fn [ctx] (assoc ctx :stop "This is an XML feed"))])
 
 (def csv-validations
-  [(fn [ctx] (assoc ctx :stop "This is a CSV feed"))])
+  [csv/validate-filenames])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
