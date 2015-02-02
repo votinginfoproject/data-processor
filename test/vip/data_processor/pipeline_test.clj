@@ -7,15 +7,15 @@
 (defn thrower [ctx]
   (throw (Throwable. "Boom!")))
 
-(deftest try-validation-test
+(deftest try-processing-fn-test
   (let [ctx {:input 0}]
     (testing "Without an exception"
-      (let [result (try-validation incrementor ctx)]
+      (let [result (try-processing-fn incrementor ctx)]
         (is (= 1 (:input result)))
         (is (not (contains? result :stop)))
         (is (not (contains? result :exception)))))
     (testing "With an exception"
-      (let [result (try-validation thrower ctx)]
+      (let [result (try-processing-fn thrower ctx)]
         (is (:stop result))
         (is (:exception result))))))
 

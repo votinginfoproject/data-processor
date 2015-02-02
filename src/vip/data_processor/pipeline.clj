@@ -2,13 +2,13 @@
   (:require [clojure.tools.logging :as log]
             [clojure.stacktrace :as stacktrace]))
 
-(defn try-validation [validation ctx]
+(defn try-processing-fn [processing-fn ctx]
   (try
-    (validation ctx)
+    (processing-fn ctx)
     (catch Throwable e
       (log/error e)
       (assoc ctx :stop "Exception caught"
-                 :thrown-by validation
+                 :thrown-by processing-fn
                  :exception e))))
 
 (defn run-pipeline [c]
@@ -16,7 +16,7 @@
     (let [pipeline (:pipeline ctx)]
       (if-let [next-step (first pipeline)]
         (let [ctx-with-rest-pipeline (assoc ctx :pipeline (rest pipeline))
-              next-ctx (try-validation next-step ctx-with-rest-pipeline)]
+              next-ctx (try-processing-fn next-step ctx-with-rest-pipeline)]
           (if (:stop next-ctx)
             next-ctx
             (recur next-ctx)))
