@@ -3,7 +3,7 @@
             [vip.data-processor.pipeline :refer :all]))
 
 (defn incrementor [ctx]
-  (update-in ctx [:input] inc))
+  (update ctx :input inc))
 (defn thrower [ctx]
   (throw (Throwable. "Boom!")))
 
