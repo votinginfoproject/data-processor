@@ -2,7 +2,11 @@
   (:require [clojure.tools.logging :as log]
             [clojure.stacktrace :as stacktrace]))
 
-(defn try-processing-fn [processing-fn ctx]
+(defn try-processing-fn
+  "Attempt to run the processing function on the context. If the
+  processing function throws, add a `:stop` key and the `Throwable` to
+  the context."
+  [processing-fn ctx]
   (try
     (processing-fn ctx)
     (catch Throwable e
@@ -11,7 +15,11 @@
                  :thrown-by processing-fn
                  :exception e))))
 
-(defn run-pipeline [c]
+(defn run-pipeline
+  "Run the `pipeline` attached to a processing context. Will return
+  the context after all processing functions in the pipeline have
+  been completed or until a `:stop` key is added to the context."
+  [c]
   (loop [ctx c]
     (let [pipeline (:pipeline ctx)]
       (if-let [next-step (first pipeline)]
@@ -26,7 +34,11 @@
   "A pipeline is a sequence of functions that take and return a
   `processing context`. The `initial-input` will be placed as the
   `:input` on the processing context for the first function in the
-  pipeline."
+  pipeline.
+
+  Runs the pipeline, returning the final context. An exception on the
+  context will result in logging the exception, and this function
+  throwing it."
   [pipeline initial-input]
   (let [ctx {:input initial-input
              :warnings {}
