@@ -22,18 +22,19 @@ $ lein trampoline run
 ### Docker
 
 Configuration in Docker is set with environment variables, so you'll
-need to set them when you run the container.
+need to set them when you run the container. See the variable names in
+`resources/config.edn`.
+
+Running all dependent Docker containers is managed by
+[docker-compose][docker-compose]. After installing that, bringing it
+all up should be as simple as:
 
 ```sh
-$ docker build -t vip-data-processor .
-$ docker run -e AWS_ACCESS_KEY=**your aws key** \
-             -e AWS_SECRET_KEY=**your aws secret key** \
-             -e S3_BUCKET=**your s3 bucket** \
-             -e SQS_REGION=**your sqs region** \
-             -e SQS_QUEUE=**your sqs queue** \
-             -e SQS_FAIL_QUEUE=**your sqs failure queue** \
-             vip-data-processor
+$ docker-compose build
+$ docker-compose up
 ```
+
+[docker-compose]: https://github.com/docker/fig
 
 ## Developing
 
@@ -52,9 +53,10 @@ queue).
 
 A processing function may alter the `:input` key for further
 processing functions (e.g., `validation.transforms/download-from-s3`,
-which transforms an `:input` describing the location of a file on S3,
-downloads that file, and associates the file object to the `:input`
-key). Such functions can be called *transforms*.
+which takes the `:input` of an incoming context describing the
+location of a file on S3, downloads that file, and associates that
+file object to the `:input` key of the outgoing context). Such
+functions can be called *transforms*.
 
 A processing function may alter the `:pipeline` key, as well, allowing
 for branching within a processing pipeline (e.g., XML and CSV files
