@@ -32,4 +32,4 @@
         filetype-validations (condp set/superset? file-extensions
                                #{"txt" "csv"} csv-validations
                                #{"xml"} xml-validations)]
-    (update-in ctx [:pipeline] (partial concat filetype-validations))))
+    (update ctx :pipeline (partial concat filetype-validations))))

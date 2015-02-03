@@ -52,9 +52,10 @@ queue).
 
 A processing function may alter the `:input` key for further
 processing functions (e.g., `validation.transforms/download-from-s3`,
-which transforms an `:input` describing the location of a file on S3,
-downloads that file, and associates the file object to the `:input`
-key). Such functions can be called *transforms*.
+which takes the `:input` of an incoming context describing the
+location of a file on S3, downloads that file, and associates that
+file object to the `:input` key of the outgoing context). Such
+functions can be called *transforms*.
 
 A processing function may alter the `:pipeline` key, as well, allowing
 for branching within a processing pipeline (e.g., XML and CSV files
