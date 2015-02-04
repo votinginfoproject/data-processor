@@ -1,0 +1,9 @@
+processor:
+  build: .
+  environment:
+    VIP_DP_AWS_ACCESS_KEY:
+    VIP_DP_AWS_SECRET_KEY:
+    VIP_DP_S3_BUCKET:
+    VIP_DP_SQS_REGION:
+    VIP_DP_SQS_QUEUE:
+    VIP_DP_SQS_FAIL_QUEUE:
