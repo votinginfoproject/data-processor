@@ -3,4 +3,6 @@
        :s3 {:bucket "bucket-name"}
        :sqs {:region #aws/region "US_WEST_2"
              :queue "vip-processor-queue"
-             :fail-queue "vip-processor-fail-queue"}}}
+             :fail-queue "vip-processor-fail-queue"}}
+ :rabbit-mq {:connection-params {:host "localhost"
+                                 :port 5672}}}
