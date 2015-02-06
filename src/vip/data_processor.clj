@@ -16,7 +16,15 @@
    t/xml-csv-branch])
 
 (defn consume []
-  (sqs/consume-messages (sqs/client) (partial pipeline/process pipeline)))
+  (sqs/consume-messages (sqs/client)
+                        (fn [message]
+                          (q/publish {:initial-input message
+                                      :status :started}
+                                     "processing.started")
+                          (pipeline/process pipeline message)
+                          (q/publish {:initial-input message
+                                      :status :complete}
+                                     "processing.complete"))))
 
 (defn -main [& args]
   (let [id (java.util.UUID/randomUUID)]
