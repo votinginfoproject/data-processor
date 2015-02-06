@@ -1,6 +1,7 @@
 (ns vip.data-processor.pipeline
   (:require [clojure.tools.logging :as log]
-            [clojure.stacktrace :as stacktrace]))
+            [clojure.stacktrace :as stacktrace]
+            [vip.data-processor.queue :as q]))
 
 (defn try-processing-fn
   "Attempt to run the processing function on the context. If the
@@ -47,8 +48,15 @@
         result (run-pipeline ctx)]
     (log/info result)
     (when-let [ex (:exception result)]
+      (q/publish {:initial-input initial-input
+                  :status :error
+                  :message (str ex)}
+                 "processing.error")
       (log/error (with-out-str (stacktrace/print-stack-trace ex)))
       (throw (ex-info "Exception during processing" {:exception ex
                                                      :initial-ctx ctx
                                                      :final-ctx result})))
+    (q/publish {:initial-input initial-input
+                :status :success}
+               "processing.complete")
     result))
