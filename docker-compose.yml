@@ -10,6 +10,8 @@ processor:
     VIP_DP_SQS_QUEUE:
     VIP_DP_SQS_FAIL_QUEUE:
 queue:
-  image: rabbitmq
+  image: rabbitmq:3.4.3-management
+  ports:
+    - "15672"
   environment:
     RABBITMQ_NODENAME: vip_data_processor
