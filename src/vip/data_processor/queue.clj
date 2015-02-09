@@ -7,11 +7,6 @@
             [langohr.basic :as lb]
             [turbovote.resource-config :refer [config]]))
 
-(defn coerce-config [config]
-  (if (string? (:port config))
-    (update config :port #(Integer/parseInt %))
-    config))
-
 (def rabbit-connection (atom nil))
 (def rabbit-channel (atom nil))
 (def qa-engine-exchange "qa-engine")
@@ -21,8 +16,9 @@
     (loop [attempt 1]
       (try
         (reset! rabbit-connection
-                (rmq/connect (or (coerce-config (config :rabbit-mq :connection-params))
+                (rmq/connect (or (config :rabbit-mq :connection-params)
                                  {})))
+        (log/info "RabbitMQ connected.")
         (catch Throwable t
           (log/warn "RabbitMQ not available:" (.getMessage t) "attempt:" attempt)))
       (when (nil? @rabbit-connection)
@@ -34,6 +30,7 @@
   (reset! rabbit-channel
           (let [ch (lch/open @rabbit-connection)]
             (le/topic ch qa-engine-exchange {:durable false :auto-delete true})
+            (log/info "RabbitMQ topic set.")
             ch)))
 
 (defn publish

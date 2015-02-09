@@ -9,6 +9,6 @@
                  [democracyworks.squishy "1.0.0" :exclusions [joda-time
                                                               org.slf4j/slf4j-simple]]
                  [net.lingala.zip4j/zip4j "1.3.2"]
-                 [turbovote.resource-config "0.1.3"]]
+                 [turbovote.resource-config "0.1.4"]]
   :profiles {:test {:resource-paths ["test-resources"]}}
   :main vip.data-processor)

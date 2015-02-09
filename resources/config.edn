@@ -5,4 +5,4 @@
              :queue #resource-config/env "VIP_DP_SQS_QUEUE"
              :fail-queue #resource-config/env "VIP_DP_SQS_FAIL_QUEUE"}}
  :rabbit-mq {:connection-params {:host #resource-config/env "QUEUE_PORT_5672_TCP_ADDR"
-                                 :port #resource-config/env "QUEUE_PORT_5672_TCP_PORT"}}}
+                                 :port #resource-config/edn #resource-config/env "QUEUE_PORT_5672_TCP_PORT"}}}
