@@ -9,6 +9,7 @@ processor:
     VIP_DP_SQS_REGION:
     VIP_DP_SQS_QUEUE:
     VIP_DP_SQS_FAIL_QUEUE:
+    VIP_DP_RABBITMQ_EXCHANGE:
 queue:
   image: rabbitmq:3.4.3-management
   ports:

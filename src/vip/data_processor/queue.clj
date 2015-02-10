@@ -9,7 +9,6 @@
 
 (def rabbit-connection (atom nil))
 (def rabbit-channel (atom nil))
-(def qa-engine-exchange "qa-engine")
 
 (defn initialize []
   (let [max-retries 5]
@@ -29,7 +28,7 @@
             (throw (ex-info "Connecting to RabbitMQ failed" {:attemts attempt})))))))
   (reset! rabbit-channel
           (let [ch (lch/open @rabbit-connection)]
-            (le/topic ch qa-engine-exchange {:durable false :auto-delete true})
+            (le/topic ch (config :rabbit-mq :exchange) {:durable false :auto-delete true})
             (log/info "RabbitMQ topic set.")
             ch)))
 
@@ -39,7 +38,7 @@
   [payload routing-key]
   (log/debug routing-key "-" (pr-str payload))
   (lb/publish @rabbit-channel
-              qa-engine-exchange
+              (config :rabbit-mq :exchange)
               routing-key
               (pr-str payload)
               {:content-type "application/edn" :type "qa-engine.event"}))

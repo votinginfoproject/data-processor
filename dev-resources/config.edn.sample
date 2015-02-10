@@ -5,4 +5,5 @@
              :queue "vip-processor-queue"
              :fail-queue "vip-processor-fail-queue"}}
  :rabbit-mq {:connection {:host "localhost"
-                          :port 5672}}}
+                          :port 5672}
+             :exchange "qa-engine"}}
