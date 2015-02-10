@@ -33,11 +33,21 @@
     "state_early_vote_site.txt"
     "street_segment.txt"})
 
-(defn validate-filenames [ctx]
+(defn file-name [file]
+  (.getName file))
+
+(defn good-filename? [file]
+  (->> file
+       file-name
+       (contains? csv-filenames)))
+
+(defn remove-bad-filenames [ctx]
   (let [input (:input ctx)
-        filenames (map #(.getName %) input)
-        bad-filenames (seq (set/difference (set filenames) csv-filenames))]
-    (if bad-filenames
-      (assoc ctx :stop (apply str "Bad filenames: "
-                                  (interpose ", " (sort bad-filenames))))
+        {good-files true bad-files false} (group-by good-filename? input)]
+    (if (seq bad-files)
+      (-> ctx
+          (assoc-in [:warnings :validate-filenames]
+                    (apply str "Bad filenames: "
+                           (interpose ", " (->> bad-files (map file-name) sort))))
+          (assoc :input good-files))
       ctx)))
