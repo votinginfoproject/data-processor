@@ -1,5 +1,7 @@
 processor:
   build: .
+  links:
+    - queue
   environment:
     VIP_DP_AWS_ACCESS_KEY:
     VIP_DP_AWS_SECRET_KEY:
@@ -7,3 +9,10 @@ processor:
     VIP_DP_SQS_REGION:
     VIP_DP_SQS_QUEUE:
     VIP_DP_SQS_FAIL_QUEUE:
+    VIP_DP_RABBITMQ_EXCHANGE:
+queue:
+  image: rabbitmq:3.4.3-management
+  ports:
+    - "15672"
+  environment:
+    RABBITMQ_NODENAME: vip_data_processor
