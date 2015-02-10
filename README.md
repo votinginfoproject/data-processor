@@ -22,8 +22,18 @@ $ lein trampoline run
 ### Docker
 
 Configuration in Docker is set with environment variables, so you'll
-need to set them when you run the container. See the variable names in
-`resources/config.edn`.
+need to set them when you run the container. The following variables
+need values:
+
+* `VIP_DP_AWS_ACCESS_KEY`
+* `VIP_DP_AWS_SECRET_KEY`
+* `VIP_DP_S3_BUCKET`
+* `VIP_DP_SQS_REGION`
+* `VIP_DP_SQS_QUEUE`
+* `VIP_DP_SQS_FAIL_QUEUE`
+* `VIP_DP_RABBITMQ_EXCHANGE`
+* `POSTGRES_USER`
+* `POSTGRES_PASSWORD`
 
 Running all dependent Docker containers is managed by
 [docker-compose][docker-compose]. After installing that, bringing it

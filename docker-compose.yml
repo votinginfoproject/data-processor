@@ -2,6 +2,7 @@ processor:
   build: .
   links:
     - queue
+    - db
   environment:
     VIP_DP_AWS_ACCESS_KEY:
     VIP_DP_AWS_SECRET_KEY:
@@ -16,3 +17,10 @@ queue:
     - "15672"
   environment:
     RABBITMQ_NODENAME: vip_data_processor
+db:
+  image: postgres:9.4.1
+  ports:
+    - "5432"
+  environment:
+    POSTGRES_USER:
+    POSTGRES_PASSWORD:

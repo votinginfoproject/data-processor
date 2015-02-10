@@ -4,7 +4,8 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.zip :as zip]
-            [vip.data-processor.queue :as q])
+            [vip.data-processor.queue :as q]
+            [vip.data-processor.db.postgres :as psql])
   (:gen-class))
 
 (def pipeline
@@ -30,6 +31,7 @@
   (let [id (java.util.UUID/randomUUID)]
     (log/info "VIP Data Processor starting up. ID:" id)
     (q/initialize)
+    (psql/migrate)
     (q/publish {:id id :event "starting"} "qa-engine.status")
     (let [consumer (consume)]
       (.addShutdownHook (Runtime/getRuntime)

@@ -9,6 +9,8 @@
                  [democracyworks.squishy "1.0.0" :exclusions [joda-time
                                                               org.slf4j/slf4j-simple]]
                  [net.lingala.zip4j/zip4j "1.3.2"]
-                 [turbovote.resource-config "0.1.4"]]
+                 [turbovote.resource-config "0.1.4"]
+                 [joplin.jdbc "0.2.7"]
+                 [org.postgresql/postgresql "9.4-1200-jdbc4" :exclusions [org.slf4j/slf4j-simple]]]
   :profiles {:test {:resource-paths ["test-resources"]}}
   :main vip.data-processor)
