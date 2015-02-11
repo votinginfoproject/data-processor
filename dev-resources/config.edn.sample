@@ -4,6 +4,10 @@
        :sqs {:region #aws/region "US_WEST_2"
              :queue "vip-processor-queue"
              :fail-queue "vip-processor-fail-queue"}}
+ :postgres {:host "localhost"
+            :port 5432
+            :user "postgres"
+            :password "sssssecret"}
  :rabbit-mq {:connection {:host "localhost"
                           :port 5672}
              :exchange "qa-engine"}}
