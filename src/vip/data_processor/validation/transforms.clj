@@ -10,7 +10,7 @@
 
 (defn assert-filename [ctx]
   (if-let [filename (get-in ctx [:input :filename])]
-    ctx
+    (assoc ctx :filename filename)
     (assoc ctx :stop "No filename!")))
 
 (defn download-from-s3 [ctx]
