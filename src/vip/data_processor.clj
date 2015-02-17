@@ -26,9 +26,9 @@
                           (let [result (pipeline/process pipeline message)
                                 filename (:filename result)]
                             (korma/insert psql/results
-                                          (korma/values [{:upload filename
-                                                          :complete true
-                                                          :completed_at (korma/sqlfn now)}])))
+                                          (korma/values {:upload filename
+                                                         :complete true
+                                                         :completed_at (korma/sqlfn now)})))
                           (q/publish {:initial-input message
                                       :status :complete}
                                      "processing.complete"))))
