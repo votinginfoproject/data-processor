@@ -2,6 +2,7 @@
   (:require [clojure.edn :as edn]
             [clojure.set :as set]
             [clojure.string :as s]
+            [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]))
 
@@ -12,6 +13,9 @@
   (if-let [filename (get-in ctx [:input :filename])]
     (assoc ctx :filename filename)
     (assoc ctx :stop "No filename!")))
+
+(defn attach-sqlite-db [ctx]
+  (assoc ctx :db (sqlite/temp-db (:filename ctx))))
 
 (defn download-from-s3 [ctx]
   (let [filename (get-in ctx [:input :filename])
