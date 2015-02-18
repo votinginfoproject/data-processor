@@ -13,6 +13,7 @@
                  [joplin.jdbc "0.2.7"]
                  [korma "0.4.0"]
                  [org.clojure/java.jdbc "0.3.5"]
-                 [org.postgresql/postgresql "9.4-1200-jdbc4" :exclusions [org.slf4j/slf4j-simple]]]
+                 [org.postgresql/postgresql "9.4-1200-jdbc4" :exclusions [org.slf4j/slf4j-simple]]
+                 [org.xerial/sqlite-jdbc "3.8.7"]]
   :profiles {:test {:resource-paths ["test-resources"]}}
   :main vip.data-processor)
