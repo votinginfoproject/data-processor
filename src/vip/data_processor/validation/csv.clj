@@ -71,11 +71,12 @@
 (defn load-elections [ctx]
   (let [files (:input ctx)
         election-file (first (filter #(= "election.txt" (.getName %)) files))]
-    (when election-file
+    (if election-file
       (let [elections-table (get-in ctx [:tables :elections])
             contents (read-csv-with-headers election-file)
             coerced-contents (->> contents
                                   (map (booleanize "election_day_registration"))
                                   (map (booleanize "statewide")))]
-        (korma/insert elections-table (korma/values coerced-contents))))
-    ctx))
+        (korma/insert elections-table (korma/values coerced-contents))
+        ctx)
+      (assoc-in ctx [:errors :load-elections] "election.txt missing"))))

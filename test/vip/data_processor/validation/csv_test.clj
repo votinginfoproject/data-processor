@@ -35,8 +35,9 @@
             (is (= '({:id 5400 :statewide 1} {:id 5401 :statewide 0})
                    (korma/select (get-in out-ctx [:tables :elections])
                                  (korma/fields :id :statewide)))))))))
-  (testing "with no election.txt file the ctx remains the same"
+  (testing "with no election.txt file the ctx includes an error"
     (let [db (sqlite/temp-db "no-load-elections-test")
           ctx (merge {:input []} db)
           out-ctx (load-elections (assoc ctx :input []))]
-      (is (empty? (korma/select (get-in out-ctx [:tables :elections])))))))
+      (is (empty? (korma/select (get-in out-ctx [:tables :elections]))))
+      (is (get-in out-ctx [:errors :load-elections])))))
