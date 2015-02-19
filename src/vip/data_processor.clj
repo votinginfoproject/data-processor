@@ -12,6 +12,7 @@
 (def pipeline
   [t/read-edn-sqs-message
    t/assert-filename
+   t/attach-sqlite-db
    t/download-from-s3
    zip/unzip
    zip/extracted-contents
