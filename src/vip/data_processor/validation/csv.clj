@@ -1,5 +1,8 @@
 (ns vip.data-processor.validation.csv
-  (:require [clojure.set :as set]))
+  (:require [clojure.data.csv :as csv]
+            [clojure.java.io :as io]
+            [clojure.set :as set]
+            [korma.core :as korma]))
 
 (def csv-filenames
   #{"ballot.txt"
@@ -51,3 +54,11 @@
                            (interpose ", " (->> bad-files (map file-name) sort))))
           (assoc :input good-files))
       ctx)))
+
+(defn read-csv-with-headers [file]
+  (let [raw-rows (with-open [in-file (io/reader file)]
+                   (doall
+                    (csv/read-csv in-file)))
+        headers (first raw-rows)
+        rows (rest raw-rows)]
+    (map (partial zipmap headers) rows)))

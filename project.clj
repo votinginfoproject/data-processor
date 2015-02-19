@@ -2,6 +2,7 @@
   :description "Voting Information Project Data Processor"
   :dependencies [[org.clojure/clojure "1.7.0-alpha5"]
                  [org.slf4j/slf4j-log4j12 "1.7.10"]
+                 [org.clojure/data.csv "0.1.2"]
                  [org.clojure/tools.logging "0.3.1"]
                  [com.novemberain/langohr "3.0.1"]
                  [joda-time "2.7"]
