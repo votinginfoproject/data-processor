@@ -80,3 +80,13 @@
         (korma/insert elections-table (korma/values coerced-contents))
         ctx)
       (assoc-in ctx [:errors :load-elections] "election.txt missing"))))
+
+(defn load-sources [ctx]
+  (let [files (:input ctx)
+        source-file (first (filter #(= "source.txt" (.getName %)) files))]
+    (if source-file
+      (let [sources-table (get-in ctx [:tables :sources])
+            contents (read-csv-with-headers source-file)]
+        (korma/insert sources-table (korma/values contents))
+        ctx)
+      (assoc-in ctx [:errors :load-sources] "source.txt missing"))))
