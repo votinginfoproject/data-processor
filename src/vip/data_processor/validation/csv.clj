@@ -114,10 +114,6 @@
   error-on-missing-file
   (add-report-on-missing-file-fn :errors))
 
-(def error-on-missing-election (error-on-missing-file "election.txt"))
-(def error-on-missing-source (error-on-missing-file "source.txt"))
-(def warn-on-missing-state (warn-on-missing-file "state.txt"))
-
 (def load-elections (csv-loader "election.txt" :elections
                                 (booleanize "election_day_registration")
                                 (booleanize "statewide")))
