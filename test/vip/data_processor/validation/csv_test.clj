@@ -41,3 +41,21 @@
           out-ctx (load-elections (assoc ctx :input []))]
       (is (empty? (korma/select (get-in out-ctx [:tables :elections]))))
       (is (get-in out-ctx [:errors :load-elections])))))
+
+(deftest load-sources-test
+  (testing "with a valid source.txt file"
+    (let [db (sqlite/temp-db "load-sources-test")
+          ctx (merge {:input [(io/as-file (io/resource "source.txt"))]}
+                     db)]
+      (is (empty? (korma/select (get-in ctx [:tables :sources]))))
+      (testing "inserts rows from the valid source.txt file"
+        (let [out-ctx (load-sources ctx)]
+          (is (= '({:id 4400})
+                 (korma/select (get-in out-ctx [:tables :sources])
+                               (korma/fields :id))))))))
+  (testing "with no source.txt file the ctx includes an error"
+    (let [db (sqlite/temp-db "no-load-sources-test")
+          ctx (merge {:input []} db)
+          out-ctx (load-sources (assoc ctx :input []))]
+      (is (empty? (korma/select (get-in out-ctx [:tables :sources]))))
+      (is (get-in out-ctx [:errors :load-sources])))))
