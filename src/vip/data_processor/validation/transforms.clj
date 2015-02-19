@@ -26,7 +26,8 @@
   [(fn [ctx] (assoc ctx :stop "This is an XML feed"))])
 
 (def csv-validations
-  [csv/remove-bad-filenames])
+  [csv/remove-bad-filenames
+   csv/load-elections])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
