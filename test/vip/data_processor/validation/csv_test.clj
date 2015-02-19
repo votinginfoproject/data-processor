@@ -85,3 +85,12 @@
       (is (get-in out-ctx [:errors "election.txt"]))
       (is (get-in out-ctx [:warnings "state.txt"]))
       (is (not (contains? (:errors out-ctx) "source.txt"))))))
+
+(deftest csv-loader-test
+  (testing "ignores unknown columns"
+    (let [loader (csv-loader "state-with-bad-columns.txt" :states)
+          ctx (merge {:input [(io/as-file (io/resource "state-with-bad-columns.txt"))]}
+                     (sqlite/temp-db "ignore-columns-test"))
+          out-ctx (loader ctx)]
+      (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
+             (korma/select (get-in out-ctx [:tables :states])))))))

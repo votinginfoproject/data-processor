@@ -2,7 +2,8 @@
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io]
             [clojure.set :as set]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [vip.data-processor.db.sqlite :as sqlite]))
 
 (def csv-filenames
   #{"ballot.txt"
@@ -76,7 +77,8 @@
 
 (defn csv-loader
   "Generates a validation function that loads the specified file into
-  the specified table, transforming each row by the row-tranform-fns.
+  the specified table, transforming each row by the
+  row-tranform-fns. Ignores columns that don't exist in the database.
 
   Example:
   (csv-loader \"election.txt\" :elections (booleanize \"statewide\")"
@@ -84,8 +86,11 @@
   (fn [ctx]
     (when-let [file-to-load (find-input-file ctx filename)]
       (let [sql-table (get-in ctx [:tables table])
+            column-names (sqlite/column-names (:db ctx) (name table))
+            select-columns (fn [row] (select-keys row column-names))
             contents (read-csv-with-headers file-to-load)
-            transformed-contents (map (apply comp row-transform-fns) contents)]
+            transforms (apply comp select-columns row-transform-fns)
+            transformed-contents (map transforms contents)]
         (korma/insert sql-table (korma/values transformed-contents))))
     ctx))
 
