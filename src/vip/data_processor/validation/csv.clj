@@ -90,3 +90,13 @@
         (korma/insert sources-table (korma/values contents))
         ctx)
       (assoc-in ctx [:errors :load-sources] "source.txt missing"))))
+
+(defn load-states [ctx]
+  (let [files (:input ctx)
+        state-file (first (filter #(= "state.txt" (.getName %)) files))]
+    (if state-file
+      (let [states-table (get-in ctx [:tables :states])
+            contents (read-csv-with-headers state-file)]
+        (korma/insert states-table (korma/values contents))
+        ctx)
+      (assoc-in ctx [:warnings :load-states] "state.txt missing"))))

@@ -22,4 +22,5 @@
                    :migrator "resources/processing-migrations"})
     {:db db
      :tables {:elections (entity :elections (korma/database db))
-              :sources (entity :sources (korma/database db))}}))
+              :sources (entity :sources (korma/database db))
+              :states (entity :states (korma/database db))}}))
