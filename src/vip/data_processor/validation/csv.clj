@@ -68,35 +68,53 @@
                   (if (= "yes" (row field))
                     1 0))))
 
-(defn load-elections [ctx]
-  (let [files (:input ctx)
-        election-file (first (filter #(= "election.txt" (.getName %)) files))]
-    (if election-file
-      (let [elections-table (get-in ctx [:tables :elections])
-            contents (read-csv-with-headers election-file)
-            coerced-contents (->> contents
-                                  (map (booleanize "election_day_registration"))
-                                  (map (booleanize "statewide")))]
-        (korma/insert elections-table (korma/values coerced-contents))
-        ctx)
-      (assoc-in ctx [:errors :load-elections] "election.txt missing"))))
+(defn find-input-file [ctx filename]
+  (->> ctx
+       :input
+       (filter #(= filename (.getName %)))
+       first))
 
-(defn load-sources [ctx]
-  (let [files (:input ctx)
-        source-file (first (filter #(= "source.txt" (.getName %)) files))]
-    (if source-file
-      (let [sources-table (get-in ctx [:tables :sources])
-            contents (read-csv-with-headers source-file)]
-        (korma/insert sources-table (korma/values contents))
-        ctx)
-      (assoc-in ctx [:errors :load-sources] "source.txt missing"))))
+(defn csv-loader
+  "Generates a validation function that loads the specified file into
+  the specified table, transforming each row by the row-tranform-fns.
 
-(defn load-states [ctx]
-  (let [files (:input ctx)
-        state-file (first (filter #(= "state.txt" (.getName %)) files))]
-    (if state-file
-      (let [states-table (get-in ctx [:tables :states])
-            contents (read-csv-with-headers state-file)]
-        (korma/insert states-table (korma/values contents))
-        ctx)
-      (assoc-in ctx [:warnings :load-states] "state.txt missing"))))
+  Example:
+  (csv-loader \"election.txt\" :elections (booleanize \"statewide\")"
+  [filename table & row-transform-fns]
+  (fn [ctx]
+    (when-let [file-to-load (find-input-file ctx filename)]
+      (let [sql-table (get-in ctx [:tables table])
+            contents (read-csv-with-headers file-to-load)
+            transformed-contents (map (apply comp row-transform-fns) contents)]
+        (korma/insert sql-table (korma/values transformed-contents))))
+    ctx))
+
+(defn add-report-on-missing-file-fn
+  "Generates a validation function generator that takes a filename and
+  associates a report-type on the context if the filename is missing."
+  [report-type]
+  (fn [filename]
+    (fn [ctx]
+      (if (find-input-file ctx filename)
+        ctx
+        (assoc-in ctx [report-type filename] (str filename " is missing"))))))
+
+(def ^{:doc "Generates a validation function that adds a warning when
+  the given filename is missing from the input"}
+  warn-on-missing-file
+  (add-report-on-missing-file-fn :warnings))
+
+(def ^{:doc "Generates a validation function that adds an error when
+  the given filename is missing from the input"}
+  error-on-missing-file
+  (add-report-on-missing-file-fn :errors))
+
+(def error-on-missing-election (error-on-missing-file "election.txt"))
+(def error-on-missing-source (error-on-missing-file "source.txt"))
+(def warn-on-missing-state (warn-on-missing-file "state.txt"))
+
+(def load-elections (csv-loader "election.txt" :elections
+                                (booleanize "election_day_registration")
+                                (booleanize "statewide")))
+(def load-sources (csv-loader "source.txt" :sources))
+(def load-states (csv-loader "state.txt" :states))

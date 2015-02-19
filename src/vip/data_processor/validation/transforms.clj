@@ -27,6 +27,9 @@
 
 (def csv-validations
   [csv/remove-bad-filenames
+   csv/error-on-missing-election
+   csv/error-on-missing-source
+   csv/warn-on-missing-state
    csv/load-elections
    csv/load-sources
    csv/load-states])
