@@ -28,7 +28,8 @@
 (def csv-validations
   [csv/remove-bad-filenames
    csv/load-elections
-   csv/load-sources])
+   csv/load-sources
+   csv/load-states])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
