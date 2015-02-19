@@ -62,3 +62,19 @@
         headers (first raw-rows)
         rows (rest raw-rows)]
     (map (partial zipmap headers) rows)))
+
+(defn load-elections [ctx]
+  (let [files (:input ctx)
+        election-file (first (filter #(= "election.txt" (.getName %)) files))]
+    (when election-file
+      (let [elections-table (get-in ctx [:tables :elections])
+            contents (read-csv-with-headers election-file)
+            coerced-contents (->> contents
+                                  (map #(assoc % "election_day_registration"
+                                               (if (= "yes" (% "election_day_registration"))
+                                                 1 0)))
+                                  (map #(assoc % "statewide"
+                                               (if (= "yes" (% "statewide"))
+                                                 1 0))))]
+        (korma/insert elections-table (korma/values coerced-contents))))
+    ctx))
