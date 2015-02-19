@@ -15,7 +15,7 @@
     (assoc ctx :stop "No filename!")))
 
 (defn attach-sqlite-db [ctx]
-  (assoc ctx :db (sqlite/temp-db (:filename ctx))))
+  (merge ctx (sqlite/temp-db (:filename ctx))))
 
 (defn download-from-s3 [ctx]
   (let [filename (get-in ctx [:input :filename])
