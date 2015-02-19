@@ -15,7 +15,7 @@
     (assoc ctx :stop "No filename!")))
 
 (defn attach-sqlite-db [ctx]
-  (assoc ctx :db (sqlite/temp-db (:filename ctx))))
+  (merge ctx (sqlite/temp-db (:filename ctx))))
 
 (defn download-from-s3 [ctx]
   (let [filename (get-in ctx [:input :filename])
@@ -26,7 +26,8 @@
   [(fn [ctx] (assoc ctx :stop "This is an XML feed"))])
 
 (def csv-validations
-  [csv/remove-bad-filenames])
+  [csv/remove-bad-filenames
+   csv/load-elections])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx

@@ -1,5 +1,8 @@
 (ns vip.data-processor.validation.csv
-  (:require [clojure.set :as set]))
+  (:require [clojure.data.csv :as csv]
+            [clojure.java.io :as io]
+            [clojure.set :as set]
+            [korma.core :as korma]))
 
 (def csv-filenames
   #{"ballot.txt"
@@ -51,3 +54,29 @@
                            (interpose ", " (->> bad-files (map file-name) sort))))
           (assoc :input good-files))
       ctx)))
+
+(defn read-csv-with-headers [file]
+  (let [raw-rows (with-open [in-file (io/reader file)]
+                   (doall
+                    (csv/read-csv in-file)))
+        headers (first raw-rows)
+        rows (rest raw-rows)]
+    (map (partial zipmap headers) rows)))
+
+(defn booleanize [field]
+  (fn [row] (assoc row field
+                  (if (= "yes" (row field))
+                    1 0))))
+
+(defn load-elections [ctx]
+  (let [files (:input ctx)
+        election-file (first (filter #(= "election.txt" (.getName %)) files))]
+    (if election-file
+      (let [elections-table (get-in ctx [:tables :elections])
+            contents (read-csv-with-headers election-file)
+            coerced-contents (->> contents
+                                  (map (booleanize "election_day_registration"))
+                                  (map (booleanize "statewide")))]
+        (korma/insert elections-table (korma/values coerced-contents))
+        ctx)
+      (assoc-in ctx [:errors :load-elections] "election.txt missing"))))
