@@ -71,9 +71,9 @@
           (is (= '({:id 1})
                  (korma/select (get-in out-ctx [:tables :states])
                                (korma/fields :id))))))))
-  (testing "with no state.txt file the ctx includes an error"
+  (testing "with no state.txt file the ctx includes a warning"
     (let [db (sqlite/temp-db "no-load-states-test")
           ctx (merge {:input []} db)
           out-ctx (load-states (assoc ctx :input []))]
       (is (empty? (korma/select (get-in out-ctx [:tables :states]))))
-      (is (get-in out-ctx [:errors :load-states])))))
+      (is (get-in out-ctx [:warnings :load-states])))))

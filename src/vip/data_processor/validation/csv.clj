@@ -99,4 +99,4 @@
             contents (read-csv-with-headers state-file)]
         (korma/insert states-table (korma/values contents))
         ctx)
-      (assoc-in ctx [:errors :load-states] "state.txt missing"))))
+      (assoc-in ctx [:warnings :load-states] "state.txt missing"))))
