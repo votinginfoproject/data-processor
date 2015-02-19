@@ -78,7 +78,6 @@
 (deftest missing-files-test
   (testing "reports errors or warnings when certain files are missing"
     (let [ctx {:input [(io/as-file (io/resource "source.txt"))]}
-          ()
           out-ctx (-> ctx
                       ((error-on-missing-file "election.txt"))
                       ((error-on-missing-file "source.txt"))
