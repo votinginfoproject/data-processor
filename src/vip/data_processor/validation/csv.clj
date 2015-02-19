@@ -63,6 +63,11 @@
         rows (rest raw-rows)]
     (map (partial zipmap headers) rows)))
 
+(defn booleanize [field]
+  (fn [row] (assoc row field
+                  (if (= "yes" (row field))
+                    1 0))))
+
 (defn load-elections [ctx]
   (let [files (:input ctx)
         election-file (first (filter #(= "election.txt" (.getName %)) files))]
@@ -70,11 +75,7 @@
       (let [elections-table (get-in ctx [:tables :elections])
             contents (read-csv-with-headers election-file)
             coerced-contents (->> contents
-                                  (map #(assoc % "election_day_registration"
-                                               (if (= "yes" (% "election_day_registration"))
-                                                 1 0)))
-                                  (map #(assoc % "statewide"
-                                               (if (= "yes" (% "statewide"))
-                                                 1 0))))]
+                                  (map (booleanize "election_day_registration"))
+                                  (map (booleanize "statewide")))]
         (korma/insert elections-table (korma/values coerced-contents))))
     ctx))
