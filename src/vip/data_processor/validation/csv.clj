@@ -91,7 +91,8 @@
             contents (read-csv-with-headers file-to-load)
             transforms (apply comp select-columns row-transform-fns)
             transformed-contents (map transforms contents)]
-        (korma/insert sql-table (korma/values transformed-contents))))
+        (doseq [row transformed-contents]
+          (korma/insert sql-table (korma/values row)))))
     ctx))
 
 (defn add-report-on-missing-file-fn
