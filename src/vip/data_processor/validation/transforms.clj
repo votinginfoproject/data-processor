@@ -30,9 +30,11 @@
    (csv/error-on-missing-file "election.txt")
    (csv/error-on-missing-file "source.txt")
    (csv/warn-on-missing-file "state.txt")
+   (csv/warn-on-missing-file "election_administration.txt")
    csv/load-elections
    csv/load-sources
-   csv/load-states])
+   csv/load-states
+   csv/load-election-administrations])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
