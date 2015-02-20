@@ -86,7 +86,7 @@
   (fn [ctx]
     (when-let [file-to-load (find-input-file ctx filename)]
       (let [sql-table (get-in ctx [:tables table])
-            column-names (sqlite/column-names (:db ctx) (name table))
+            column-names (sqlite/column-names (:db ctx) (:name sql-table))
             select-columns (fn [row] (select-keys row column-names))
             contents (read-csv-with-headers file-to-load)
             transforms (apply comp select-columns row-transform-fns)
