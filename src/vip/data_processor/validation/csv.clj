@@ -123,3 +123,6 @@
 (def load-election-administrations
   (csv-loader "election_administration.txt" :election-administrations))
 (def load-election-officials (csv-loader "election_official.txt" :election-officials))
+(def load-localities (csv-loader "locality.txt" :localities))
+(def load-precincts (csv-loader "precinct.txt" :precincts
+                                (booleanize "mail_only")))
