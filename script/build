@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -exo pipefail
+
+IMAGE_TAG=${BUILDKITE_TAG:-"$BUILDKITE_BRANCH-$(git rev-parse --short $BUILDKITE_COMMIT)"}
+
+docker build -t quay.io/votinginfoproject/qa-engine:$IMAGE_TAG .
