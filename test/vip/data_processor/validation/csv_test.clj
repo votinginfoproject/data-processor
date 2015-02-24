@@ -23,7 +23,7 @@
 (deftest load-elections-test
   (testing "with a valid election.txt file"
     (let [db (sqlite/temp-db "load-elections-test")
-          ctx (merge {:input [(io/as-file (io/resource "election.txt"))]}
+          ctx (merge {:input [(io/as-file (io/resource "full-good-run/election.txt"))]}
                      db)]
       (is (empty? (korma/select (get-in ctx [:tables :elections]))))
       (testing "inserts rows from the valid election.txt file"
@@ -44,7 +44,7 @@
 (deftest load-sources-test
   (testing "with a valid source.txt file"
     (let [db (sqlite/temp-db "load-sources-test")
-          ctx (merge {:input [(io/as-file (io/resource "source.txt"))]}
+          ctx (merge {:input [(io/as-file (io/resource "full-good-run/source.txt"))]}
                      db)]
       (is (empty? (korma/select (get-in ctx [:tables :sources]))))
       (testing "inserts rows from the valid source.txt file"
@@ -61,7 +61,7 @@
 (deftest load-states-test
   (testing "with a valid state.txt file"
     (let [db (sqlite/temp-db "load-states-test")
-          ctx (merge {:input [(io/as-file (io/resource "state.txt"))]}
+          ctx (merge {:input [(io/as-file (io/resource "full-good-run/state.txt"))]}
                      db)]
       (is (empty? (korma/select (get-in ctx [:tables :states]))))
       (testing "inserts rows from the valid state.txt file"
@@ -77,7 +77,7 @@
 
 (deftest missing-files-test
   (testing "reports errors or warnings when certain files are missing"
-    (let [ctx {:input [(io/as-file (io/resource "source.txt"))]}
+    (let [ctx {:input [(io/as-file (io/resource "full-good-run/source.txt"))]}
           out-ctx (-> ctx
                       ((error-on-missing-file "election.txt"))
                       ((error-on-missing-file "source.txt"))
@@ -94,3 +94,5 @@
           out-ctx (loader ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
              (korma/select (get-in out-ctx [:tables :states])))))))
+
+
