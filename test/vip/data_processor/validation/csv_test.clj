@@ -35,12 +35,11 @@
             (is (= '({:id 5400 :statewide 1} {:id 5401 :statewide 0})
                    (korma/select (get-in out-ctx [:tables :elections])
                                  (korma/fields :id :statewide)))))))))
-  (testing "with no election.txt file the ctx includes an error"
+  (testing "with no election.txt file, does nothing"
     (let [db (sqlite/temp-db "no-load-elections-test")
           ctx (merge {:input []} db)
           out-ctx (load-elections (assoc ctx :input []))]
-      (is (empty? (korma/select (get-in out-ctx [:tables :elections]))))
-      (is (get-in out-ctx [:errors :load-elections])))))
+      (is (empty? (korma/select (get-in out-ctx [:tables :elections])))))))
 
 (deftest load-sources-test
   (testing "with a valid source.txt file"
@@ -53,12 +52,11 @@
           (is (= '({:id 4400})
                  (korma/select (get-in out-ctx [:tables :sources])
                                (korma/fields :id))))))))
-  (testing "with no source.txt file the ctx includes an error"
+  (testing "with no source.txt file, does nothing"
     (let [db (sqlite/temp-db "no-load-sources-test")
           ctx (merge {:input []} db)
           out-ctx (load-sources (assoc ctx :input []))]
-      (is (empty? (korma/select (get-in out-ctx [:tables :sources]))))
-      (is (get-in out-ctx [:errors :load-sources])))))
+      (is (empty? (korma/select (get-in out-ctx [:tables :sources])))))))
 
 (deftest load-states-test
   (testing "with a valid state.txt file"
@@ -71,9 +69,28 @@
           (is (= '({:id 1})
                  (korma/select (get-in out-ctx [:tables :states])
                                (korma/fields :id))))))))
-  (testing "with no state.txt file the ctx includes a warning"
+  (testing "with no state.txt file, does nothing"
     (let [db (sqlite/temp-db "no-load-states-test")
           ctx (merge {:input []} db)
           out-ctx (load-states (assoc ctx :input []))]
-      (is (empty? (korma/select (get-in out-ctx [:tables :states]))))
-      (is (get-in out-ctx [:warnings :load-states])))))
+      (is (empty? (korma/select (get-in out-ctx [:tables :states])))))))
+
+(deftest missing-files-test
+  (testing "reports errors or warnings when certain files are missing"
+    (let [ctx {:input [(io/as-file (io/resource "source.txt"))]}
+          out-ctx (-> ctx
+                      ((error-on-missing-file "election.txt"))
+                      ((error-on-missing-file "source.txt"))
+                      ((warn-on-missing-file "state.txt")))]
+      (is (get-in out-ctx [:errors "election.txt"]))
+      (is (get-in out-ctx [:warnings "state.txt"]))
+      (is (not (contains? (:errors out-ctx) "source.txt"))))))
+
+(deftest csv-loader-test
+  (testing "ignores unknown columns"
+    (let [loader (csv-loader "state-with-bad-columns.txt" :states)
+          ctx (merge {:input [(io/as-file (io/resource "state-with-bad-columns.txt"))]}
+                     (sqlite/temp-db "ignore-columns-test"))
+          out-ctx (loader ctx)]
+      (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
+             (korma/select (get-in out-ctx [:tables :states])))))))
