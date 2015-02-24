@@ -120,3 +120,6 @@
                                 (booleanize "statewide")))
 (def load-sources (csv-loader "source.txt" :sources))
 (def load-states (csv-loader "state.txt" :states))
+(def load-election-administrations
+  (csv-loader "election_administration.txt" :election-administrations))
+(def load-election-officials (csv-loader "election_official.txt" :election-officials))

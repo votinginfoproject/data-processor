@@ -23,7 +23,9 @@
     {:db db
      :tables {:elections (entity :elections (korma/database db))
               :sources (entity :sources (korma/database db))
-              :states (entity :states (korma/database db))}}))
+              :states (entity :states (korma/database db))
+              :election-administrations (entity :election_administrations (korma/database db))
+              :election-officials (entity :election_officials (korma/database db))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
