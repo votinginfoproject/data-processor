@@ -126,3 +126,8 @@
 (def load-localities (csv-loader "locality.txt" :localities))
 (def load-precincts (csv-loader "precinct.txt" :precincts
                                 (booleanize "mail_only")))
+(def load-precinct-splits (csv-loader "precinct_split.txt" :precinct-splits))
+(def load-precinct-split-electoral-districts 
+  (csv-loader "precinct_split_electoral_district.txt" :precinct-split-electoral-districts))
+(def load-early-vote-sites (csv-loader "early_vote_site.txt" :early-vote-sites))
+(def load-precinct-polling-locations (csv-loader "precinct_polling_location.txt" :precinct-polling-locations))
