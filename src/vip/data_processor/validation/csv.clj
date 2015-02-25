@@ -127,3 +127,5 @@
 (def load-precincts (csv-loader "precinct.txt" :precincts
                                 (booleanize "mail_only")))
 (def load-precinct-splits (csv-loader "precinct_split.txt" :precinct-splits))
+(def load-precinct-split-electoral-districts 
+  (csv-loader "precinct_split_electoral_district.txt" :precinct-split-electoral-districts))

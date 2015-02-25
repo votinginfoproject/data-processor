@@ -28,7 +28,8 @@
               :election-officials (entity :election_officials (korma/database db))
               :localities (entity :localities (korma/database db))
               :precincts (entity :precincts (korma/database db))
-              :precinct-splits (entity :precinct_splits (korma/database db))}}))
+              :precinct-splits (entity :precinct_splits (korma/database db))
+              :precinct-split-electoral-districts (entity :precinct_split_electoral_districts (korma/database db))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
