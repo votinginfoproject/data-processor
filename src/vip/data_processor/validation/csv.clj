@@ -126,3 +126,4 @@
 (def load-localities (csv-loader "locality.txt" :localities))
 (def load-precincts (csv-loader "precinct.txt" :precincts
                                 (booleanize "mail_only")))
+(def load-precinct-splits (csv-loader "precinct_split.txt" :precinct-splits))
