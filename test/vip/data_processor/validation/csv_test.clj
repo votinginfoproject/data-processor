@@ -94,5 +94,3 @@
           out-ctx (loader ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
              (korma/select (get-in out-ctx [:tables :states])))))))
-
-
