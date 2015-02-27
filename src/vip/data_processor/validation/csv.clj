@@ -131,3 +131,5 @@
   (csv-loader "precinct_split_electoral_district.txt" :precinct-split-electoral-districts))
 (def load-early-vote-sites (csv-loader "early_vote_site.txt" :early-vote-sites))
 (def load-precinct-polling-locations (csv-loader "precinct_polling_location.txt" :precinct-polling-locations))
+(def load-polling-locations (csv-loader "polling_location.txt" :polling-locations))
+(def load-street-segments (csv-loader "street_segment.txt" :street-segments))
