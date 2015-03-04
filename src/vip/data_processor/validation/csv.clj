@@ -2,7 +2,6 @@
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io]
             [clojure.set :as set]
-            [korma.core :as korma]
             [vip.data-processor.db.sqlite :as sqlite]))
 
 (def csv-filenames
@@ -73,27 +72,6 @@
        (filter #(= filename (.getName %)))
        first))
 
-(defn chunk-rows
-  "Given a seq of maps, split them into groups, such that no group
-  have more than n total keys across its maps."
-  [rows n]
-  (lazy-seq
-   (loop [this-chunk []
-          this-chunk-size 0
-          to-go rows]
-     (if (empty? to-go)
-       (list this-chunk)
-       (let [next-row (first to-go)
-             size-with-next-row (+ this-chunk-size (count next-row))]
-         (cond
-          (< n (count next-row)) (throw (ex-info "Map too large" {:map next-row}))
-          (< n size-with-next-row) (cons this-chunk (chunk-rows to-go n))
-          :else (recur (conj this-chunk next-row)
-                       size-with-next-row
-                       (rest to-go))))))))
-
-(def sqlite-statement-parameter-limit 999)
-
 (defn csv-loader
   "Generates a validation function that loads the specified file into
   the specified table, transforming each row by the
@@ -111,9 +89,7 @@
               contents (read-csv-with-headers in-file)
               transforms (apply comp select-columns row-transform-fns)
               transformed-contents (map transforms contents)]
-          (doseq [rows (chunk-rows transformed-contents
-                                   sqlite-statement-parameter-limit)]
-            (korma/insert sql-table (korma/values rows))))))
+          (sqlite/bulk-import transformed-contents sql-table))))
     ctx))
 
 (defn add-report-on-missing-file-fn
