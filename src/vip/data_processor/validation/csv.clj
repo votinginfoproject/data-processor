@@ -64,7 +64,7 @@
 
 (defn booleanize [field]
   (fn [row] (assoc row field
-                  (if (= "yes" (row field))
+                  (if (#{"YES" "yes"} (row field))
                     1 0))))
 
 (defn find-input-file [ctx filename]
