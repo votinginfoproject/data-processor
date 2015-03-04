@@ -132,3 +132,4 @@
 (def load-precinct-polling-locations (csv-loader "precinct_polling_location.txt" :precinct-polling-locations))
 (def load-polling-locations (csv-loader "polling_location.txt" :polling-locations))
 (def load-street-segments (csv-loader "street_segment.txt" :street-segments))
+(def load-electoral-districts (csv-loader "electoral_district.txt" :electoral-districts))
