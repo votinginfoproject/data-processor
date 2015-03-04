@@ -56,10 +56,8 @@
           (assoc :input good-files))
       ctx)))
 
-(defn read-csv-with-headers [file]
-  (let [raw-rows (with-open [in-file (io/reader file)]
-                   (doall
-                    (csv/read-csv in-file)))
+(defn read-csv-with-headers [file-handle]
+  (let [raw-rows (csv/read-csv file-handle)
         headers (first raw-rows)
         rows (rest raw-rows)]
     (map (partial zipmap headers) rows)))
@@ -85,14 +83,15 @@
   [filename table & row-transform-fns]
   (fn [ctx]
     (when-let [file-to-load (find-input-file ctx filename)]
-      (let [sql-table (get-in ctx [:tables table])
-            column-names (sqlite/column-names (:db ctx) (:name sql-table))
-            select-columns (fn [row] (select-keys row column-names))
-            contents (read-csv-with-headers file-to-load)
-            transforms (apply comp select-columns row-transform-fns)
-            transformed-contents (map transforms contents)]
-        (doseq [row transformed-contents]
-          (korma/insert sql-table (korma/values row)))))
+      (with-open [in-file (io/reader file-to-load)]
+        (let [sql-table (get-in ctx [:tables table])
+              column-names (sqlite/column-names (:db ctx) (:name sql-table))
+              select-columns (fn [row] (select-keys row column-names))
+              contents (read-csv-with-headers in-file)
+              transforms (apply comp select-columns row-transform-fns)
+              transformed-contents (map transforms contents)]
+          (doseq [row transformed-contents]
+            (korma/insert sql-table (korma/values row))))))
     ctx))
 
 (defn add-report-on-missing-file-fn
