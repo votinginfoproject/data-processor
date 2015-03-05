@@ -33,7 +33,9 @@
               :early-vote-sites (entity :early_vote_sites (korma/database db))
               :precinct-polling-locations (entity :precinct_polling_locations (korma/database db))
               :polling-locations (entity :polling_locations (korma/database db))
-              :street-segments (entity :street_segments (korma/database db))}}))
+              :street-segments (entity :street_segments (korma/database db))
+              :electoral-districts (entity :electoral_districts (korma/database db))
+              :contests (entity :contests (korma/database db))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
