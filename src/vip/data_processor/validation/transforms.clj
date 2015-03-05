@@ -43,6 +43,7 @@
    (csv/warn-on-missing-file "electoral_district.txt")
    (csv/warn-on-missing-file "contest.txt")
    (csv/warn-on-missing-file "ballot.txt")
+   (csv/warn-on-missing-file "ballot_response.txt")
    csv/load-elections
    csv/load-sources
    csv/load-states
@@ -58,7 +59,8 @@
    csv/load-street-segments
    csv/load-electoral-districts
    csv/load-contests
-   csv/load-ballots])
+   csv/load-ballots
+   csv/load-ballot-responses])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
