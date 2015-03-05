@@ -35,7 +35,8 @@
               :polling-locations (entity :polling_locations (korma/database db))
               :street-segments (entity :street_segments (korma/database db))
               :electoral-districts (entity :electoral_districts (korma/database db))
-              :contests (entity :contests (korma/database db))}}))
+              :contests (entity :contests (korma/database db))
+              :ballots (entity :ballots (korma/database db))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
