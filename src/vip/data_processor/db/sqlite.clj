@@ -49,3 +49,28 @@
           (if (.next result-set)
             (recur (conj columns (.getString result-set "name")))
             columns))))))
+
+(defn chunk-rows
+  "Given a seq of maps, split them into groups, such that no group
+  have more than n total keys across its maps."
+  [rows n]
+  (lazy-seq
+   (loop [this-chunk []
+          this-chunk-size 0
+          to-go rows]
+     (if (empty? to-go)
+       (list this-chunk)
+       (let [next-row (first to-go)
+             size-with-next-row (+ this-chunk-size (count next-row))]
+         (cond
+          (< n (count next-row)) (throw (ex-info "Map too large" {:map next-row}))
+          (< n size-with-next-row) (cons this-chunk (chunk-rows to-go n))
+          :else (recur (conj this-chunk next-row)
+                       size-with-next-row
+                       (rest to-go))))))))
+
+(def statement-parameter-limit 999)
+
+(defn bulk-import [rows table]
+  (doseq [chunk (chunk-rows rows statement-parameter-limit)]
+    (korma/insert table (korma/values chunk))))
