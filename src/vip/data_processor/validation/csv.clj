@@ -134,3 +134,6 @@
 (def load-contests (csv-loader "contest.txt" :contests
                                (booleanize "partisan")
                                (booleanize "special")))
+(def load-ballots (csv-loader "ballot.txt" :ballots
+                              (booleanize "write_in")))
+(def load-ballot-responses (csv-loader "ballot_response.txt" :ballot-responses))
