@@ -138,3 +138,4 @@
                               (booleanize "write_in")))
 (def load-ballot-responses (csv-loader "ballot_response.txt" :ballot-responses))
 (def load-referendums (csv-loader "referendum.txt" :referendums))
+(def load-referendum-ballot-responses (csv-loader "referendum_ballot_response.txt" :referendum-ballot-responses))
