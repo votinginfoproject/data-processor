@@ -40,7 +40,8 @@
               :ballot-responses (entity :ballot_responses (korma/database db))
               :referendums (entity :referendums (korma/database db))
               :referendum-ballot-responses (entity :referendum_ballot_responses (korma/database db))
-              :candidates (entity :candidates (korma/database db))}}))
+              :candidates (entity :candidates (korma/database db))
+              :ballot-candidates (entity :ballot_candidates (korma/database db))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection

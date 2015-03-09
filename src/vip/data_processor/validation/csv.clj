@@ -140,3 +140,4 @@
 (def load-referendums (csv-loader "referendum.txt" :referendums))
 (def load-referendum-ballot-responses (csv-loader "referendum_ballot_response.txt" :referendum-ballot-responses))
 (def load-candidates (csv-loader "candidate.txt" :candidates))
+(def load-ballot-candidates (csv-loader "ballot_candidate.txt" :ballot-candidates))
