@@ -43,7 +43,8 @@
               :candidates (entity :candidates (korma/database db))
               :ballot-candidates (entity :ballot_candidates (korma/database db))
               :state-early-vote-sites (entity :state_early_vote_sites (korma/database db))
-              :precinct-split-polling-locations (entity :precinct_split_polling_locations (korma/database db))}}))
+              :precinct-split-polling-locations (entity :precinct_split_polling_locations (korma/database db))
+              :precinct-electoral-districts (entity :precinct_electoral_districts (korma/database db))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
