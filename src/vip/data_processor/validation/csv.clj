@@ -137,3 +137,9 @@
 (def load-ballots (csv-loader "ballot.txt" :ballots
                               (booleanize "write_in")))
 (def load-ballot-responses (csv-loader "ballot_response.txt" :ballot-responses))
+(def load-referendums (csv-loader "referendum.txt" :referendums))
+(def load-referendum-ballot-responses (csv-loader "referendum_ballot_response.txt" :referendum-ballot-responses))
+(def load-candidates (csv-loader "candidate.txt" :candidates))
+(def load-ballot-candidates (csv-loader "ballot_candidate.txt" :ballot-candidates))
+(def load-state-early-vote-sites (csv-loader "state_early_vote_site.txt" :state-early-vote-sites))
+(def load-precinct-split-polling-locations (csv-loader "precinct_split_polling_location.txt" :precinct-split-polling-locations))

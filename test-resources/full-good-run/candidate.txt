@@ -1,0 +1,27 @@
+name,party,candidate_url,biography,phone,photo_url,filed_mailing_address_location_name,filed_mailing_address_line1,filed_mailing_address_line2,filed_mailing_address_line3,filed_mailing_address_city,filed_mailing_address_state,filed_mailing_address_zip,email,sort_order,id
+Barack Obama,DEM,,,,,,,,,,,,,,3100047456984
+No Preference,DEM,,,,,,,,,,,,,,3100047456987
+Newt Gingrich,REP,,,,,,,,,,,,,,3100047466988
+Ron Paul,REP,,,,,,,,,,,,,,3100047466989
+Mitt Romney,REP,,,,,,,,,,,,,,3100047466991
+Rick Santorum,REP,,,,,,,,,,,,,,3100047466992
+No Preference,REP,,,,,,,,,,,,,,3100047466994
+Roger Gary,LIB,,,,,,,,,,,,,,3100047476995
+R. J. Harris,LIB,,,,,,,,,,,,,,3100047476996
+Gary Johnson,LIB,,,,,,,,,,,,,,3100047476997
+Carl Person,LIB,,,,,,,,,,,,,,3100047476998
+Bill Still,LIB,,,,,,,,,,,,,,3100047476999
+Lee Wrights,LIB,,,,,,,,,,,,,,3100047477000
+No Preference,LIB,,,,,,,,,,,,,,3100047477001
+Bill Faison,DEM,,,9195631370,,,,,,,,,,,3100048016427
+Gary M. Dunn,DEM,,,,,,,,,,,,,,3100048016713
+Gardenia M. Henley,DEM,,,3367678398,,,,,,,,,,,3100048016728
+Walter H. Dalton,DEM,,,,,,,,,,,,,,3100048016758
+Bruce Blackmon,DEM,,,9108933543,,,,,,,,,,,3100048016933
+Bob Etheridge,DEM,,,,,,,,,,,,,,3100048016985
+Pat McCrory,REP,,,7043440484,,,,,,,,,,,3100048026637
+Jim Harney,REP,,,9103080898,,,,,,,,,,,3100048026817
+Paul Wright,REP,,,,,,,,,,,,,,3100048026846
+Charles Kenneth Moss,REP,,,3369636061,,,,,,,,,,,3100048026855
+Jim Mahan,REP,,,7044836938,,,,,,,,,,,3100048026890
+Scott A. Jones,REP,,,3364510981,,,,,,,,,,,3100048026982
