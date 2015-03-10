@@ -51,6 +51,7 @@
    (csv/warn-on-missing-file "state_early_vote_site.txt")
    (csv/warn-on-missing-file "precinct_split_polling_location.txt")
    (csv/warn-on-missing-file "precinct_electoral_district.txt")
+   (csv/warn-on-missing-file "precinct_early_vote_site.txt")
    csv/load-elections
    csv/load-sources
    csv/load-states
@@ -74,7 +75,8 @@
    csv/load-ballot-candidates
    csv/load-state-early-vote-sites
    csv/load-precinct-split-polling-locations
-   csv/load-precinct-electoral-districts])
+   csv/load-precinct-electoral-districts
+   csv/load-precinct-early-vote-sites])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
