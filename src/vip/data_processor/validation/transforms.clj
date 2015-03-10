@@ -48,6 +48,7 @@
    (csv/warn-on-missing-file "referendum_ballot_response.txt")
    (csv/warn-on-missing-file "candidate.txt")
    (csv/warn-on-missing-file "ballot_candidate.txt")
+   (csv/warn-on-missing-file "state_early_vote_site.txt")
    csv/load-elections
    csv/load-sources
    csv/load-states
@@ -68,7 +69,8 @@
    csv/load-referendums
    csv/load-referendum-ballot-responses
    csv/load-candidates
-   csv/load-ballot-candidates])
+   csv/load-ballot-candidates
+   csv/load-state-early-vote-sites])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx

@@ -141,3 +141,4 @@
 (def load-referendum-ballot-responses (csv-loader "referendum_ballot_response.txt" :referendum-ballot-responses))
 (def load-candidates (csv-loader "candidate.txt" :candidates))
 (def load-ballot-candidates (csv-loader "ballot_candidate.txt" :ballot-candidates))
+(def load-state-early-vote-sites (csv-loader "state_early_vote_site.txt" :state-early-vote-sites))
