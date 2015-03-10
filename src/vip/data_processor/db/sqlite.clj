@@ -80,4 +80,5 @@
 
 (defn bulk-import [rows table]
   (doseq [chunk (chunk-rows rows statement-parameter-limit)]
-    (korma/insert table (korma/values chunk))))
+    (when-not (empty? chunk)
+      (korma/insert table (korma/values chunk)))))
