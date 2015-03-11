@@ -43,6 +43,8 @@
   (let [ctx {:input initial-input
              :warnings {}
              :errors {}
+             :critical {}
+             :fatal {}
              :pipeline pipeline}
         result (run-pipeline ctx)]
     (log/info result)
