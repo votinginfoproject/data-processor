@@ -59,7 +59,7 @@
   (let [raw-rows (csv/read-csv file-handle)
         headers (first raw-rows)
         rows (rest raw-rows)]
-    (map (partial zipmap headers) rows)))
+    [headers (map (partial zipmap headers) rows)]))
 
 (defn booleanize [field]
   (fn [row] (assoc row field
@@ -81,16 +81,19 @@
   (csv-loader \"election.txt\" :elections (booleanize \"statewide\")"
   [filename table & row-transform-fns]
   (fn [ctx]
-    (when-let [file-to-load (find-input-file ctx filename)]
+    (if-let [file-to-load (find-input-file ctx filename)]
       (with-open [in-file (io/reader file-to-load)]
         (let [sql-table (get-in ctx [:tables table])
               column-names (sqlite/column-names (:db ctx) (:name sql-table))
               select-columns (fn [row] (select-keys row column-names))
-              contents (read-csv-with-headers in-file)
-              transforms (apply comp select-columns row-transform-fns)
-              transformed-contents (map transforms contents)]
-          (sqlite/bulk-import transformed-contents sql-table))))
-    ctx))
+              [headers contents] (read-csv-with-headers in-file)]
+          (if (empty? (clojure.set/intersection (set headers) (set column-names)))
+            (update-in ctx [:critical filename] conj "No header row")
+            (let [transforms (apply comp select-columns row-transform-fns)
+                  transformed-contents (map transforms contents)]
+              (sqlite/bulk-import transformed-contents sql-table)
+              ctx))))
+      ctx)))
 
 (defn add-report-on-missing-file-fn
   "Generates a validation function generator that takes a filename and
