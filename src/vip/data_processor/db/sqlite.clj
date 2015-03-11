@@ -47,7 +47,8 @@
               :precinct-electoral-districts (entity :precinct_electoral_districts (korma/database db))
               :precinct-early-vote-sites (entity :precinct_early_vote_sites (korma/database db))
               :locality-early-vote-sites (entity :locality_early_vote_sites (korma/database db))
-              :custom-ballot-ballot-responses (entity :custom_ballot_ballot_responses (korma/database db))}}))
+              :custom-ballot-ballot-responses (entity :custom_ballot_ballot_responses (korma/database db))
+              :custom-ballots (entity :custom_ballots (korma/database db ))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
