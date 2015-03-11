@@ -18,7 +18,7 @@
          ")")
     (str part)))
 
-(defn- error-message-for [dependencies]
+(defn error-message-for [dependencies]
   (str "File dependencies not met: " (error-message-part dependencies)))
 
 (defmacro build-dependencies
