@@ -146,3 +146,4 @@
 (def load-precinct-electoral-districts (csv-loader "precinct_electoral_district.txt" :precinct-electoral-districts))
 (def load-precinct-early-vote-sites (csv-loader "precinct_early_vote_site.txt" :precinct-early-vote-sites))
 (def load-locality-early-vote-sites (csv-loader "locality_early_vote_site.txt" :locality-early-vote-sites))
+(def load-custom-ballot-ballot-responses (csv-loader "custom_ballot_ballot_response.txt" :custom-ballot-ballot-responses))
