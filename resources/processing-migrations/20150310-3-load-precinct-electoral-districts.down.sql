@@ -1,0 +1,1 @@
+DROP TABLE precinct_electoral_districts;

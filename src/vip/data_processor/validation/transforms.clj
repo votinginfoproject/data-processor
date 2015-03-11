@@ -53,7 +53,9 @@
    csv/load-candidates
    csv/load-ballot-candidates
    csv/load-state-early-vote-sites
-   csv/load-precinct-split-polling-locations])
+   csv/load-precinct-split-polling-locations
+   csv/load-precinct-electoral-districts
+   csv/load-precinct-early-vote-sites])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
