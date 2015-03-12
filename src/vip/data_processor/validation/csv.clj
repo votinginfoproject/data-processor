@@ -148,3 +148,4 @@
 (def load-locality-early-vote-sites (csv-loader "locality_early_vote_site.txt" :locality-early-vote-sites))
 (def load-custom-ballot-ballot-responses (csv-loader "custom_ballot_ballot_response.txt" :custom-ballot-ballot-responses))
 (def load-custom-ballots (csv-loader "custom_ballot.txt" :custom-ballots))
+(def load-contest-results (csv-loader "contest_result.txt" :contest-results))
