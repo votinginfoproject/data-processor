@@ -80,7 +80,8 @@
    csv/load-locality-early-vote-sites
    csv/load-custom-ballot-ballot-responses
    csv/load-custom-ballots
-   csv/load-contest-results])
+   csv/load-contest-results
+   csv/load-ballot-line-results])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx

@@ -49,7 +49,8 @@
               :locality-early-vote-sites (entity :locality_early_vote_sites (korma/database db))
               :custom-ballot-ballot-responses (entity :custom_ballot_ballot_responses (korma/database db))
               :custom-ballots (entity :custom_ballots (korma/database db ))
-              :contest-results (entity :contest_results (korma/database db))}}))
+              :contest-results (entity :contest_results (korma/database db))
+              :ballot-line-results (entity :ballot_line_results (korma/database db))}}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
