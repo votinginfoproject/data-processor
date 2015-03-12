@@ -59,7 +59,7 @@
   (let [raw-rows (csv/read-csv file-handle)
         headers (first raw-rows)
         rows (rest raw-rows)]
-    [headers (map (partial zipmap headers) rows)]))
+    {:headers headers :contents (map (partial zipmap headers) rows)}))
 
 (defn booleanize [field]
   (fn [row] (assoc row field
@@ -86,7 +86,7 @@
         (let [sql-table (get-in ctx [:tables table])
               column-names (sqlite/column-names (:db ctx) (:name sql-table))
               select-columns (fn [row] (select-keys row column-names))
-              [headers contents] (read-csv-with-headers in-file)]
+              {:keys [headers contents]} (read-csv-with-headers in-file)]
           (if (empty? (clojure.set/intersection (set headers) (set column-names)))
             (update-in ctx [:critical filename] conj "No header row")
             (let [transforms (apply comp select-columns row-transform-fns)
