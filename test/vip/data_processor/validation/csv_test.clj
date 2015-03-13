@@ -93,4 +93,9 @@
                      (sqlite/temp-db "ignore-columns-test"))
           out-ctx (loader ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
-             (korma/select (get-in out-ctx [:tables :states])))))))
+             (korma/select (get-in out-ctx [:tables :states]))))))
+  (testing "requires a header row"
+    (let [ctx (merge {:input [(io/as-file (io/resource "no-header-row/ballot.txt"))]}
+                     (sqlite/temp-db "no-headers-test"))
+          out-ctx (load-ballots ctx)]
+      (is (some #{"No header row"} (get-in out-ctx [:critical "ballot.txt"]))))))

@@ -48,4 +48,6 @@
       (is (= {:input 3
               :pipeline []
               :warnings {}
-              :errors {}} result)))))
+              :errors {}
+              :critical {}
+              :fatal {}} result)))))

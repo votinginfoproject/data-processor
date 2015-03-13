@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.transforms-test
   (:require [clojure.test :refer :all]
+            [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.transforms :refer :all]
@@ -18,5 +19,4 @@
           results-ctx (pipeline/run-pipeline ctx)]
       (is (not (contains? results-ctx :stop )))
       (is (not (contains? results-ctx :exception)))
-      (is (empty? (:errors results-ctx)))
-      (is (empty? (:warnings results-ctx))))))
+      (assert-no-problems results-ctx []))))
