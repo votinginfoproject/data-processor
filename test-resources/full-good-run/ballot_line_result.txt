@@ -1,0 +1,1 @@
+contest_id,jurisdiction_id,entire_district,candidate_id,ballot_response_id,votes,victorious,id,certification
