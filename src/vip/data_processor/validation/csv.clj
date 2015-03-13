@@ -152,4 +152,4 @@
                                       (booleanize "entire_district")))
 (def load-ballot-line-results (csv-loader "ballot_line_result.txt" :ballot-line-results
                                           (booleanize "entire_district")
-                                          (booleanize "victorious"))
+                                          (booleanize "victorious")))
