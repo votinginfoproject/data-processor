@@ -88,11 +88,17 @@
         (let [sql-table (get-in ctx [:tables table])
               column-names (sqlite/column-names (:db ctx) (:name sql-table))
               select-columns (fn [row] (select-keys row column-names))
-              {:keys [headers contents]} (read-csv-with-headers in-file)]
-          (if (empty? (clojure.set/intersection (set headers) (set column-names)))
+              {:keys [headers contents]} (read-csv-with-headers in-file)
+              extraneous-headers (seq (set/difference (set headers) (set column-names)))
+              ctx (if extraneous-headers
+                    (update-in ctx [:warnings filename]
+                               conj (str "Extraneous headers: " (str/join ", " extraneous-headers)))
+                    ctx)]
+          (if (empty? (set/intersection (set headers) (set column-names)))
             (update-in ctx [:critical filename] conj "No header row")
             (if-let [missing-headers (seq (set/difference (set required-headers) (set headers)))]
-              (update-in ctx [:critical filename] conj (str "Missing headers: " (str/join ", " missing-headers)))
+              (update-in ctx [:critical filename]
+                         conj (str "Missing headers: " (str/join ", " missing-headers)))
               (let [transforms (apply comp select-columns row-transform-fns)
                     transformed-contents (map transforms contents)]
                 (sqlite/bulk-import transformed-contents sql-table)

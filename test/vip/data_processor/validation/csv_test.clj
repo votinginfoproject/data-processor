@@ -93,7 +93,9 @@
                      (sqlite/temp-db "ignore-columns-test"))
           out-ctx (loader ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
-             (korma/select (get-in out-ctx [:tables :states]))))))
+             (korma/select (get-in out-ctx [:tables :states]))))
+      (testing "but warns about them"
+        (is (get-in out-ctx [:warnings "state-with-bad-columns.txt"])))))
   (testing "requires a header row"
     (let [ctx (merge {:input [(io/as-file (io/resource "no-header-row/ballot.txt"))]}
                      (sqlite/temp-db "no-headers-test"))
