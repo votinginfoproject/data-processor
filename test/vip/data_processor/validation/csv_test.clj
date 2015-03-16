@@ -88,14 +88,25 @@
 
 (deftest csv-loader-test
   (testing "ignores unknown columns"
-    (let [loader (csv-loader "state-with-bad-columns.txt" :states)
+    (let [loader (csv-loader "state-with-bad-columns.txt" :states [])
           ctx (merge {:input [(io/as-file (io/resource "state-with-bad-columns.txt"))]}
                      (sqlite/temp-db "ignore-columns-test"))
           out-ctx (loader ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
-             (korma/select (get-in out-ctx [:tables :states]))))))
+             (korma/select (get-in out-ctx [:tables :states]))))
+      (testing "but warns about them"
+        (is (get-in out-ctx [:warnings "state-with-bad-columns.txt"])))))
   (testing "requires a header row"
     (let [ctx (merge {:input [(io/as-file (io/resource "no-header-row/ballot.txt"))]}
                      (sqlite/temp-db "no-headers-test"))
           out-ctx (load-ballots ctx)]
       (is (some #{"No header row"} (get-in out-ctx [:critical "ballot.txt"]))))))
+
+(deftest missing-required-columns-test
+  (let [ctx (merge {:input [(io/as-file (io/resource "missing-required-columns/contest.txt"))]}
+                   (sqlite/temp-db "missing-required-columns"))
+        out-ctx (load-contests ctx)]
+    (testing "adds a critical error for contest.txt"
+      (is (get-in out-ctx [:critical "contest.txt"])))
+    (testing "does not import contest.txt"
+      (is (empty? (korma/select (get-in ctx [:tables :contests])))))))
