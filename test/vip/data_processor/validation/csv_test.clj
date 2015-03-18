@@ -87,6 +87,12 @@
       (is (not (contains? (:errors out-ctx) "source.txt"))))))
 
 (deftest csv-loader-test
+  (testing "check for .txt file extension"
+    (let [loader (csv-loader "election_official.csv" :election-officials [])
+          ctx {:input [(File. "election_official.csv")]}
+          out-ctx (loader ctx)]
+      (is (some #{"File is not a .txt file."}
+                (get-in out-ctx [:critical "election_official.csv"])))))
   (testing "ignores unknown columns"
     (let [loader (csv-loader "state-with-bad-columns.txt" :states [])
           ctx (merge {:input [(io/as-file (io/resource "state-with-bad-columns.txt"))]}
