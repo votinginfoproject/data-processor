@@ -90,7 +90,7 @@
           (testing "it doesn't match the format, you get an error"
             (let [result-ctx (format-rule ctx {column "asdf"} line-number)]
               (is (get-in result-ctx [:errors filename line-number column])))))))
-    (testing "check that is a list of options"
+    (testing "a check that is a list of options"
       (let [format-rule (create-format-rule filename {:name column :format format/yes-no})]
         (testing "matches"
           (is (= ctx (format-rule ctx {column "yes"} line-number)))
@@ -98,7 +98,7 @@
         (testing "non-matches"
           (is (get-in (format-rule ctx {column "YEP!"} line-number) [:errors filename line-number column]))
           (is (get-in (format-rule ctx {column "no way"} line-number) [:errors filename line-number column])))))
-    (testing "check that is a function"
+    (testing "a check that is a function"
       (let [palindrome? (fn [v] (= v (clojure.string/reverse v)))
             format-rule (create-format-rule filename {:name column :format {:check palindrome? :message "Not a palindrome"}})]
         (testing "matches"
