@@ -307,7 +307,18 @@
   (let [raw-rows (csv/read-csv file-handle)
         headers (first raw-rows)
         rows (rest raw-rows)]
-    {:headers headers :contents (map (partial zipmap headers) rows)}))
+    {:headers headers
+     :contents (map (partial zipmap headers) rows)
+     :bad-rows (remove (fn [[_ row]] (= (count headers) (count row)))
+                       (map list (iterate inc 2) rows))}))
+
+(defn report-bad-rows [ctx filename bad-rows]
+  (if-not (empty? bad-rows)
+    (reduce (fn [ctx [line-number row]]
+              (assoc-in ctx [:critical filename line-number "Number of values"]
+                        (str "Wrong number of values: " (str/join "," row))))
+            ctx bad-rows)
+    ctx))
 
 (defn find-input-file [ctx filename]
   (->> ctx
@@ -365,12 +376,13 @@
       (let [sql-table (get-in ctx [:tables table])
             column-names (map :name columns)
             required-header-names (->> columns (filter :required) (map :name))
-            {:keys [headers contents]} (read-csv-with-headers in-file)
+            {:keys [headers contents bad-rows]} (read-csv-with-headers in-file)
             extraneous-headers (seq (set/difference (set headers) (set column-names)))
             ctx (if extraneous-headers
                   (assoc-in ctx [:warnings filename :extraneous-headers]
                             (str/join ", " extraneous-headers))
                   ctx)
+            ctx (report-bad-rows ctx filename bad-rows)
             contents (map #(select-keys % column-names) contents)]
         (if (empty? (set/intersection (set headers) (set column-names)))
           (assoc-in ctx [:critical filename :headers] "No header row")
