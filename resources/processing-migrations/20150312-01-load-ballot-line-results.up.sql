@@ -5,10 +5,6 @@ CREATE TABLE ballot_line_results (id INTEGER PRIMARY KEY,
                                   candidate_id INTEGER,
                                   ballot_response_id INTEGER,
                                   votes INTEGER,
+                                  overvotes INTEGER,
                                   victorious BOOLEAN NOT NULL CHECK (victorious IN (0,1)),
                                   certification TEXT);
-
-
-
-
-

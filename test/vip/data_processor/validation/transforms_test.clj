@@ -17,6 +17,6 @@
                          (remove nil?))
           ctx (merge {:input filenames :pipeline csv-validations} db)
           results-ctx (pipeline/run-pipeline ctx)]
-      (is (not (contains? results-ctx :stop )))
-      (is (not (contains? results-ctx :exception)))
+      (is (nil? (:stop results-ctx)))
+      (is (nil? (:exception results-ctx)))
       (assert-no-problems results-ctx []))))
