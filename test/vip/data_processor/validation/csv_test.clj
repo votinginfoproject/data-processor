@@ -62,6 +62,16 @@
     (testing "does not import contest.txt"
       (is (empty? (korma/select (get-in ctx [:tables :contests])))))))
 
+(deftest number-of-values-in-a-row-test
+  (let [ctx (merge {:input [(io/as-file (io/resource "bad-number-of-values/contest.txt"))]}
+                   (sqlite/temp-db "bad-number-of-values"))
+        only-contests-spec (filter #(= "contest.txt" (:filename %)) csv-specs)
+        load-contests (load-csvs only-contests-spec)
+        out-ctx (load-contests ctx)]
+    (testing "reports critical errors for rows with wrong number of values"
+      (is (get-in out-ctx [:critical "contest.txt" 3 "Number of values"]))
+      (is (get-in out-ctx [:critical "contest.txt" 5 "Number of values"])))))
+
 (deftest create-format-rule-test
   (let [column "id"
         filename "test.txt"
