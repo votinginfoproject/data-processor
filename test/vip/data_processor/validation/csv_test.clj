@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.csv-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.validation.csv :refer :all]
+            [vip.data-processor.validation.csv.value-format :as format]
             [vip.data-processor.db.sqlite :as sqlite]
             [clojure.java.io :as io]
             [korma.core :as korma])
@@ -20,61 +21,6 @@
         (is (not-every? good-filename? (:input ctx)))
         (is (every? good-filename? (:input out-ctx)))))))
 
-(deftest load-elections-test
-  (testing "with a valid election.txt file"
-    (let [db (sqlite/temp-db "load-elections-test")
-          ctx (merge {:input [(io/as-file (io/resource "full-good-run/election.txt"))]}
-                     db)]
-      (is (empty? (korma/select (get-in ctx [:tables :elections]))))
-      (testing "inserts rows from the valid election.txt file"
-        (let [out-ctx (load-elections ctx)]
-          (is (= '({:id 5400} {:id 5401})
-                 (korma/select (get-in out-ctx [:tables :elections])
-                               (korma/fields :id))))
-          (testing "no/yes values are turned into 0/1"
-            (is (= '({:id 5400 :statewide 1} {:id 5401 :statewide 0})
-                   (korma/select (get-in out-ctx [:tables :elections])
-                                 (korma/fields :id :statewide)))))))))
-  (testing "with no election.txt file, does nothing"
-    (let [db (sqlite/temp-db "no-load-elections-test")
-          ctx (merge {:input []} db)
-          out-ctx (load-elections (assoc ctx :input []))]
-      (is (empty? (korma/select (get-in out-ctx [:tables :elections])))))))
-
-(deftest load-sources-test
-  (testing "with a valid source.txt file"
-    (let [db (sqlite/temp-db "load-sources-test")
-          ctx (merge {:input [(io/as-file (io/resource "full-good-run/source.txt"))]}
-                     db)]
-      (is (empty? (korma/select (get-in ctx [:tables :sources]))))
-      (testing "inserts rows from the valid source.txt file"
-        (let [out-ctx (load-sources ctx)]
-          (is (= '({:id 4400})
-                 (korma/select (get-in out-ctx [:tables :sources])
-                               (korma/fields :id))))))))
-  (testing "with no source.txt file, does nothing"
-    (let [db (sqlite/temp-db "no-load-sources-test")
-          ctx (merge {:input []} db)
-          out-ctx (load-sources (assoc ctx :input []))]
-      (is (empty? (korma/select (get-in out-ctx [:tables :sources])))))))
-
-(deftest load-states-test
-  (testing "with a valid state.txt file"
-    (let [db (sqlite/temp-db "load-states-test")
-          ctx (merge {:input [(io/as-file (io/resource "full-good-run/state.txt"))]}
-                     db)]
-      (is (empty? (korma/select (get-in ctx [:tables :states]))))
-      (testing "inserts rows from the valid state.txt file"
-        (let [out-ctx (load-states ctx)]
-          (is (= '({:id 1})
-                 (korma/select (get-in out-ctx [:tables :states])
-                               (korma/fields :id))))))))
-  (testing "with no state.txt file, does nothing"
-    (let [db (sqlite/temp-db "no-load-states-test")
-          ctx (merge {:input []} db)
-          out-ctx (load-states (assoc ctx :input []))]
-      (is (empty? (korma/select (get-in out-ctx [:tables :states])))))))
-
 (deftest missing-files-test
   (testing "reports errors or warnings when certain files are missing"
     (let [ctx {:input [(io/as-file (io/resource "full-good-run/source.txt"))]}
@@ -88,25 +34,80 @@
 
 (deftest csv-loader-test
   (testing "ignores unknown columns"
-    (let [loader (csv-loader "state-with-bad-columns.txt" :states [])
-          ctx (merge {:input [(io/as-file (io/resource "state-with-bad-columns.txt"))]}
+    (let [only-state-spec (filter #(= "state.txt" (:filename %)) csv-specs)
+          load-state (load-csvs only-state-spec)
+          ctx (merge {:input [(io/as-file (io/resource "bad-columns/state.txt"))]}
                      (sqlite/temp-db "ignore-columns-test"))
-          out-ctx (loader ctx)]
+          out-ctx (load-state ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
              (korma/select (get-in out-ctx [:tables :states]))))
       (testing "but warns about them"
-        (is (get-in out-ctx [:warnings "state-with-bad-columns.txt"])))))
+        (is (get-in out-ctx [:warnings "state.txt" :extraneous-headers])))))
   (testing "requires a header row"
-    (let [ctx (merge {:input [(io/as-file (io/resource "no-header-row/ballot.txt"))]}
+    (let [only-ballot-spec (filter #(= "ballot.txt" (:filename %)) csv-specs)
+          load-ballots (load-csvs only-ballot-spec)
+          ctx (merge {:input [(io/as-file (io/resource "no-header-row/ballot.txt"))]}
                      (sqlite/temp-db "no-headers-test"))
           out-ctx (load-ballots ctx)]
-      (is (some #{"No header row"} (get-in out-ctx [:critical "ballot.txt"]))))))
+      (is (= "No header row" (get-in out-ctx [:critical "ballot.txt" :headers]))))))
 
 (deftest missing-required-columns-test
   (let [ctx (merge {:input [(io/as-file (io/resource "missing-required-columns/contest.txt"))]}
                    (sqlite/temp-db "missing-required-columns"))
+        only-contests-spec (filter #(= "contest.txt" (:filename %)) csv-specs)
+        load-contests (load-csvs only-contests-spec)
         out-ctx (load-contests ctx)]
     (testing "adds a critical error for contest.txt"
       (is (get-in out-ctx [:critical "contest.txt"])))
     (testing "does not import contest.txt"
       (is (empty? (korma/select (get-in ctx [:tables :contests])))))))
+
+(deftest create-format-rule-test
+  (let [column "id"
+        filename "test.txt"
+        line-number 7
+        ctx {}]
+    (testing "required column"
+      (let [format-rule (create-format-rule filename {:name column :required true :format format/all-digits})]
+        (testing "if the required column is missing, adds a fatal error"
+          (let [result-ctx (format-rule ctx {column ""} line-number)]
+            (is (get-in result-ctx [:fatal filename line-number column]))))
+        (testing "if the column doesn't have the right format, adds an error"
+          (let [result-ctx (format-rule ctx {column "asdf"} line-number)]
+            (is (get-in result-ctx [:errors filename line-number column]))))
+        (testing "if the required column is there and matches the format, is okay"
+          (let [result-ctx (format-rule ctx {column "1234"} line-number)]
+            (is (= ctx result-ctx))))))
+    (testing "optional column"
+      (let [format-rule (create-format-rule filename {:name column :format format/all-digits})]
+        (testing "if it's not there, it's okay"
+          (let [result-ctx (format-rule ctx {} line-number)]
+            (is (= ctx result-ctx))))
+        (testing "if it is there"
+          (testing "it matches the format, everything's okay"
+            (let [result-ctx (format-rule ctx {column "1234"} line-number)]
+              (is (= ctx result-ctx))))
+          (testing "it doesn't match the format, you get an error"
+            (let [result-ctx (format-rule ctx {column "asdf"} line-number)]
+              (is (get-in result-ctx [:errors filename line-number column])))))))
+    (testing "a check that is a list of options"
+      (let [format-rule (create-format-rule filename {:name column :format format/yes-no})]
+        (testing "matches"
+          (is (= ctx (format-rule ctx {column "yes"} line-number)))
+          (is (= ctx (format-rule ctx {column "no"} line-number))))
+        (testing "non-matches"
+          (is (get-in (format-rule ctx {column "YEP!"} line-number) [:errors filename line-number column]))
+          (is (get-in (format-rule ctx {column "no way"} line-number) [:errors filename line-number column])))))
+    (testing "a check that is a function"
+      (let [palindrome? (fn [v] (= v (clojure.string/reverse v)))
+            format-rule (create-format-rule filename {:name column :format {:check palindrome? :message "Not a palindrome"}})]
+        (testing "matches"
+          (is (= ctx (format-rule ctx {column "able was I ere I saw elba"} line-number)))
+          (is (= ctx (format-rule ctx {column "racecar"} line-number))))
+        (testing "non-matches"
+          (is (get-in (format-rule ctx {column "abcdefg"} line-number) [:errors filename line-number column]))
+          (is (get-in (format-rule ctx {column "cleveland"} line-number) [:errors filename line-number column])))))
+    (testing "if there's no check function, everything is okay"
+      (let [format-rule (create-format-rule filename {:name column})]
+        (is (= ctx (format-rule ctx {column "hi"} line-number)))
+        (is (= ctx (format-rule ctx {} line-number)))))))

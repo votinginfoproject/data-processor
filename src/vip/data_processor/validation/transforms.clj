@@ -31,36 +31,7 @@
    (csv/error-on-missing-file "election.txt")
    (csv/error-on-missing-file "source.txt")
    (csv-files/validate-dependencies csv-files/file-dependencies)
-   csv/load-elections
-   csv/load-sources
-   csv/load-states
-   csv/load-election-administrations
-   csv/load-election-officials
-   csv/load-localities
-   csv/load-precincts
-   csv/load-precinct-splits
-   csv/load-precinct-split-electoral-districts
-   csv/load-early-vote-sites
-   csv/load-precinct-polling-locations
-   csv/load-polling-locations
-   csv/load-street-segments
-   csv/load-electoral-districts
-   csv/load-contests
-   csv/load-ballots
-   csv/load-ballot-responses
-   csv/load-referendums
-   csv/load-referendum-ballot-responses
-   csv/load-candidates
-   csv/load-ballot-candidates
-   csv/load-state-early-vote-sites
-   csv/load-precinct-split-polling-locations
-   csv/load-precinct-electoral-districts
-   csv/load-precinct-early-vote-sites
-   csv/load-locality-early-vote-sites
-   csv/load-custom-ballot-ballot-responses
-   csv/load-custom-ballots
-   csv/load-contest-results
-   csv/load-ballot-line-results])
+   (csv/load-csvs csv/csv-specs)])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
