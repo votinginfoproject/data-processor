@@ -312,11 +312,11 @@
      :bad-rows (remove (fn [[_ row]] (= (count headers) (count row)))
                        (map list (iterate inc 2) rows))}))
 
-(defn report-bad-rows [ctx filename bad-rows]
+(defn report-bad-rows [ctx filename expected-number bad-rows]
   (if-not (empty? bad-rows)
     (reduce (fn [ctx [line-number row]]
               (assoc-in ctx [:critical filename line-number "Number of values"]
-                        (str "Wrong number of values: " (str/join "," row))))
+                        (str "Expected " expected-number " values, found " (count row))))
             ctx bad-rows)
     ctx))
 
@@ -382,7 +382,7 @@
                   (assoc-in ctx [:warnings filename :extraneous-headers]
                             (str/join ", " extraneous-headers))
                   ctx)
-            ctx (report-bad-rows ctx filename bad-rows)
+            ctx (report-bad-rows ctx filename (count headers) bad-rows)
             contents (map #(select-keys % column-names) contents)]
         (if (empty? (set/intersection (set headers) (set column-names)))
           (assoc-in ctx [:critical filename :headers] "No header row")
