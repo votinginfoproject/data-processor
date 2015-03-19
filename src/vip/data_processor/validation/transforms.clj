@@ -5,7 +5,8 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]
-            [vip.data-processor.validation.csv.file-set :as csv-files]))
+            [vip.data-processor.validation.csv.file-set :as csv-files]
+            [vip.data-processor.validation.db :as db]))
 
 (defn read-edn-sqs-message [ctx]
   (assoc ctx :input (edn/read-string (get-in ctx [:input :body]))))
@@ -31,7 +32,8 @@
    (csv/error-on-missing-file "election.txt")
    (csv/error-on-missing-file "source.txt")
    (csv-files/validate-dependencies csv-files/file-dependencies)
-   (csv/load-csvs csv/csv-specs)])
+   (csv/load-csvs csv/csv-specs)
+   db/validate-no-duplicated-ids])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
