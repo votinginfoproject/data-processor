@@ -1,7 +1,7 @@
 election_id,electoral_district_id,type,partisan,primary_party,electorate_specifications,special,office,filing_closed_date,number_elected,number_voting_for,ballot_id,ballot_placement,id
 2003,330004745,primary,yes,DEM,,,PRESIDENTIAL PREFERENCE,,1,1,410004745,1,320004745
-2003,330004746,primary,yes,REP,,,PRESIDENTIAL PREFERENCE,,1,1,410004746,1,320004746
+2003,330004746,primary,yes,,,PRESIDENTIAL PREFERENCE,,1,1,410004746,1,320004746
 2003,330004747,primary,yes,LIB,,,PRESIDENTIAL PREFERENCE,,1,1,410004747,1,320004747
-2003,330004801,primary,yes,DEM,,,NC GOVERNOR,,1,1,410004801,4,320004801
+2003,330004801,primary,yes,DEM,,,NC GOVERNOR,,1,1,410004801,4,320004801,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 2003,330004802,primary,yes,REP,,,NC GOVERNOR,,1,1,410004802,4,320004802
 2003,330004745,referendum,no,,,,,,,,41100368,,32100368
