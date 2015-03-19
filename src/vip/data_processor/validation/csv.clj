@@ -375,28 +375,32 @@
     (update-in ctx [:critical filename] conj "File is not a .txt file.")
     (if-let [file-to-load (find-input-file ctx filename)]
       (with-open [in-file (io/reader file-to-load)]
-        (let [sql-table (get-in ctx [:tables table])
-              column-names (map :name columns)
-              required-header-names (->> columns (filter :required) (map :name))
-              {:keys [headers contents bad-rows]} (read-csv-with-headers in-file)
-              extraneous-headers (seq (set/difference (set headers) (set column-names)))
-              ctx (if extraneous-headers
-                    (assoc-in ctx [:warnings filename :extraneous-headers]
-                              (str/join ", " extraneous-headers))
-                    ctx)
-              ctx (report-bad-rows ctx filename (count headers) bad-rows)
-              contents (map #(select-keys % column-names) contents)]
-          (if (empty? (set/intersection (set headers) (set column-names)))
-            (assoc-in ctx [:critical filename :headers] "No header row")
-            (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
-              (assoc-in ctx [:critical filename :headers]
-                        (str "Missing headers: " (str/join ", " missing-headers)))
-              (let [ctx (validate-format-rules ctx contents csv-spec)
-                    transforms (apply comp (translation-fns columns))
-                    transformed-contents (map transforms contents)]
-                (sqlite/bulk-import transformed-contents sql-table)
-                ctx)))))
+      (let [sql-table (get-in ctx [:tables table])
+            column-names (map :name columns)
+            required-header-names (->> columns (filter :required) (map :name))
+            {:keys [headers contents bad-rows]} (read-csv-with-headers in-file)
+            extraneous-headers (seq (set/difference (set headers) (set column-names)))
+            ctx (if extraneous-headers
+                  (assoc-in ctx [:warnings filename :extraneous-headers]
+                            (str/join ", " extraneous-headers))
+                  ctx)
+            ctx (report-bad-rows ctx filename (count headers) bad-rows)
+            contents (map #(select-keys % column-names) contents)]
+        (if (empty? (set/intersection (set headers) (set column-names)))
+          (assoc-in ctx [:critical filename :headers] "No header row")
+          (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
+            (assoc-in ctx [:critical filename :headers]
+                      (str "Missing headers: " (str/join ", " missing-headers)))
+            (let [ctx (validate-format-rules ctx contents csv-spec)
+                  transforms (apply comp (translation-fns columns))
+                  transformed-contents (map transforms contents)]
+              (sqlite/bulk-import transformed-contents sql-table)
+              ctx)))))
       ctx)))
+
+(defn load-csvs [csv-specs]
+  (fn [ctx]
+    (reduce load-csv ctx csv-specs)))
 
 (defn load-csvs [csv-specs]
   (fn [ctx]
