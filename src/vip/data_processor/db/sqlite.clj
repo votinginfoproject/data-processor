@@ -107,3 +107,20 @@
                   (korma/where
                    (and (= to-id-name nil)
                         (not= via-join-name ""))))))
+
+(defn unmatched-jurisdiction-references [tables from-table]
+  (let [table (tables from-table)
+        table-name (:name table)
+        jurisdiction-id (keyword (str table-name ".jurisdiction_id"))]
+    (korma/select table
+                  (korma/join :left (:states tables) (= :states.id jurisdiction-id))
+                  (korma/join :left (:localities tables) (= :localities.id jurisdiction-id))
+                  (korma/join :left (:precincts tables) (= :precincts.id jurisdiction-id))
+                  (korma/join :left (:precinct-splits tables) (= :precinct_splits.id jurisdiction-id))
+                  (korma/join :left (:electoral-districts tables) (= :electoral_districts.id jurisdiction-id))
+                  (korma/where (and (not= jurisdiction-id "")
+                                    (= :states.id nil)
+                                    (= :localities.id nil)
+                                    (= :precincts.id nil)
+                                    (= :precinct_splits.id nil)
+                                    (= :electoral_districts.id nil))))))

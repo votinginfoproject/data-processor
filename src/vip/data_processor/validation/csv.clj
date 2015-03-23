@@ -441,3 +441,19 @@
 (defn validate-references [csv-specs]
   (fn [ctx]
     (reduce validate-references-for-csv-spec ctx csv-specs)))
+
+(defn validate-jurisdiction-reference [ctx {:keys [filename table]}]
+  (let [unmatched-references (sqlite/unmatched-jurisdiction-references
+                              (:tables ctx) table)]
+    (if (seq unmatched-references)
+      (assoc-in ctx [:errors filename :reference-error "jurisdiction_id"]
+                unmatched-references)
+      ctx)))
+
+(defn validate-jurisdiction-references [csv-specs]
+  (fn [ctx]
+    (let [jurisdiction-tables (filter
+                               (fn [spec] (some #{"jurisdiction_id"}
+                                                (map :name (:columns spec))))
+                               csv-specs)]
+      (reduce validate-jurisdiction-reference ctx jurisdiction-tables))))

@@ -35,7 +35,8 @@
    (csv/load-csvs csv/csv-specs)
    db/validate-no-duplicated-ids
    (db/validate-no-duplicated-rows csv/csv-specs)
-   (csv/validate-references csv/csv-specs)])
+   (csv/validate-references csv/csv-specs)
+   (csv/validate-jurisdiction-references csv/csv-specs)])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
