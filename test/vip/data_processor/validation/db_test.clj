@@ -30,3 +30,27 @@
              (set (get-in out-ctx [:warnings "candidate.txt" :duplicated-rows]))))
       (is (= #{{:candidate_id 3100047456987, :ballot_id 410004745} {:candidate_id 3100047466988, :ballot_id 410004746}}
              (set (get-in out-ctx [:warnings "ballot_candidate.txt" :duplicated-rows])))))))
+
+(deftest validate-references-test
+  (testing "finds bad references"
+    (let [ctx (merge {:input [(io/as-file (io/resource "bad-references/ballot.txt"))
+                              (io/as-file (io/resource "bad-references/referendum.txt"))]
+                      :pipeline [(csv/load-csvs csv/csv-specs)
+                                 (validate-references csv/csv-specs)]}
+                     (sqlite/temp-db "bad-references"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= 1 (count (get-in out-ctx [:errors "ballot.txt" :reference-error "referendum_id"])))))))
+
+(deftest validate-jurisdiction-references-test
+  (testing "finds bad jurisdiction references"
+    (let [ctx (merge {:input [(io/as-file (io/resource "bad-references/ballot_line_result.txt"))
+                              (io/as-file (io/resource "bad-references/state.txt"))
+                              (io/as-file (io/resource "bad-references/locality.txt"))
+                              (io/as-file (io/resource "bad-references/precinct.txt"))
+                              (io/as-file (io/resource "bad-references/precinct_split.txt"))
+                              (io/as-file (io/resource "bad-references/electoral_district.txt"))]
+                      :pipeline [(csv/load-csvs csv/csv-specs)
+                                 (validate-jurisdiction-references csv/csv-specs)]}
+                     (sqlite/temp-db "bad-jurisdiction-references"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= [100 101] (map :id (get-in out-ctx [:errors "ballot_line_result.txt" :reference-error "jurisdiction_id"])))))))

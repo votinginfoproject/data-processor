@@ -1,0 +1,2 @@
+title,subtitle,brief,text,pro_statement,con_statement,passage_threshold,effect_of_abstain,id
+CONSTITUTIONAL AMENDMENT,,,Constitutional amendment to provide that marriage between one man and one woman is the only domestic legal union that shall be valid or recognized in this State.,,,,,810005909
