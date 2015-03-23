@@ -78,3 +78,41 @@
 (defn validate-no-duplicated-rows [csv-specs]
   (fn [ctx]
     (reduce validate-no-duplicated-rows-in-table ctx csv-specs)))
+
+(defn validate-references-for-csv-spec [ctx {:keys [filename table columns]}]
+  (let [reference-columns (filter :references columns)]
+    (reduce (fn [ctx column]
+              (let [unmatched-references (sqlite/unmatched-references
+                                          (:tables ctx)
+                                          table
+                                          (:name column)
+                                          (:references column))]
+                (if (seq unmatched-references)
+                  (assoc-in ctx [:errors
+                                 filename
+                                 :reference-error
+                                 (:name column)]
+                            unmatched-references)
+                  ctx)))
+            ctx
+            reference-columns)))
+
+(defn validate-references [csv-specs]
+  (fn [ctx]
+    (reduce validate-references-for-csv-spec ctx csv-specs)))
+
+(defn validate-jurisdiction-reference [ctx {:keys [filename table]}]
+  (let [unmatched-references (sqlite/unmatched-jurisdiction-references
+                              (:tables ctx) table)]
+    (if (seq unmatched-references)
+      (assoc-in ctx [:errors filename :reference-error "jurisdiction_id"]
+                unmatched-references)
+      ctx)))
+
+(defn validate-jurisdiction-references [csv-specs]
+  (fn [ctx]
+    (let [jurisdiction-tables (filter
+                               (fn [spec] (some #{"jurisdiction_id"}
+                                                (map :name (:columns spec))))
+                               csv-specs)]
+      (reduce validate-jurisdiction-reference ctx jurisdiction-tables))))
