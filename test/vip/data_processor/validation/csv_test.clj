@@ -41,8 +41,8 @@
           load-election-official (load-csvs updated-spec)
           ctx {:input [(File. "election_official.csv")]}
           out-ctx (load-election-official ctx)]
-      (is (some #{"File is not a .txt file."}
-                (get-in out-ctx [:critical "election_official.csv"])))))
+      (is "File is not a .txt file."
+          (get-in out-ctx [:critical "election_official.csv" "File extension"]))))
   (testing "ignores unknown columns"
     (let [only-state-spec (filter #(= "state.txt" (:filename %)) csv-specs)
           load-state (load-csvs only-state-spec)
