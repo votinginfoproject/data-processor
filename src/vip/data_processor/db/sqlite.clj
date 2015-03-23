@@ -102,7 +102,6 @@
         via-join-name (keyword (str from-table-name "." via))
         to-id-name (keyword (str to-table-name ".id"))]
     (korma/select from-table
-                  (korma/fields :id via)
                   (korma/join :left to-table
                               (= via-join-name to-id-name))
                   (korma/where

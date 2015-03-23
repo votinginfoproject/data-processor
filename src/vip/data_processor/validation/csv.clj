@@ -19,8 +19,8 @@
               {:name "image_url" :format format/url}]}
    {:filename "ballot_candidate.txt"
     :table :ballot-candidates
-    :columns [{:name "ballot_id" :required true :format format/all-digits}
-              {:name "candidate_id" :required true :format format/all-digits}]}
+    :columns [{:name "ballot_id" :required true :format format/all-digits :references :ballots}
+              {:name "candidate_id" :required true :format format/all-digits :references :candidates}]}
    {:filename "ballot_line_result.txt"
     :table :ballot-line-results
     :columns [{:name "id" :required true :format format/all-digits}
@@ -91,8 +91,8 @@
               {:name "heading" :required true}]}
    {:filename "custom_ballot_ballot_response.txt"
     :table :custom-ballot-ballot-responses
-    :columns [{:name "custom_ballot_id" :required true :format format/all-digits}
-              {:name "ballot_response_id" :required true :format format/all-digits}
+    :columns [{:name "custom_ballot_id" :required true :format format/all-digits :references :custom-ballots}
+              {:name "ballot_response_id" :required true :format format/all-digits :references :ballot-responses}
               {:name "sort_order" :format format/all-digits}]}
    {:filename "early_vote_site.txt"
     :table :early-vote-sites
@@ -176,8 +176,8 @@
               {:name "election_administration_id" :format format/all-digits :references :election-administrations}]}
    {:filename "locality_early_vote_site.txt"
     :table :locality-early-vote-sites
-    :columns [{:name "locality_id" :required true :format format/all-digits}
-              {:name "early_vote_site_id" :required true :format format/all-digits}]}
+    :columns [{:name "locality_id" :required true :format format/all-digits :references :localities}
+              {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites}]}
    {:filename "polling_location.txt"
     :table :polling-locations
     :columns [{:name "id" :required true :format format/all-digits}
@@ -208,24 +208,24 @@
               {:name "ballot_style_image_url" :format format/url}]}
    {:filename "precinct_early_vote_site.txt"
     :table :precinct-early-vote-sites
-    :columns [{:name "precinct_id" :required true :format format/all-digits}
-              {:name "early_vote_site_id" :required true :format format/all-digits}]}
+    :columns [{:name "precinct_id" :required true :format format/all-digits :references :precincts}
+              {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites}]}
    {:filename "precinct_electoral_district.txt"
     :table :precinct-electoral-districts
-    :columns [{:name "precinct_id" :required true :format format/all-digits}
-              {:name "electoral_district_id" :required true :format format/all-digits}]}
+    :columns [{:name "precinct_id" :required true :format format/all-digits :references :precincts}
+              {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts}]}
    {:filename "precinct_polling_location.txt"
     :table :precinct-polling-locations
-    :columns [{:name "precinct_id" :required true :format format/all-digits}
-              {:name "polling_location_id" :required true :format format/all-digits}]}
+    :columns [{:name "precinct_id" :required true :format format/all-digits :references :precincts}
+              {:name "polling_location_id" :required true :format format/all-digits :references :polling-locations}]}
    {:filename "precinct_split_electoral_district.txt"
     :table :precinct-split-electoral-districts
-    :columns [{:name "precinct_split_id" :required true :format format/all-digits}
-              {:name "electoral_district_id" :required true :format format/all-digits}]}
+    :columns [{:name "precinct_split_id" :required true :format format/all-digits :references :precinct-splits}
+              {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts}]}
    {:filename "precinct_split_polling_location.txt"
     :table :precinct-split-polling-locations
-    :columns [{:name "precinct_split_id" :required true :format format/all-digits}
-              {:name "polling_location_id" :required true :format format/all-digits}]}
+    :columns [{:name "precinct_split_id" :required true :format format/all-digits :references :precinct-splits}
+              {:name "polling_location_id" :required true :format format/all-digits :references :polling-locations}]}
    {:filename "referendum.txt"
     :table :referendums
     :columns [{:name "id" :required true :format format/all-digits}
@@ -239,13 +239,13 @@
               {:name "effect_of_abstain"}]}
     {:filename "referendum_ballot_response.txt"
      :table :referendum-ballot-responses
-     :columns [{:name "referendum_id" :required true :format format/all-digits}
-               {:name "ballot_response_id" :required true :format format/all-digits}
+     :columns [{:name "referendum_id" :required true :format format/all-digits :references :referendums}
+               {:name "ballot_response_id" :required true :format format/all-digits :references :ballot-responses}
                {:name "sort_order" :format format/all-digits}]}
     {:filename "state_early_vote_site.txt"
      :table :state-early-vote-sites
-     :columns [{:name "state_id" :required true :format format/all-digits}
-               {:name "early_vote_site_id" :required true :format format/all-digits}]}
+     :columns [{:name "state_id" :required true :format format/all-digits :references :states}
+               {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites}]}
     {:filename "street_segment.txt"
      :table :street-segments
      :columns [{:name "id" :required true :format format/all-digits}
