@@ -9,7 +9,13 @@
 (defn dupe-column-name [column]
   (str "dupes." column))
 
-(defn if-null [column-name]
+(defn if-null
+  "SQL does not believe that NULL = NULL, so in order to match NULL
+  values across rows which may be identical, we must transform NULLs
+  to a known value that will not naturally appear in the
+  data. IFNULL(column_name, \"NULL_VALUE\") will return the value in
+  the column if it's not NULL, otherwise \"NULL_VALUE\"."
+  [column-name]
   (str "IFNULL(" column-name ", \"NULL_VALUE\")"))
 
 (defn dupe-field-select [column-name]
