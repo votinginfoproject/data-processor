@@ -18,9 +18,9 @@
     (reduce refs/validate-references-for-csv-spec ctx csv-specs)))
 
 (defn validate-jurisdiction-references [csv-specs]
-  (fn [ctx]
-    (let [jurisdiction-tables (filter
+  (let [jurisdiction-tables (filter
                                (fn [spec] (some #{"jurisdiction_id"}
                                                 (map :name (:columns spec))))
                                csv-specs)]
+    (fn [ctx]
       (reduce refs/validate-jurisdiction-reference ctx jurisdiction-tables))))
