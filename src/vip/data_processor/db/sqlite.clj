@@ -55,11 +55,11 @@
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection
   directly."
-  [db table]
-  (let [url (str "jdbc:sqlite:" (:db db))]
+  [table]
+  (let [url (str "jdbc:sqlite:" (get-in table [:db :db]))]
     (with-open [conn (java.sql.DriverManager/getConnection url)]
       (let [statement (.createStatement conn)
-            result-set (.executeQuery statement (str "PRAGMA table_info(" table ")"))]
+            result-set (.executeQuery statement (str "PRAGMA table_info(" (:name table) ")"))]
         (loop [columns []]
           (if (.next result-set)
             (recur (conj columns (.getString result-set "name")))
