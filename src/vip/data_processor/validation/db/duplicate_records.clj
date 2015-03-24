@@ -6,9 +6,6 @@
 (defn columns-without-id [table]
   (remove (partial = "id") (sqlite/column-names table)))
 
-(defn dupe-column-name [column]
-  (str "dupes." column))
-
 (defn if-null
   "SQL does not believe that NULL = NULL, so in order to match NULL
   values across rows which may be identical, we must transform NULLs
