@@ -1,0 +1,8 @@
+contest_id,jurisdiction_id,entire_district,candidate_id,ballot_response_id,votes,victorious,id,certification
+1,8,yes,,,0,,100,
+2,800,yes,,,0,,101,
+3,37,yes,,,0,,102,
+4,1001,yes,,,0,,103,
+5,910011,yes,,,0,,104,
+6,71001100,yes,,,0,,105,
+7,330004745,yes,,,0,,106,

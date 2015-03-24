@@ -1,0 +1,3 @@
+type,name,number,id
+statewide,PRESIDENTIAL PREFERENCE,,330004745
+statewide,NC GOVERNOR,,330004801

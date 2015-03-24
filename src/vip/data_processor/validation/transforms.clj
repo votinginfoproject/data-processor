@@ -34,7 +34,9 @@
    (csv-files/validate-dependencies csv-files/file-dependencies)
    (csv/load-csvs csv/csv-specs)
    db/validate-no-duplicated-ids
-   (db/validate-no-duplicated-rows csv/csv-specs)])
+   (db/validate-no-duplicated-rows csv/csv-specs)
+   (db/validate-references csv/csv-specs)
+   (db/validate-jurisdiction-references csv/csv-specs)])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
