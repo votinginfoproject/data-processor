@@ -77,7 +77,7 @@
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "contest_id" :required true :format format/all-digits :references :contests}
               {:name "jurisdiction_id" :required true :format format/all-digits}
-              {:name "entire_district" :required true :format format/yes-no}
+              {:name "entire_district" :required true :format format/yes-no :translate boolean-value}
               {:name "total_votes" :format format/all-digits}
               {:name "total_valid_votes" :format format/all-digits}
               {:name "overvotes" :format format/all-digits}
