@@ -1,3 +1,0 @@
-text,sort_order,id
-FOR,,820006215
-AGAINST,,820006216

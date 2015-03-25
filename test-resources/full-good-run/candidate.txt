@@ -1,27 +1,8 @@
 name,party,candidate_url,biography,phone,photo_url,filed_mailing_address_location_name,filed_mailing_address_line1,filed_mailing_address_line2,filed_mailing_address_line3,filed_mailing_address_city,filed_mailing_address_state,filed_mailing_address_zip,email,sort_order,id
-Barack Obama,DEM,,,,,,,,,,,,,,3100047456984
-No Preference,DEM,,,,,,,,,,,,,,3100047456987
-Newt Gingrich,REP,,,,,,,,,,,,,,3100047466988
-Ron Paul,REP,,,,,,,,,,,,,,3100047466989
-Mitt Romney,REP,,,,,,,,,,,,,,3100047466991
-Rick Santorum,REP,,,,,,,,,,,,,,3100047466992
-No Preference,REP,,,,,,,,,,,,,,3100047466994
-Roger Gary,LIB,,,,,,,,,,,,,,3100047476995
-R. J. Harris,LIB,,,,,,,,,,,,,,3100047476996
-Gary Johnson,LIB,,,,,,,,,,,,,,3100047476997
-Carl Person,LIB,,,,,,,,,,,,,,3100047476998
-Bill Still,LIB,,,,,,,,,,,,,,3100047476999
-Lee Wrights,LIB,,,,,,,,,,,,,,3100047477000
-No Preference,LIB,,,,,,,,,,,,,,3100047477001
-Bill Faison,DEM,,,(919) 563-1370,,,,,,,,,,,3100048016427
-Gary M. Dunn,DEM,,,,,,,,,,,,,,3100048016713
-Gardenia M. Henley,DEM,,,(336) 767-8398,,,,,,,,,,,3100048016728
-Walter H. Dalton,DEM,,,,,,,,,,,,,,3100048016758
-Bruce Blackmon,DEM,,,(910) 893-3543,,,,,,,,,,,3100048016933
-Bob Etheridge,DEM,,,,,,,,,,,,,,3100048016985
-Pat McCrory,REP,,,(704) 344-0484,,,,,,,,,,,3100048026637
-Jim Harney,REP,,,(910) 308-0898,,,,,,,,,,,3100048026817
-Paul Wright,REP,,,,,,,,,,,,,,3100048026846
-Charles Kenneth Moss,REP,,,(336) 963-6061,,,,,,,,,,,3100048026855
-Jim Mahan,REP,,,(704) 483-6938,,,,,,,,,,,3100048026890
-Scott A. Jones,REP,,,(336) 451-0981,,,,,,,,,,,3100048026982
+Gail H. Timberlake,Independent,,,(804) 598-3989,,,,,,,,,ghtimber1@aaol.com,3,10000
+Jason Moore,Independent,http://www.moore4powhatancwa.com,,(804) 598-8851,,,,,,,,,elmouva@hotmail.com,3,10001
+Stephanie N. Morales,Independent,http://www.moralesforportsmouth.com,,(757) 729-0185,,,,,,,,,moralesforportsmouth@gmail.com,3,10002
+"Richard K. ""Dickie"" Cox",Independent,,,(804) 598-5668,,,,,,,,,curlylaw@aol.com,3,10003
+Larry J. Nordvig,Republican,,,(804) 245-4551,,,,,,,,,Larrynordvig@msn.com,1,10004
+"Michael C. ""Mike"" Rosenberg",Independent,,,(757) 397-1000,,,,,,,,,miker@rnrlawfirm.com,3,10005
+Ali T. Sprinkle,Independent,,,(757) 397-9797,,,,,,,,,atsprinkle@aol.com,3,10006
