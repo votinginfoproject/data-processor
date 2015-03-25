@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.db
   (:require [vip.data-processor.validation.db.duplicate-records :as dupe-records]
             [vip.data-processor.validation.db.duplicate-ids :as dupe-ids]
-            [vip.data-processor.validation.db.references :as refs]))
+            [vip.data-processor.validation.db.references :as refs]
+            [vip.data-processor.validation.db.reverse-references :as rev-refs]))
 
 (defn validate-no-duplicated-ids [ctx]
   (let [dupes (dupe-ids/duplicated-ids ctx)]
@@ -24,3 +25,8 @@
                                csv-specs)]
     (fn [ctx]
       (reduce refs/validate-jurisdiction-reference ctx jurisdiction-tables))))
+
+(defn validate-no-unreferenced-rows [csv-specs]
+  (let [referenced-tables (rev-refs/find-all-referenced-tables csv-specs)]
+    (fn [ctx]
+      (reduce rev-refs/validate-no-unreferenced-rows-for-table ctx referenced-tables))))
