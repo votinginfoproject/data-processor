@@ -38,7 +38,8 @@
    db/validate-no-duplicated-rows
    db/validate-references
    db/validate-jurisdiction-references
-   db/validate-no-unreferenced-rows])
+   db/validate-no-unreferenced-rows
+   db/validate-no-overlapping-street-segments])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
