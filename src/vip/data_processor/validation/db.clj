@@ -11,26 +11,22 @@
       (assoc-in ctx [:errors "Duplicate IDs"] dupes)
       ctx)))
 
-(defn validate-no-duplicated-rows [csv-specs]
-  (fn [ctx]
-    (reduce dupe-records/validate-no-duplicated-rows-in-table ctx csv-specs)))
+(defn validate-no-duplicated-rows [{:keys [csv-specs] :as ctx}]
+  (reduce dupe-records/validate-no-duplicated-rows-in-table ctx (:csv-specs ctx)))
 
 (defn validate-one-record-limit [ctx]
   (record-limit/tables-allow-only-one-record ctx))
 
-(defn validate-references [csv-specs]
-  (fn [ctx]
-    (reduce refs/validate-references-for-csv-spec ctx csv-specs)))
+(defn validate-references [{:keys [csv-specs] :as ctx}]
+  (reduce refs/validate-references-for-csv-spec ctx csv-specs))
 
-(defn validate-jurisdiction-references [csv-specs]
+(defn validate-jurisdiction-references [{:keys [csv-specs] :as ctx}]
   (let [jurisdiction-tables (filter
                                (fn [spec] (some #{"jurisdiction_id"}
                                                 (map :name (:columns spec))))
                                csv-specs)]
-    (fn [ctx]
-      (reduce refs/validate-jurisdiction-reference ctx jurisdiction-tables))))
+    (reduce refs/validate-jurisdiction-reference ctx jurisdiction-tables)))
 
-(defn validate-no-unreferenced-rows [csv-specs]
+(defn validate-no-unreferenced-rows [{:keys [csv-specs] :as ctx}]
   (let [referenced-tables (rev-refs/find-all-referenced-tables csv-specs)]
-    (fn [ctx]
-      (reduce rev-refs/validate-no-unreferenced-rows-for-table ctx referenced-tables))))
+    (reduce rev-refs/validate-no-unreferenced-rows-for-table ctx referenced-tables)))

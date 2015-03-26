@@ -34,40 +34,36 @@
 
 (deftest csv-loader-test
   (testing "ignores unknown columns"
-    (let [only-state-spec (filter #(= "state.txt" (:filename %)) csv-specs)
-          load-state (load-csvs only-state-spec)
-          ctx (merge {:input [(io/as-file (io/resource "bad-columns/state.txt"))]}
+    (let [ctx (merge {:input [(io/as-file (io/resource "bad-columns/state.txt"))]
+                      :csv-specs csv-specs}
                      (sqlite/temp-db "ignore-columns-test"))
-          out-ctx (load-state ctx)]
+          out-ctx (load-csvs ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
              (korma/select (get-in out-ctx [:tables :states]))))
       (testing "but warns about them"
         (is (get-in out-ctx [:warnings "state.txt" :extraneous-headers])))))
   (testing "requires a header row"
-    (let [only-ballot-spec (filter #(= "ballot.txt" (:filename %)) csv-specs)
-          load-ballots (load-csvs only-ballot-spec)
-          ctx (merge {:input [(io/as-file (io/resource "no-header-row/ballot.txt"))]}
+    (let [ctx (merge {:input [(io/as-file (io/resource "no-header-row/ballot.txt"))]
+                      :csv-specs csv-specs}
                      (sqlite/temp-db "no-headers-test"))
-          out-ctx (load-ballots ctx)]
+          out-ctx (load-csvs ctx)]
       (is (= "No header row" (get-in out-ctx [:critical "ballot.txt" :headers]))))))
 
 (deftest missing-required-columns-test
-  (let [ctx (merge {:input [(io/as-file (io/resource "missing-required-columns/contest.txt"))]}
+  (let [ctx (merge {:input [(io/as-file (io/resource "missing-required-columns/contest.txt"))]
+                    :csv-specs csv-specs}
                    (sqlite/temp-db "missing-required-columns"))
-        only-contests-spec (filter #(= "contest.txt" (:filename %)) csv-specs)
-        load-contests (load-csvs only-contests-spec)
-        out-ctx (load-contests ctx)]
+        out-ctx (load-csvs ctx)]
     (testing "adds a critical error for contest.txt"
       (is (get-in out-ctx [:critical "contest.txt"])))
     (testing "does not import contest.txt"
       (is (empty? (korma/select (get-in ctx [:tables :contests])))))))
 
 (deftest number-of-values-in-a-row-test
-  (let [ctx (merge {:input [(io/as-file (io/resource "bad-number-of-values/contest.txt"))]}
+  (let [ctx (merge {:input [(io/as-file (io/resource "bad-number-of-values/contest.txt"))]
+                    :csv-specs csv-specs}
                    (sqlite/temp-db "bad-number-of-values"))
-        only-contests-spec (filter #(= "contest.txt" (:filename %)) csv-specs)
-        load-contests (load-csvs only-contests-spec)
-        out-ctx (load-contests ctx)]
+        out-ctx (load-csvs ctx)]
     (testing "reports critical errors for rows with wrong number of values"
       (is (get-in out-ctx [:critical "contest.txt" 3 "Number of values"]))
       (is (get-in out-ctx [:critical "contest.txt" 5 "Number of values"])))))
