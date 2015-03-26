@@ -10,7 +10,8 @@
   (testing "finds duplicated ids across CSVs and errors"
     (let [ctx (merge {:input [(io/as-file (io/resource "duplicate-ids/contest.txt"))
                               (io/as-file (io/resource "duplicate-ids/candidate.txt"))]
-                      :pipeline [(csv/load-csvs csv/csv-specs)
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                                 csv/load-csvs
                                  validate-no-duplicated-ids]}
                      (sqlite/temp-db "duplicate-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -22,8 +23,9 @@
   (testing "finds possibly duplicated rows in a table and warns"
     (let [ctx (merge {:input [(io/as-file (io/resource "duplicate-rows/candidate.txt"))
                               (io/as-file (io/resource "duplicate-rows/ballot_candidate.txt"))]
-                      :pipeline [(csv/load-csvs csv/csv-specs)
-                                 (validate-no-duplicated-rows csv/csv-specs)]}
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                                 csv/load-csvs
+                                 validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicate-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= #{3100047456984 3100047456989 3100047466988 3100047466990}
@@ -35,8 +37,9 @@
   (testing "finds bad references"
     (let [ctx (merge {:input [(io/as-file (io/resource "bad-references/ballot.txt"))
                               (io/as-file (io/resource "bad-references/referendum.txt"))]
-                      :pipeline [(csv/load-csvs csv/csv-specs)
-                                 (validate-references csv/csv-specs)]}
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                                 csv/load-csvs
+                                 validate-references]}
                      (sqlite/temp-db "bad-references"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= 1 (count (get-in out-ctx [:errors "ballot.txt" :reference-error "referendum_id"])))))))
@@ -49,8 +52,9 @@
                               (io/as-file (io/resource "bad-references/precinct.txt"))
                               (io/as-file (io/resource "bad-references/precinct_split.txt"))
                               (io/as-file (io/resource "bad-references/electoral_district.txt"))]
-                      :pipeline [(csv/load-csvs csv/csv-specs)
-                                 (validate-jurisdiction-references csv/csv-specs)]}
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                                 csv/load-csvs
+                                 validate-jurisdiction-references]}
                      (sqlite/temp-db "bad-jurisdiction-references"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= [100 101] (map :id (get-in out-ctx [:errors "ballot_line_result.txt" :reference-error "jurisdiction_id"])))))))
@@ -60,8 +64,9 @@
     (let [ctx (merge {:input [(io/as-file (io/resource "unreferenced-rows/ballot.txt"))
                               (io/as-file (io/resource "unreferenced-rows/candidate.txt"))
                               (io/as-file (io/resource "unreferenced-rows/ballot_candidate.txt"))]
-                      :pipeline [(csv/load-csvs csv/csv-specs)
-                                 (validate-no-unreferenced-rows csv/csv-specs)]}
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                                 csv/load-csvs
+                                 validate-no-unreferenced-rows]}
                      (sqlite/temp-db "unreferenced-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= [2 3]
