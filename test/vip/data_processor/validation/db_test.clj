@@ -54,3 +54,19 @@
                      (sqlite/temp-db "bad-jurisdiction-references"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= [100 101] (map :id (get-in out-ctx [:errors "ballot_line_result.txt" :reference-error "jurisdiction_id"])))))))
+
+(deftest validate-no-unreferenced-rows-test
+  (testing "finds rows not referenced"
+    (let [ctx (merge {:input [(io/as-file (io/resource "unreferenced-rows/ballot.txt"))
+                              (io/as-file (io/resource "unreferenced-rows/candidate.txt"))
+                              (io/as-file (io/resource "unreferenced-rows/ballot_candidate.txt"))]
+                      :pipeline [(csv/load-csvs csv/csv-specs)
+                                 (validate-no-unreferenced-rows csv/csv-specs)]}
+                     (sqlite/temp-db "unreferenced-rows"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= [2 3]
+             (map :id (get-in out-ctx
+                              [:warnings :ballots "Unreferenced records"]))))
+      (is (= [13 14]
+             (map :id (get-in out-ctx
+                              [:warnings :candidates "Unreferenced records"])))))))
