@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.db.reverse-references
-  (:require [korma.core :as korma]
+  (:require [vip.data-processor.validation.db.util :as util]
+            [korma.core :as korma]
             [korma.sql.engine :as eng]))
 
 (defn find-referencing-column [table-name csv-spec]
@@ -16,16 +17,13 @@
               :when referencing-column]
           [table referencing-column])))
 
-(defn column-name [table column]
-  (keyword (str table "." column)))
-
 (defn join-clause [from-table from-column to-table]
-  (let [from-column (column-name from-table from-column)
-        to-column (column-name to-table "id")]
+  (let [from-column (util/column-name from-table from-column)
+        to-column (util/column-name to-table "id")]
     (list '= from-column to-column)))
 
 (defn where-clause-part [table column]
-  (let [column (column-name table column)]
+  (let [column (util/column-name table column)]
     (list '= column nil)))
 
 (defn find-unreferenced-rows [tables table-id references-map]

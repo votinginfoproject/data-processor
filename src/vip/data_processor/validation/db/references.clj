@@ -1,13 +1,14 @@
 (ns vip.data-processor.validation.db.references
-  (:require [korma.core :as korma]))
+  (:require [vip.data-processor.validation.db.util :as util]
+            [korma.core :as korma]))
 
 (defn unmatched-references [tables from via to]
   (let [from-table (tables from)
         to-table (tables to)
         from-table-name (:name from-table)
         to-table-name (:name to-table)
-        via-join-name (keyword (str from-table-name "." via))
-        to-id-name (keyword (str to-table-name ".id"))]
+        via-join-name (util/column-name from-table-name via)
+        to-id-name (util/column-name to-table-name "id")]
     (korma/select from-table
                   (korma/join :left to-table
                               (= via-join-name to-id-name))
@@ -36,7 +37,7 @@
 (defn unmatched-jurisdiction-references [tables from-table]
   (let [table (tables from-table)
         table-name (:name table)
-        jurisdiction-id (keyword (str table-name ".jurisdiction_id"))]
+        jurisdiction-id (util/column-name table-name "jurisdiction_id")]
     (korma/select table
                   (korma/join :left (:states tables) (= :states.id jurisdiction-id))
                   (korma/join :left (:localities tables) (= :localities.id jurisdiction-id))
