@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.db
   (:require [vip.data-processor.validation.db.duplicate-records :as dupe-records]
             [vip.data-processor.validation.db.duplicate-ids :as dupe-ids]
+            [vip.data-processor.validation.db.record-limit :as record-limit]
             [vip.data-processor.validation.db.references :as refs]))
 
 (defn validate-no-duplicated-ids [ctx]
@@ -12,6 +13,9 @@
 (defn validate-no-duplicated-rows [csv-specs]
   (fn [ctx]
     (reduce dupe-records/validate-no-duplicated-rows-in-table ctx csv-specs)))
+
+(defn validate-one-record-limit [ctx]
+  (record-limit/tables-allow-only-one-record ctx))
 
 (defn validate-references [csv-specs]
   (fn [ctx]
