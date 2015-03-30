@@ -37,7 +37,8 @@
   (testing "validates that only one row exists in certain files"
     (let [ctx (merge {:input [(io/as-file
                                 (io/resource "bad-number-of-rows/election.txt"))]
-                      :pipeline [(csv/load-csvs csv/csv-specs)
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                                 csv/load-csvs
                                  validate-one-record-limit]}
                      (sqlite/temp-db "too-many-records"))
           out-ctx (pipeline/run-pipeline ctx)]
