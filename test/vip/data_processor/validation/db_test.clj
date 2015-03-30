@@ -83,7 +83,7 @@
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= [2 3]
              (map :id (get-in out-ctx
-                              [:warnings :ballots "Unreferenced records"]))))
+                              [:warnings "ballot.txt" :unreferenced-rows]))))
       (is (= [13 14]
              (map :id (get-in out-ctx
-                              [:warnings :candidates "Unreferenced records"])))))))
+                              [:warnings "candidate.txt" :unreferenced-rows])))))))

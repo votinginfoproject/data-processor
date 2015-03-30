@@ -71,5 +71,10 @@
   (let [tables (:tables ctx)
         unreferenced-rows (find-unreferenced-rows tables table-id references-map)]
     (if (seq unreferenced-rows)
-      (assoc-in ctx [:warnings table-id "Unreferenced records"] unreferenced-rows)
+      (let [filename (->> ctx
+                          :csv-specs
+                          (filter #(= table-id (:table %)))
+                          first
+                          :filename)]
+        (assoc-in ctx [:warnings filename :unreferenced-rows] unreferenced-rows))
       ctx)))
