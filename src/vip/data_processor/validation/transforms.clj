@@ -37,6 +37,7 @@
    (db/validate-no-duplicated-rows csv/csv-specs)
    (db/validate-references csv/csv-specs)
    (db/validate-jurisdiction-references csv/csv-specs)
+   db/validate-one-record-limit
    (db/validate-no-unreferenced-rows csv/csv-specs)])
 
 (defn xml-csv-branch [ctx]
