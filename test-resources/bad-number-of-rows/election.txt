@@ -1,2 +1,3 @@
 "date","election_type","state_id","statewide","registration_info","absentee_ballot_info","results_url","polling_hours","election_day_registration","registration_deadline","absentee_request_deadline","id"
 "2014-11-04","Federal","37","yes","","","","6:30 am - 7:30 pm","no","2014-10-14","2014-10-29","2003"
+"2014-11-05","State","37","no","","","","8:30 am - 1:30 pm","no","2012-10-14","2012-10-29","2004"
