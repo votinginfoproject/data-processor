@@ -1,3 +1,4 @@
 referendum_id,custom_ballot_id,write_in,image_url,id
-,,,,410004745
-810005909,,,,41100368
+,,yes,http://i.imgur.com/PMgfJSm.jpg,200000
+,,yes,http://i.imgur.com/7XCVNwn.jpg,200001
+,,yes,http://i.imgur.com/rxYb3KM.jpg,200002

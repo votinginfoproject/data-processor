@@ -77,7 +77,7 @@
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "contest_id" :required true :format format/all-digits :references :contests}
               {:name "jurisdiction_id" :required true :format format/all-digits}
-              {:name "entire_district" :required true :format format/yes-no}
+              {:name "entire_district" :required true :format format/yes-no :translate boolean-value}
               {:name "total_votes" :format format/all-digits}
               {:name "total_valid_votes" :format format/all-digits}
               {:name "overvotes" :format format/all-digits}
@@ -283,6 +283,10 @@
               {:name "name" :required true}
               {:name "election_administration_id" :format format/all-digits :references :election-administrations}]}])
 
+(defn add-csv-specs [csv-specs]
+  (fn [ctx]
+    (assoc ctx :csv-specs csv-specs)))
+
 (def csv-filenames (set (map :filename csv-specs)))
 
 (defn file-name [file]
@@ -396,9 +400,8 @@
               ctx)))))
     ctx))
 
-(defn load-csvs [csv-specs]
-  (fn [ctx]
-    (reduce load-csv ctx csv-specs)))
+(defn load-csvs [ctx]
+  (reduce load-csv ctx (:csv-specs ctx)))
 
 (defn add-report-on-missing-file-fn
   "Generates a validation function generator that takes a filename and

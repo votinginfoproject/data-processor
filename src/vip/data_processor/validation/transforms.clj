@@ -28,16 +28,18 @@
   [(fn [ctx] (assoc ctx :stop "This is an XML feed"))])
 
 (def csv-validations
-  [csv/remove-bad-filenames
+  [(csv/add-csv-specs csv/csv-specs)
+   csv/remove-bad-filenames
    (csv/error-on-missing-file "election.txt")
    (csv/error-on-missing-file "source.txt")
    (csv-files/validate-dependencies csv-files/file-dependencies)
-   (csv/load-csvs csv/csv-specs)
+   csv/load-csvs
    db/validate-no-duplicated-ids
-   (db/validate-no-duplicated-rows csv/csv-specs)
-   (db/validate-references csv/csv-specs)
-   (db/validate-jurisdiction-references csv/csv-specs)
-   db/validate-one-record-limit])
+   db/validate-no-duplicated-rows
+   db/validate-references
+   db/validate-jurisdiction-references
+   db/validate-one-record-limit
+   db/validate-no-unreferenced-rows])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx

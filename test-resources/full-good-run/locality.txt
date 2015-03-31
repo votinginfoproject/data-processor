@@ -1,4 +1,3 @@
 name,state_id,type,election_administration_id,id
-ALAMANCE,37,county,22001,1001
-ALEXANDER,37,county,22002,1002
-ALLEGHANY,37,county,22003,1003
+POWHATAN COUNTY,51,county,40069,70069
+PORTSMOUTH CITY,51,city,40122,70123

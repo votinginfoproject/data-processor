@@ -1,3 +1,4 @@
-type,name,number,id
-statewide,PRESIDENTIAL PREFERENCE,,330004745
-statewide,NC GOVERNOR,,330004801
+name,type,number,id
+DISTRICT 2,statewide,2,60000
+POWHATAN COUNTY,statewide,,60001
+PORTSMOUTH CITY,statewide,,60002
