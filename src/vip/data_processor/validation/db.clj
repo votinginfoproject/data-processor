@@ -2,6 +2,7 @@
   (:require [vip.data-processor.validation.db.duplicate-records :as dupe-records]
             [vip.data-processor.validation.db.duplicate-ids :as dupe-ids]
             [vip.data-processor.validation.db.references :as refs]
+            [vip.data-processor.validation.db.record-limit :as record-limit]
             [vip.data-processor.validation.db.reverse-references :as rev-refs]
             [vip.data-processor.validation.db.street-segment :as street-segment]))
 
@@ -13,6 +14,9 @@
 
 (defn validate-no-duplicated-rows [{:keys [csv-specs] :as ctx}]
   (reduce dupe-records/validate-no-duplicated-rows-in-table ctx (:csv-specs ctx)))
+
+(defn validate-one-record-limit [ctx]
+  (record-limit/tables-allow-only-one-record ctx))
 
 (defn validate-references [{:keys [csv-specs] :as ctx}]
   (reduce refs/validate-references-for-csv-spec ctx csv-specs))

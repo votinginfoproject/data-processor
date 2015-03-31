@@ -33,6 +33,18 @@
       (is (= #{{:candidate_id 3100047456987, :ballot_id 410004745} {:candidate_id 3100047466988, :ballot_id 410004746}}
              (set (get-in out-ctx [:warnings "ballot_candidate.txt" :duplicated-rows])))))))
 
+(deftest validate-one-record-limit-test
+  (testing "validates that only one row exists in certain files"
+    (let [ctx (merge {:input [(io/as-file
+                                (io/resource "bad-number-of-rows/election.txt"))]
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                                 csv/load-csvs
+                                 validate-one-record-limit]}
+                     (sqlite/temp-db "too-many-records"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= (get-in out-ctx [:errors "election.txt" :row-constraint])
+             "File needs to contain exactly one row.")))))
+
 (deftest validate-references-test
   (testing "finds bad references"
     (let [ctx (merge {:input [(io/as-file (io/resource "bad-references/ballot.txt"))
@@ -71,7 +83,7 @@
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= [2 3]
              (map :id (get-in out-ctx
-                              [:warnings :ballots "Unreferenced records"]))))
+                              [:warnings "ballot.txt" :unreferenced-rows]))))
       (is (= [13 14]
              (map :id (get-in out-ctx
-                              [:warnings :candidates "Unreferenced records"])))))))
+                              [:warnings "candidate.txt" :unreferenced-rows])))))))

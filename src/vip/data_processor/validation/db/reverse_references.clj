@@ -9,7 +9,10 @@
        (filter #(= table-name (:references %)))
        first))
 
-(defn find-referencing-tables [table-name csv-specs]
+(defn find-referencing-tables
+  "Returns a map from table keys to column names of all tables in the
+  csv-spec that contain references to `table-name`."
+  [table-name csv-specs]
   (into {}
         (for [spec csv-specs
               :let [referencing-column (:name (find-referencing-column table-name spec))
@@ -26,7 +29,18 @@
   (let [column (util/column-name table column)]
     (list '= column nil)))
 
-(defn find-unreferenced-rows [tables table-id references-map]
+(defn find-unreferenced-rows
+  "Find all rows in the database that can be referenced by another
+  table but which are not. For example, there are a few tables that
+  have a `locality_id` column. This finds any rows in `localities`
+  that are never referenced by any of those tables' `locality_id`
+  column.
+
+  * `tables` a map with korma tables as values
+  * `table-id` is the key for the table we're checking references for
+  * `references-map` is a map describing how tables reference each
+    other, in the form returned from `find-referencing-tables`."
+  [tables table-id references-map]
   (let [basis (table-id tables)
         where-clause-parts (map (fn [[table-id column]]
                                   (let [table-name (:name (table-id tables))]
@@ -57,5 +71,10 @@
   (let [tables (:tables ctx)
         unreferenced-rows (find-unreferenced-rows tables table-id references-map)]
     (if (seq unreferenced-rows)
-      (assoc-in ctx [:warnings table-id "Unreferenced records"] unreferenced-rows)
+      (let [filename (->> ctx
+                          :csv-specs
+                          (filter #(= table-id (:table %)))
+                          first
+                          :filename)]
+        (assoc-in ctx [:warnings filename :unreferenced-rows] unreferenced-rows))
       ctx)))

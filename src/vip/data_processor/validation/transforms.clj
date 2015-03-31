@@ -38,6 +38,7 @@
    db/validate-no-duplicated-rows
    db/validate-references
    db/validate-jurisdiction-references
+   db/validate-one-record-limit
    db/validate-no-unreferenced-rows
    db/validate-no-overlapping-street-segments])
 
