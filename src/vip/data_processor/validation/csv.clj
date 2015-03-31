@@ -375,8 +375,10 @@
        (map create-translation-fn)))
 
 (defn load-csv [ctx {:keys [filename table columns] :as csv-spec}]
-  (if-let [file-to-load (find-input-file ctx filename)]
-    (with-open [in-file (io/reader file-to-load)]
+  (if-not (.endsWith filename ".txt")
+    (assoc-in ctx [:critical filename "File extension"] "File is not a .txt file.")
+    (if-let [file-to-load (find-input-file ctx filename)]
+      (with-open [in-file (io/reader file-to-load)]
       (let [sql-table (get-in ctx [:tables table])
             column-names (map :name columns)
             required-header-names (->> columns (filter :required) (map :name))
@@ -398,7 +400,7 @@
                   transformed-contents (map transforms contents)]
               (sqlite/bulk-import transformed-contents sql-table)
               ctx)))))
-    ctx))
+      ctx)))
 
 (defn load-csvs [ctx]
   (reduce load-csv ctx (:csv-specs ctx)))

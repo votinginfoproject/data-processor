@@ -33,6 +33,16 @@
       (is (not (contains? (:errors out-ctx) "source.txt"))))))
 
 (deftest csv-loader-test
+  (testing "check for .txt file extension"
+    (let [only-election-official-spec (filter #(= "election_official.txt" (:filename %))
+                                              csv-specs)
+          updated-spec (list (assoc (first only-election-official-spec)
+                                    :filename "election_official.csv"))
+          load-election-official (load-csvs updated-spec)
+          ctx {:input [(File. "election_official.csv")]}
+          out-ctx (load-election-official ctx)]
+      (is "File is not a .txt file."
+          (get-in out-ctx [:critical "election_official.csv" "File extension"]))))
   (testing "ignores unknown columns"
     (let [ctx (merge {:input [(io/as-file (io/resource "bad-columns/state.txt"))]
                       :csv-specs csv-specs}
