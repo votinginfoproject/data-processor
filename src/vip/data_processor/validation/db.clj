@@ -3,7 +3,8 @@
             [vip.data-processor.validation.db.duplicate-ids :as dupe-ids]
             [vip.data-processor.validation.db.references :as refs]
             [vip.data-processor.validation.db.record-limit :as record-limit]
-            [vip.data-processor.validation.db.reverse-references :as rev-refs]))
+            [vip.data-processor.validation.db.reverse-references :as rev-refs]
+            [vip.data-processor.validation.db.street-segment :as street-segment]))
 
 (defn validate-no-duplicated-ids [ctx]
   (let [dupes (dupe-ids/duplicated-ids ctx)]
@@ -30,3 +31,14 @@
 (defn validate-no-unreferenced-rows [{:keys [csv-specs] :as ctx}]
   (let [referenced-tables (rev-refs/find-all-referenced-tables csv-specs)]
     (reduce rev-refs/validate-no-unreferenced-rows-for-table ctx referenced-tables)))
+
+(defn validate-no-overlapping-street-segments [ctx]
+  (let [street-segments (get-in ctx [:tables :street-segments])
+        overlaps (->> street-segments
+                      street-segment/query-overlaps
+                      (map vals)
+                      (map set)
+                      set)]
+    (if (seq overlaps)
+      (assoc-in ctx [:errors "street_segment.txt" :overlaps] overlaps)
+      ctx)))

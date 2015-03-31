@@ -1,6 +1,8 @@
 (ns vip.data-processor.test-helpers
   (:require [clojure.test :refer :all]))
 
+(set! *print-length* 10)
+
 (def problem-types [:warnings :errors :critical :fatal])
 
 (defn assert-no-problems
