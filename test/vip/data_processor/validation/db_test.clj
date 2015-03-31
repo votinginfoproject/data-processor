@@ -87,3 +87,13 @@
       (is (= [13 14]
              (map :id (get-in out-ctx
                               [:warnings "candidate.txt" :unreferenced-rows])))))))
+
+(deftest validate-no-overlapping-street-segments-test
+  (let [ctx (merge {:input [(io/as-file (io/resource "overlapping-street-segments/street_segment.txt"))]
+                    :pipeline [(csv/add-csv-specs csv/csv-specs)
+                               csv/load-csvs
+                               validate-no-overlapping-street-segments]}
+                   (sqlite/temp-db "overlapping-street-segments"))
+        out-ctx (pipeline/run-pipeline ctx)]
+    (is (= #{#{11 12} #{13 14} #{15 16} #{17 18} #{19 20}}
+           (get-in out-ctx [:errors "street_segment.txt" :overlaps])))))

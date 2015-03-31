@@ -34,7 +34,11 @@
 
 (defn validate-no-overlapping-street-segments [ctx]
   (let [street-segments (get-in ctx [:tables :street-segments])
-        overlaps (street-segment/query-overlaps street-segments)]
+        overlaps (->> street-segments
+                      street-segment/query-overlaps
+                      (map vals)
+                      (map set)
+                      set)]
     (if (seq overlaps)
       (assoc-in ctx [:errors "street_segment.txt" :overlaps] overlaps)
       ctx)))
