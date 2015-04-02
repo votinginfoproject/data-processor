@@ -50,16 +50,30 @@ $ docker-compose up
 
 The processing pipeline is defined as a sequence of functions that
 take and return a processing context. The processing context is a map
-containing an `:input`, further processing functions as `:pipeline`,
-and maps containing `:warnings` and `:errors`.
+containing an `:input`, processing functions in `:pipeline`, and
+validation failures in `:warnings`, `:errors`, `:critical`, and
+`:fatal`.
+
+### The Processing Pipeline
+
+`run-pipeline` function in the `vip.data-processor.pipeline` namespace
+takes a context and will run thread that context through each function
+in its `:pipeline`. Those processing functions may alter the
+`:pipeline` (for example, to alter how uploads are loaded into the
+database based on file type, or to add extra processing functions only
+if all validations are successful).
 
 Any processing function may add a `:stop` key to the processing
 context which will halt the processing pipeline, returning the current
 context as the final result.
 
-Setting an `:exception` key will cause the processing pipeline to
-throw its value (thereby placing a message on the failed processing
-queue).
+Uncaught exceptions in a processing function will result in a `:stop`
+key on the processing context and the exception being added as the
+`:exception`.
+
+### Processing Functions
+
+#### Transforms
 
 A processing function may alter the `:input` key for further
 processing functions (e.g., `validation.transforms/download-from-s3`,
@@ -68,25 +82,53 @@ location of a file on S3, downloads that file, and associates that
 file object to the `:input` key of the outgoing context). Such
 functions can be called *transforms*.
 
+#### Branches
+
 A processing function may alter the `:pipeline` key, as well, allowing
 for branching within a processing pipeline (e.g., XML and CSV files
 will need to be transformed differently into a database
 representation). Such functions can be called *branches*.
 
-Processing functions that do not alter the `:input` or `:pipeline`
-keys can be called *validations*.
+#### Validations
 
-When parallel processing steps of the pipeline are implemented, only
-*validations* will be able to participate.
+*Validation* functions check _something_ about the context, reporting
+any failures in the `:warnings`, `:errors`, `:critical` or `:fatal`
+keys of the processing context depending on the severity of the
+failure.
 
-The `:warnings` and `:errors` keys are meant for messages a client
-would find useful but which don't necessarily need to stop processing
-from continuing. For example, illegal values in a data set would
-prohibit the data set from being acceptable, but further processing
-may be able to be accomplished to find more issues a client could
-correct without having their data rejected each time at the first
-problem.
+The structure of those failure maps is the following: At the top level
+is the severity. Next is the scope of the failure (e.g., the filename
+or the XML node where the problem lies). Then the kind of problem
+(e.g., `:duplicate-rows` or `:missing-headers`). And finally, a
+message or sequence of bad data some further error message UI may use
+to provide feedback to the use.
 
-Uncaught exceptions in a processing function will result in a `:stop`
-key on the processing context and the exception being added as the
-`:exception`.
+For example:
+
+```clj
+{:critical
+  {"contest.txt"
+    {:missing-headers ["election_id", "type"]
+     :reference-error {"ballot_id" [{:line 4 "ballot_id" 108}
+                                    {:line 6 "ballot_id" 109}]
+                       "election_id" [{:line 2 "election_id" 210}]}}}}
+```
+
+Validation function are simply functions that accept a processing
+context and return one, optionally adding failure report as
+above. Typically, they'll look something like the following:
+
+```clj
+(defn validate-source-cromulence [ctx]
+  (let [source-table (get-in ctx [:tables :sources])]
+    (if (cromulent? source-table)
+      ctx  ;; everything is okay, just return the context as-is
+      (assoc-in ctx [:errors :source :cromulence]  ;; otherwise add error
+                "Source is not cromulent"))))
+```
+
+To add a validation to all processing, it should be added to the
+`pipeline` list in the `vip.data-processor` namespace. If it's only
+required for XML or CSV processing, it should be added to the
+`xml-validations` or `csv-validations` lists respectively in the
+`vip.data-processor.validation.transforms` namespace.
