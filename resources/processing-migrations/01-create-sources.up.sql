@@ -1,6 +1,6 @@
 CREATE TABLE sources (id INTEGER PRIMARY KEY,
                       name TEXT,
-                      vip_id INT,
+                      vip_id TEXT,
                       datetime DATE,
                       description TEXT,
                       organization_url TEXT,
