@@ -6,7 +6,8 @@
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.csv.file-set :as csv-files]
-            [vip.data-processor.validation.db :as db]))
+            [vip.data-processor.validation.db :as db]
+            [vip.data-processor.validation.fips :as fips]))
 
 (defn read-edn-sqs-message [ctx]
   (assoc ctx :input (edn/read-string (get-in ctx [:input :body]))))
@@ -40,7 +41,8 @@
    db/validate-jurisdiction-references
    db/validate-one-record-limit
    db/validate-no-unreferenced-rows
-   db/validate-no-overlapping-street-segments])
+   db/validate-no-overlapping-street-segments
+   fips/validate-valid-source-vip-id])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx

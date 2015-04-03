@@ -1,0 +1,2 @@
+name,vip_id,datetime,id
+"Source with a bad vip_id",5199955554447,2015-01-21T18:13:25
