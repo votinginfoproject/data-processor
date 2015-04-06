@@ -330,6 +330,9 @@
        (filter #(= filename (.getName %)))
        first))
 
+(defn invalid-utf-8? [string]
+  (.contains string "�"))
+
 (defn create-format-rule
   "Create a function that applies a format check for a specific row of
   a CSV import."
@@ -342,13 +345,19 @@
                  :else (constantly true))]
     (fn [ctx row line-number]
       (let [val (row name)]
-        (if (empty? val)
+        (cond
+          (empty? val)
           (if required
             (assoc-in ctx [:fatal filename line-number name] (str "Missing required column: " name))
             ctx)
-          (if (test-fn val)
-            ctx
-            (assoc-in ctx [:errors filename line-number name] message)))))))
+
+          (invalid-utf-8? val)
+          (assoc-in ctx [:errors filename line-number name] "Is not valid UTF-8.")
+
+          (not (test-fn val))
+          (assoc-in ctx [:errors filename line-number name] message)
+
+          :else ctx)))))
 
 (defn create-format-rules [{:keys [filename columns]}]
   (map (partial create-format-rule filename) columns))
@@ -376,7 +385,7 @@
 
 (defn load-csv [ctx {:keys [filename table columns] :as csv-spec}]
   (if-let [file-to-load (find-input-file ctx filename)]
-    (with-open [in-file (io/reader file-to-load)]
+    (with-open [in-file (io/reader file-to-load :encoding "UTF-8")]
       (let [sql-table (get-in ctx [:tables table])
             column-names (map :name columns)
             required-header-names (->> columns (filter :required) (map :name))

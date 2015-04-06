@@ -117,3 +117,13 @@
       (let [format-rule (create-format-rule filename {:name column})]
         (is (= ctx (format-rule ctx {column "hi"} line-number)))
         (is (= ctx (format-rule ctx {} line-number)))))))
+
+(deftest invalid-utf-8-test
+  (testing "marks any value with a Unicode replacement character as invalid UTF-8 because that's what we assume we get"
+    (let [ctx (merge {:input [(io/as-file (io/resource "invalid-utf8/source.txt"))]
+                    :csv-specs csv-specs}
+                   (sqlite/temp-db "invalid-utf-8"))
+          out-ctx (load-csvs ctx)]
+    (testing "reports errors for values with the Unicode replacement character"
+      (is (= (get-in out-ctx [:errors "source.txt" 2 "name"])
+             "Is not valid UTF-8."))))))
