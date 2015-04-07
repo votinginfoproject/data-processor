@@ -8,7 +8,8 @@
             [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.db :as db]
-            [vip.data-processor.validation.fips :as fips]))
+            [vip.data-processor.validation.fips :as fips]
+            [vip.data-processor.validation.xml :as xml]))
 
 (defn read-edn-sqs-message [ctx]
   (assoc ctx :input (edn/read-string (get-in ctx [:input :body]))))
@@ -27,7 +28,7 @@
     (assoc ctx :input file)))
 
 (def xml-validations
-  [(fn [ctx] (assoc ctx :stop "This is an XML feed"))])
+  [xml/parse-xml])
 
 (def csv-validations
   [(data-spec/add-data-specs data-spec/data-specs)
