@@ -1,5 +1,6 @@
 (ns vip.data-processor.test-helpers
-  (:require [clojure.test :refer :all]))
+  (:require [clojure.test :refer :all]
+            [clojure.java.io :as io]))
 
 (set! *print-length* 10)
 
@@ -21,3 +22,10 @@
   "Test that there is an error of some level for the key-path."
   [ctx key-path]
   (is (seq (remove nil? (map #(get-in ctx (cons % key-path)) problem-types)))))
+
+(defn csv-inputs [file-names]
+  (map #(->> %
+             (str "csv/")
+             io/resource
+             io/as-file)
+       file-names))

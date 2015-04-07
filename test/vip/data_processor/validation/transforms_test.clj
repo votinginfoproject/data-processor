@@ -13,7 +13,7 @@
   (testing "full run on good files"
     (let [db (sqlite/temp-db "good-run-test")
           filenames (->> csv/csv-filenames
-                         (map #(io/as-file (io/resource (str "full-good-run/" %))))
+                         (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
           ctx (merge {:input filenames :pipeline csv-validations} db)
           results-ctx (pipeline/run-pipeline ctx)]
