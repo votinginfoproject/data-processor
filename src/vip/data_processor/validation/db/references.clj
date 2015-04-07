@@ -16,7 +16,7 @@
                    (and (= to-id-name nil)
                         (not= via-join-name ""))))))
 
-(defn validate-references-for-csv-spec [ctx {:keys [filename table columns]}]
+(defn validate-references-for-data-spec [ctx {:keys [filename table columns]}]
   (let [reference-columns (filter :references columns)]
     (reduce (fn [ctx column]
               (let [unmatched-references (unmatched-references

@@ -3,18 +3,18 @@
             [korma.core :as korma]
             [korma.sql.engine :as eng]))
 
-(defn find-referencing-column [table-name csv-spec]
-  (->> csv-spec
+(defn find-referencing-column [table-name data-spec]
+  (->> data-spec
        :columns
        (filter #(= table-name (:references %)))
        first))
 
 (defn find-referencing-tables
   "Returns a map from table keys to column names of all tables in the
-  csv-spec that contain references to `table-name`."
-  [table-name csv-specs]
+  data-spec that contain references to `table-name`."
+  [table-name data-specs]
   (into {}
-        (for [spec csv-specs
+        (for [spec data-specs
               :let [referencing-column (:name (find-referencing-column table-name spec))
                     table (:table spec)]
               :when referencing-column]
@@ -60,10 +60,10 @@
                       join-clauses)]
     (korma/exec query)))
 
-(defn find-all-referenced-tables [csv-specs]
-  (into {} (for [csv-spec csv-specs
-                 :let [table (:table csv-spec)
-                       references (find-referencing-tables table csv-specs)]
+(defn find-all-referenced-tables [data-specs]
+  (into {} (for [data-spec data-specs
+                 :let [table (:table data-spec)
+                       references (find-referencing-tables table data-specs)]
                  :when (seq references)]
              [table references])))
 
@@ -72,7 +72,7 @@
         unreferenced-rows (find-unreferenced-rows tables table-id references-map)]
     (if (seq unreferenced-rows)
       (let [filename (->> ctx
-                          :csv-specs
+                          :data-specs
                           (filter #(= table-id (:table %)))
                           first
                           :filename)]

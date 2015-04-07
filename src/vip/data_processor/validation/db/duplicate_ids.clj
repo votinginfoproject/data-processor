@@ -1,13 +1,13 @@
 (ns vip.data-processor.validation.db.duplicate-ids
-  (:require [vip.data-processor.validation.csv :as csv]
+  (:require [vip.data-processor.validation.data-spec :refer [data-specs]]
             [korma.core :as korma]))
 
-(defn has-id? [csv-spec]
-  (some #(-> % :name (= "id")) (:columns csv-spec)))
+(defn has-id? [data-spec]
+  (some #(-> % :name (= "id")) (:columns data-spec)))
 
 (defn tables-with-ids [ctx]
-  (let [csvs-with-id (filter has-id? csv/csv-specs)
-        table-names (map :table csvs-with-id)]
+  (let [table-with-id (filter has-id? data-specs)
+        table-names (map :table table-with-id)]
     (map (:tables ctx) table-names)))
 
 (defn add-to-seen-ids [seen-ids table]

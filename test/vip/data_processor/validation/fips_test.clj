@@ -3,13 +3,14 @@
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.fips :refer :all]
             [vip.data-processor.validation.csv :as csv]
+            [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.pipeline :as pipeline]))
 
 (deftest validate-valid-source-vip-id-test
   (testing "adds an error if the source's vip_id is bad"
     (let [ctx (merge {:input (csv-inputs ["invalid-source-vip-id/source.txt"])
-                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
                                  csv/load-csvs
                                  validate-valid-source-vip-id]}
                      (sqlite/temp-db "invalid-source-vip-id"))

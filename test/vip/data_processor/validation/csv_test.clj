@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.csv :refer :all]
+            [vip.data-processor.validation.data-spec :refer [data-specs]]
             [vip.data-processor.validation.csv.value-format :as format]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma])
@@ -35,7 +36,7 @@
 (deftest csv-loader-test
   (testing "ignores unknown columns"
     (let [ctx (merge {:input (csv-inputs ["bad-columns/state.txt"])
-                      :csv-specs csv-specs}
+                      :data-specs data-specs}
                      (sqlite/temp-db "ignore-columns-test"))
           out-ctx (load-csvs ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
@@ -44,14 +45,14 @@
         (is (get-in out-ctx [:warnings "state.txt" :extraneous-headers])))))
   (testing "requires a header row"
     (let [ctx (merge {:input (csv-inputs ["no-header-row/ballot.txt"])
-                      :csv-specs csv-specs}
+                      :data-specs data-specs}
                      (sqlite/temp-db "no-headers-test"))
           out-ctx (load-csvs ctx)]
       (is (= "No header row" (get-in out-ctx [:critical "ballot.txt" :headers]))))))
 
 (deftest missing-required-columns-test
   (let [ctx (merge {:input (csv-inputs ["missing-required-columns/contest.txt"])
-                    :csv-specs csv-specs}
+                    :data-specs data-specs}
                    (sqlite/temp-db "missing-required-columns"))
         out-ctx (load-csvs ctx)]
     (testing "adds a critical error for contest.txt"
@@ -61,7 +62,7 @@
 
 (deftest number-of-values-in-a-row-test
   (let [ctx (merge {:input (csv-inputs ["bad-number-of-values/contest.txt"])
-                    :csv-specs csv-specs}
+                    :data-specs data-specs}
                    (sqlite/temp-db "bad-number-of-values"))
         out-ctx (load-csvs ctx)]
     (testing "reports critical errors for rows with wrong number of values"
@@ -121,7 +122,7 @@
 (deftest invalid-utf-8-test
   (testing "marks any value with a Unicode replacement character as invalid UTF-8 because that's what we assume we get"
     (let [ctx (merge {:input (csv-inputs ["invalid-utf8/source.txt"])
-                    :csv-specs csv-specs}
+                    :data-specs data-specs}
                    (sqlite/temp-db "invalid-utf-8"))
           out-ctx (load-csvs ctx)]
     (testing "reports errors for values with the Unicode replacement character"
