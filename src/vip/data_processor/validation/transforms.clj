@@ -6,7 +6,6 @@
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.csv.file-set :as csv-files]
-            [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.fips :as fips]
             [vip.data-processor.validation.xml :as xml]))
@@ -31,8 +30,7 @@
   [xml/parse-xml])
 
 (def csv-validations
-  [(data-spec/add-data-specs data-spec/data-specs)
-   csv/remove-bad-filenames
+  [csv/remove-bad-filenames
    (csv/error-on-missing-file "election.txt")
    (csv/error-on-missing-file "source.txt")
    (csv-files/validate-dependencies csv-files/file-dependencies)
