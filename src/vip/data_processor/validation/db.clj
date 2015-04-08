@@ -4,7 +4,8 @@
             [vip.data-processor.validation.db.references :as refs]
             [vip.data-processor.validation.db.record-limit :as record-limit]
             [vip.data-processor.validation.db.reverse-references :as rev-refs]
-            [vip.data-processor.validation.db.street-segment :as street-segment]))
+            [vip.data-processor.validation.db.street-segment :as street-segment]
+            [vip.data-processor.validation.db.admin-addresses :as admin-addresses]))
 
 (defn validate-no-duplicated-ids [ctx]
   (let [dupes (dupe-ids/duplicated-ids ctx)]
@@ -42,3 +43,6 @@
     (if (seq overlaps)
       (assoc-in ctx [:errors "street_segment.txt" :overlaps] overlaps)
       ctx)))
+
+(defn validate-election-administration-addresses [ctx]
+  (admin-addresses/validate-addresses ctx))
