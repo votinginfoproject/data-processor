@@ -11,6 +11,7 @@
 (def data-specs
   [{:filename "ballot.txt"
     :table :ballots
+    :tag-name :ballot
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "referendum_id" :format format/all-digits :references :referendums}
               {:name "custom_ballot_id" :format format/all-digits :references :custom-ballots}
@@ -22,6 +23,7 @@
               {:name "candidate_id" :required true :format format/all-digits :references :candidates}]}
    {:filename "ballot_line_result.txt"
     :table :ballot-line-results
+    :tag-name :ballot_line_result
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "contest_id" :required true :format format/all-digits :references :contests}
               {:name "jurisdiction_id" :required true :format format/all-digits}
@@ -34,6 +36,7 @@
               {:name "certification"}]}
    {:filename "ballot_response.txt"
     :table :ballot-responses
+    :tag-name :ballot_response
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "text" :required true}
               {:name "sort_order" :format format/all-digits}]}
@@ -57,6 +60,7 @@
               {:name "sort_order" :format format/all-digits}]}
    {:filename "contest.txt"
     :table :contests
+    :tag-name :contest
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "election_id" :required true :format format/all-digits :references :elections}
               {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts}
@@ -73,6 +77,7 @@
               {:name "ballot_placement" :format format/all-digits}]}
    {:filename "contest_result.txt"
     :table :contest-results
+    :tag-name :contest_result
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "contest_id" :required true :format format/all-digits :references :contests}
               {:name "jurisdiction_id" :required true :format format/all-digits}
@@ -86,6 +91,7 @@
               {:name "certification"}]}
    {:filename "custom_ballot.txt"
     :table :custom-ballots
+    :tag-name :custom_ballot
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "heading" :required true}]}
    {:filename "custom_ballot_ballot_response.txt"
@@ -111,6 +117,7 @@
               {:name "days_times_open"}]}
    {:filename "election.txt"
     :table :elections
+    :tag-name :election
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "date" :required true :format format/date}
               {:name "election_type" :format format/election-type}
@@ -154,6 +161,7 @@
               {:name "hours"}]}
    {:filename "election_official.txt"
     :table :election-officials
+    :tag-name :election_official
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "title"}
@@ -162,12 +170,14 @@
               {:name "email" :format format/email}]}
    {:filename "electoral_district.txt"
     :table :electoral-districts
+    :tag-name :electoral_district
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "type" :format format/electoral-district-type}
               {:name "number" :format format/all-digits}]}
    {:filename "locality.txt"
     :table :localities
+    :tag-name :locality
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "state_id" :required true :format format/all-digits :references :states}
@@ -192,6 +202,7 @@
               {:name "photo_url" :format format/url}]}
    {:filename "precinct.txt"
     :table :precincts
+    :tag-name :precinct
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "number"}
@@ -201,6 +212,7 @@
               {:name "ballot_style_image_url" :format format/url}]}
    {:filename "precinct_split.txt"
     :table :precinct-splits
+    :tag-name :precinct-split
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "precinct_id" :required true :format format/all-digits :references :precincts}
@@ -227,6 +239,7 @@
               {:name "polling_location_id" :required true :format format/all-digits :references :polling-locations}]}
    {:filename "referendum.txt"
     :table :referendums
+    :tag-name :referendum
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "title" :required true}
               {:name "subtitle"}
@@ -268,6 +281,7 @@
               {:name "precinct_split_id" :format format/all-digits :references :precinct-splits}]}
    {:filename "source.txt"
     :table :sources
+    :tag-name :source
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "vip_id" :required true :format format/all-digits}
@@ -278,9 +292,11 @@
               {:name "tou_url" :format format/url}]}
    {:filename "state.txt"
     :table :states
+    :tag-name :state
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "election_administration_id" :format format/all-digits :references :election-administrations}]}])
+
 (defn invalid-utf-8? [string]
   (.contains string "�"))
 

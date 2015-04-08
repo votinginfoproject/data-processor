@@ -49,5 +49,5 @@
    :message "Invalid url format"})
 
 (def yes-no
-  {:check ["yes" "no"]
+  {:check #"\A(?i:yes|no)\z"
    :message "Must be yes or no"})

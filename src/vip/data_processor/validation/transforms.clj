@@ -27,7 +27,7 @@
     (assoc ctx :input file)))
 
 (def xml-validations
-  [xml/parse-xml])
+  [xml/load-xml])
 
 (def csv-validations
   [csv/remove-bad-filenames
