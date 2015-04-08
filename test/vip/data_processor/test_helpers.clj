@@ -29,3 +29,9 @@
              io/resource
              io/as-file)
        file-names))
+
+(defn xml-input [file-name]
+  [(->> file-name
+         (str "xml/")
+         io/resource
+         io/as-file)])
