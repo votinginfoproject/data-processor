@@ -281,3 +281,48 @@
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "election_administration_id" :format format/all-digits :references :election-administrations}]}])
+(defn invalid-utf-8? [string]
+  (.contains string "�"))
+
+(defn create-format-rule
+  "Create a function that applies a format check for a specific
+  element of an import."
+  [scope {:keys [name required format]}]
+  (let [{:keys [check message]} format
+        test-fn (cond
+                 (sequential? check) (fn [val] (some #{val} check))
+                 (instance? clojure.lang.IFn check) check
+                 (instance? java.util.regex.Pattern check) (fn [val] (re-find check val))
+                 :else (constantly true))]
+    (fn [ctx element id]
+      (let [val (element name)]
+        (cond
+          (empty? val)
+          (if required
+            (assoc-in ctx [:fatal scope id name] (str "Missing " name))
+            ctx)
+
+          (invalid-utf-8? val)
+          (assoc-in ctx [:errors scope id name] "Is not valid UTF-8.")
+
+          (not (test-fn val))
+          (assoc-in ctx [:errors scope id name] message)
+
+          :else ctx)))))
+
+(defn create-format-rules [scope columns]
+  (map (partial create-format-rule scope) columns))
+
+(defn apply-format-rules [rules ctx element id]
+  (reduce (fn [ctx rule] (rule ctx element id)) ctx rules))
+
+(defn create-translation-fn [{:keys [name translate]}]
+  (fn [row]
+    (if-let [cell (row name)]
+      (assoc row name (translate cell))
+      row)))
+
+(defn translation-fns [columns]
+  (->> columns
+       (filter :translate)
+       (map create-translation-fn)))

@@ -3,10 +3,10 @@
             [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as str]
-            [vip.data-processor.validation.data-spec :refer [data-specs]]
+            [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]))
 
-(def csv-filenames (set (map :filename data-specs)))
+(def csv-filenames (set (map :filename data-spec/data-specs)))
 
 (defn file-name [file]
   (.getName file))
@@ -49,58 +49,12 @@
        (filter #(= filename (.getName %)))
        first))
 
-(defn invalid-utf-8? [string]
-  (.contains string "�"))
-
-(defn create-format-rule
-  "Create a function that applies a format check for a specific row of
-  a CSV import."
-  [filename {:keys [name required format]}]
-  (let [{:keys [check message]} format
-        test-fn (cond
-                 (sequential? check) (fn [val] (some #{val} check))
-                 (instance? clojure.lang.IFn check) check
-                 (instance? java.util.regex.Pattern check) (fn [val] (re-find check val))
-                 :else (constantly true))]
-    (fn [ctx row line-number]
-      (let [val (row name)]
-        (cond
-          (empty? val)
-          (if required
-            (assoc-in ctx [:fatal filename line-number name] (str "Missing required column: " name))
-            ctx)
-
-          (invalid-utf-8? val)
-          (assoc-in ctx [:errors filename line-number name] "Is not valid UTF-8.")
-
-          (not (test-fn val))
-          (assoc-in ctx [:errors filename line-number name] message)
-
-          :else ctx)))))
-
-(defn create-format-rules [{:keys [filename columns]}]
-  (map (partial create-format-rule filename) columns))
-
-(defn apply-format-rules [rules ctx row line-number]
-  (reduce (fn [ctx rule] (rule ctx row line-number)) ctx rules))
-
-(defn validate-format-rules [ctx rows data-spec]
-  (let [format-rules (create-format-rules data-spec)
+(defn validate-format-rules [ctx rows {:keys [filename columns]}]
+  (let [format-rules (data-spec/create-format-rules filename columns)
         line-number (atom 1)]
     (reduce (fn [ctx row]
-              (apply-format-rules format-rules ctx row (swap! line-number inc)))
+              (data-spec/apply-format-rules format-rules ctx row (swap! line-number inc)))
             ctx rows)))
-
-(defn create-translation-fn [{:keys [name translate]}]
-  (fn [row]
-    (if-let [cell (row name)]
-      (assoc row name (translate cell))
-      row)))
-
-(defn translation-fns [columns]
-  (->> columns
-       (filter :translate)
-       (map create-translation-fn)))
 
 (defn load-csv [ctx {:keys [filename table columns] :as data-spec}]
   (if-let [file-to-load (find-input-file ctx filename)]
@@ -122,7 +76,7 @@
             (assoc-in ctx [:critical filename :headers]
                       (str "Missing headers: " (str/join ", " missing-headers)))
             (let [ctx (validate-format-rules ctx contents data-spec)
-                  transforms (apply comp (translation-fns columns))
+                  transforms (apply comp (data-spec/translation-fns columns))
                   transformed-contents (map transforms contents)]
               (sqlite/bulk-import transformed-contents sql-table)
               ctx)))))
