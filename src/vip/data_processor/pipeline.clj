@@ -47,7 +47,7 @@
              :fatal {}
              :pipeline pipeline}
         result (run-pipeline ctx)]
-    (log/info result)
+    (log/info (select-keys result [:errors :warnings :critical :fatal :db]))
     (when-let [ex (:exception result)]
       (log/error (with-out-str (stacktrace/print-stack-trace ex)))
       (throw (ex-info "Exception during processing" {:exception ex
