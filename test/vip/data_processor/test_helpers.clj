@@ -1,6 +1,7 @@
 (ns vip.data-processor.test-helpers
   (:require [clojure.test :refer :all]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [korma.core :as korma]))
 
 (set! *print-length* 10)
 
@@ -35,3 +36,10 @@
          (str "xml/")
          io/resource
          io/as-file)])
+
+(defn assert-column [ctx table column values]
+  (is (= values
+         (map column
+              (korma/select (get-in ctx [:tables table])
+                            (korma/fields column)
+                            (korma/order :id :ASC))))))
