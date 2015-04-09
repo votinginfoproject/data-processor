@@ -26,113 +26,113 @@ Note that the ID attributes are unique throughout the file.
     <feed_contact_id>1555122</feed_contact_id>
     <tou_url>http://www.sos.state.oh.us/vipFeed/terms_of_use.html</tou_url>
   </source>
-	<election id="1">
-		<date>2012-11-06</date>
-		<election_type>Federal</election_type>
-		<state_id>39</state_id>
-		<statewide>yes</statewide>
-		<registration_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=14</registration_info>
-		<absentee_ballot_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=16</absentee_ballot_info>
-		<results_url>http://www.sos.state.oh.us/sos/ElectionsVoter/electionResults.aspx</results_url>
+  <election id="1">
+    <date>2012-11-06</date>
+    <election_type>Federal</election_type>
+    <state_id>39</state_id>
+    <statewide>yes</statewide>
+    <registration_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=14</registration_info>
+    <absentee_ballot_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=16</absentee_ballot_info>
+    <results_url>http://www.sos.state.oh.us/sos/ElectionsVoter/electionResults.aspx</results_url>
     <polling_hours>7am-8pm</polling_hours>
     <election_day_registration>no</election_day_registration>
     <registration_deadline>2012-10-01</registration_deadline>
     <absentee_request_deadline>2012-11-01</absentee_request_deadline>
-	</election>
-	<state id="39">
-		<name>Ohio</name>
-		<election_administration_id>3456</election_administration_id>
-	</state>
-	<locality id="101">
-		<name>Adams</name>
-		<state_id>39</state_id>
-		<type>county</type>
-		<early_vote_site_id>30203</early_vote_site_id>
-	</locality>
-	<locality id="102">
-		<name>Allen</name>
-		<state_id>39</state_id>
-		<type>county</type>
-	</locality>
-	<locality id="103">
-		<name>Ashland</name>
-		<state_id>39</state_id>
-		<type>county</type>
-	</locality>
-	<precinct id="10101">
-		<name>Fake Twp</name>
-		<locality_id>101</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70003</electoral_district_id>
-		<polling_location_id>20121</polling_location_id>
-	</precinct>
-	<precinct id="10102">
-		<name>Psuedo Twp</name>
-		<locality_id>101</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70002</electoral_district_id>
-		<electoral_district_id>70003</electoral_district_id>
-		<polling_location_id>20122</polling_location_id>
-	</precinct>
-	<precinct id="10103">
-		<name>SharesTwoOtherLocations Twp</name>
-		<locality_id>101</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70003</electoral_district_id>
-		<polling_location_id>20121</polling_location_id>
-		<polling_location_id>20122</polling_location_id>
-	</precinct>
-	<precinct id="10201">
-		<name>Bath Twp A</name>
-		<locality_id>102</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70002</electoral_district_id>
-		<polling_location_id>20201</polling_location_id>
-	</precinct>
-	<precinct id="10202">
-		<name>Bath Twp B</name>
-		<locality_id>102</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70002</electoral_district_id>
-		<polling_location_id>20201</polling_location_id>
-	</precinct>
-	<precinct id="10203">
-		<name>Rural Twp Mail In </name>
-		<locality_id>102</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70002</electoral_district_id>
-	  <mail_only>yes</mail_only>
-		<early_vote_site_id>30204</early_vote_site_id>
-	</precinct>
-	<precinct id="10301">
-		<name>1-A</name>
-		<locality_id>103</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70003</electoral_district_id>
-		<ward>1</ward>
-		<polling_location_id>20301</polling_location_id>
-	</precinct>
-	<precinct id="10302">
-		<name>1-B</name>
-		<locality_id>103</locality_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70002</electoral_district_id>
-		<ward>1</ward>
-		<polling_location_id>20301</polling_location_id>
-	</precinct>
-	<precinct_split id="30101">
-		<name>Fake Twp-A</name>
-		<precinct_id>10101</precinct_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70002</electoral_district_id>
+  </election>
+  <state id="39">
+    <name>Ohio</name>
+    <election_administration_id>3456</election_administration_id>
+  </state>
+  <locality id="101">
+    <name>Adams</name>
+    <state_id>39</state_id>
+    <type>county</type>
+    <early_vote_site_id>30203</early_vote_site_id>
+  </locality>
+  <locality id="102">
+    <name>Allen</name>
+    <state_id>39</state_id>
+    <type>county</type>
+  </locality>
+  <locality id="103">
+    <name>Ashland</name>
+    <state_id>39</state_id>
+    <type>county</type>
+  </locality>
+  <precinct id="10101">
+    <name>Fake Twp</name>
+    <locality_id>101</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70003</electoral_district_id>
+    <polling_location_id>20121</polling_location_id>
+  </precinct>
+  <precinct id="10102">
+    <name>Psuedo Twp</name>
+    <locality_id>101</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70002</electoral_district_id>
+    <electoral_district_id>70003</electoral_district_id>
+    <polling_location_id>20122</polling_location_id>
+  </precinct>
+  <precinct id="10103">
+    <name>SharesTwoOtherLocations Twp</name>
+    <locality_id>101</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70003</electoral_district_id>
+    <polling_location_id>20121</polling_location_id>
+    <polling_location_id>20122</polling_location_id>
+  </precinct>
+  <precinct id="10201">
+    <name>Bath Twp A</name>
+    <locality_id>102</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70002</electoral_district_id>
+    <polling_location_id>20201</polling_location_id>
+  </precinct>
+  <precinct id="10202">
+    <name>Bath Twp B</name>
+    <locality_id>102</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70002</electoral_district_id>
+    <polling_location_id>20201</polling_location_id>
+  </precinct>
+  <precinct id="10203">
+    <name>Rural Twp Mail In </name>
+    <locality_id>102</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70002</electoral_district_id>
+    <mail_only>yes</mail_only>
+    <early_vote_site_id>30204</early_vote_site_id>
+  </precinct>
+  <precinct id="10301">
+    <name>1-A</name>
+    <locality_id>103</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70003</electoral_district_id>
+    <ward>1</ward>
+    <polling_location_id>20301</polling_location_id>
+  </precinct>
+  <precinct id="10302">
+    <name>1-B</name>
+    <locality_id>103</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70002</electoral_district_id>
+    <ward>1</ward>
+    <polling_location_id>20301</polling_location_id>
+  </precinct>
+  <precinct_split id="30101">
+    <name>Fake Twp-A</name>
+    <precinct_id>10101</precinct_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70002</electoral_district_id>
     <ballot_style_image_url>http://www.example.com/precinct_split_101_ballot.pdf</ballot_style_image_url>
-	</precinct_split>
-	<precinct_split id="30102">
-		<name>Fake Twp-B</name>
-		<precinct_id>10101</precinct_id>
-		<electoral_district_id>70001</electoral_district_id>
-		<electoral_district_id>70003</electoral_district_id>
-	</precinct_split>
+  </precinct_split>
+  <precinct_split id="30102">
+    <name>Fake Twp-B</name>
+    <precinct_id>10101</precinct_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70003</electoral_district_id>
+  </precinct_split>
   <election_administration id="3456">
     <eo_id>3457</eo_id>
     <ovc_id>3458</ovc_id>
@@ -176,11 +176,11 @@ Note that the ID attributes are unique throughout the file.
     <email>rmiller@ohio.gov</email>
   </election_official>
 
-	<polling_location id="20121">
-		<address><location_name>Springfield Elementary</location_name><line1>123 Main St.</line1><city>Fake Twp</city><state>OH</state><zip>33333</zip></address>
-		<directions>Enter through gym door.</directions>
+  <polling_location id="20121">
+    <address><location_name>Springfield Elementary</location_name><line1>123 Main St.</line1><city>Fake Twp</city><state>OH</state><zip>33333</zip></address>
+    <directions>Enter through gym door.</directions>
     <polling_hours>7:30am-8:30pm</polling_hours>
-	</polling_location>
+  </polling_location>
 	<polling_location id="20122">
 		<address><location_name>Adams Church</location_name><line1>123 Main St.</line1><city>Adams</city><state>OH</state><zip>33333</zip></address>
 		<directions>Enter through door by parking lot.</directions>
