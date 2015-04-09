@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.xml
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]
+            [clojure.walk :refer [stringify-keys]]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.validation.data-spec :as data-spec]))
 
@@ -18,10 +19,9 @@
       :else
       [tag (first content)])))
 
-(defn element->map [{:keys [tag attrs content]}]
-  (let [id (:id attrs)]
-    (into (if id {"id" id} {})
-          (map node->key-value content))))
+(defn element->map [{:keys [attrs content]}]
+  (into (stringify-keys attrs)
+        (map node->key-value content)))
 
 (defn validate-format-rules [ctx rows {:keys [tag-name columns]}]
   (let [format-rules (data-spec/create-format-rules tag-name columns)]
