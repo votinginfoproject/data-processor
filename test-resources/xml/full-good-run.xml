@@ -17,15 +17,15 @@ Note that the ID attributes are unique throughout the file.
 
 -->
 <vip_object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://election-info-standard.googlecode.com/files/election_spec_v3.0.xsd" schemaVersion="3.0">
-      <source id="0">
-        <name>State of Ohio</name>
-        <vip_id>39</vip_id>
-        <datetime>2012-10-31T15:45:10</datetime>
-        <description>The State of Ohio is the official source of eletion information in Ohio. This feed provides information on election dates, districts, offices, candidates, and precinct boundaries.</description>
-        <organization_url>http://www.sos.state.oh.us/</organization_url>
-        <feed_contact_id>1555122</feed_contact_id>
-        <tou_url>http://www.sos.state.oh.us/vipFeed/terms_of_use.html</tou_url>
-      </source>
+  <source id="0">
+    <name>State of Ohio</name>
+    <vip_id>39</vip_id>
+    <datetime>2012-10-31T15:45:10</datetime>
+    <description>The State of Ohio is the official source of eletion information in Ohio. This feed provides information on election dates, districts, offices, candidates, and precinct boundaries.</description>
+    <organization_url>http://www.sos.state.oh.us/</organization_url>
+    <feed_contact_id>1555122</feed_contact_id>
+    <tou_url>http://www.sos.state.oh.us/vipFeed/terms_of_use.html</tou_url>
+  </source>
 	<election id="1">
 		<date>2012-11-06</date>
 		<election_type>Federal</election_type>
@@ -34,10 +34,10 @@ Note that the ID attributes are unique throughout the file.
 		<registration_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=14</registration_info>
 		<absentee_ballot_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=16</absentee_ballot_info>
 		<results_url>http://www.sos.state.oh.us/sos/ElectionsVoter/electionResults.aspx</results_url>
-            <polling_hours>7am-8pm</polling_hours>
-            <election_day_registration>no</election_day_registration>
-            <registration_deadline>2012-10-01</registration_deadline>
-            <absentee_request_deadline>2012-11-01</absentee_request_deadline>
+    <polling_hours>7am-8pm</polling_hours>
+    <election_day_registration>no</election_day_registration>
+    <registration_deadline>2012-10-01</registration_deadline>
+    <absentee_request_deadline>2012-11-01</absentee_request_deadline>
 	</election>
 	<state id="39">
 		<name>Ohio</name>
@@ -101,7 +101,7 @@ Note that the ID attributes are unique throughout the file.
 		<locality_id>102</locality_id>
 		<electoral_district_id>70001</electoral_district_id>
 		<electoral_district_id>70002</electoral_district_id>
-	      <mail_only>yes</mail_only>
+	  <mail_only>yes</mail_only>
 		<early_vote_site_id>30204</early_vote_site_id>
 	</precinct>
 	<precinct id="10301">
@@ -125,7 +125,7 @@ Note that the ID attributes are unique throughout the file.
 		<precinct_id>10101</precinct_id>
 		<electoral_district_id>70001</electoral_district_id>
 		<electoral_district_id>70002</electoral_district_id>
-            <ballot_style_image_url>http://www.example.com/precinct_split_101_ballot.pdf</ballot_style_image_url>
+    <ballot_style_image_url>http://www.example.com/precinct_split_101_ballot.pdf</ballot_style_image_url>
 	</precinct_split>
 	<precinct_split id="30102">
 		<name>Fake Twp-B</name>
@@ -133,58 +133,58 @@ Note that the ID attributes are unique throughout the file.
 		<electoral_district_id>70001</electoral_district_id>
 		<electoral_district_id>70003</electoral_district_id>
 	</precinct_split>
-    <election_administration id="3456">
-        <eo_id>3457</eo_id>
-        <ovc_id>3458</ovc_id>
-        <physical_address><location_name>Government Center</location_name><line1>12 Chad Ct.</line1><city>Columbus</city><state>OH</state><zip>33333</zip></physical_address>
-        <mailing_address><line1>P.O. Box 1776</line1><city>Columbus</city><state>OH</state><zip>33333</zip></mailing_address>
-        <elections_url>http://www.sos.state.oh.us/sos/ElectionsVoter/ohioElections.aspx</elections_url>
-        <registration_url>http://www.elections.oh.us/register.html</registration_url>
-        <am_i_registered_url>http://www.elections.oh.us/check_reg.html</am_i_registered_url>
-        <absentee_url>http://www.elections.oh.us/early_absentee.html</absentee_url>
-        <where_do_i_vote_url>http://www.elections.oh.us/where_vote.html</where_do_i_vote_url>
-        <what_is_on_my_ballot_url>http://www.elections.oh.us/ballot_guide.html</what_is_on_my_ballot_url>
-        <rules_url>http://codes.ohio.gov/orc/35</rules_url>
-        <voter_services>Early voting and absentee ballot request are available beginning October 1. Voter registration is always available.</voter_services>
-        <hours>M-F 9am-6pm Sat 9am-Noon</hours>
-    </election_administration>
-    <election_official id="3457">
-        <name>Robert Smith</name>
-        <phone>(101) 555-1212</phone>
-        <fax>(101) 555-1213</fax>
-        <email>rsmith@ohio.gov</email>
-    </election_official>
-    <election_official id="3458">
-        <name>Roberta Smith</name>
-        <title>Head of Elections</title>
-        <phone>(101) 555-1212</phone>
-        <fax>(101) 555-1213</fax>
-        <email>rsmith@ohio.gov</email>
-    </election_official>
-    <election_official id="1555122">
-        <name>Alissa P. Hacker</name>
-        <title>Information Technology Specialist</title>
-        <phone>(101) 555-1235</phone>
-        <fax>(101) 555-1236</fax>
-        <email>ahacker@ohio.gov</email>
-    </election_official>
-    <election_official id="3459">
-        <name>Robert Miller</name>
-        <title>Overseas Voter Contact</title>
-        <phone>(101) 555-1215</phone>
-        <fax>(101) 555-1216</fax>
-        <email>rmiller@ohio.gov</email>
-    </election_official>
+  <election_administration id="3456">
+    <eo_id>3457</eo_id>
+    <ovc_id>3458</ovc_id>
+    <physical_address><location_name>Government Center</location_name><line1>12 Chad Ct.</line1><city>Columbus</city><state>OH</state><zip>33333</zip></physical_address>
+    <mailing_address><line1>P.O. Box 1776</line1><city>Columbus</city><state>OH</state><zip>33333</zip></mailing_address>
+    <elections_url>http://www.sos.state.oh.us/sos/ElectionsVoter/ohioElections.aspx</elections_url>
+    <registration_url>http://www.elections.oh.us/register.html</registration_url>
+    <am_i_registered_url>http://www.elections.oh.us/check_reg.html</am_i_registered_url>
+    <absentee_url>http://www.elections.oh.us/early_absentee.html</absentee_url>
+    <where_do_i_vote_url>http://www.elections.oh.us/where_vote.html</where_do_i_vote_url>
+    <what_is_on_my_ballot_url>http://www.elections.oh.us/ballot_guide.html</what_is_on_my_ballot_url>
+    <rules_url>http://codes.ohio.gov/orc/35</rules_url>
+    <voter_services>Early voting and absentee ballot request are available beginning October 1. Voter registration is always available.</voter_services>
+    <hours>M-F 9am-6pm Sat 9am-Noon</hours>
+  </election_administration>
+  <election_official id="3457">
+    <name>Robert Smith</name>
+    <phone>(101) 555-1212</phone>
+    <fax>(101) 555-1213</fax>
+    <email>rsmith@ohio.gov</email>
+  </election_official>
+  <election_official id="3458">
+    <name>Roberta Smith</name>
+    <title>Head of Elections</title>
+    <phone>(101) 555-1212</phone>
+    <fax>(101) 555-1213</fax>
+    <email>rsmith@ohio.gov</email>
+  </election_official>
+  <election_official id="1555122">
+    <name>Alissa P. Hacker</name>
+    <title>Information Technology Specialist</title>
+    <phone>(101) 555-1235</phone>
+    <fax>(101) 555-1236</fax>
+    <email>ahacker@ohio.gov</email>
+  </election_official>
+  <election_official id="3459">
+    <name>Robert Miller</name>
+    <title>Overseas Voter Contact</title>
+    <phone>(101) 555-1215</phone>
+    <fax>(101) 555-1216</fax>
+    <email>rmiller@ohio.gov</email>
+  </election_official>
 
 	<polling_location id="20121">
 		<address><location_name>Springfield Elementary</location_name><line1>123 Main St.</line1><city>Fake Twp</city><state>OH</state><zip>33333</zip></address>
 		<directions>Enter through gym door.</directions>
-        	<polling_hours>7:30am-8:30pm</polling_hours>
+    <polling_hours>7:30am-8:30pm</polling_hours>
 	</polling_location>
 	<polling_location id="20122">
 		<address><location_name>Adams Church</location_name><line1>123 Main St.</line1><city>Adams</city><state>OH</state><zip>33333</zip></address>
 		<directions>Enter through door by parking lot.</directions>
-        	<photo_url>http://www.seo.gov/photo20122.jpg</photo_url>
+    <photo_url>http://www.seo.gov/photo20122.jpg</photo_url>
 	</polling_location>
 	<polling_location id="20201">
 		<address><location_name>Bath Firehouse Church</location_name><line1>123 State St.</line1><city>Bath</city><state>OH</state><zip>33333</zip></address>
@@ -195,34 +195,34 @@ Note that the ID attributes are unique throughout the file.
 		<directions>Enter at main doors and take a left.</directions>
 	</polling_location>
 	<early_vote_site id="30203">
-        <name>Adams Early Vote Center</name>
-        <address>
-          <location_name>Adams County Government Center</location_name>
-          <line1>321 Main St.</line1>
+    <name>Adams Early Vote Center</name>
+    <address>
+      <location_name>Adams County Government Center</location_name>
+      <line1>321 Main St.</line1>
 	    <line2>Suite 200</line2>
-          <city>Adams</city>
-          <state>OH</state>
-          <zip>42224</zip>
-        </address>
-        <directions>Follow signs to early vote</directions>
-        <voter_services>Early voting is available.</voter_services>
+      <city>Adams</city>
+      <state>OH</state>
+      <zip>42224</zip>
+    </address>
+    <directions>Follow signs to early vote</directions>
+    <voter_services>Early voting is available.</voter_services>
 	  <start_date>2012-10-01</start_date>
-        <end_date>2012-11-04</end_date>
-        <days_times_open>Mon-Fri: 9am - 6pm. Sat. and Sun.: 10am - 7pm.</days_times_open>
+    <end_date>2012-11-04</end_date>
+    <days_times_open>Mon-Fri: 9am - 6pm. Sat. and Sun.: 10am - 7pm.</days_times_open>
 	</early_vote_site>
 	<early_vote_site id="30204">
-        <name>Springfield Ballot Drop</name>
-        <address>
-          <line1>321 Main St.</line1>
-          <city>Springfield</city>
-          <state>OH</state>
-          <zip>44444</zip>
-        </address>
-        <directions>Next to Post Office.</directions>
-        <voter_services>Ballot drop only</voter_services>
+    <name>Springfield Ballot Drop</name>
+    <address>
+      <line1>321 Main St.</line1>
+      <city>Springfield</city>
+      <state>OH</state>
+      <zip>44444</zip>
+    </address>
+    <directions>Next to Post Office.</directions>
+    <voter_services>Ballot drop only</voter_services>
 	  <start_date>2012-10-01</start_date>
-        <end_date>2012-11-06</end_date>
-        <days_times_open>Open all days, all times.</days_times_open>
+    <end_date>2012-11-06</end_date>
+    <days_times_open>Open all days, all times.</days_times_open>
 	</early_vote_site>
 	<contest id="60001">
 		<election_id>1</election_id>
@@ -270,7 +270,7 @@ Note that the ID attributes are unique throughout the file.
 		<type>general</type>
 		<partisan>no</partisan>
 		<office>County Supervisor At Large</office>
-      	<number_elected>2</number_elected>
+    <number_elected>2</number_elected>
 		<number_voting_for>2</number_voting_for>
 		<ballot_id>80005</ballot_id>
 		<ballot_placement>4</ballot_placement>
@@ -401,108 +401,108 @@ Note that the ID attributes are unique throughout the file.
 		<sort_order>2</sort_order>
 		<text>No</text>
 	</ballot_response>
-    <contest_result id="61004" certification="certified">
-      <contest_id>60004</contest_id>
-      <jurisdiction_id>70003</jurisdiction_id>
-      <entire_district>Yes</entire_district>
-      <total_votes>1002</total_votes>
-      <total_valid_votes>1000</total_valid_votes>
-      <overvotes>1</overvotes>
-      <blank_votes>1</blank_votes>
-      <accepted_provisional_votes>1</accepted_provisional_votes>
-      <rejected_votes>2</rejected_votes>
-    </contest_result>
-    <ballot_line_result id="91008" certification="certified">
-      <contest_id>60004</contest_id>
-      <jurisdiction_id>70003</jurisdiction_id>
-      <entire_district>Yes</entire_district>
-      <candidate_id>90008</candidate_id>
-      <votes>510</votes>
-      <victorious>Yes</victorious>
-    </ballot_line_result>
-    <ballot_line_result id="91009" certification="certified">
-      <contest_id>60004</contest_id>
-      <jurisdiction_id>70003</jurisdiction_id>
-      <entire_district>Yes</entire_district>
-      <candidate_id>90009</candidate_id>
-      <votes>490</votes>
-      <victorious>No</victorious>
-    </ballot_line_result>
-    <contest_result id="61006" certification="certified">
-      <contest_id>60006</contest_id>
-      <jurisdiction_id>10103</jurisdiction_id>
-      <entire_district>No</entire_district>
-      <total_votes>250</total_votes>
-    </contest_result>
-    <ballot_line_result id="62006" certification="certified">
-      <contest_id>60006</contest_id>
-      <jurisdiction_id>10103</jurisdiction_id>
-      <entire_district>No</entire_district>
-	<ballot_response_id>120001</ballot_response_id>
-      <votes>150</votes>
-    </ballot_line_result>
-    <ballot_line_result id="63006" certification="certified">
-      <contest_id>60006</contest_id>
-      <jurisdiction_id>10103</jurisdiction_id>
-      <entire_district>No</entire_district>
-	<ballot_response_id>120002</ballot_response_id>
-      <votes>100</votes>
-    </ballot_line_result>
-    <street_segment id="1210001">
-        <start_house_number>1</start_house_number>
-        <end_house_number>10</end_house_number>
-        <odd_even_both>both</odd_even_both>
-        <non_house_address>
-          <street_direction>E</street_direction>
-          <street_name>Guinevere</street_name>
-          <street_suffix>Dr</street_suffix>
-          <address_direction>SE</address_direction>
-          <apartment>616S</apartment>
-          <state>VA</state>
-          <city>Annandale</city>
-          <zip>22003</zip>
-        </non_house_address>
-        <precinct_id>10101</precinct_id>
-    </street_segment>
-    <street_segment id="1210002">
-        <start_house_number>1</start_house_number>
-        <end_house_number>9</end_house_number>
-        <odd_even_both>odd</odd_even_both>
-        <non_house_address>
-          <street_name>Main</street_name>
-          <street_suffix>Dr</street_suffix>
-          <state>VA</state>
-          <city>Annandale</city>
-          <zip>22003</zip>
-        </non_house_address>
-        <precinct_id>10101</precinct_id>
-        <precinct_split_id>30102</precinct_split_id>
-    </street_segment>
-    <street_segment id="1210003">
-        <start_house_number>2</start_house_number>
-        <end_house_number>2</end_house_number>
-        <odd_even_both>both</odd_even_both>
-        <non_house_address>
-          <house_number_prefix>NW</house_number_prefix>
-          <house_number_suffix>A</house_number_suffix>
-          <street_name>Main</street_name>
-          <street_suffix>Dr</street_suffix>
-          <state>VA</state>
-          <city>Annandale</city>
-          <zip>22003</zip>
-        </non_house_address>
-        <precinct_id>10102</precinct_id>
-    </street_segment>
-    <street_segment id="1210004">
-        <start_house_number>0</start_house_number>
-        <end_house_number>9999999</end_house_number>
-        <odd_even_both>both</odd_even_both>
-        <non_house_address>
-          <street_name>*</street_name>
-          <city>Rural</city>
-          <state>OH</state>
-          <zip>43321</zip>
-        </non_house_address>
-        <precinct_id>10203</precinct_id>
-    </street_segment>
+  <contest_result id="61004" certification="certified">
+    <contest_id>60004</contest_id>
+    <jurisdiction_id>70003</jurisdiction_id>
+    <entire_district>Yes</entire_district>
+    <total_votes>1002</total_votes>
+    <total_valid_votes>1000</total_valid_votes>
+    <overvotes>1</overvotes>
+    <blank_votes>1</blank_votes>
+    <accepted_provisional_votes>1</accepted_provisional_votes>
+    <rejected_votes>2</rejected_votes>
+  </contest_result>
+  <ballot_line_result id="91008" certification="certified">
+    <contest_id>60004</contest_id>
+    <jurisdiction_id>70003</jurisdiction_id>
+    <entire_district>Yes</entire_district>
+    <candidate_id>90008</candidate_id>
+    <votes>510</votes>
+    <victorious>Yes</victorious>
+  </ballot_line_result>
+  <ballot_line_result id="91009" certification="certified">
+    <contest_id>60004</contest_id>
+    <jurisdiction_id>70003</jurisdiction_id>
+    <entire_district>Yes</entire_district>
+    <candidate_id>90009</candidate_id>
+    <votes>490</votes>
+    <victorious>No</victorious>
+  </ballot_line_result>
+  <contest_result id="61006" certification="certified">
+    <contest_id>60006</contest_id>
+    <jurisdiction_id>10103</jurisdiction_id>
+    <entire_district>No</entire_district>
+    <total_votes>250</total_votes>
+  </contest_result>
+  <ballot_line_result id="62006" certification="certified">
+    <contest_id>60006</contest_id>
+    <jurisdiction_id>10103</jurisdiction_id>
+    <entire_district>No</entire_district>
+	  <ballot_response_id>120001</ballot_response_id>
+    <votes>150</votes>
+  </ballot_line_result>
+  <ballot_line_result id="63006" certification="certified">
+    <contest_id>60006</contest_id>
+    <jurisdiction_id>10103</jurisdiction_id>
+    <entire_district>No</entire_district>
+	  <ballot_response_id>120002</ballot_response_id>
+    <votes>100</votes>
+  </ballot_line_result>
+  <street_segment id="1210001">
+    <start_house_number>1</start_house_number>
+    <end_house_number>10</end_house_number>
+    <odd_even_both>both</odd_even_both>
+    <non_house_address>
+      <street_direction>E</street_direction>
+      <street_name>Guinevere</street_name>
+      <street_suffix>Dr</street_suffix>
+      <address_direction>SE</address_direction>
+      <apartment>616S</apartment>
+      <state>VA</state>
+      <city>Annandale</city>
+      <zip>22003</zip>
+    </non_house_address>
+    <precinct_id>10101</precinct_id>
+  </street_segment>
+  <street_segment id="1210002">
+    <start_house_number>1</start_house_number>
+    <end_house_number>9</end_house_number>
+    <odd_even_both>odd</odd_even_both>
+    <non_house_address>
+      <street_name>Main</street_name>
+      <street_suffix>Dr</street_suffix>
+      <state>VA</state>
+      <city>Annandale</city>
+      <zip>22003</zip>
+    </non_house_address>
+    <precinct_id>10101</precinct_id>
+    <precinct_split_id>30102</precinct_split_id>
+  </street_segment>
+  <street_segment id="1210003">
+    <start_house_number>2</start_house_number>
+    <end_house_number>2</end_house_number>
+    <odd_even_both>both</odd_even_both>
+    <non_house_address>
+      <house_number_prefix>NW</house_number_prefix>
+      <house_number_suffix>A</house_number_suffix>
+      <street_name>Main</street_name>
+      <street_suffix>Dr</street_suffix>
+      <state>VA</state>
+      <city>Annandale</city>
+      <zip>22003</zip>
+    </non_house_address>
+    <precinct_id>10102</precinct_id>
+  </street_segment>
+  <street_segment id="1210004">
+    <start_house_number>0</start_house_number>
+    <end_house_number>9999999</end_house_number>
+    <odd_even_both>both</odd_even_both>
+    <non_house_address>
+      <street_name>*</street_name>
+      <city>Rural</city>
+      <state>OH</state>
+      <zip>43321</zip>
+    </non_house_address>
+    <precinct_id>10203</precinct_id>
+  </street_segment>
 </vip_object>
