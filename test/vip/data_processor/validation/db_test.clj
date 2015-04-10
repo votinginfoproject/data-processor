@@ -100,10 +100,10 @@
 
 (deftest validate-election-administration-addresses-test
   (testing "errors are returned if either the physical or mailing address is incomplete"
-    (let [ctx (merge {:input [(io/as-file (io/resource "bad-election-administration-addresses/election_administration.txt"))]
-                      :pipeline [(csv/add-csv-specs csv/csv-specs)
-                               csv/load-csvs
-                               validate-election-administration-addresses]}
+    (let [ctx (merge {:input (csv-inputs ["bad-election-administration-addresses/election_administration.txt"])
+                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                                 csv/load-csvs
+                                 validate-election-administration-addresses]}
                      (sqlite/temp-db "incomplete-addresses"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:errors "election_administration.txt"
