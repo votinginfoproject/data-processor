@@ -5,6 +5,30 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.validation.data-spec :as data-spec]))
 
+(def address-elements
+  #{"address"
+    "physical_address"
+    "mailing_address"
+    "filed_mailing_address"
+    "non_house_address"})
+
+(defn suffix-map [suffix map]
+  (reduce-kv (fn [suffixed-map k v]
+               (assoc suffixed-map
+                      (str suffix "_" k)
+                      v))
+             {}
+             map))
+
+(defn flatten-address-elements [map]
+  (reduce (fn [element address-key]
+            (if-let [address (element address-key)]
+              (merge (dissoc element address-key)
+                     (suffix-map address-key address))
+              element))
+          map
+          address-elements))
+
 (declare element->map)
 
 (defn node->key-value [{:keys [tag content] :as node}]
@@ -20,8 +44,10 @@
       [tag (first content)])))
 
 (defn element->map [{:keys [attrs content]}]
-  (into (stringify-keys attrs)
-        (map node->key-value content)))
+  (-> attrs
+      stringify-keys
+      (into (map node->key-value content))
+      flatten-address-elements))
 
 (defn validate-format-rules [ctx rows {:keys [tag-name columns]}]
   (let [format-rules (data-spec/create-format-rules tag-name columns)]

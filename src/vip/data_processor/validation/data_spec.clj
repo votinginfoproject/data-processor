@@ -42,6 +42,7 @@
               {:name "sort_order" :format format/all-digits}]}
    {:filename "candidate.txt"
     :table :candidates
+    :tag-name :candidate
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "party"}
@@ -101,6 +102,7 @@
               {:name "sort_order" :format format/all-digits}]}
    {:filename "early_vote_site.txt"
     :table :early-vote-sites
+    :tag-name :early_vote_site
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name"}
               {:name "address_location_name"}
@@ -132,6 +134,7 @@
               {:name "absentee_request_deadline" :format format/date}]}
    {:filename "election_administration.txt"
     :table :election-administrations
+    :tag-name :election_administration
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name"}
               {:name "eo_id" :format format/all-digits :references :election-officials}
@@ -189,6 +192,7 @@
               {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites}]}
    {:filename "polling_location.txt"
     :table :polling-locations
+    :tag-name :polling_location
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "address_location_name"}
               {:name "address_line1" :required true}
@@ -260,6 +264,7 @@
               {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites}]}
    {:filename "street_segment.txt"
     :table :street-segments
+    :tag-name :street_segment
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "start_house_number" :required true}
               {:name "end_house_number" :required true}
