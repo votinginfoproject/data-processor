@@ -42,6 +42,7 @@
    db/validate-one-record-limit
    db/validate-no-unreferenced-rows
    db/validate-no-overlapping-street-segments
+   db/validate-election-administration-addresses
    fips/validate-valid-source-vip-id])
 
 (defn xml-csv-branch [ctx]

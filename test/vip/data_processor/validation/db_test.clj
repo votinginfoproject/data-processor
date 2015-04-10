@@ -97,3 +97,16 @@
         out-ctx (pipeline/run-pipeline ctx)]
     (is (= #{#{11 12} #{13 14} #{15 16} #{17 18} #{19 20}}
            (get-in out-ctx [:errors "street_segment.txt" :overlaps])))))
+
+(deftest validate-election-administration-addresses-test
+  (testing "errors are returned if either the physical or mailing address is incomplete"
+    (let [ctx (merge {:input [(io/as-file (io/resource "bad-election-administration-addresses/election_administration.txt"))]
+                      :pipeline [(csv/add-csv-specs csv/csv-specs)
+                               csv/load-csvs
+                               validate-election-administration-addresses]}
+                     (sqlite/temp-db "incomplete-addresses"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors "election_administration.txt"
+                           :incomplete-physical-address]))
+      (is (get-in out-ctx [:errors "election_administration.txt"
+                           :incomplete-mailing-address])))))
