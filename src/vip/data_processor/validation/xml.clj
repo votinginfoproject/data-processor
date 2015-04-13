@@ -52,7 +52,7 @@
 (defn validate-format-rules [ctx rows {:keys [tag-name columns]}]
   (let [format-rules (data-spec/create-format-rules tag-name columns)]
     (reduce (fn [ctx row]
-              (data-spec/apply-format-rules format-rules ctx row (:id row)))
+              (data-spec/apply-format-rules format-rules ctx row (row "id")))
             ctx rows)))
 
 (defn is-tag? [elem tag]
