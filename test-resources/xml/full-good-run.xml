@@ -154,13 +154,6 @@ Note that the ID attributes are unique throughout the file.
     <fax>(101) 555-1213</fax>
     <email>rsmith@ohio.gov</email>
   </election_official>
-  <election_official id="3458">
-    <name>Roberta Smith</name>
-    <title>Head of Elections</title>
-    <phone>(101) 555-1212</phone>
-    <fax>(101) 555-1213</fax>
-    <email>rsmith@ohio.gov</email>
-  </election_official>
   <election_official id="1555122">
     <name>Alissa P. Hacker</name>
     <title>Information Technology Specialist</title>
@@ -168,14 +161,6 @@ Note that the ID attributes are unique throughout the file.
     <fax>(101) 555-1236</fax>
     <email>ahacker@ohio.gov</email>
   </election_official>
-  <election_official id="3459">
-    <name>Robert Miller</name>
-    <title>Overseas Voter Contact</title>
-    <phone>(101) 555-1215</phone>
-    <fax>(101) 555-1216</fax>
-    <email>rmiller@ohio.gov</email>
-  </election_official>
-
   <polling_location id="20121">
     <address><location_name>Springfield Elementary</location_name><line1>123 Main St.</line1><city>Fake Twp</city><state>OH</state><zip>33333</zip></address>
     <directions>Enter through gym door.</directions>
@@ -224,37 +209,6 @@ Note that the ID attributes are unique throughout the file.
     <end_date>2012-11-06</end_date>
     <days_times_open>Open all days, all times.</days_times_open>
   </early_vote_site>
-  <contest id="60001">
-    <election_id>1</election_id>
-    <electoral_district_id>70001</electoral_district_id>
-    <type>general</type>
-    <partisan>yes</partisan>
-    <office>State Treasurer</office>
-    <ballot_id>80001</ballot_id>
-    <ballot_placement>1</ballot_placement>
-    <filing_closed_date>2012-05-10</filing_closed_date>
-  </contest>
-  <contest id="60002">
-    <election_id>1</election_id>
-    <electoral_district_id>70001</electoral_district_id>
-    <type>general</type>
-    <partisan>yes</partisan>
-    <office>Attorney General</office>
-    <ballot_id>80002</ballot_id>
-    <ballot_placement>2</ballot_placement>
-  </contest>
-  <contest id="60003">
-    <election_id>1</election_id>
-    <electoral_district_id>70002</electoral_district_id>
-    <type>primary</type>
-    <partisan>yes</partisan>
-    <primary_party>Democrat</primary_party>
-    <electorate_specifications>All voters registered in the Democratic Party by October 20th, 2012.</electorate_specifications>
-    <special>yes</special>
-    <office>State Senate</office>
-    <ballot_id>80003</ballot_id>
-    <ballot_placement>3</ballot_placement>
-  </contest>
   <contest id="60004">
     <election_id>1</election_id>
     <electoral_district_id>70003</electoral_district_id>
@@ -262,17 +216,6 @@ Note that the ID attributes are unique throughout the file.
     <partisan>no</partisan>
     <office>County Commisioner</office>
     <ballot_id>80004</ballot_id>
-    <ballot_placement>4</ballot_placement>
-  </contest>
-  <contest id="60005">
-    <election_id>1</election_id>
-    <electoral_district_id>70003</electoral_district_id>
-    <type>general</type>
-    <partisan>no</partisan>
-    <office>County Supervisor At Large</office>
-    <number_elected>2</number_elected>
-    <number_voting_for>2</number_voting_for>
-    <ballot_id>80005</ballot_id>
     <ballot_placement>4</ballot_placement>
   </contest>
   <contest id="60006">
@@ -283,59 +226,53 @@ Note that the ID attributes are unique throughout the file.
     <ballot_id>80006</ballot_id>
     <ballot_placement>6</ballot_placement>
   </contest>
-  <contest id="60007">
-    <election_id>1</election_id>
-    <electoral_district_id>70003</electoral_district_id>
-    <type>judge retention</type>
-    <partisan>no</partisan>
-    <ballot_id>80007</ballot_id>
-    <ballot_placement>5</ballot_placement>
-  </contest>
   <electoral_district id="70001">
     <name>statewide</name>
     <type>statewide</type>
   </electoral_district>
   <electoral_district id="70002">
     <name>SD-13</name>
-    <type>State Senate</type>
+    <type>state senate</type>
   </electoral_district>
   <electoral_district id="70003">
     <name>Ashland County</name>
-    <type>County</type>
+    <type>county</type>
   </electoral_district>
   <ballot id="80001">
     <candidate_id>90001</candidate_id>
     <candidate_id>90002</candidate_id>
     <candidate_id>90003</candidate_id>
+    <image_url>http://example.com/1.jpg</image_url>
   </ballot>
   <ballot id="80002">
     <candidate_id>90004</candidate_id>
     <candidate_id>90005</candidate_id>
+    <image_url>http://example.com/2.jpg</image_url>
   </ballot>
   <ballot id="80003">
     <candidate_id>90006</candidate_id>
     <candidate_id>90007</candidate_id>
+    <image_url>http://example.com/3.jpg</image_url>
   </ballot>
   <ballot id="80004">
     <candidate_id>90008</candidate_id>
     <candidate_id>90009</candidate_id>
+    <image_url>http://example.com/4.jpg</image_url>
   </ballot>
   <ballot id="80005">
     <candidate_id>90010</candidate_id>
+    <image_url>http://example.com/5.jpg</image_url>
   </ballot>
   <ballot id="80006">
     <referendum_id>90011</referendum_id>
-  </ballot>
-  <ballot id="80007">
-    <custom_ballot_id>90012</custom_ballot_id>
-    <write_in>no</write_in>
+    <image_url>http://example.com/6.jpg</image_url>
   </ballot>
   <candidate id="90001">
     <name>Daniel Berlin</name>
     <party>Democrat</party>
     <candidate_url>http://www.dberlin.org</candidate_url>
     <biography>Daniel Berlin grew up somewhere</biography>
-    <phone>123-456-7890</phone>
+    <phone>(123) 456-7890</phone>
     <photo_url>http://www.dberlin.org/dannyb.jpg</photo_url>
     <filed_mailing_address><line1>123 Fake St.</line1><city>Rockville</city><state>OH</state><zip>20852</zip></filed_mailing_address>
     <email>dberlin@example.com</email>
@@ -481,7 +418,7 @@ Note that the ID attributes are unique throughout the file.
   <street_segment id="1210003">
     <start_house_number>2</start_house_number>
     <end_house_number>2</end_house_number>
-    <odd_even_both>both</odd_even_both>
+    <odd_even_both>even</odd_even_both>
     <non_house_address>
       <house_number_prefix>NW</house_number_prefix>
       <house_number_suffix>A</house_number_suffix>
