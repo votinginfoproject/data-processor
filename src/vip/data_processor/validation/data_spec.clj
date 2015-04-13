@@ -234,7 +234,7 @@
               {:name "ballot_style_image_url" :format format/url}]}
    {:filename "precinct_split.txt"
     :table :precinct-splits
-    :tag-name :precinct-split
+    :tag-name :precinct_split
     :xml-references [{:join-table :precinct-split-electoral-districts
                       :id "precinct_split_id"
                       :joined-id "electoral_district_id"}
