@@ -1,5 +1,7 @@
 (ns vip.data-processor.test-helpers
-  (:require [clojure.test :refer :all]))
+  (:require [clojure.test :refer :all]
+            [clojure.java.io :as io]
+            [korma.core :as korma]))
 
 (set! *print-length* 10)
 
@@ -21,3 +23,23 @@
   "Test that there is an error of some level for the key-path."
   [ctx key-path]
   (is (seq (remove nil? (map #(get-in ctx (cons % key-path)) problem-types)))))
+
+(defn csv-inputs [file-names]
+  (map #(->> %
+             (str "csv/")
+             io/resource
+             io/as-file)
+       file-names))
+
+(defn xml-input [file-name]
+  [(->> file-name
+         (str "xml/")
+         io/resource
+         io/as-file)])
+
+(defn assert-column [ctx table column values]
+  (is (= values
+         (map column
+              (korma/select (get-in ctx [:tables table])
+                            (korma/fields column)
+                            (korma/order :id :ASC))))))

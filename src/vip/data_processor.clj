@@ -3,6 +3,7 @@
             [democracyworks.squishy :as sqs]
             [korma.core :as korma]
             [vip.data-processor.pipeline :as pipeline]
+            [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.queue :as q]
@@ -16,6 +17,7 @@
    t/download-from-s3
    zip/unzip
    zip/extracted-contents
+   (data-spec/add-data-specs data-spec/data-specs)
    t/xml-csv-branch])
 
 (defn consume []
