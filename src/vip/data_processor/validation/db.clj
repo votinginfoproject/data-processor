@@ -14,7 +14,7 @@
       ctx)))
 
 (defn validate-no-duplicated-rows [{:keys [data-specs] :as ctx}]
-  (reduce dupe-records/validate-no-duplicated-rows-in-table ctx (:data-specs ctx)))
+  (reduce dupe-records/validate-no-duplicated-rows-in-table ctx data-specs))
 
 (defn validate-one-record-limit [ctx]
   (record-limit/tables-allow-only-one-record ctx))

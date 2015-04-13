@@ -1,14 +1,14 @@
 (ns vip.data-processor.validation.db.duplicate-ids
-  (:require [vip.data-processor.validation.data-spec :refer [data-specs]]
-            [korma.core :as korma]))
+  (:require [korma.core :as korma]))
 
 (defn has-id? [data-spec]
   (some #(-> % :name (= "id")) (:columns data-spec)))
 
-(defn tables-with-ids [ctx]
-  (let [table-with-id (filter has-id? data-specs)
-        table-names (map :table table-with-id)]
-    (map (:tables ctx) table-names)))
+(defn tables-with-ids [{:keys [data-specs tables]}]
+  (->> data-specs
+       (filter has-id?)
+       (map :table)
+       (map tables)))
 
 (defn add-to-seen-ids [seen-ids table]
   (let [ids (korma/select table (korma/fields :id))]
