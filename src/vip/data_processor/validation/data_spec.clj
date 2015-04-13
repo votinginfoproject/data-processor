@@ -12,6 +12,9 @@
   [{:filename "ballot.txt"
     :table :ballots
     :tag-name :ballot
+    :xml-references [{:join-table :ballot-candidates
+                      :id "ballot_id"
+                      :joined-id "candidate_id"}]
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "referendum_id" :format format/all-digits :references :referendums}
               {:name "custom_ballot_id" :format format/all-digits :references :custom-ballots}
@@ -93,6 +96,9 @@
    {:filename "custom_ballot.txt"
     :table :custom-ballots
     :tag-name :custom_ballot
+    :xml-references [{:join-table :custom-ballot-ballot-responses
+                      :id "custom_ballot_id"
+                      :joined-id "ballot_response_id"}]
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "heading" :required true}]}
    {:filename "custom_ballot_ballot_response.txt"
@@ -181,6 +187,9 @@
    {:filename "locality.txt"
     :table :localities
     :tag-name :locality
+    :xml-references [{:join-table :locality-early-vote-sites
+                      :id "locality_id"
+                      :joined-id "early_vote_site_id"}]
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "state_id" :required true :format format/all-digits :references :states}
@@ -207,6 +216,15 @@
    {:filename "precinct.txt"
     :table :precincts
     :tag-name :precinct
+    :xml-references [{:join-table :precinct-polling-locations
+                      :id "precinct_id"
+                      :joined-id "polling_location_id"}
+                     {:join-table :precinct-early-vote-sites
+                      :id "precinct_id"
+                      :joined-id "early_vote_site_id"}
+                     {:join-table :precinct-electoral-districts
+                      :id "precinct_id"
+                      :joined-id "electoral_district_id"}]
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "number"}
@@ -217,6 +235,12 @@
    {:filename "precinct_split.txt"
     :table :precinct-splits
     :tag-name :precinct-split
+    :xml-references [{:join-table :precinct-split-electoral-districts
+                      :id "precinct_split_id"
+                      :joined-id "electoral_district_id"}
+                     {:join-table :precinct-split-polling-locations
+                      :id "precinct_split_id"
+                      :joined-id "polling_location_id"}]
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "precinct_id" :required true :format format/all-digits :references :precincts}
@@ -244,6 +268,9 @@
    {:filename "referendum.txt"
     :table :referendums
     :tag-name :referendum
+    :xml-references [{:join-table :referendum-ballot-responses
+                      :id "referendum_id"
+                      :joined-id "ballot_response_id"}]
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "title" :required true}
               {:name "subtitle"}
@@ -298,6 +325,9 @@
    {:filename "state.txt"
     :table :states
     :tag-name :state
+    :xml-references [{:join-table :state-early-vote-sites
+                      :id "state_id"
+                      :joined-id "early_vote_site_id"}]
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "name" :required true}
               {:name "election_administration_id" :format format/all-digits :references :election-administrations}]}])

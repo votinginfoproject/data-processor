@@ -93,4 +93,17 @@
                                            :address_city
                                            :address_state
                                            :address_zip)
-                             (korma/where {:id 20121}))))))))
+                             (korma/where {:id 20121})))))
+      (testing "loads join table data"
+        (let [precinct-polling-locations (korma/select
+                                          (get-in out-ctx [:tables :precinct-polling-locations])
+                                          (korma/where {:precinct_id 10103}))]
+          (is (= #{20121 20122} (set (map :polling_location_id precinct-polling-locations)))))
+        (let [referendum-ballot-responses (korma/select
+                                           (get-in out-ctx [:tables :referendum-ballot-responses])
+                                           (korma/where {:referendum_id 90011}))]
+          (is (= #{120001 120002} (set (map :ballot_response_id referendum-ballot-responses)))))
+        (let [locality-early-vote-sites (korma/select
+                                         (get-in out-ctx [:tables :locality-early-vote-sites]))]
+          (is (= [{:locality_id 101 :early_vote_site_id 30203}]
+                 locality-early-vote-sites)))))))

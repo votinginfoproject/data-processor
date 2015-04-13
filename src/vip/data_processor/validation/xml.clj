@@ -55,6 +55,21 @@
               (data-spec/apply-format-rules format-rules ctx row (:id row)))
             ctx rows)))
 
+(defn is-tag? [elem tag]
+  (= (keyword tag) (:tag elem)))
+
+(defn element->joins [id-name joined-id elem]
+  (let [id (:id (:attrs elem))
+        join-elements (filter #(is-tag? % joined-id) (:content elem))]
+    (map (fn [join-elem] {id-name id joined-id (first (:content join-elem))})
+         join-elements)))
+
+(defn import-joins [ctx {:keys [xml-references] :as data-spec} elements]
+  (doseq [{:keys [join-table id joined-id]} xml-references]
+    (let [sql-table (get-in ctx [:tables join-table])
+          join-contents (mapcat (partial element->joins id joined-id) elements)]
+      (sqlite/bulk-import join-contents sql-table))))
+
 (defn load-elements [ctx elements]
   (let [tag (:tag (first elements))]
     (if-let [data-spec (first (filter #(= tag (:tag-name %)) data-spec/data-specs))]
@@ -67,6 +82,7 @@
             contents (map #(select-keys % column-names) element-maps)
             transforms (apply comp (data-spec/translation-fns columns))
             transformed-contents (map transforms contents)]
+        (import-joins ctx data-spec elements)
         (sqlite/bulk-import transformed-contents sql-table)
         ctx)
       (assoc-in ctx [:critical :xml-import tag :unknown] tag))))
