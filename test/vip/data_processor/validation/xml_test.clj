@@ -3,6 +3,7 @@
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.db :as db]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma]))
@@ -11,22 +12,16 @@
   (testing "loads data into the db from an XML file"
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
                       :data-specs data-spec/data-specs}
-                     (sqlite/temp-db "full-good-run-xml"))
+                     (sqlite/temp-db "load-xml-test"))
           out-ctx (load-xml ctx)]
       (testing "loads simple data from XML"
         (is (= [{:id 39 :name "Ohio" :election_administration_id 3456}]
                (korma/select (get-in out-ctx [:tables :states]))))
-        (is (= 7
+        (is (= 6
                (:cnt (first (korma/select (get-in out-ctx [:tables :ballots])
                                           (korma/aggregate (count "*") :cnt))))))
         (assert-column out-ctx :ballot-responses :text ["Yes" "No"])
-        (assert-column out-ctx :contests :office ["State Treasurer"
-                                                  "Attorney General"
-                                                  "State Senate"
-                                                  "County Commisioner"
-                                                  "County Supervisor At Large"
-                                                  nil
-                                                  nil])
+        (assert-column out-ctx :contests :office ["County Commisioner" nil])
         (assert-column out-ctx :contest-results :total_votes [1002 250])
         (assert-column out-ctx :custom-ballots :heading ["Should Judge Carlton Smith be retained?"]))
       (testing "loads data from attributes"
@@ -107,3 +102,14 @@
                                          (get-in out-ctx [:tables :locality-early-vote-sites]))]
           (is (= [{:locality_id 101 :early_vote_site_id 30203}]
                  locality-early-vote-sites)))))))
+
+(deftest full-good-run-test
+  (testing "a good XML file produces no erorrs or warnings"
+    (let [ctx (merge {:input (xml-input "full-good-run.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline (concat [load-xml] db/validations)}
+                     (sqlite/temp-db "load-xml-test"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (nil? (:stop out-ctx)))
+      (is (nil? (:exception out-ctx)))
+      (assert-no-problems out-ctx []))))

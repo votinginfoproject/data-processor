@@ -6,8 +6,6 @@
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.csv.file-set :as csv-files]
-            [vip.data-processor.validation.db :as db]
-            [vip.data-processor.validation.fips :as fips]
             [vip.data-processor.validation.xml :as xml]))
 
 (defn read-edn-sqs-message [ctx]
@@ -34,16 +32,7 @@
    (csv/error-on-missing-file "election.txt")
    (csv/error-on-missing-file "source.txt")
    (csv-files/validate-dependencies csv-files/file-dependencies)
-   csv/load-csvs
-   db/validate-no-duplicated-ids
-   db/validate-no-duplicated-rows
-   db/validate-references
-   db/validate-jurisdiction-references
-   db/validate-one-record-limit
-   db/validate-no-unreferenced-rows
-   db/validate-no-overlapping-street-segments
-   db/validate-election-administration-addresses
-   fips/validate-valid-source-vip-id])
+   csv/load-csvs])
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
