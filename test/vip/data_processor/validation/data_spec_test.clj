@@ -3,7 +3,7 @@
             [vip.data-processor.validation.data-spec :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.csv :as csv]
-            [vip.data-processor.validation.csv.value-format :as format]
+            [vip.data-processor.validation.data-spec.value-format :as format]
             [vip.data-processor.db.sqlite :as sqlite]))
 
 (deftest create-format-rule-test

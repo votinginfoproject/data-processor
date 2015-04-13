@@ -1,5 +1,5 @@
 (ns vip.data-processor.validation.data-spec
-  (:require [vip.data-processor.validation.csv.value-format :as format]))
+  (:require [vip.data-processor.validation.data-spec.value-format :as format]))
 
 (defn boolean-value [x]
   (if (re-find #"\A(?i:yes)\z" x) 1 0))

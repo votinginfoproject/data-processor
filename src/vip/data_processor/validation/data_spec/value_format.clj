@@ -1,4 +1,4 @@
-(ns vip.data-processor.validation.csv.value-format)
+(ns vip.data-processor.validation.data-spec.value-format)
 
 (def all-digits
   {:check #"\A\d+\z"
