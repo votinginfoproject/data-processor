@@ -49,8 +49,8 @@
       (into (map node->key-value content))
       flatten-address-elements))
 
-(defn validate-format-rules [ctx rows {:keys [tag-name columns]}]
-  (let [format-rules (data-spec/create-format-rules tag-name columns)]
+(defn validate-format-rules [ctx rows {:keys [table columns]}]
+  (let [format-rules (data-spec/create-format-rules table columns)]
     (reduce (fn [ctx row]
               (data-spec/apply-format-rules format-rules ctx row (row "id")))
             ctx rows)))

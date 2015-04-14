@@ -101,7 +101,14 @@
         (let [locality-early-vote-sites (korma/select
                                          (get-in out-ctx [:tables :locality-early-vote-sites]))]
           (is (= [{:locality_id 101 :early_vote_site_id 30203}]
-                 locality-early-vote-sites)))))))
+                 locality-early-vote-sites))))))
+  (testing "adds errors for non-UTF-8 data"
+    (let [ctx (merge {:input (xml-input "non-utf-8.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml]}
+                     (sqlite/temp-db "non-utf-8"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :candidates "90001"])))))
 
 (deftest full-good-run-test
   (testing "a good XML file produces no erorrs or warnings"
