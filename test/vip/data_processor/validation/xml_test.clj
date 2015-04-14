@@ -141,3 +141,12 @@
                      (sqlite/temp-db "unreferenced-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:errors :localities :reference-error])))))
+
+(deftest validate-jurisdiction-references-test
+  (testing "returns an error if there are unreferenced jurisdiction references"
+    (let [ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-jurisdiction-references]}
+                     (sqlite/temp-db "unreferenced-jurisdictions"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :ballot-line-results :reference-error])))))

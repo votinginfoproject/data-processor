@@ -55,6 +55,6 @@
   (let [unmatched-references (unmatched-jurisdiction-references
                               (:tables ctx) table)]
     (if (seq unmatched-references)
-      (assoc-in ctx [:errors filename :reference-error "jurisdiction_id"]
+      (assoc-in ctx [:errors table :reference-error "jurisdiction_id"]
                 unmatched-references)
       ctx)))
