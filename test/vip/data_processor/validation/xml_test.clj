@@ -171,3 +171,16 @@
                      (sqlite/temp-db "overlapping-street-segments"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:errors :street-segments :overlaps])))))
+
+(deftest validate-election-administration-addresses
+  (testing "returns an error if either the physical or mailing address is incomplete"
+    (let [ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml
+                                 db/validate-election-administration-addresses]}
+                     (sqlite/temp-db "incomplete-election-administrations"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :election-administrations
+                           :incomplete-physical-address]))
+      (is (get-in out-ctx [:errors :election-administrations
+                           :incomplete-mailing-address])))))

@@ -106,7 +106,7 @@
                                  validate-election-administration-addresses]}
                      (sqlite/temp-db "incomplete-addresses"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors "election_administration.txt"
+      (is (get-in out-ctx [:errors :election-administrations
                            :incomplete-physical-address]))
-      (is (get-in out-ctx [:errors "election_administration.txt"
+      (is (get-in out-ctx [:errors :election-administrations
                            :incomplete-mailing-address])))))

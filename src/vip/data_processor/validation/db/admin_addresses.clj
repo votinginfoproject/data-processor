@@ -22,7 +22,7 @@
                            (map :id))
         error-name (keyword (str "incomplete-" (name address-type) "-address"))]
     (if (seq bad-addresses)
-      (assoc-in ctx [:errors "election_administration.txt" error-name]
+      (assoc-in ctx [:errors :election-administrations error-name]
                 bad-addresses)
       ctx)))
 
