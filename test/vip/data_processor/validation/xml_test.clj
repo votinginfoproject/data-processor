@@ -108,7 +108,7 @@
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
                       :data-specs data-spec/data-specs
                       :pipeline (concat [load-xml] db/validations)}
-                     (sqlite/temp-db "load-xml-test"))
+                     (sqlite/temp-db "full-good-xml"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (nil? (:stop out-ctx)))
       (is (nil? (:exception out-ctx)))
