@@ -54,7 +54,7 @@
                                  validate-references]}
                      (sqlite/temp-db "bad-references"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= 1 (count (get-in out-ctx [:errors "ballot.txt" :reference-error "referendum_id"])))))))
+      (is (= 1 (count (get-in out-ctx [:errors :ballots :reference-error "referendum_id"])))))))
 
 (deftest validate-jurisdiction-references-test
   (testing "finds bad jurisdiction references"

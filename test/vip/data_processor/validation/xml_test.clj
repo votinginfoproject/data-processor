@@ -132,3 +132,12 @@
                      (sqlite/temp-db "duplicated-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (not (empty? (get-in out-ctx [:warnings :ballots :duplicated-rows])))))))
+
+(deftest validate-references-test
+  (testing "returns an error if there are unreferenced objects"
+    (let [ctx (merge {:input (xml-input "unreferenced-ids.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-references]}
+                     (sqlite/temp-db "unreferenced-ids"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :localities :reference-error])))))

@@ -26,7 +26,7 @@
                                           (:references column))]
                 (if (seq unmatched-references)
                   (assoc-in ctx [:errors
-                                 filename
+                                 table
                                  :reference-error
                                  (:name column)]
                             unmatched-references)
