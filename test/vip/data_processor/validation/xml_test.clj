@@ -150,3 +150,15 @@
                      (sqlite/temp-db "unreferenced-jurisdictions"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:errors :ballot-line-results :reference-error])))))
+
+(deftest validate-one-record-limit-test
+  (testing "returns an error if particular nodes are duplicated more than once"
+    (let [ctx (merge {:input (xml-input "one-record-limit.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-one-record-limit]}
+                     (sqlite/temp-db "one-record-limit"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= "File needs to contain exactly one row."
+             (get-in out-ctx [:errors :elections :row-constraint])))
+      (is (= "File needs to contain exactly one row."
+             (get-in out-ctx [:errors :sources :row-constraint]))))))

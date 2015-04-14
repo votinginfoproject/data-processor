@@ -42,7 +42,7 @@
                                  validate-one-record-limit]}
                      (sqlite/temp-db "too-many-records"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= (get-in out-ctx [:errors "election.txt" :row-constraint])
+      (is (= (get-in out-ctx [:errors :elections :row-constraint])
              "File needs to contain exactly one row.")))))
 
 (deftest validate-references-test
