@@ -3,7 +3,6 @@
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.csv :refer :all]
             [vip.data-processor.validation.data-spec :refer [data-specs]]
-            [vip.data-processor.validation.csv.value-format :as format]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma])
   (:import [java.io File]))
