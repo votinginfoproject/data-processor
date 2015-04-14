@@ -42,9 +42,9 @@
         sql (find-dupes-sql (:name table) columns-without-id)]
     (korma/exec-raw (:db table) [sql] :results)))
 
-(defn validate-no-duplicated-rows-in-table [ctx {:keys [filename table]}]
-  (let [table (get-in ctx [:tables table])
-        potential-dupes (find-potential-dupes table)]
+(defn validate-no-duplicated-rows-in-table [ctx {:keys [table]}]
+  (let [sql-table (get-in ctx [:tables table])
+        potential-dupes (find-potential-dupes sql-table)]
     (if (seq potential-dupes)
-      (assoc-in ctx [:warnings filename :duplicated-rows] potential-dupes)
+      (assoc-in ctx [:warnings table :duplicated-rows] potential-dupes)
       ctx)))

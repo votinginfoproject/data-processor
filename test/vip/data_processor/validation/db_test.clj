@@ -30,9 +30,9 @@
                      (sqlite/temp-db "duplicate-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= #{3100047456984 3100047456989 3100047466988 3100047466990}
-             (set (map :id (get-in out-ctx [:warnings "candidate.txt" :duplicated-rows])))))
+             (set (map :id (get-in out-ctx [:warnings :candidates :duplicated-rows])))))
       (is (= #{{:candidate_id 3100047456987, :ballot_id 410004745} {:candidate_id 3100047466988, :ballot_id 410004746}}
-             (set (get-in out-ctx [:warnings "ballot_candidate.txt" :duplicated-rows])))))))
+             (set (get-in out-ctx [:warnings :ballot-candidates :duplicated-rows])))))))
 
 (deftest validate-one-record-limit-test
   (testing "validates that only one row exists in certain files"

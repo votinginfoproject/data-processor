@@ -123,3 +123,12 @@
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= #{"precincts" "localities"}
              (set (get-in out-ctx [:errors :import :duplicated-ids 101])))))))
+
+(deftest validate-no-duplicated-rows-test
+  (testing "returns a warning if two nodes have the same data"
+    (let [ctx (merge {:input (xml-input "duplicated-rows.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-duplicated-rows]}
+                     (sqlite/temp-db "duplicated-rows"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (not (empty? (get-in out-ctx [:warnings :ballots :duplicated-rows])))))))
