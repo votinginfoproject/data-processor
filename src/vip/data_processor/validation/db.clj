@@ -42,7 +42,7 @@
                       (map set)
                       set)]
     (if (seq overlaps)
-      (assoc-in ctx [:errors "street_segment.txt" :overlaps] overlaps)
+      (assoc-in ctx [:errors :street-segments :overlaps] overlaps)
       ctx)))
 
 (defn validate-election-administration-addresses [ctx]

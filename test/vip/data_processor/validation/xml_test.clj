@@ -162,3 +162,12 @@
              (get-in out-ctx [:errors :elections :row-constraint])))
       (is (= "File needs to contain exactly one row."
              (get-in out-ctx [:errors :sources :row-constraint]))))))
+
+(deftest validate-no-overlapping-street-segments
+  (testing "returns an error if street segments overlap"
+    (let [ctx (merge {:input (xml-input "overlapping-street-segments.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-overlapping-street-segments]}
+                     (sqlite/temp-db "overlapping-street-segments"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :street-segments :overlaps])))))

@@ -96,7 +96,7 @@
                    (sqlite/temp-db "overlapping-street-segments"))
         out-ctx (pipeline/run-pipeline ctx)]
     (is (= #{#{11 12} #{13 14} #{15 16} #{17 18} #{19 20}}
-           (get-in out-ctx [:errors "street_segment.txt" :overlaps])))))
+           (get-in out-ctx [:errors :street-segments :overlaps])))))
 
 (deftest validate-election-administration-addresses-test
   (testing "errors are returned if either the physical or mailing address is incomplete"
