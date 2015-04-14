@@ -200,3 +200,17 @@
                            :incomplete-physical-address]))
       (is (get-in out-ctx [:errors :election-administrations
                            :incomplete-mailing-address])))))
+
+(deftest validate-data-formats
+  (let [ctx (merge {:input (xml-input "bad-data-values.xml")
+                    :data-specs data-spec/data-specs
+                    :pipeline [load-xml]}
+                   (sqlite/temp-db "bad-data-values"))
+        out-ctx (pipeline/run-pipeline ctx)]
+    (testing "adds fatal errors for missing required fields"
+      (is (get-in out-ctx [:fatal :candidates "90001" "name"])))
+    (testing "adds errors for values that fail format validation"
+      (is (get-in out-ctx [:errors :candidates "90001" "candidate_url"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "phone"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "email"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "sort_order"])))))
