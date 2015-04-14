@@ -26,7 +26,29 @@ Note that the ID attributes are unique throughout the file.
     <feed_contact_id>1555122</feed_contact_id>
     <tou_url>http://www.sos.state.oh.us/vipFeed/terms_of_use.html</tou_url>
   </source>
-  <election id="1">
+  <source id="1">
+    <name>State of Ohio</name>
+    <vip_id>39</vip_id>
+    <datetime>2012-10-31T15:45:10</datetime>
+    <description>The State of Ohio is the official source of eletion information in Ohio. This feed provides information on election dates, districts, offices, candidates, and precinct boundaries.</description>
+    <organization_url>http://www.sos.state.oh.us/</organization_url>
+    <feed_contact_id>1555122</feed_contact_id>
+    <tou_url>http://www.sos.state.oh.us/vipFeed/terms_of_use.html</tou_url>
+  </source>
+  <election id="2">
+    <date>2012-11-06</date>
+    <election_type>Federal</election_type>
+    <state_id>39</state_id>
+    <statewide>yes</statewide>
+    <registration_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=14</registration_info>
+    <absentee_ballot_info>http://www.sos.state.oh.us/sos/PublicAffairs/VoterInfoGuide.aspx?Section=16</absentee_ballot_info>
+    <results_url>http://www.sos.state.oh.us/sos/ElectionsVoter/electionResults.aspx</results_url>
+    <polling_hours>7am-8pm</polling_hours>
+    <election_day_registration>no</election_day_registration>
+    <registration_deadline>2012-10-01</registration_deadline>
+    <absentee_request_deadline>2012-11-01</absentee_request_deadline>
+  </election>
+  <election id="3">
     <date>2012-11-06</date>
     <election_type>Federal</election_type>
     <state_id>39</state_id>

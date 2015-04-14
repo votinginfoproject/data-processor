@@ -19,7 +19,7 @@ Note that the ID attributes are unique throughout the file.
 <vip_object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://election-info-standard.googlecode.com/files/election_spec_v3.0.xsd" schemaVersion="3.0">
   <source id="0">
     <name>State of Ohio</name>
-    <vip_id>39</vip_id>
+    <vip_id>99999</vip_id>
     <datetime>2012-10-31T15:45:10</datetime>
     <description>The State of Ohio is the official source of eletion information in Ohio. This feed provides information on election dates, districts, offices, candidates, and precinct boundaries.</description>
     <organization_url>http://www.sos.state.oh.us/</organization_url>

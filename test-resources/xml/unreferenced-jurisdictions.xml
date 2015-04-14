@@ -351,7 +351,7 @@ Note that the ID attributes are unique throughout the file.
   </contest_result>
   <ballot_line_result id="91008" certification="certified">
     <contest_id>60004</contest_id>
-    <jurisdiction_id>70003</jurisdiction_id>
+    <jurisdiction_id>99999</jurisdiction_id>
     <entire_district>Yes</entire_district>
     <candidate_id>90008</candidate_id>
     <votes>510</votes>

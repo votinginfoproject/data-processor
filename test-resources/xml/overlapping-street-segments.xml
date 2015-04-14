@@ -404,7 +404,7 @@ Note that the ID attributes are unique throughout the file.
   <street_segment id="1210002">
     <start_house_number>1</start_house_number>
     <end_house_number>9</end_house_number>
-    <odd_even_both>odd</odd_even_both>
+    <odd_even_both>both</odd_even_both>
     <non_house_address>
       <street_name>Main</street_name>
       <street_suffix>Dr</street_suffix>

@@ -268,7 +268,7 @@ Note that the ID attributes are unique throughout the file.
     <image_url>http://example.com/6.jpg</image_url>
   </ballot>
   <candidate id="90001">
-    <name>Daniel Berlin</name>
+    <name>Danÿel Berlin</name>
     <party>Democrat</party>
     <candidate_url>http://www.dberlin.org</candidate_url>
     <biography>Daniel Berlin grew up somewhere</biography>

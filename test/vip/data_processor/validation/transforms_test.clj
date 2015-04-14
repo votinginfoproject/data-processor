@@ -4,6 +4,7 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.transforms :refer :all]
             [vip.data-processor.db.sqlite :as sqlite]
             [clojure.java.io :as io]
@@ -16,8 +17,9 @@
           filenames (->> csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
-          ctx (merge {:input filenames :pipeline (concat [data-spec/add-data-specs data-spec/data-specs]
-                                                         csv-validations)} db)
+          ctx (merge {:input filenames :pipeline (concat [(data-spec/add-data-specs data-spec/data-specs)]
+                                                         csv-validations
+                                                         db/validations)} db)
           results-ctx (pipeline/run-pipeline ctx)]
       (is (nil? (:stop results-ctx)))
       (is (nil? (:exception results-ctx)))

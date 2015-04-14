@@ -5,12 +5,13 @@
             [vip.data-processor.validation.db.record-limit :as record-limit]
             [vip.data-processor.validation.db.reverse-references :as rev-refs]
             [vip.data-processor.validation.db.street-segment :as street-segment]
-            [vip.data-processor.validation.db.admin-addresses :as admin-addresses]))
+            [vip.data-processor.validation.db.admin-addresses :as admin-addresses]
+            [vip.data-processor.validation.fips :as fips]))
 
 (defn validate-no-duplicated-ids [ctx]
   (let [dupes (dupe-ids/duplicated-ids ctx)]
     (if-not (empty? dupes)
-      (assoc-in ctx [:errors "Duplicate IDs"] dupes)
+      (assoc-in ctx [:errors :import :duplicated-ids] dupes)
       ctx)))
 
 (defn validate-no-duplicated-rows [{:keys [data-specs] :as ctx}]
@@ -41,8 +42,19 @@
                       (map set)
                       set)]
     (if (seq overlaps)
-      (assoc-in ctx [:errors "street_segment.txt" :overlaps] overlaps)
+      (assoc-in ctx [:errors :street-segments :overlaps] overlaps)
       ctx)))
 
 (defn validate-election-administration-addresses [ctx]
   (admin-addresses/validate-addresses ctx))
+
+(def validations
+  [validate-no-duplicated-ids
+   validate-no-duplicated-rows
+   validate-references
+   validate-jurisdiction-references
+   validate-one-record-limit
+   validate-no-unreferenced-rows
+   validate-no-overlapping-street-segments
+   validate-election-administration-addresses
+   fips/validate-valid-source-vip-id])

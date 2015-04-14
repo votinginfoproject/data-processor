@@ -136,8 +136,8 @@ Note that the ID attributes are unique throughout the file.
   <election_administration id="3456">
     <eo_id>3457</eo_id>
     <ovc_id>3458</ovc_id>
-    <physical_address><location_name>Government Center</location_name><line1>12 Chad Ct.</line1><city>Columbus</city><state>OH</state><zip>33333</zip></physical_address>
-    <mailing_address><line1>P.O. Box 1776</line1><city>Columbus</city><state>OH</state><zip>33333</zip></mailing_address>
+    <physical_address><location_name>Government Center</location_name><line1>12 Chad Ct.</line1><city>Columbus</city><state>OH</state><zip></zip></physical_address>
+    <mailing_address><line1>P.O. Box 1776</line1><city>Columbus</city><state></state><zip>33333</zip></mailing_address>
     <elections_url>http://www.sos.state.oh.us/sos/ElectionsVoter/ohioElections.aspx</elections_url>
     <registration_url>http://www.elections.oh.us/register.html</registration_url>
     <am_i_registered_url>http://www.elections.oh.us/check_reg.html</am_i_registered_url>

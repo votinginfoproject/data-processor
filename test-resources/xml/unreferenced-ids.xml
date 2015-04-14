@@ -45,7 +45,7 @@ Note that the ID attributes are unique throughout the file.
   </state>
   <locality id="101">
     <name>Adams</name>
-    <state_id>39</state_id>
+    <state_id>99</state_id>
     <type>county</type>
     <early_vote_site_id>30203</early_vote_site_id>
   </locality>

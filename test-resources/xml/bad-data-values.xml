@@ -268,15 +268,14 @@ Note that the ID attributes are unique throughout the file.
     <image_url>http://example.com/6.jpg</image_url>
   </ballot>
   <candidate id="90001">
-    <name>Daniel Berlin</name>
     <party>Democrat</party>
-    <candidate_url>http://www.dberlin.org</candidate_url>
+    <candidate_url>gopher://www.dberlin.org</candidate_url>
     <biography>Daniel Berlin grew up somewhere</biography>
-    <phone>(123) 456-7890</phone>
+    <phone>800-MIX-A-LOT</phone>
     <photo_url>http://www.dberlin.org/dannyb.jpg</photo_url>
     <filed_mailing_address><line1>123 Fake St.</line1><city>Rockville</city><state>OH</state><zip>20852</zip></filed_mailing_address>
-    <email>dberlin@example.com</email>
-    <sort_order>1</sort_order>
+    <email>dberlin.at.example.com</email>
+    <sort_order>1a</sort_order>
   </candidate>
   <candidate id="90002">
     <name>Berlin Opponent</name>

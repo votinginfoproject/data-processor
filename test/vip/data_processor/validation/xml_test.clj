@@ -3,6 +3,7 @@
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.db :as db]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma]))
@@ -11,22 +12,16 @@
   (testing "loads data into the db from an XML file"
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
                       :data-specs data-spec/data-specs}
-                     (sqlite/temp-db "full-good-run-xml"))
+                     (sqlite/temp-db "load-xml-test"))
           out-ctx (load-xml ctx)]
       (testing "loads simple data from XML"
         (is (= [{:id 39 :name "Ohio" :election_administration_id 3456}]
                (korma/select (get-in out-ctx [:tables :states]))))
-        (is (= 7
+        (is (= 6
                (:cnt (first (korma/select (get-in out-ctx [:tables :ballots])
                                           (korma/aggregate (count "*") :cnt))))))
         (assert-column out-ctx :ballot-responses :text ["Yes" "No"])
-        (assert-column out-ctx :contests :office ["State Treasurer"
-                                                  "Attorney General"
-                                                  "State Senate"
-                                                  "County Commisioner"
-                                                  "County Supervisor At Large"
-                                                  nil
-                                                  nil])
+        (assert-column out-ctx :contests :office ["County Commisioner" nil])
         (assert-column out-ctx :contest-results :total_votes [1002 250])
         (assert-column out-ctx :custom-ballots :heading ["Should Judge Carlton Smith be retained?"]))
       (testing "loads data from attributes"
@@ -106,4 +101,116 @@
         (let [locality-early-vote-sites (korma/select
                                          (get-in out-ctx [:tables :locality-early-vote-sites]))]
           (is (= [{:locality_id 101 :early_vote_site_id 30203}]
-                 locality-early-vote-sites)))))))
+                 locality-early-vote-sites))))))
+  (testing "adds errors for non-UTF-8 data"
+    (let [ctx (merge {:input (xml-input "non-utf-8.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml]}
+                     (sqlite/temp-db "non-utf-8"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :candidates "90001"])))))
+
+(deftest full-good-run-test
+  (testing "a good XML file produces no erorrs or warnings"
+    (let [ctx (merge {:input (xml-input "full-good-run.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline (concat [load-xml] db/validations)}
+                     (sqlite/temp-db "full-good-xml"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (nil? (:stop out-ctx)))
+      (is (nil? (:exception out-ctx)))
+      (assert-no-problems out-ctx []))))
+
+(deftest validate-no-duplicated-ids-test
+  (testing "returns an error when there is a duplicated id"
+    (let [ctx (merge {:input (xml-input "duplicated-ids.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-duplicated-ids]}
+                     (sqlite/temp-db "duplicated-ids"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= #{"precincts" "localities"}
+             (set (get-in out-ctx [:errors :import :duplicated-ids 101])))))))
+
+(deftest validate-no-duplicated-rows-test
+  (testing "returns a warning if two nodes have the same data"
+    (let [ctx (merge {:input (xml-input "duplicated-rows.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-duplicated-rows]}
+                     (sqlite/temp-db "duplicated-rows"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (not (empty? (get-in out-ctx [:warnings :ballots :duplicated-rows])))))))
+
+(deftest validate-references-test
+  (testing "returns an error if there are unreferenced objects"
+    (let [ctx (merge {:input (xml-input "unreferenced-ids.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-references]}
+                     (sqlite/temp-db "unreferenced-ids"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :localities :reference-error])))))
+
+(deftest validate-jurisdiction-references-test
+  (testing "returns an error if there are unreferenced jurisdiction references"
+    (let [ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-jurisdiction-references]}
+                     (sqlite/temp-db "unreferenced-jurisdictions"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :ballot-line-results :reference-error])))))
+
+(deftest validate-one-record-limit-test
+  (testing "returns an error if particular nodes are duplicated more than once"
+    (let [ctx (merge {:input (xml-input "one-record-limit.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-one-record-limit]}
+                     (sqlite/temp-db "one-record-limit"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= "File needs to contain exactly one row."
+             (get-in out-ctx [:errors :elections :row-constraint])))
+      (is (= "File needs to contain exactly one row."
+             (get-in out-ctx [:errors :sources :row-constraint]))))))
+
+(deftest validate-no-unreferenced-rows
+  (testing "returns a warning if it finds rows that are unreferenced"
+    (let [ctx (merge {:input (xml-input "unreferenced-rows.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-unreferenced-rows]}
+                     (sqlite/temp-db "unreferenced-rows"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:warnings :candidates :unreferenced-rows])))))
+
+(deftest validate-no-overlapping-street-segments
+  (testing "returns an error if street segments overlap"
+    (let [ctx (merge {:input (xml-input "overlapping-street-segments.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-overlapping-street-segments]}
+                     (sqlite/temp-db "overlapping-street-segments"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :street-segments :overlaps])))))
+
+(deftest validate-election-administration-addresses
+  (testing "returns an error if either the physical or mailing address is incomplete"
+    (let [ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml
+                                 db/validate-election-administration-addresses]}
+                     (sqlite/temp-db "incomplete-election-administrations"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:errors :election-administrations
+                           :incomplete-physical-address]))
+      (is (get-in out-ctx [:errors :election-administrations
+                           :incomplete-mailing-address])))))
+
+(deftest validate-data-formats
+  (let [ctx (merge {:input (xml-input "bad-data-values.xml")
+                    :data-specs data-spec/data-specs
+                    :pipeline [load-xml]}
+                   (sqlite/temp-db "bad-data-values"))
+        out-ctx (pipeline/run-pipeline ctx)]
+    (testing "adds fatal errors for missing required fields"
+      (is (get-in out-ctx [:fatal :candidates "90001" "name"])))
+    (testing "adds errors for values that fail format validation"
+      (is (get-in out-ctx [:errors :candidates "90001" "candidate_url"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "phone"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "email"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "sort_order"])))))

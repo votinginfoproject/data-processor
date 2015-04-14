@@ -238,6 +238,12 @@ Note that the ID attributes are unique throughout the file.
     <name>Ashland County</name>
     <type>county</type>
   </electoral_district>
+  <ballot id="80000">
+    <candidate_id>90001</candidate_id>
+    <candidate_id>90002</candidate_id>
+    <candidate_id>90003</candidate_id>
+    <image_url>http://example.com/1.jpg</image_url>
+  </ballot>
   <ballot id="80001">
     <candidate_id>90001</candidate_id>
     <candidate_id>90002</candidate_id>

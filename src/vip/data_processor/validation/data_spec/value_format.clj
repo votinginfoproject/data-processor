@@ -5,7 +5,7 @@
    :message "Invalid data type"})
 
 (def contest-election-type
-  {:check ["general" "primary" "run-off" "referendum"]
+  {:check ["general" "primary" "run-off" "referendum" "judge retention"]
    :message "Invalid election_type"})
 
 (def date
@@ -21,7 +21,7 @@
    :message "Invalid election_type"})
 
 (def electoral-district-type
-  {:check ["statewide" "state senate" "state house" "fire district" "congressional district" "school district"]
+  {:check ["statewide" "state senate" "state house" "fire district" "congressional district" "school district" "county"]
    :message "Invalid type"})
 
 (def email

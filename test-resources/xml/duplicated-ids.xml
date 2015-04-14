@@ -59,6 +59,13 @@ Note that the ID attributes are unique throughout the file.
     <state_id>39</state_id>
     <type>county</type>
   </locality>
+  <precinct id="101">
+    <name>Fake Twp</name>
+    <locality_id>101</locality_id>
+    <electoral_district_id>70001</electoral_district_id>
+    <electoral_district_id>70003</electoral_district_id>
+    <polling_location_id>20121</polling_location_id>
+  </precinct>
   <precinct id="10101">
     <name>Fake Twp</name>
     <locality_id>101</locality_id>
