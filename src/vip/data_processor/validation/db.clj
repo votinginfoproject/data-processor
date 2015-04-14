@@ -11,7 +11,7 @@
 (defn validate-no-duplicated-ids [ctx]
   (let [dupes (dupe-ids/duplicated-ids ctx)]
     (if-not (empty? dupes)
-      (assoc-in ctx [:errors "Duplicate IDs"] dupes)
+      (assoc-in ctx [:errors :import :duplicated-ids] dupes)
       ctx)))
 
 (defn validate-no-duplicated-rows [{:keys [data-specs] :as ctx}]

@@ -113,3 +113,13 @@
       (is (nil? (:stop out-ctx)))
       (is (nil? (:exception out-ctx)))
       (assert-no-problems out-ctx []))))
+
+(deftest validate-no-duplicated-ids-test
+  (testing "returns an error when there is a duplicated id"
+    (let [ctx (merge {:input (xml-input "duplicated-ids.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-duplicated-ids]}
+                     (sqlite/temp-db "duplicated-ids"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= #{"precincts" "localities"}
+             (set (get-in out-ctx [:errors :import :duplicated-ids 101])))))))

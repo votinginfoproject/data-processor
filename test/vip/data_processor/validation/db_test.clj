@@ -16,9 +16,9 @@
                                  validate-no-duplicated-ids]}
                      (sqlite/temp-db "duplicate-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors "Duplicate IDs" 8675309]))
-      (is (get-in out-ctx [:errors "Duplicate IDs" 5882300]))
-      (is (not (get-in out-ctx [:errors "Duplicate IDs" 7]))))))
+      (is (get-in out-ctx [:errors :import :duplicated-ids 8675309]))
+      (is (get-in out-ctx [:errors :import :duplicated-ids 5882300]))
+      (is (not (get-in out-ctx [:errors :import :duplicated-ids 7]))))))
 
 (deftest validate-no-duplicated-rows-test
   (testing "finds possibly duplicated rows in a table and warns"
