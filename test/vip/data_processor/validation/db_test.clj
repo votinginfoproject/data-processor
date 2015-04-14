@@ -83,10 +83,10 @@
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= [2 3]
              (map :id (get-in out-ctx
-                              [:warnings "ballot.txt" :unreferenced-rows]))))
+                              [:warnings :ballots :unreferenced-rows]))))
       (is (= [13 14]
              (map :id (get-in out-ctx
-                              [:warnings "candidate.txt" :unreferenced-rows])))))))
+                              [:warnings :candidates :unreferenced-rows])))))))
 
 (deftest validate-no-overlapping-street-segments-test
   (let [ctx (merge {:input (csv-inputs ["overlapping-street-segments/street_segment.txt"])

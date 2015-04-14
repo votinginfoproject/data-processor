@@ -163,6 +163,15 @@
       (is (= "File needs to contain exactly one row."
              (get-in out-ctx [:errors :sources :row-constraint]))))))
 
+(deftest validate-no-unreferenced-rows
+  (testing "returns a warning if it finds rows that are unreferenced"
+    (let [ctx (merge {:input (xml-input "unreferenced-rows.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml db/validate-no-unreferenced-rows]}
+                     (sqlite/temp-db "unreferenced-rows"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:warnings :candidates :unreferenced-rows])))))
+
 (deftest validate-no-overlapping-street-segments
   (testing "returns an error if street segments overlap"
     (let [ctx (merge {:input (xml-input "overlapping-street-segments.xml")
