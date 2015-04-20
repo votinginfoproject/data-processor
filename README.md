@@ -12,12 +12,16 @@ reported upon.
 
 ### lein
 
-Copy `dev-resources/config.edn.sample` to `dev-resources/config.edn`
-and set the values inside as necessary. Then:
+To run the processor against a local .zip file run the following:
 
 ```sh
-$ lein trampoline run
+$ lein run ~/path/to/upload.zip
 ```
+
+Currently this will validate the data and produce the XML output but
+without any reporting whatsoever. Once the reporting infrastructure is
+in place, a report will be generated so you can see errors and
+warnings generated during validations.
 
 ### Docker
 
