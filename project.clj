@@ -1,6 +1,6 @@
 (defproject vip.data-processor "0.1.0-SNAPSHOT"
   :description "Voting Information Project Data Processor"
-  :dependencies [[org.clojure/clojure "1.7.0-alpha5"]
+  :dependencies [[org.clojure/clojure "1.7.0-beta1"]
                  [org.slf4j/slf4j-log4j12 "1.7.10"]
                  [org.clojure/data.csv "0.1.2"]
                  [org.clojure/data.xml "0.0.8"]
