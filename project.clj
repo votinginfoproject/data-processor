@@ -5,6 +5,7 @@
                  [org.clojure/data.csv "0.1.2"]
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/tools.logging "0.3.1"]
+                 [org.apache.directory.studio/org.apache.commons.lang "2.6"]
                  [com.novemberain/langohr "3.0.1"]
                  [joda-time "2.7"]
                  [clj-aws-s3 "0.3.10" :exclusions [joda-time]]
