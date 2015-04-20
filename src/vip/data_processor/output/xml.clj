@@ -19,7 +19,8 @@
             [clojure.walk :as walk]
             [vip.data-processor.output.candidate :as candidate]
             [vip.data-processor.output.early-vote-site :as early-vote-site]
-            [vip.data-processor.output.polling-location :as polling-location])
+            [vip.data-processor.output.polling-location :as polling-location]
+            [vip.data-processor.output.state :as state])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [org.apache.commons.lang StringEscapeUtils]))
@@ -85,4 +86,5 @@
    (add-xml-children candidate/xml-nodes)
    (add-xml-children early-vote-site/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
+   (add-xml-children state/xml-nodes)
    write-xml])
