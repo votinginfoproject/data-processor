@@ -17,7 +17,8 @@
             [clojure.string :as string]
             [clojure.java.io :as io]
             [clojure.walk :as walk]
-            [vip.data-processor.output.candidate :as candidate])
+            [vip.data-processor.output.candidate :as candidate]
+            [vip.data-processor.output.early-vote-site :as early-vote-site])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [org.apache.commons.lang StringEscapeUtils]))
@@ -81,4 +82,5 @@
 (def pipeline
   [create-xml-file
    (add-xml-children candidate/xml-nodes)
+   (add-xml-children early-vote-site/xml-nodes)
    write-xml])
