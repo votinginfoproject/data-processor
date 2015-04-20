@@ -16,7 +16,8 @@
   (:require [clojure.xml :as xml]
             [clojure.string :as string]
             [clojure.java.io :as io]
-            [clojure.walk :as walk])
+            [clojure.walk :as walk]
+            [vip.data-processor.output.candidate :as candidate])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [org.apache.commons.lang StringEscapeUtils]))
@@ -79,4 +80,5 @@
 
 (def pipeline
   [create-xml-file
+   (add-xml-children candidate/xml-nodes)
    write-xml])
