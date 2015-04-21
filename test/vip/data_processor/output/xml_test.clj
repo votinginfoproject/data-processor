@@ -48,6 +48,9 @@
       (are [path text] (= text (xpath/$x:text path xml-doc))
            "/vip_object/candidate[@id=10000]/name" "Gail H. Timberlake"
            "/vip_object/candidate[@id=10004]/party" "Republican"
+           "/vip_object/contest[@id=20000]/partisan" "no"
+           "/vip_object/contest[@id=20000]/special" "no"
+           "/vip_object/contest[@id=20002]/office" "Member Board of Supervisors"
            "/vip_object/state/name" "Virginia"
            "/vip_object/state/election_administration_id" "40133"
            "/vip_object/street_segment[@id=2000005]/non_house_address/street_name" "Neptune"
