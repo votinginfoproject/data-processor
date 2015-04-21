@@ -52,6 +52,8 @@
            "/vip_object/contest[@id=20000]/special" "no"
            "/vip_object/contest[@id=20002]/office" "Member Board of Supervisors"
            "/vip_object/referendum[@id=86702]/title" "More Cats"
+           "/vip_object/election_official[@id=50122]/title" "General Registrar Physical"
+           "/vip_object/election_official[@id=50122]/phone" "(757) 393-8644"
            "/vip_object/referendum[@id=86702]/ballot_response_id[@sort_order=1]" "87703"
            "/vip_object/referendum[@id=86702]/ballot_response_id[@sort_order=2]" "87704"
            "/vip_object/state/name" "Virginia"
