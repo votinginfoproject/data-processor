@@ -46,6 +46,9 @@
                       slurp
                       xpath/xml->doc)]
       (are [path text] (= text (xpath/$x:text path xml-doc))
+           "/vip_object/ballot[@id=200000]/image_url" "http://i.imgur.com/PMgfJSm.jpg"
+           "/vip_object/ballot[@id=200000]/candidate_id[@sort_order=3]" "10000"
+           "/vip_object/ballot[@id=200000]/candidate_id[@sort_order=1]" "10004"
            "/vip_object/candidate[@id=10000]/name" "Gail H. Timberlake"
            "/vip_object/candidate[@id=10004]/party" "Republican"
            "/vip_object/contest[@id=20000]/partisan" "no"
