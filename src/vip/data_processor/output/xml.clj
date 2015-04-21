@@ -22,6 +22,7 @@
             [vip.data-processor.output.candidate :as candidate]
             [vip.data-processor.output.contest :as contest]
             [vip.data-processor.output.early-vote-site :as early-vote-site]
+            [vip.data-processor.output.election :as election]
             [vip.data-processor.output.election-official :as election-official]
             [vip.data-processor.output.polling-location :as polling-location]
             [vip.data-processor.output.referendum :as referendum]
@@ -94,6 +95,7 @@
    (add-xml-children candidate/xml-nodes)
    (add-xml-children contest/xml-nodes)
    (add-xml-children early-vote-site/xml-nodes)
+   (add-xml-children election/xml-nodes)
    (add-xml-children election-official/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
    (add-xml-children referendum/xml-nodes)
