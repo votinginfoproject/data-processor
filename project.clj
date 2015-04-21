@@ -18,7 +18,8 @@
                  [org.clojure/java.jdbc "0.3.5"]
                  [org.postgresql/postgresql "9.4-1200-jdbc4" :exclusions [org.slf4j/slf4j-simple]]
                  [org.xerial/sqlite-jdbc "3.8.7"]]
-  :profiles {:test {:resource-paths ["test-resources"]}
+  :profiles {:test {:resource-paths ["test-resources"]
+                    :dependencies [[com.github.kyleburton/clj-xpath "1.4.4"]]}
              :dev {:source-paths ["dev-src"]
                    :main dev.core}}
   :main vip.data-processor)
