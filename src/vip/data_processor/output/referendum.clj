@@ -31,13 +31,17 @@
                          (map ballot-response->xml ballot-responses))]
     (simple-xml :referendum id children)))
 
+(defn ballot-responses [ctx referendum]
+  (let [referendum-ballot-responses-table (get-in ctx [:tables :referendum-ballot-responses])
+        ballot-responses-table (get-in ctx [:tables :ballot-responses])]
+    (korma/select referendum-ballot-responses-table
+                  (korma/fields :ballot_responses.id :ballot_responses.sort_order)
+                  (korma/join ballot-responses-table
+                              (= :ballot_responses.id :ballot_response_id))
+                  (korma/where {:referendum_id (:id referendum)}))))
+
 (defn xml-nodes [ctx]
   (let [referendums-table (get-in ctx [:tables :referendums])
-        referendum-ballot-responses-table (get-in ctx [:tables :referendum-ballot-responses])
-        ballot-responses-table (get-in ctx [:tables :ballot-responses])
         referendums (korma/select referendums-table)]
-    (map #(->xml % (korma/select referendum-ballot-responses-table
-                                                    (korma/fields :ballot_responses.id :ballot_responses.sort_order)
-                                                    (korma/join ballot-responses-table
-                                                                (= :ballot_responses.id :ballot_response_id))
-                                                    (korma/where {:referendum_id (:id %)}))) referendums)))
+    (map #(->xml % (ballot-responses ctx %))
+         referendums)))
