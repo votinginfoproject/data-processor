@@ -17,6 +17,7 @@
             [clojure.string :as string]
             [clojure.java.io :as io]
             [clojure.walk :as walk]
+            [vip.data-processor.output.ballot-response :as ballot-response]
             [vip.data-processor.output.candidate :as candidate]
             [vip.data-processor.output.early-vote-site :as early-vote-site]
             [vip.data-processor.output.polling-location :as polling-location]
@@ -84,6 +85,7 @@
 
 (def pipeline
   [create-xml-file
+   (add-xml-children ballot-response/xml-nodes)
    (add-xml-children candidate/xml-nodes)
    (add-xml-children early-vote-site/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
