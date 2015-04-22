@@ -62,6 +62,8 @@
            "/vip_object/election_official[@id=50122]/phone" "(757) 393-8644"
            "/vip_object/referendum[@id=86702]/ballot_response_id[@sort_order=1]" "87703"
            "/vip_object/referendum[@id=86702]/ballot_response_id[@sort_order=2]" "87704"
+           "/vip_object/source/name" "Department of Elections, Commonwealth of Virginia"
+           "/vip_object/source/datetime" "2015-01-21T18:13:25"
            "/vip_object/state/name" "Virginia"
            "/vip_object/state/election_administration_id" "40133"
            "/vip_object/street_segment[@id=2000005]/non_house_address/street_name" "Neptune"

@@ -26,6 +26,7 @@
             [vip.data-processor.output.election-official :as election-official]
             [vip.data-processor.output.polling-location :as polling-location]
             [vip.data-processor.output.referendum :as referendum]
+            [vip.data-processor.output.source :as source]
             [vip.data-processor.output.state :as state]
             [vip.data-processor.output.street-segment :as street-segment])
   (:import [java.nio.file Files]
@@ -99,6 +100,7 @@
    (add-xml-children election-official/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
    (add-xml-children referendum/xml-nodes)
+   (add-xml-children source/xml-nodes)
    (add-xml-children state/xml-nodes)
    (add-xml-children street-segment/xml-nodes)
    write-xml])
