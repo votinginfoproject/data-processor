@@ -1,0 +1,3 @@
+precinct_id,electoral_district_id
+90000,60000
+90000,60002
