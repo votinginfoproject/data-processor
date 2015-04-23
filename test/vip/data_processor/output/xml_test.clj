@@ -60,6 +60,7 @@
            "/vip_object/election/registration_deadline" "2015-01-27"
            "/vip_object/election_official[@id=50122]/title" "General Registrar Physical"
            "/vip_object/election_official[@id=50122]/phone" "(757) 393-8644"
+           "/vip_object/electoral_district[@id=60001]/name" "POWHATAN COUNTY"
            "/vip_object/precinct[@id=90000]/name" "034- THIRTY-FOUR"
            "/vip_object/precinct[@id=90000]/mail_only" "yes"
            "/vip_object/precinct[@id=90000]/polling_location_id" "80016"
