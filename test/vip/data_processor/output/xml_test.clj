@@ -49,6 +49,8 @@
            "/vip_object/ballot[@id=200000]/image_url" "http://i.imgur.com/PMgfJSm.jpg"
            "/vip_object/ballot[@id=200000]/candidate_id[@sort_order=3]" "10000"
            "/vip_object/ballot[@id=200000]/candidate_id[@sort_order=1]" "10004"
+           "/vip_object/ballot_line_result/votes" "81"
+           "/vip_object/ballot_line_result/entire_district" "no"
            "/vip_object/candidate[@id=10000]/name" "Gail H. Timberlake"
            "/vip_object/candidate[@id=10004]/party" "Republican"
            "/vip_object/contest[@id=20000]/partisan" "no"
@@ -75,4 +77,5 @@
            "/vip_object/street_segment[@id=2000005]/non_house_address/street_name" "Neptune"
            "/vip_object/street_segment[@id=2000005]/odd_even_both" "both"
            "/vip_object/polling_location[@id=80006]/address/location_name" "Huguenot Public Safety Building"
-           "/vip_object/polling_location[@id=80006]/polling_hours" "6:00 AM - 7:00 PM"))))
+           "/vip_object/polling_location[@id=80006]/polling_hours" "6:00 AM - 7:00 PM")
+      (is (= "certified" (:certification (xpath/$x:attrs "/vip_object/ballot_line_result" xml-doc)))))))

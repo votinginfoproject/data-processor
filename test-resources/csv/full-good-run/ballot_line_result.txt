@@ -1,0 +1,2 @@
+contest_id,jurisdiction_id,entire_district,candidate_id,ballot_response_id,votes,overvotes,victorious,certification,id
+20002,51,no,10006,87704,81,75,yes,certified,11215
