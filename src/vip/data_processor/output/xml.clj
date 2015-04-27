@@ -30,6 +30,7 @@
             [vip.data-processor.output.electoral-district :as electoral-district]
             [vip.data-processor.output.polling-location :as polling-location]
             [vip.data-processor.output.precinct :as precinct]
+            [vip.data-processor.output.precinct-split :as precinct-split]
             [vip.data-processor.output.referendum :as referendum]
             [vip.data-processor.output.source :as source]
             [vip.data-processor.output.state :as state]
@@ -109,6 +110,7 @@
    (add-xml-children electoral-district/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
    (add-xml-children precinct/xml-nodes)
+   (add-xml-children precinct-split/xml-nodes)
    (add-xml-children referendum/xml-nodes)
    (add-xml-children source/xml-nodes)
    (add-xml-children state/xml-nodes)

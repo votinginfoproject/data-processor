@@ -73,6 +73,8 @@
            "/vip_object/precinct[@id=90000]/polling_location_id" "80016"
            "/vip_object/precinct[@id=90000]/electoral_district_id[1]" "60000"
            "/vip_object/precinct[@id=90000]/electoral_district_id[2]" "60002"
+           "/vip_object/precinct_split[@id=100042]/name" "Tobaccoville"
+           "/vip_object/precinct_split[@id=100042]/electoral_district_id" "60001"
            "/vip_object/referendum[@id=86702]/ballot_response_id[@sort_order=1]" "87703"
            "/vip_object/referendum[@id=86702]/ballot_response_id[@sort_order=2]" "87704"
            "/vip_object/source/name" "Department of Elections, Commonwealth of Virginia"
