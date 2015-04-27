@@ -22,6 +22,7 @@
             [vip.data-processor.output.ballot-response :as ballot-response]
             [vip.data-processor.output.candidate :as candidate]
             [vip.data-processor.output.contest :as contest]
+            [vip.data-processor.output.contest-result :as contest-result]
             [vip.data-processor.output.early-vote-site :as early-vote-site]
             [vip.data-processor.output.election :as election]
             [vip.data-processor.output.election-official :as election-official]
@@ -99,6 +100,7 @@
    (add-xml-children ballot-response/xml-nodes)
    (add-xml-children candidate/xml-nodes)
    (add-xml-children contest/xml-nodes)
+   (add-xml-children contest-result/xml-nodes)
    (add-xml-children early-vote-site/xml-nodes)
    (add-xml-children election/xml-nodes)
    (add-xml-children election-official/xml-nodes)

@@ -56,6 +56,8 @@
            "/vip_object/contest[@id=20000]/partisan" "no"
            "/vip_object/contest[@id=20000]/special" "no"
            "/vip_object/contest[@id=20002]/office" "Member Board of Supervisors"
+           "/vip_object/contest_result[@id=867002]/total_votes" "300"
+           "/vip_object/contest_result[@id=867002]/blank_votes" "2"
            "/vip_object/referendum[@id=86702]/title" "More Cats"
            "/vip_object/election/election_type" "State"
            "/vip_object/election/statewide" "yes"
@@ -78,4 +80,6 @@
            "/vip_object/street_segment[@id=2000005]/odd_even_both" "both"
            "/vip_object/polling_location[@id=80006]/address/location_name" "Huguenot Public Safety Building"
            "/vip_object/polling_location[@id=80006]/polling_hours" "6:00 AM - 7:00 PM")
-      (is (= "certified" (:certification (xpath/$x:attrs "/vip_object/ballot_line_result" xml-doc)))))))
+      (is (= "certified" (:certification (xpath/$x:attrs "/vip_object/ballot_line_result" xml-doc))))
+      (is (= "unofficial_complete" (:certification (xpath/$x:attrs "/vip_object/contest_result[@id=867001]" xml-doc))))
+      (is (= "certified" (:certification (xpath/$x:attrs "/vip_object/contest_result[@id=867002]" xml-doc)))))))
