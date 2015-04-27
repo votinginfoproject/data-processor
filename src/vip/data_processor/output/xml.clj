@@ -29,6 +29,7 @@
             [vip.data-processor.output.election-administration :as election-administration]
             [vip.data-processor.output.election-official :as election-official]
             [vip.data-processor.output.electoral-district :as electoral-district]
+            [vip.data-processor.output.locality :as locality]
             [vip.data-processor.output.polling-location :as polling-location]
             [vip.data-processor.output.precinct :as precinct]
             [vip.data-processor.output.precinct-split :as precinct-split]
@@ -110,6 +111,7 @@
    (add-xml-children election-administration/xml-nodes)
    (add-xml-children election-official/xml-nodes)
    (add-xml-children electoral-district/xml-nodes)
+   (add-xml-children locality/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
    (add-xml-children precinct/xml-nodes)
    (add-xml-children precinct-split/xml-nodes)
