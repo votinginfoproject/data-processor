@@ -26,6 +26,7 @@
             [vip.data-processor.output.custom-ballot :as custom-ballot]
             [vip.data-processor.output.early-vote-site :as early-vote-site]
             [vip.data-processor.output.election :as election]
+            [vip.data-processor.output.election-administration :as election-administration]
             [vip.data-processor.output.election-official :as election-official]
             [vip.data-processor.output.electoral-district :as electoral-district]
             [vip.data-processor.output.polling-location :as polling-location]
@@ -106,6 +107,7 @@
    (add-xml-children custom-ballot/xml-nodes)
    (add-xml-children early-vote-site/xml-nodes)
    (add-xml-children election/xml-nodes)
+   (add-xml-children election-administration/xml-nodes)
    (add-xml-children election-official/xml-nodes)
    (add-xml-children electoral-district/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
