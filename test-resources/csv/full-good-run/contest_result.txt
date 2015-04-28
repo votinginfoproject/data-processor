@@ -1,4 +1,4 @@
-id,contest_id,jurisdiction_id,entire_district
-867000,20000,70069,yes
-867001,20001,70123,yes
-867002,20002,51,no
+id,contest_id,jurisdiction_id,entire_district,certification,total_votes,total_valid_votes,blank_votes
+867000,20000,70069,yes,unofficial_partial,1000,999,1
+867001,20001,70123,yes,unofficial_complete,500,450,50
+867002,20002,51,no,certified,300,298,2

@@ -1,0 +1,2 @@
+id,name,address_line1,address_city,address_state,address_zip
+556001,Early Vote Center,742 Evergreen Terrace,Springfield,VA,90025

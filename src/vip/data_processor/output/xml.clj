@@ -22,12 +22,17 @@
             [vip.data-processor.output.ballot-response :as ballot-response]
             [vip.data-processor.output.candidate :as candidate]
             [vip.data-processor.output.contest :as contest]
+            [vip.data-processor.output.contest-result :as contest-result]
+            [vip.data-processor.output.custom-ballot :as custom-ballot]
             [vip.data-processor.output.early-vote-site :as early-vote-site]
             [vip.data-processor.output.election :as election]
+            [vip.data-processor.output.election-administration :as election-administration]
             [vip.data-processor.output.election-official :as election-official]
             [vip.data-processor.output.electoral-district :as electoral-district]
+            [vip.data-processor.output.locality :as locality]
             [vip.data-processor.output.polling-location :as polling-location]
             [vip.data-processor.output.precinct :as precinct]
+            [vip.data-processor.output.precinct-split :as precinct-split]
             [vip.data-processor.output.referendum :as referendum]
             [vip.data-processor.output.source :as source]
             [vip.data-processor.output.state :as state]
@@ -99,12 +104,17 @@
    (add-xml-children ballot-response/xml-nodes)
    (add-xml-children candidate/xml-nodes)
    (add-xml-children contest/xml-nodes)
+   (add-xml-children contest-result/xml-nodes)
+   (add-xml-children custom-ballot/xml-nodes)
    (add-xml-children early-vote-site/xml-nodes)
    (add-xml-children election/xml-nodes)
+   (add-xml-children election-administration/xml-nodes)
    (add-xml-children election-official/xml-nodes)
    (add-xml-children electoral-district/xml-nodes)
+   (add-xml-children locality/xml-nodes)
    (add-xml-children polling-location/xml-nodes)
    (add-xml-children precinct/xml-nodes)
+   (add-xml-children precinct-split/xml-nodes)
    (add-xml-children referendum/xml-nodes)
    (add-xml-children source/xml-nodes)
    (add-xml-children state/xml-nodes)

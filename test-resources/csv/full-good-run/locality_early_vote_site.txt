@@ -1,0 +1,2 @@
+locality_id,early_vote_site_id
+70069,556001
