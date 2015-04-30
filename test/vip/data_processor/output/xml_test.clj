@@ -1,5 +1,6 @@
 (ns vip.data-processor.output.xml-test
   (:require [clojure.test :refer :all]
+            [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.output.xml :refer :all]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.pipeline :as pipeline]
@@ -45,6 +46,7 @@
                       .toString
                       slurp
                       xpath/xml->doc)]
+      (assert-no-problems results-ctx [])
       (are [path text] (= text (xpath/$x:text path xml-doc))
            "/vip_object/ballot[@id=200000]/image_url" "http://i.imgur.com/PMgfJSm.jpg"
            "/vip_object/ballot[@id=200000]/candidate_id[@sort_order=3]" "10000"

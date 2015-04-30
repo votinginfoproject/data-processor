@@ -15,13 +15,13 @@
 
         children (concat [(xml-node name)
                           (xml-node number)
-                          (xml-node locality_id)
-                          (xml-node ward)
-                          (boolean-xml-node mail_only)
-                          (xml-node ballot_style_image_url)]
+                          (xml-node locality_id)]
+                         electoral-district-nodes
+                         [(xml-node ward)
+                          (boolean-xml-node mail_only)]
                          polling-location-nodes
                          early-vote-site-nodes
-                         electoral-district-nodes)]
+                         [(xml-node ballot_style_image_url)])]
     (simple-xml :precinct id children)))
 
 (defn xml-nodes [ctx]
