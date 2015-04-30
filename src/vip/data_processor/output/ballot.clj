@@ -29,11 +29,11 @@
                 custom_ballot_id
                 write_in
                 image_url]} ballot
-        children (concat [(xml-node referendum_id)
-                          (xml-node custom_ballot_id)
+        children (concat [(xml-node referendum_id)]
+                         (map candidate->xml candidates)
+                         [(xml-node custom_ballot_id)
                           (boolean-xml-node write_in)
-                          (xml-node image_url)]
-                         (map candidate->xml candidates))]
+                          (xml-node image_url)])]
     (simple-xml :ballot id children)))
 
 (defn xml-nodes [ctx]
