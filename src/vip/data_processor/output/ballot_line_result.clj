@@ -9,7 +9,6 @@
                      candidate_id
                      ballot_response_id
                      votes
-                     overvotes
                      victorious
                      certification]}]
   (let [children [(xml-node contest_id)
@@ -18,7 +17,6 @@
                   (xml-node candidate_id)
                   (xml-node ballot_response_id)
                   (xml-node votes)
-                  (xml-node overvotes)
                   (boolean-xml-node victorious)]]
     (assoc-in (simple-xml :ballot_line_result id children)
               [:attrs :certification] certification)))
