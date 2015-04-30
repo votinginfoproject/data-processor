@@ -39,6 +39,10 @@
             [vip.data-processor.output.street-segment :as street-segment])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
+           [javax.xml XMLConstants]
+           [javax.xml.transform.stream StreamSource]
+           [javax.xml.validation SchemaFactory]
+           [org.xml.sax SAXParseException]
            [org.apache.commons.lang StringEscapeUtils]))
 
 (def vip-object-attrs
@@ -97,6 +101,16 @@
     (let [children (xml-fn ctx)]
       (update ctx :xml-children #(lazy-cat % %2) children))))
 
+(defn validate-xml-output [{:keys [xml-output-file] :as ctx}]
+  (let [schema-factory (SchemaFactory/newInstance XMLConstants/W3C_XML_SCHEMA_NS_URI)
+        schema (.newSchema schema-factory (io/resource "specs/vip_spec_v3.0.xsd"))
+        validator (.newValidator schema)]
+    (try
+      (.validate validator (StreamSource. (.toFile xml-output-file)))
+      ctx
+      (catch SAXParseException e
+        (assoc-in ctx [:fatal :xml-generation :validation] (.getMessage e))))))
+
 (def pipeline
   [create-xml-file
    (add-xml-children ballot/xml-nodes)
@@ -119,4 +133,5 @@
    (add-xml-children source/xml-nodes)
    (add-xml-children state/xml-nodes)
    (add-xml-children street-segment/xml-nodes)
-   write-xml])
+   write-xml
+   validate-xml-output])
