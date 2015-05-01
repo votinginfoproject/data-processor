@@ -10,10 +10,10 @@
         polling-location-nodes (joined-nodes ctx :precinct-split id :polling-location)
 
         children (concat [(xml-node name)
-                          (xml-node precinct_id)
-                          (xml-node ballot_style_image_url)]
+                          (xml-node precinct_id)]
                          electoral-district-nodes
-                         polling-location-nodes)]
+                         polling-location-nodes
+                         [(xml-node ballot_style_image_url)])]
     (simple-xml :precinct_split id children)))
 
 (defn xml-nodes [ctx]
