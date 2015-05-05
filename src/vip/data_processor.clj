@@ -9,7 +9,8 @@
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.queue :as q]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.output.xml :as xml-output])
+            [vip.data-processor.output.xml :as xml-output]
+            [vip.data-processor.s3 :as s3])
   (:gen-class))
 
 (def download-pipeline
@@ -25,7 +26,8 @@
           [(data-spec/add-data-specs data-spec/data-specs)
            t/xml-csv-branch]
           db/validations
-          xml-output/pipeline))
+          xml-output/pipeline
+          [s3/upload-to-s3]))
 
 (defn consume []
   (sqs/consume-messages (sqs/client)
