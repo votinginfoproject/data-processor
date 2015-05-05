@@ -31,27 +31,23 @@
                 (into-array [StandardCopyOption/REPLACE_EXISTING]))
     tmp-path))
 
-(defn format-fips-code [fips]
-  (let [fips-length (count fips)]
-    (if-not (= fips-length (or 2 5))
-      (let [padding-length (- 5 fips-length)
-            padding (apply str (repeat padding-length "0"))]
-        (str padding fips))
-      fips)))
-
 (defn xml-filename [ctx]
-  (let [fips (-> (get-in ctx [:tables :sources])
-                 korma/select first :vip_id format-fips-code)
+  (let [fips (->> (get-in ctx [:tables :sources])
+                  korma/select first :vip_id)
+        formatted-fips (if (< (count fips) 2)
+                         (format "%02d" (Integer/parseInt fips))
+                         (if (< (count fips) 5)
+                           (format "%05d" (Integer/parseInt fips))
+                           fips))
         election-date (->> (get-in ctx [:tables :elections])
                            korma/select first :date)
         timestamp (.getTime (java.util.Date.))]
-    (->> (vector "vipFeed" fips election-date timestamp)
-         (join "-"))))
+    (join "-" ["vipfeed" fips election-date timestamp])))
 
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
   [ctx]
   (let [new-filename (xml-filename ctx)]
     (put-object (str "processed-feeds/" new-filename)
-                (slurp (str (:xml-output-file ctx))))
+                (.toFile (:xml-output-file ctx)))
     ctx))
