@@ -50,4 +50,4 @@
   (let [new-filename (xml-filename ctx)]
     (put-object (str "processed-feeds/" new-filename)
                 (.toFile (:xml-output-file ctx)))
-    ctx))
+    (assoc ctx :generated-xml-filename new-filename)))
