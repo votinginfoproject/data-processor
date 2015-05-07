@@ -21,5 +21,6 @@
   :profiles {:test {:resource-paths ["test-resources"]
                     :dependencies [[com.github.kyleburton/clj-xpath "1.4.4"]]}
              :dev {:source-paths ["dev-src"]
+                   :resource-paths ["dev-resources"]
                    :main dev.core}}
   :main vip.data-processor)

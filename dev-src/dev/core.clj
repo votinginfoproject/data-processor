@@ -6,7 +6,9 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.transforms :as t]
-            [vip.data-processor.validation.zip :as zip]))
+            [vip.data-processor.validation.zip :as zip]
+            [vip.data-processor.db.postgres :as psql]
+            [vip.data-processor.s3 :refer [xml-filename]]))
 
 (def pipeline
   (concat [zip/unzip
@@ -18,7 +20,12 @@
           xml-output/pipeline))
 
 (defn -main [zip-filename]
+  (psql/initialize)
   (let [zip (java.io.File. zip-filename)
-        result (pipeline/process pipeline zip)]
+        result (-> (pipeline/process pipeline zip)
+                   (psql/start-run))]
     (when-let [xml-output-file (:xml-output-file result)]
-      (println "XML:" (.toString xml-output-file)))))
+      (println "XML:" (.toString xml-output-file))
+      (let [filename (xml-filename result)
+            results (assoc result :generated-xml-filename filename)]
+        (psql/complete-run results)))))
