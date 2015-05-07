@@ -32,7 +32,7 @@
 
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
-        filename (:filename ctx)]
+        filename (:generated-xml-filename ctx)]
     (korma/update results
                   (korma/set-fields {:filename filename
                                      :complete true
