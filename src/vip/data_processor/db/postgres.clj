@@ -14,15 +14,20 @@
                       :url (url)}
                  :migrator "resources/migrations"}))
 
-(declare results-db results)
+(declare results-db results
+         validations-db validations)
 
 (defn initialize []
   (migrate)
-  (db/defdb results-db (db/postgres (-> :postgres
-                                        config
-                                        (assoc :db (config :postgres :user)))))
+  (let [opts (-> :postgres
+                 config
+                 (assoc :db (config :postgres :user)))]
+    (db/defdb results-db (db/postgres opts))
+    (db/defdb validations-db (db/postgres opts)))
   (korma/defentity results
-    (korma/database results-db)))
+    (korma/database results-db))
+  (korma/defentity validations
+    (korma/database validations-db)))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
