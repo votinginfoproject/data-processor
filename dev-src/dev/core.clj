@@ -16,14 +16,14 @@
            t/attach-sqlite-db
            (data-spec/add-data-specs data-spec/data-specs)
            t/xml-csv-branch]
+          [psql/start-run]
           db/validations
           xml-output/pipeline))
 
 (defn -main [zip-filename]
   (psql/initialize)
   (let [zip (java.io.File. zip-filename)
-        result (-> (pipeline/process pipeline zip)
-                   (psql/start-run))]
+        result (pipeline/process pipeline zip)]
     (when-let [xml-output-file (:xml-output-file result)]
       (println "XML:" (.toString xml-output-file))
       (let [filename (xml-filename result)
