@@ -28,7 +28,8 @@
            t/xml-csv-branch]
           db/validations
           xml-output/pipeline
-          [s3/upload-to-s3]))
+          [s3/upload-to-s3]
+          [psql/insert-validations]))
 
 (defn consume []
   (sqs/consume-messages (sqs/client)
