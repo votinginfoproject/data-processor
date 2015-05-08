@@ -85,7 +85,7 @@
         (import-joins ctx data-spec elements)
         (sqlite/bulk-import transformed-contents sql-table)
         ctx)
-      (assoc-in ctx [:critical :xml-import tag :unknown] tag))))
+      (assoc-in ctx [:critical :xml-import :unknown] tag))))
 
 (defn partition-by-n
   "Applies f to each value in coll, splitting it each time f returns a

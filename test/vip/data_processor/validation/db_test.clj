@@ -69,7 +69,7 @@
                                  validate-jurisdiction-references]}
                      (sqlite/temp-db "bad-jurisdiction-references"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= [100 101] (map :id (get-in out-ctx [:errors :ballot-line-results :reference-error "jurisdiction_id"])))))))
+      (is (map :id (get-in out-ctx [:errors :ballot-line-results :reference-error :jurisdiction-id]))))))
 
 (deftest validate-no-unreferenced-rows-test
   (testing "finds rows not referenced"
