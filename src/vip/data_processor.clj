@@ -16,6 +16,7 @@
 (def download-pipeline
   [t/read-edn-sqs-message
    t/assert-filename
+   psql/start-run
    t/attach-sqlite-db
    t/download-from-s3
    zip/unzip
@@ -35,12 +36,10 @@
                           (q/publish {:initial-input message
                                       :status :started}
                                      "processing.started")
-                          (let [result (pipeline/process pipeline message)
-                                filename (:filename result)]
-                            (korma/insert psql/results
-                                          (korma/values {:upload filename
-                                                         :complete true
-                                                         :completed_at (korma/sqlfn now)})))
+                          (let [result (pipeline/process pipeline message)]
+                            (psql/complete-run result)
+                            (log/info "New run completed:"
+                                      (psql/get-run result)))
                           (q/publish {:initial-input message
                                       :status :complete}
                                      "processing.complete"))))

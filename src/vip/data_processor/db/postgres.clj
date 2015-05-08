@@ -23,3 +23,22 @@
                                         (assoc :db (config :postgres :user)))))
   (korma/defentity results
     (korma/database results-db)))
+
+(defn start-run [ctx]
+  (let [results (korma/insert results
+                              (korma/values {:start_time (korma/sqlfn now)
+                                             :complete false}))]
+    (assoc ctx :import-id (:id results))))
+
+(defn complete-run [ctx]
+  (let [id (:import-id ctx)
+        filename (:generated-xml-filename ctx)]
+    (korma/update results
+                  (korma/set-fields {:filename filename
+                                     :complete true
+                                     :end_time (korma/sqlfn now)})
+                  (korma/where {:id id}))))
+
+(defn get-run [ctx]
+  (korma/select results
+                (korma/where {:id (:import-id ctx)})))
