@@ -61,13 +61,13 @@
                                  :description (if (keyword? description)
                                                 (name description)
                                                 description)
-                                 :message (apply str message)}))))
+                                 :message (pr-str message)}))))
 
 (defn insert-validations [{:keys [warnings errors critical fatal] :as ctx}]
   (let [result-id (:import-id ctx)
         insert-severity-fn (fn [type scopes]
-                             (pmap (partial insert-validation result-id type scopes)
-                                   (keys scopes)))]
+                             (doseq [scope (keys scopes)]
+                               (insert-validation result-id type scopes scope)))]
     (when warnings (insert-severity-fn 'warnings warnings))
     (when errors (insert-severity-fn 'errors errors))
     (when critical (insert-severity-fn 'critical critical))
