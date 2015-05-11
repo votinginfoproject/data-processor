@@ -18,7 +18,8 @@
            t/xml-csv-branch]
           [psql/start-run]
           db/validations
-          xml-output/pipeline))
+          xml-output/pipeline
+          [psql/insert-validations]))
 
 (defn -main [zip-filename]
   (psql/initialize)

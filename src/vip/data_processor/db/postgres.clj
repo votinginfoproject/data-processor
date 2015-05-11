@@ -14,15 +14,20 @@
                       :url (url)}
                  :migrator "resources/migrations"}))
 
-(declare results-db results)
+(declare results-db results
+         validations-db validations)
 
 (defn initialize []
   (migrate)
-  (db/defdb results-db (db/postgres (-> :postgres
-                                        config
-                                        (assoc :db (config :postgres :user)))))
+  (let [opts (-> :postgres
+                 config
+                 (assoc :db (config :postgres :user)))]
+    (db/defdb results-db (db/postgres opts))
+    (db/defdb validations-db (db/postgres opts)))
   (korma/defentity results
-    (korma/database results-db)))
+    (korma/database results-db))
+  (korma/defentity validations
+    (korma/database validations-db)))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
@@ -42,3 +47,29 @@
 (defn get-run [ctx]
   (korma/select results
                 (korma/where {:id (:import-id ctx)})))
+
+(defn insert-validation [id severity scopes scope-key]
+  (let [scope (get scopes scope-key)
+        description (-> scope keys first)
+        message (-> scope vals first)]
+    (korma/insert validations
+                  (korma/values {:result_id id
+                                 :severity (name severity)
+                                 :scope (if (keyword? scope-key)
+                                          (name scope-key)
+                                          scope-key)
+                                 :description (if (keyword? description)
+                                                (name description)
+                                                description)
+                                 :message (pr-str message)}))))
+
+(defn insert-validations [{:keys [warnings errors critical fatal] :as ctx}]
+  (let [result-id (:import-id ctx)
+        insert-severity-fn (fn [type scopes]
+                             (doseq [scope (keys scopes)]
+                               (insert-validation result-id type scopes scope)))]
+    (when warnings (insert-severity-fn 'warnings warnings))
+    (when errors (insert-severity-fn 'errors errors))
+    (when critical (insert-severity-fn 'critical critical))
+    (when fatal (insert-severity-fn 'fatal fatal))
+    ctx))
