@@ -19,11 +19,13 @@
   (let [input (:input ctx)
         {good-files true bad-files false} (group-by good-filename? input)]
     (if (seq bad-files)
-      (-> ctx
-          (assoc-in [:warnings :validate-filenames :bad-filenames]
-                    (apply str "Bad filenames: "
-                           (interpose ", " (->> bad-files (map file-name) sort))))
-          (assoc :input good-files))
+      (let [bad-filenames (->> bad-files (map file-name) sort)
+            bad-file-list (apply str "Bad filenames: "
+                                 (interpose ", " bad-filenames))]
+        (-> ctx
+            (update-in [:warnings :validate-filenames :bad-filenames]
+                       conj bad-file-list)
+            (assoc :input good-files)))
       ctx)))
 
 (defn read-csv-with-headers [file-handle]
@@ -38,10 +40,10 @@
 (defn report-bad-rows [ctx filename expected-number bad-rows]
   (if-not (empty? bad-rows)
     (reduce (fn [ctx [line-number row]]
-              (assoc-in ctx [:critical filename :number-of-values
-                             (keyword (str "line-" line-number))]
-                        (str "Expected " expected-number
-                             " values, found " (count row))))
+              (let [expected (str "Expected " expected-number
+                                  " values, found " (count row))]
+                (assoc-in ctx [:critical filename :number-of-values line-number]
+                           expected)))
             ctx bad-rows)
     ctx))
 

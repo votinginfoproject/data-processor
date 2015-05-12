@@ -350,14 +350,14 @@
         (cond
           (empty? val)
           (if required
-            (assoc-in ctx [:fatal scope name] {id (str "Missing " name)})
+            (assoc-in ctx [:fatal scope name id] (str "Missing " name))
             ctx)
 
           (invalid-utf-8? val)
-          (assoc-in ctx [:errors scope name] {id "Is not valid UTF-8."})
+          (assoc-in ctx [:errors scope name id] "Is not valid UTF-8.")
 
           (not (test-fn val))
-          (assoc-in ctx [:errors scope name] {id message})
+          (assoc-in ctx [:errors scope name id] message)
 
           :else ctx)))))
 

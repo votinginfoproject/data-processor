@@ -65,5 +65,5 @@
                    (sqlite/temp-db "bad-number-of-values"))
         out-ctx (load-csvs ctx)]
     (testing "reports critical errors for rows with wrong number of values"
-      (is (get-in out-ctx [:critical :contests :number-of-values :line-3]))
-      (is (get-in out-ctx [:critical :contests :number-of-values :line-5])))))
+      (is (get-in out-ctx [:critical :contests :number-of-values 3]))
+      (is (get-in out-ctx [:critical :contests :number-of-values 5])))))
