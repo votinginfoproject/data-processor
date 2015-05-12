@@ -108,7 +108,8 @@
                       :pipeline [load-xml]}
                      (sqlite/temp-db "non-utf-8"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :candidates "90001"])))))
+      (is (= (get-in out-ctx [:errors :candidates "name"])
+             {"90001" "Is not valid UTF-8."})))))
 
 (deftest full-good-run-test
   (testing "a good XML file produces no erorrs or warnings"
@@ -208,9 +209,9 @@
                    (sqlite/temp-db "bad-data-values"))
         out-ctx (pipeline/run-pipeline ctx)]
     (testing "adds fatal errors for missing required fields"
-      (is (get-in out-ctx [:fatal :candidates "90001" "name"])))
+      (is (get-in out-ctx [:fatal :candidates "name" "90001"])))
     (testing "adds errors for values that fail format validation"
-      (is (get-in out-ctx [:errors :candidates "90001" "candidate_url"]))
-      (is (get-in out-ctx [:errors :candidates "90001" "phone"]))
-      (is (get-in out-ctx [:errors :candidates "90001" "email"]))
-      (is (get-in out-ctx [:errors :candidates "90001" "sort_order"])))))
+      (is (get-in out-ctx [:errors :candidates "candidate_url" "90001"]))
+      (is (get-in out-ctx [:errors :candidates "phone" "90001"]))
+      (is (get-in out-ctx [:errors :candidates "email" "90001"]))
+      (is (get-in out-ctx [:errors :candidates "sort_order" "90001"])))))

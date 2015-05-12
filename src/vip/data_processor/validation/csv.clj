@@ -19,11 +19,13 @@
   (let [input (:input ctx)
         {good-files true bad-files false} (group-by good-filename? input)]
     (if (seq bad-files)
-      (-> ctx
-          (assoc-in [:warnings :validate-filenames]
-                    (apply str "Bad filenames: "
-                           (interpose ", " (->> bad-files (map file-name) sort))))
-          (assoc :input good-files))
+      (let [bad-filenames (->> bad-files (map file-name) sort)
+            bad-file-list (apply str "Bad filenames: "
+                                 (interpose ", " bad-filenames))]
+        (-> ctx
+            (update-in [:warnings :validate-filenames :bad-filenames]
+                       conj bad-file-list)
+            (assoc :input good-files)))
       ctx)))
 
 (defn read-csv-with-headers [file-handle]
@@ -38,8 +40,10 @@
 (defn report-bad-rows [ctx filename expected-number bad-rows]
   (if-not (empty? bad-rows)
     (reduce (fn [ctx [line-number row]]
-              (assoc-in ctx [:critical filename line-number "Number of values"]
-                        (str "Expected " expected-number " values, found " (count row))))
+              (let [expected (str "Expected " expected-number
+                                  " values, found " (count row))]
+                (assoc-in ctx [:critical filename :number-of-values line-number]
+                           expected)))
             ctx bad-rows)
     ctx))
 
@@ -65,15 +69,15 @@
             {:keys [headers contents bad-rows]} (read-csv-with-headers in-file)
             extraneous-headers (seq (set/difference (set headers) (set column-names)))
             ctx (if extraneous-headers
-                  (assoc-in ctx [:warnings filename :extraneous-headers]
+                  (assoc-in ctx [:warnings table :extraneous-headers]
                             (str/join ", " extraneous-headers))
                   ctx)
-            ctx (report-bad-rows ctx filename (count headers) bad-rows)
+            ctx (report-bad-rows ctx table (count headers) bad-rows)
             contents (map #(select-keys % column-names) contents)]
         (if (empty? (set/intersection (set headers) (set column-names)))
-          (assoc-in ctx [:critical filename :headers] "No header row")
+          (assoc-in ctx [:critical table :headers] "No header row")
           (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
-            (assoc-in ctx [:critical filename :headers]
+            (assoc-in ctx [:critical table :headers]
                       (str "Missing headers: " (str/join ", " missing-headers)))
             (let [ctx (validate-format-rules ctx contents data-spec)
                   transforms (apply comp (data-spec/translation-fns columns))
@@ -90,10 +94,12 @@
   associates a report-type on the context if the filename is missing."
   [report-type]
   (fn [filename]
-    (fn [ctx]
-      (if (find-input-file ctx filename)
-        ctx
-        (assoc-in ctx [report-type filename] (str filename " is missing"))))))
+    (let [data-spec (first (filter #(= filename (:filename %)) data-spec/data-specs))
+          table (:table data-spec)]
+      (fn [ctx]
+        (if (find-input-file ctx filename)
+          ctx
+          (assoc-in ctx [report-type table :missing-csv] (str filename " is missing")))))))
 
 (def ^{:doc "Generates a validation function that adds a warning when
   the given filename is missing from the input"}

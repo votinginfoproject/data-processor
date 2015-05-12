@@ -25,11 +25,11 @@
                                           (:name column)
                                           (:references column))]
                 (if (seq unmatched-references)
-                  (assoc-in ctx [:errors
-                                 table
-                                 :reference-error
-                                 (:name column)]
-                            unmatched-references)
+                  (update-in ctx [:errors
+                                  table
+                                  :reference-error
+                                  (:name column)]
+                             conj unmatched-references)
                   ctx)))
             ctx
             reference-columns)))
@@ -55,6 +55,6 @@
   (let [unmatched-references (unmatched-jurisdiction-references
                               (:tables ctx) table)]
     (if (seq unmatched-references)
-      (assoc-in ctx [:errors table :reference-error "jurisdiction_id"]
-                unmatched-references)
+      (update-in ctx [:errors table :reference-error :jurisdiction-id]
+                 conj unmatched-references)
       ctx)))

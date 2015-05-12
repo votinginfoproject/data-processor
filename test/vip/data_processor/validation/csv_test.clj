@@ -28,9 +28,9 @@
                       ((error-on-missing-file "election.txt"))
                       ((error-on-missing-file "source.txt"))
                       ((warn-on-missing-file "state.txt")))]
-      (is (get-in out-ctx [:errors "election.txt"]))
-      (is (get-in out-ctx [:warnings "state.txt"]))
-      (is (not (contains? (:errors out-ctx) "source.txt"))))))
+      (is (get-in out-ctx [:errors :elections]))
+      (is (get-in out-ctx [:warnings :states]))
+      (is (not (contains? (:errors out-ctx) :sources))))))
 
 (deftest csv-loader-test
   (testing "ignores unknown columns"
@@ -41,13 +41,13 @@
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
              (korma/select (get-in out-ctx [:tables :states]))))
       (testing "but warns about them"
-        (is (get-in out-ctx [:warnings "state.txt" :extraneous-headers])))))
+        (is (get-in out-ctx [:warnings :states :extraneous-headers])))))
   (testing "requires a header row"
     (let [ctx (merge {:input (csv-inputs ["no-header-row/ballot.txt"])
                       :data-specs data-specs}
                      (sqlite/temp-db "no-headers-test"))
           out-ctx (load-csvs ctx)]
-      (is (= "No header row" (get-in out-ctx [:critical "ballot.txt" :headers]))))))
+      (is (= "No header row" (get-in out-ctx [:critical :ballots :headers]))))))
 
 (deftest missing-required-columns-test
   (let [ctx (merge {:input (csv-inputs ["missing-required-columns/contest.txt"])
@@ -55,7 +55,7 @@
                    (sqlite/temp-db "missing-required-columns"))
         out-ctx (load-csvs ctx)]
     (testing "adds a critical error for contest.txt"
-      (is (get-in out-ctx [:critical "contest.txt"])))
+      (is (get-in out-ctx [:critical :contests])))
     (testing "does not import contest.txt"
       (is (empty? (korma/select (get-in ctx [:tables :contests])))))))
 
@@ -65,5 +65,5 @@
                    (sqlite/temp-db "bad-number-of-values"))
         out-ctx (load-csvs ctx)]
     (testing "reports critical errors for rows with wrong number of values"
-      (is (get-in out-ctx [:critical "contest.txt" 3 "Number of values"]))
-      (is (get-in out-ctx [:critical "contest.txt" 5 "Number of values"])))))
+      (is (get-in out-ctx [:critical :contests :number-of-values 3]))
+      (is (get-in out-ctx [:critical :contests :number-of-values 5])))))

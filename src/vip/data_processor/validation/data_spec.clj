@@ -350,19 +350,23 @@
         (cond
           (empty? val)
           (if required
-            (assoc-in ctx [:fatal scope id name] (str "Missing " name))
+            (assoc-in ctx [:fatal scope name id] (str "Missing " name))
             ctx)
 
           (invalid-utf-8? val)
-          (assoc-in ctx [:errors scope id name] "Is not valid UTF-8.")
+          (assoc-in ctx [:errors scope name id] "Is not valid UTF-8.")
 
           (not (test-fn val))
-          (assoc-in ctx [:errors scope id name] message)
+          (assoc-in ctx [:errors scope name id] message)
 
           :else ctx)))))
 
 (defn create-format-rules [scope columns]
-  (map (partial create-format-rule scope) columns))
+  (let [table (-> #(= scope (:filename %))
+                  (filter data-specs)
+                  first :table)
+        scope (if table table scope)]
+    (map (partial create-format-rule scope) columns)))
 
 (defn apply-format-rules [rules ctx element id]
   (reduce (fn [ctx rule] (rule ctx element id)) ctx rules))
