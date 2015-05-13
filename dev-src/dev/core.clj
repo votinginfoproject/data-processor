@@ -8,7 +8,8 @@
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.s3 :refer [xml-filename]]))
+            [vip.data-processor.s3 :refer [xml-filename]]
+            [democracyworks.squishy.data-readers]))
 
 (def pipeline
   (concat [zip/unzip
