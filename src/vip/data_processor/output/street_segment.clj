@@ -32,7 +32,7 @@
     (letfn [(chunked-sexps [page]
               (let [offset (* page chunk-size)]
                 (when (< offset total)
-                  (concat
+                  (lazy-cat
                    (let [street-segments (korma/select sql-table
                                                        (korma/offset offset)
                                                        (korma/limit chunk-size))]
