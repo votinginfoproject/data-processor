@@ -1,5 +1,6 @@
 (ns vip.data-processor.db.sqlite
-  (:require [joplin.core :as j]
+  (:require [clojure.tools.logging :as log]
+            [joplin.core :as j]
             [joplin.jdbc.database]
             [korma.db :as db]
             [korma.core :as korma])
@@ -90,6 +91,7 @@
 (def statement-parameter-limit 999)
 
 (defn bulk-import [rows table]
+  (log/info "Bulk importing" (:name table))
   (doseq [chunk (chunk-rows rows statement-parameter-limit)]
     (when-not (empty? chunk)
       (korma/insert table (korma/values chunk)))))

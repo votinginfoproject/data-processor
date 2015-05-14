@@ -3,6 +3,7 @@
             [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as str]
+            [clojure.tools.logging :as log]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]))
 
@@ -56,6 +57,7 @@
 (defn validate-format-rules [ctx rows {:keys [filename columns]}]
   (let [format-rules (data-spec/create-format-rules filename columns)
         line-number (atom 1)]
+    (log/info "Validating" filename)
     (reduce (fn [ctx row]
               (data-spec/apply-format-rules format-rules ctx row (swap! line-number inc)))
             ctx rows)))
@@ -63,6 +65,7 @@
 (defn load-csv [ctx {:keys [filename table columns] :as data-spec}]
   (if-let [file-to-load (find-input-file ctx filename)]
     (with-open [in-file (io/reader file-to-load :encoding "UTF-8")]
+      (log/info "Loading" filename)
       (let [sql-table (get-in ctx [:tables table])
             column-names (map :name columns)
             required-header-names (->> columns (filter :required) (map :name))
