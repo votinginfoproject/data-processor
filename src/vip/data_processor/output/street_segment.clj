@@ -21,7 +21,7 @@
                   (xml-node precinct_split_id)]]
     (simple-xml :street_segment id children)))
 
-(def chunk-size 1000)
+(def chunk-size 10000)
 
 (defn xml-nodes [ctx]
   (let [sql-table (get-in ctx [:tables :street-segments])
