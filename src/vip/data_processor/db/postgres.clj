@@ -1,5 +1,6 @@
 (ns vip.data-processor.db.postgres
-  (:require [joplin.core :as j]
+  (:require [clojure.tools.logging :as log]
+            [joplin.core :as j]
             [joplin.jdbc.database]
             [korma.db :as db]
             [korma.core :as korma]
@@ -18,6 +19,7 @@
          validations-db validations)
 
 (defn initialize []
+  (log/info "Initializing Postgres")
   (migrate)
   (let [opts (-> :postgres
                  config
@@ -64,6 +66,7 @@
                                  :message (pr-str message)}))))
 
 (defn insert-validations [{:keys [warnings errors critical fatal] :as ctx}]
+  (log/info "Inserting validations")
   (let [result-id (:import-id ctx)
         insert-severity-fn (fn [type scopes]
                              (doseq [scope (keys scopes)]

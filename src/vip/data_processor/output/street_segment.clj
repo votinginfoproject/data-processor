@@ -21,7 +21,7 @@
                   (xml-node precinct_split_id)]]
     (simple-xml :street_segment id children)))
 
-(def chunk-size 1000)
+(def chunk-size 10000)
 
 (defn xml-nodes [ctx]
   (let [sql-table (get-in ctx [:tables :street-segments])
@@ -32,7 +32,7 @@
     (letfn [(chunked-sexps [page]
               (let [offset (* page chunk-size)]
                 (when (< offset total)
-                  (concat
+                  (lazy-cat
                    (let [street-segments (korma/select sql-table
                                                        (korma/offset offset)
                                                        (korma/limit chunk-size))]
