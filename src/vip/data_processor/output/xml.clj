@@ -120,13 +120,12 @@
           counter (atom 0)]
       (.write out-file "<?xml version='1.0' encoding='UTF-8'?>\n")
       (.write out-file opening-tag)
-      (doseq [xml-node-fn xml-node-fns]
-        (let [xml-children (xml-node-fn ctx)]
-          (doseq [xml-child xml-children]
-            (swap! counter inc)
-            (when (zero? (mod @counter 1000))
-              (log/info "Wrote" @counter "XML nodes"))
-            (emit-element out-file xml-child))))
+      (doseq [xml-node-fn xml-node-fns
+              xml-child (xml-node-fn ctx)]
+        (swap! counter inc)
+        (when (zero? (mod @counter 1000))
+          (log/info "Wrote" @counter "XML nodes"))
+        (emit-element out-file xml-child))
       (.write out-file closing-tag)))
   ctx)
 
