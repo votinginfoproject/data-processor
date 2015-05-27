@@ -4,8 +4,12 @@
             [turbovote.resource-config :refer [config]]
             [korma.core :as korma]
             [clojure.string :refer [join]])
-  (:import [java.nio.file Files CopyOption StandardCopyOption]
-           [java.nio.file.attribute FileAttribute]))
+  (:import [java.io File]
+           [java.nio.file Files CopyOption StandardCopyOption]
+           [java.nio.file.attribute FileAttribute]
+           [net.lingala.zip4j.core ZipFile]
+           [net.lingala.zip4j.model ZipParameters]
+           [net.lingala.zip4j.util Zip4jConstants]))
 
 (defn- get-object [key]
   (s3/get-object (config :aws :creds)
@@ -47,7 +51,13 @@
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
   [ctx]
-  (let [new-filename (xml-filename ctx)]
-    (put-object (str "processed-feeds/" new-filename)
-                (.toFile (:xml-output-file ctx)))
-    (assoc ctx :generated-xml-filename new-filename)))
+  (let [zip-filename (str (xml-filename ctx) ".zip")
+        xml-file (-> ctx :xml-output-file .toFile)
+        zip-file (ZipFile. zip-filename)
+        zip-params (doto (ZipParameters.)
+                     (.setCompressionLevel
+                      Zip4jConstants/DEFLATE_LEVEL_NORMAL))]
+    (.createZipFile zip-file xml-file zip-params)
+    (put-object (str "processed-feeds/" zip-filename)
+                (File. zip-filename))
+    (assoc ctx :generated-xml-filename zip-filename)))
