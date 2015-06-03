@@ -19,7 +19,7 @@
    psql/start-run
    t/attach-sqlite-db
    t/download-from-s3
-   zip/unzip
+   zip/assoc-file
    zip/extracted-contents])
 
 (def pipeline

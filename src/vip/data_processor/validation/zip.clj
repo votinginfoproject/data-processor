@@ -3,6 +3,11 @@
            [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
+(defn xml-file? [path]
+  (-> path
+      str
+      (.endsWith ".xml")))
+
 (defn zip-file? [path]
   (-> path
       str
@@ -15,17 +20,22 @@
     (.extractAll zip-file (str tmp-dir))
     tmp-dir))
 
-(defn unzip [ctx]
+(defn assoc-file [ctx]
   (let [path (:input ctx)]
     (if (zip-file? path)
       (assoc ctx :input (unzip-file path))
-      (assoc ctx :stop (str path " is not a zip file!")))))
+      (if (xml-file? path)
+        (assoc ctx :input path)
+        (assoc ctx :stop (str path " is not a zip file!"))))))
 
 (defn extracted-contents [ctx]
   (let [path (:input ctx)]
-    (assoc ctx :input
-           (-> path
-               (.resolve "data")
-               .toFile
-               .listFiles
-               seq))))
+    (if (xml-file? path)
+      (assoc ctx :input
+             (seq [(.toFile path)]))
+      (assoc ctx :input
+             (-> path
+                 (.resolve "data")
+                 .toFile
+                 .listFiles
+                 seq)))))
