@@ -12,7 +12,7 @@
             [democracyworks.squishy.data-readers]))
 
 (def pipeline
-  (concat [zip/unzip
+  (concat [zip/assoc-file
            zip/extracted-contents
            t/attach-sqlite-db
            (data-spec/add-data-specs data-spec/data-specs)
@@ -24,7 +24,9 @@
 
 (defn -main [zip-filename]
   (psql/initialize)
-  (let [zip (java.io.File. zip-filename)
+  (let [zip (if (zip/xml-file? zip-filename)
+              (java.nio.file.Paths/get zip-filename (into-array [""]))
+              (java.io.File. zip-filename))
         result (pipeline/process pipeline zip)]
     (when-let [xml-output-file (:xml-output-file result)]
       (println "XML:" (.toString xml-output-file))
