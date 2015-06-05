@@ -22,17 +22,16 @@
 
 (defn assoc-file [ctx]
   (let [path (:input ctx)]
-    (if (zip-file? path)
-      (assoc ctx :input (unzip-file path))
-      (if (xml-file? path)
-        (assoc ctx :input path)
-        (assoc ctx :stop (str path " is not a zip file!"))))))
+    (cond
+      (zip-file? path) (assoc ctx :input (unzip-file path))
+      (xml-file? path) (assoc ctx :input path)
+      :else (assoc ctx :stop (str path " is not a zip or xml file!")))))
 
 (defn extracted-contents [ctx]
   (let [path (:input ctx)]
     (if (xml-file? path)
       (assoc ctx :input
-             (seq [(.toFile path)]))
+             [(.toFile path)])
       (assoc ctx :input
              (-> path
                  (.resolve "data")
