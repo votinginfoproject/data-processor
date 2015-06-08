@@ -22,12 +22,12 @@
           xml-output/pipeline
           [psql/insert-validations]))
 
-(defn -main [zip-filename]
+(defn -main [filename]
   (psql/initialize)
-  (let [zip (if (zip/xml-file? zip-filename)
-              (java.nio.file.Paths/get zip-filename (into-array [""]))
-              (java.io.File. zip-filename))
-        result (pipeline/process pipeline zip)]
+  (let [file (if (zip/xml-file? filename)
+               (java.nio.file.Paths/get filename (into-array [""]))
+               (java.io.File. filename))
+        result (pipeline/process pipeline file)]
     (when-let [xml-output-file (:xml-output-file result)]
       (println "XML:" (.toString xml-output-file))
       (let [filename (xml-filename result)
