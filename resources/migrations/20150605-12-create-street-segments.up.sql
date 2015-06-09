@@ -1,0 +1,1 @@
+-- street segments are not imported into Postgres

@@ -1,0 +1,12 @@
+CREATE TABLE ballot_line_results (id INTEGER NOT NULL,
+                                  results_id INTEGER REFERENCES results (id) NOT NULL,
+                                  PRIMARY KEY (results_id, id),
+                                  contest_id INTEGER,
+                                  jurisdiction_id INTEGER,
+                                  entire_district BOOLEAN NOT NULL,
+                                  candidate_id INTEGER,
+                                  ballot_response_id INTEGER,
+                                  votes INTEGER,
+                                  overvotes INTEGER,
+                                  victorious BOOLEAN,
+                                  certification TEXT);

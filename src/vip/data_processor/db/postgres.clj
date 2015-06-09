@@ -4,7 +4,9 @@
             [joplin.jdbc.database]
             [korma.db :as db]
             [korma.core :as korma]
-            [turbovote.resource-config :refer [config]]))
+            [turbovote.resource-config :refer [config]]
+            [vip.data-processor.db.util :as util]
+            [vip.data-processor.validation.data-spec :as data-spec]))
 
 (defn url []
   (let [{:keys [host port user password]} (config :postgres)]
@@ -16,7 +18,8 @@
                  :migrator "resources/migrations"}))
 
 (declare results-db results
-         validations-db validations)
+         validations-db validations
+         import-entities)
 
 (defn initialize []
   (log/info "Initializing Postgres")
@@ -29,7 +32,9 @@
   (korma/defentity results
     (korma/database results-db))
   (korma/defentity validations
-    (korma/database validations-db)))
+    (korma/database validations-db))
+  (def import-entities
+    (util/make-entities results-db util/postgres-import-entity-names)))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
@@ -76,3 +81,20 @@
     (when critical (insert-severity-fn 'critical critical))
     (when fatal (insert-severity-fn 'fatal fatal))
     ctx))
+
+(def statement-parameter-limit 3000)
+(def bulk-import (partial util/bulk-import statement-parameter-limit))
+
+(defn import-from-sqlite [{:keys [import-id db data-specs] :as ctx}]
+  (doseq [ent util/postgres-import-entity-names]
+    (let [table (get-in ctx [:tables ent])
+          vals (korma/select table)
+          vals (map #(assoc % :results_id import-id) vals)
+          columns (->> data-specs
+                       (filter #(= ent (:table %)))
+                       first
+                       :columns)
+          vals (data-spec/coerce-rows columns vals)]
+      (when (seq vals)
+        (bulk-import (ent import-entities) vals))))
+  ctx)

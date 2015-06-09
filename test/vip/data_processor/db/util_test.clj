@@ -1,6 +1,6 @@
-(ns vip.data-processor.db.sqlite-test
+(ns vip.data-processor.db.util-test
   (:require [clojure.test :refer :all]
-            [vip.data-processor.db.sqlite :refer :all]))
+            [vip.data-processor.db.util :refer :all]))
 
 (deftest chunk-rows-test
   (let [n 7

@@ -1,0 +1,13 @@
+CREATE TABLE polling_locations (id INTEGER NOT NULL,
+                                results_id INTEGER REFERENCES results (id) NOT NULL,
+                                PRIMARY KEY (results_id, id),
+                                address_location_name TEXT,
+                                address_line1 TEXT,
+                                address_line2 TEXT,
+                                address_line3 TEXT,
+                                address_city TEXT,
+                                address_state TEXT,
+                                address_zip TEXT,
+                                directions TEXT,
+                                polling_hours TEXT,
+                                photo_url TEXT)

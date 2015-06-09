@@ -20,7 +20,8 @@
           [psql/start-run]
           db/validations
           xml-output/pipeline
-          [psql/insert-validations]))
+          [psql/insert-validations
+           psql/import-from-sqlite]))
 
 (defn -main [zip-filename]
   (psql/initialize)
