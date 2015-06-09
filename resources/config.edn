@@ -8,6 +8,6 @@
             :port #resource-config/env "DB_PORT_5432_TCP_PORT"
             :user #resource-config/env "DB_ENV_POSTGRES_USER"
             :password #resource-config/env "DB_ENV_POSTGRES_PASSWORD"}
- :rabbit-mq {:connection {:host #resource-config/env "QUEUE_PORT_5672_TCP_ADDR"
-                          :port #resource-config/edn #resource-config/env "QUEUE_PORT_5672_TCP_PORT"}
-             :exchange #resource-config/env "VIP_DP_RABBITMQ_EXCHANGE"}}
+ :rabbitmq {:connection {:host #resource-config/env "RABBITMQ_PORT_5672_TCP_ADDR"
+                         :port #resource-config/edn #resource-config/env "RABBITMQ_PORT_5672_TCP_PORT"}
+            :exchange #resource-config/env "VIP_DP_RABBITMQ_EXCHANGE"}}
