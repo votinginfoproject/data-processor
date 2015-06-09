@@ -1,0 +1,13 @@
+CREATE TABLE contest_results (id INTEGER NOT NULL,
+                              results_id INTEGER REFERENCES results (id) NOT NULL,
+                              PRIMARY KEY (results_id, id),
+                              contest_id INTEGER,
+                              jurisdiction_id INTEGER,
+                              entire_district BOOLEAN NOT NULL,
+                              total_votes INTEGER,
+                              total_valid_votes INTEGER,
+                              overvotes INTEGER,
+                              blank_votes INTEGER,
+                              accepted_provisional_votes INTEGER,
+                              rejected_votes INTEGER,
+                              certification TEXT);

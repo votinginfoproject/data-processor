@@ -85,7 +85,7 @@
             (let [ctx (validate-format-rules ctx contents data-spec)
                   transforms (apply comp (data-spec/translation-fns columns))
                   transformed-contents (map transforms contents)]
-              (sqlite/bulk-import transformed-contents sql-table)
+              (sqlite/bulk-import sql-table transformed-contents)
               ctx)))))
     ctx))
 

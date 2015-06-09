@@ -1,0 +1,11 @@
+CREATE TABLE referendums (id INTEGER NOT NULL,
+                          results_id INTEGER REFERENCES results (id) NOT NULL,
+                          PRIMARY KEY (results_id, id),
+                          title TEXT,
+                          subtitle TEXT,
+                          brief TEXT,
+                          text TEXT,
+                          pro_statement TEXT,
+                          con_statement TEXT,
+                          passage_threshold TEXT,
+                          effect_of_abstain TEXT);
