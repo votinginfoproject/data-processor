@@ -8,6 +8,6 @@
             :port 5432
             :user "postgres"
             :password "sssssecret"}
- :rabbit-mq {:connection {:host "localhost"
-                          :port 5672}
-             :exchange "qa-engine"}}
+ :rabbitmq {:connection {:host "localhost"
+                         :port 5672}
+            :exchange "qa-engine"}}

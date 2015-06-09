@@ -15,7 +15,7 @@
     (loop [attempt 1]
       (try
         (reset! rabbit-connection
-                (rmq/connect (or (config :rabbit-mq :connection)
+                (rmq/connect (or (config :rabbitmq :connection)
                                  {})))
         (log/info "RabbitMQ connected.")
         (catch Throwable t
@@ -28,7 +28,7 @@
             (throw (ex-info "Connecting to RabbitMQ failed" {:attemts attempt})))))))
   (reset! rabbit-channel
           (let [ch (lch/open @rabbit-connection)]
-            (le/topic ch (config :rabbit-mq :exchange) {:durable false :auto-delete true})
+            (le/topic ch (config :rabbitmq :exchange) {:durable false :auto-delete true})
             (log/info "RabbitMQ topic set.")
             ch)))
 
@@ -38,7 +38,7 @@
   [payload routing-key]
   (log/debug routing-key "-" (pr-str payload))
   (lb/publish @rabbit-channel
-              (config :rabbit-mq :exchange)
+              (config :rabbitmq :exchange)
               routing-key
               (pr-str payload)
               {:content-type "application/edn" :type "qa-engine.event"}))
