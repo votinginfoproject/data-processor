@@ -21,7 +21,8 @@
           db/validations
           xml-output/pipeline
           [psql/insert-validations
-           psql/import-from-sqlite]))
+           psql/import-from-sqlite
+           psql/store-stats]))
 
 (defn -main [filename]
   (psql/initialize)

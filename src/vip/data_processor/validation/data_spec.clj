@@ -31,6 +31,7 @@
   [{:filename "ballot.txt"
     :table :ballots
     :tag-name :ballot
+    :stats true
     :xml-references [{:join-table :ballot-candidates
                       :id "ballot_id"
                       :joined-id "candidate_id"}]
@@ -46,6 +47,7 @@
    {:filename "ballot_line_result.txt"
     :table :ballot-line-results
     :tag-name :ballot_line_result
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits}
               {:name "contest_id" :required true :format format/all-digits :references :contests :coerce coerce-integer}
               {:name "jurisdiction_id" :required true :format format/all-digits :coerce coerce-integer}
@@ -59,12 +61,14 @@
    {:filename "ballot_response.txt"
     :table :ballot-responses
     :tag-name :ballot_response
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "text" :required true}
               {:name "sort_order" :format format/all-digits :coerce coerce-integer}]}
    {:filename "candidate.txt"
     :table :candidates
     :tag-name :candidate
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name" :required true}
               {:name "party"}
@@ -84,6 +88,7 @@
    {:filename "contest.txt"
     :table :contests
     :tag-name :contest
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "election_id" :required true :format format/all-digits :references :elections :coerce coerce-integer}
               {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts :coerce coerce-integer}
@@ -101,6 +106,7 @@
    {:filename "contest_result.txt"
     :table :contest-results
     :tag-name :contest_result
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "contest_id" :required true :format format/all-digits :references :contests :coerce coerce-integer}
               {:name "jurisdiction_id" :required true :format format/all-digits :coerce coerce-integer}
@@ -115,6 +121,7 @@
    {:filename "custom_ballot.txt"
     :table :custom-ballots
     :tag-name :custom_ballot
+    :stats true
     :xml-references [{:join-table :custom-ballot-ballot-responses
                       :id "custom_ballot_id"
                       :joined-id "ballot_response_id"}]
@@ -128,6 +135,7 @@
    {:filename "early_vote_site.txt"
     :table :early-vote-sites
     :tag-name :early_vote_site
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name"}
               {:name "address_location_name"}
@@ -145,6 +153,7 @@
    {:filename "election.txt"
     :table :elections
     :tag-name :election
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "date" :required true :format format/date :coerce coerce-date}
               {:name "election_type" :format format/election-type}
@@ -160,6 +169,7 @@
    {:filename "election_administration.txt"
     :table :election-administrations
     :tag-name :election_administration
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name"}
               {:name "eo_id" :format format/all-digits :references :election-officials :coerce coerce-integer}
@@ -190,6 +200,7 @@
    {:filename "election_official.txt"
     :table :election-officials
     :tag-name :election_official
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name" :required true}
               {:name "title"}
@@ -199,6 +210,7 @@
    {:filename "electoral_district.txt"
     :table :electoral-districts
     :tag-name :electoral_district
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name" :required true}
               {:name "type" :format format/electoral-district-type}
@@ -206,6 +218,7 @@
    {:filename "locality.txt"
     :table :localities
     :tag-name :locality
+    :stats true
     :xml-references [{:join-table :locality-early-vote-sites
                       :id "locality_id"
                       :joined-id "early_vote_site_id"}]
@@ -221,6 +234,7 @@
    {:filename "polling_location.txt"
     :table :polling-locations
     :tag-name :polling_location
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "address_location_name"}
               {:name "address_line1" :required true}
@@ -235,6 +249,7 @@
    {:filename "precinct.txt"
     :table :precincts
     :tag-name :precinct
+    :stats true
     :xml-references [{:join-table :precinct-polling-locations
                       :id "precinct_id"
                       :joined-id "polling_location_id"}
@@ -254,6 +269,7 @@
    {:filename "precinct_split.txt"
     :table :precinct-splits
     :tag-name :precinct_split
+    :stats true
     :xml-references [{:join-table :precinct-split-electoral-districts
                       :id "precinct_split_id"
                       :joined-id "electoral_district_id"}
@@ -287,6 +303,7 @@
    {:filename "referendum.txt"
     :table :referendums
     :tag-name :referendum
+    :stats true
     :xml-references [{:join-table :referendum-ballot-responses
                       :id "referendum_id"
                       :joined-id "ballot_response_id"}]
@@ -311,6 +328,7 @@
    {:filename "street_segment.txt"
     :table :street-segments
     :tag-name :street_segment
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "start_house_number" :required true}
               {:name "end_house_number" :required true}
