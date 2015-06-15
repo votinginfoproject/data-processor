@@ -351,6 +351,7 @@
    {:filename "source.txt"
     :table :sources
     :tag-name :source
+    :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name" :required true}
               {:name "vip_id" :required true :format format/all-digits :coerce coerce-integer}
