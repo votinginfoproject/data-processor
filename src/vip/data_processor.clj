@@ -30,7 +30,8 @@
           xml-output/pipeline
           [s3/upload-to-s3]
           [psql/insert-validations
-           psql/import-from-sqlite]))
+           psql/import-from-sqlite
+           psql/store-stats]))
 
 (defn consume []
   (sqs/consume-messages (sqs/client)

@@ -5,6 +5,7 @@
             [korma.db :as db]
             [korma.core :as korma]
             [turbovote.resource-config :refer [config]]
+            [vip.data-processor.db.statistics :as stats]
             [vip.data-processor.db.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]))
 
@@ -19,7 +20,8 @@
 
 (declare results-db results
          validations-db validations
-         import-entities)
+         import-entities
+         statistics)
 
 (defn initialize []
   (log/info "Initializing Postgres")
@@ -33,6 +35,8 @@
     (korma/database results-db))
   (korma/defentity validations
     (korma/database validations-db))
+  (korma/defentity statistics
+    (korma/database results-db))
   (def import-entities
     (util/make-entities results-db util/postgres-import-entity-names)))
 
@@ -97,4 +101,9 @@
           vals (data-spec/coerce-rows columns vals)]
       (when (seq vals)
         (bulk-import (ent import-entities) vals))))
+  ctx)
+
+(defn store-stats [{:keys [import-id] :as ctx}]
+  (korma/insert statistics
+                (korma/values (assoc (stats/stats-map ctx) :results_id import-id)))
   ctx)
