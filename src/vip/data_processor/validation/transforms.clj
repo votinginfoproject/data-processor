@@ -17,12 +17,18 @@
     (assoc ctx :stop "No filename!")))
 
 (defn attach-sqlite-db [ctx]
-  (merge ctx (sqlite/temp-db (:filename ctx))))
+  (let [db (sqlite/temp-db (:filename ctx))
+        db-file (get-in db [:db :db])]
+    (-> ctx
+        (merge db)
+        (update :to-be-cleaned conj db-file))))
 
 (defn download-from-s3 [ctx]
   (let [filename (get-in ctx [:input :filename])
         file (s3/download filename)]
-    (assoc ctx :input file)))
+    (-> ctx
+        (update :to-be-cleaned conj file)
+        (assoc :input file))))
 
 (def xml-validations
   [xml/load-xml])

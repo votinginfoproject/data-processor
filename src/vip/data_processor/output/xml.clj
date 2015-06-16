@@ -78,9 +78,10 @@
    :content []})
 
 (defn create-xml-file [{:keys [filename] :as ctx}]
-  (assoc ctx
-         :xml-output-file
-         (Files/createTempFile filename ".xml" (into-array FileAttribute []))))
+  (let [xml-file (Files/createTempFile filename ".xml" (into-array FileAttribute []))]
+    (-> ctx
+        (assoc :xml-output-file xml-file)
+        (update :to-be-cleaned conj xml-file))))
 
 (def ^:const SPACE " ")
 (def ^:const OPEN-VALUE "=\"")

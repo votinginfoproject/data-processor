@@ -2,6 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [democracyworks.squishy :as sqs]
             [korma.core :as korma]
+            [vip.data-processor.cleanup :as cleanup]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.db :as db]
@@ -31,7 +32,8 @@
           [s3/upload-to-s3]
           [psql/insert-validations
            psql/import-from-sqlite
-           psql/store-stats]))
+           psql/store-stats
+           cleanup/cleanup]))
 
 (defn consume []
   (sqs/consume-messages (sqs/client)
