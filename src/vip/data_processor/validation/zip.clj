@@ -32,9 +32,11 @@
     (if (xml-file? path)
       (assoc ctx :input
              [(.toFile path)])
-      (assoc ctx :input
-             (-> path
-                 (.resolve "data")
-                 .toFile
-                 .listFiles
-                 seq)))))
+      (let [files (-> path
+                      (.resolve "data")
+                      .toFile
+                      .listFiles
+                      seq)]
+        (-> ctx
+            (assoc :input files)
+            (update :to-be-cleaned concat files))))))
