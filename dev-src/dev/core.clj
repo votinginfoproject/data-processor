@@ -17,7 +17,8 @@
            t/attach-sqlite-db
            (data-spec/add-data-specs data-spec/data-specs)
            t/xml-csv-branch]
-          [psql/start-run]
+          [psql/start-run
+           psql/store-public-id]
           db/validations
           xml-output/pipeline
           [psql/insert-validations

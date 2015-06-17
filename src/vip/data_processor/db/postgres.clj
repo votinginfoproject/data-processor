@@ -1,5 +1,6 @@
 (ns vip.data-processor.db.postgres
   (:require [clojure.tools.logging :as log]
+            [clojure.string :as str]
             [joplin.core :as j]
             [joplin.jdbc.database]
             [korma.db :as db]
@@ -45,6 +46,26 @@
                               (korma/values {:start_time (korma/sqlfn now)
                                              :complete false}))]
     (assoc ctx :import-id (:id results))))
+
+(defn generate-public-id [{:keys [import-id] :as ctx}]
+  (let [state (-> ctx
+                 (get-in [:tables :states])
+                 (korma/select (korma/fields :name))
+                 first
+                 :name)
+        {:keys [date election_type]} (-> ctx
+                                         (get-in [:tables :elections])
+                                         (korma/select (korma/fields :date :election_type))
+                                         first)]
+    (str/join "-" [date election_type state import-id])))
+
+(defn store-public-id [ctx]
+  (let [id (:import-id ctx)
+        public-id (generate-public-id ctx)]
+    (korma/update results
+                  (korma/set-fields {:public_id public-id})
+                  (korma/where {:id id}))
+    ctx))
 
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
