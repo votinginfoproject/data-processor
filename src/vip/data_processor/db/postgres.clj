@@ -47,6 +47,13 @@
                                              :complete false}))]
     (assoc ctx :import-id (:id results))))
 
+(defn build-public-id [date election-type state import-id]
+  (let [nil-or-empty? (some-fn nil? empty?)
+        good-parts (remove nil-or-empty? [date election-type state])]
+    (if (empty? good-parts)
+      (str "invalid-" import-id)
+      (str/join "-" (concat good-parts [import-id])))))
+
 (defn generate-public-id [{:keys [import-id] :as ctx}]
   (let [state (-> ctx
                  (get-in [:tables :states])
@@ -57,7 +64,7 @@
                                          (get-in [:tables :elections])
                                          (korma/select (korma/fields :date :election_type))
                                          first)]
-    (str/join "-" [date election_type state import-id])))
+    (build-public-id date election_type state import-id)))
 
 (defn store-public-id [ctx]
   (let [id (:import-id ctx)
