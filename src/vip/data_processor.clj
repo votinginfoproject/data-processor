@@ -26,7 +26,8 @@
 (def pipeline
   (concat download-pipeline
           [(data-spec/add-data-specs data-spec/data-specs)
-           t/xml-csv-branch]
+           t/xml-csv-branch
+           psql/store-public-id]
           db/validations
           xml-output/pipeline
           [s3/upload-to-s3]
