@@ -10,7 +10,7 @@ CREATE TABLE contests (id BIGINT NOT NULL,
                        special BOOLEAN,
                        office TEXT,
                        filing_closed_date DATE,
-                       number_elected BIGINT,
-                       number_voting_for BIGINT,
+                       number_elected INTEGER,
+                       number_voting_for INTEGER,
                        ballot_id BIGINT,
-                       ballot_placement BIGINT);
+                       ballot_placement INTEGER);
