@@ -47,10 +47,9 @@
              :fatal {}
              :pipeline pipeline}
         result (run-pipeline ctx)]
-    (log/info (select-keys result [:errors :warnings :critical :fatal :db :xml-output-file]))
+    (log/info (select-keys result [:import-id :db :xml-output-file]))
     (when-let [ex (:exception result)]
       (log/error (with-out-str (stacktrace/print-stack-trace ex)))
       (throw (ex-info "Exception during processing" {:exception ex
-                                                     :initial-ctx ctx
-                                                     :final-ctx result})))
+                                                     :initial-ctx ctx})))
     result))

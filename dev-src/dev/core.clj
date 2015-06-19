@@ -12,12 +12,12 @@
             [democracyworks.squishy.data-readers]))
 
 (def pipeline
-  (concat [zip/assoc-file
+  (concat [psql/start-run
+           zip/assoc-file
            zip/extracted-contents
            t/attach-sqlite-db
            (data-spec/add-data-specs data-spec/data-specs)
-           t/xml-csv-branch]
-          [psql/start-run
+           t/xml-csv-branch
            psql/store-public-id]
           db/validations
           xml-output/pipeline
