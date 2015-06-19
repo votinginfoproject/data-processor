@@ -1,5 +1,5 @@
-CREATE TABLE early_vote_sites(id INTEGER NOT NULL,
-                              results_id INTEGER REFERENCES results (id) NOT NULL,
+CREATE TABLE early_vote_sites(id BIGINT NOT NULL,
+                              results_id BIGINT REFERENCES results (id) NOT NULL,
                               PRIMARY KEY (results_id, id),
                               name TEXT,
                               address_location_name TEXT,

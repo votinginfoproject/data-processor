@@ -1,5 +1,5 @@
-CREATE TABLE polling_locations (id INTEGER NOT NULL,
-                                results_id INTEGER REFERENCES results (id) NOT NULL,
+CREATE TABLE polling_locations (id BIGINT NOT NULL,
+                                results_id BIGINT REFERENCES results (id) NOT NULL,
                                 PRIMARY KEY (results_id, id),
                                 address_location_name TEXT,
                                 address_line1 TEXT,
