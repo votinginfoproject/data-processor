@@ -16,9 +16,11 @@
                                  validate-no-duplicated-ids]}
                      (sqlite/temp-db "duplicate-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :import :duplicated-ids 8675309]))
-      (is (get-in out-ctx [:errors :import :duplicated-ids 5882300]))
-      (is (not (get-in out-ctx [:errors :import :duplicated-ids 7]))))))
+      (is (= #{"contests" "candidates"}
+             (set (get-in out-ctx [:errors :import 5882300 :duplicate-ids]))
+             (set (get-in out-ctx [:errors :import 8675309 :duplicate-ids]))))
+      (is (not (get-in out-ctx [:errors :import 7 :duplicated-ids])))
+      (assert-error-format out-ctx))))
 
 (deftest validate-no-duplicated-rows-test
   (testing "finds possibly duplicated rows in a table and warns"
@@ -29,10 +31,11 @@
                                  validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicate-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= #{3100047456984 3100047456989 3100047466988 3100047466990}
-             (set (map :id (get-in out-ctx [:warnings :candidates :duplicated-rows])))))
+      (doseq [id [3100047456984 3100047456989 3100047466988 3100047466990]]
+        (is (get-in out-ctx [:warnings :candidates id :duplicate-rows])))
       (is (= #{{:candidate_id 3100047456987, :ballot_id 410004745} {:candidate_id 3100047466988, :ballot_id 410004746}}
-             (set (get-in out-ctx [:warnings :ballot-candidates :duplicated-rows])))))))
+             (set (get-in out-ctx [:warnings :ballot-candidates nil :duplicate-rows]))))
+      (assert-error-format out-ctx))))
 
 (deftest validate-one-record-limit-test
   (testing "validates that only one row exists in certain files"
@@ -42,8 +45,9 @@
                                  validate-one-record-limit]}
                      (sqlite/temp-db "too-many-records"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= (get-in out-ctx [:errors :elections :row-constraint])
-             "File needs to contain exactly one row.")))))
+      (is (= (get-in out-ctx [:errors :elections :global :row-constraint])
+             ["File needs to contain exactly one row."]))
+      (assert-error-format out-ctx))))
 
 (deftest validate-references-test
   (testing "finds bad references"
@@ -54,7 +58,11 @@
                                  validate-references]}
                      (sqlite/temp-db "bad-references"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= 1 (count (get-in out-ctx [:errors :ballots :reference-error "referendum_id"])))))))
+      (is (= 123456789 (-> out-ctx
+                           (get-in [:errors :ballots 41100369 :unmatched-reference])
+                           first
+                           (get "referendum_id"))))
+      (assert-error-format out-ctx))))
 
 (deftest validate-jurisdiction-references-test
   (testing "finds bad jurisdiction references"
@@ -69,7 +77,15 @@
                                  validate-jurisdiction-references]}
                      (sqlite/temp-db "bad-jurisdiction-references"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (map :id (get-in out-ctx [:errors :ballot-line-results :reference-error :jurisdiction-id]))))))
+      (is (= 8 (-> out-ctx
+                   (get-in [:errors :ballot-line-results 100 :unmatched-reference])
+                   first
+                   :jurisdiction_id)))
+      (is (= 800 (-> out-ctx
+                     (get-in [:errors :ballot-line-results 101 :unmatched-reference])
+                     first
+                     :jurisdiction_id)))
+      (assert-error-format out-ctx))))
 
 (deftest validate-no-unreferenced-rows-test
   (testing "finds rows not referenced"
@@ -81,12 +97,11 @@
                                  validate-no-unreferenced-rows]}
                      (sqlite/temp-db "unreferenced-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= [2 3]
-             (map :id (get-in out-ctx
-                              [:warnings :ballots :unreferenced-rows]))))
-      (is (= [13 14]
-             (map :id (get-in out-ctx
-                              [:warnings :candidates :unreferenced-rows])))))))
+      (is (get-in out-ctx [:warnings :ballots 2 :unreferenced-row]))
+      (is (get-in out-ctx [:warnings :ballots 3 :unreferenced-row]))
+      (is (get-in out-ctx [:warnings :candidates 13 :unreferenced-row]))
+      (is (get-in out-ctx [:warnings :candidates 14 :unreferenced-row]))
+      (assert-error-format out-ctx))))
 
 (deftest validate-no-overlapping-street-segments-test
   (let [ctx (merge {:input (csv-inputs ["overlapping-street-segments/street_segment.txt"])
@@ -95,8 +110,15 @@
                                validate-no-overlapping-street-segments]}
                    (sqlite/temp-db "overlapping-street-segments"))
         out-ctx (pipeline/run-pipeline ctx)]
-    (is (= #{#{11 12} #{13 14} #{15 16} #{17 18} #{19 20}}
-           (get-in out-ctx [:errors :street-segments :overlaps])))))
+    (is (= '(12) (get-in out-ctx [:errors :street-segments 11 :overlaps])))
+    (is (= '(14) (get-in out-ctx [:errors :street-segments 13 :overlaps])))
+    (is (= #{16 17} (set (get-in out-ctx [:errors :street-segments 15 :overlaps]))))
+    (is (= '(19) (get-in out-ctx [:errors :street-segments 18 :overlaps])))
+    (is (= '(21) (get-in out-ctx [:errors :street-segments 20 :overlaps])))
+    (is (not (get-in out-ctx [:errors :street-segments 22 :overlaps])))
+    (is (not (get-in out-ctx [:errors :street-segments 23 :overlaps])))
+    (is (not (get-in out-ctx [:errors :street-segments 24 :overlaps])))
+    (assert-error-format out-ctx)))
 
 (deftest validate-election-administration-addresses-test
   (testing "errors are returned if either the physical or mailing address is incomplete"
@@ -106,7 +128,8 @@
                                  validate-election-administration-addresses]}
                      (sqlite/temp-db "incomplete-addresses"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :election-administrations
+      (is (get-in out-ctx [:errors :election-administrations 99990
                            :incomplete-physical-address]))
-      (is (get-in out-ctx [:errors :election-administrations
-                           :incomplete-mailing-address])))))
+      (is (get-in out-ctx [:errors :election-administrations 99991
+                           :incomplete-mailing-address]))
+      (assert-error-format out-ctx))))

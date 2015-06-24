@@ -6,26 +6,27 @@
 
 (deftest validate-dependencies-test
   (let [dependencies (build-dependencies
-                      "a" (and "b"
-                               (or "c" "d"))
-                      "c" "e")
+                      "ballot.txt" (and "candidate.txt"
+                               (or "precinct.txt" "election.txt"))
+                      "precinct.txt" "source.txt")
         validator (validate-dependencies dependencies)]
     (testing "does not add errors when dependencies are met"
-      (let [ctx {:input [(File. "a")
-                         (File. "b")
-                         (File. "d")]}
+      (let [ctx {:input [(File. "ballot.txt")
+                         (File. "candidate.txt")
+                         (File. "election.txt")]}
             out-ctx (validator ctx)]
-        (assert-no-problems out-ctx [:file-dependencies]))
+        (assert-no-problems out-ctx []))
       (testing "with sub-dependencies"
-        (let [ctx {:input [(File. "a")
-                           (File. "b")
-                           (File. "c")
-                           (File. "e")]}
+        (let [ctx {:input [(File. "ballot.txt")
+                           (File. "candidate.txt")
+                           (File. "precinct.txt")
+                           (File. "source.txt")]}
               out-ctx (validator ctx)]
-          (assert-no-problems out-ctx [:file-dependencies]))))
+          (assert-no-problems out-ctx []))))
     (testing "adds errors when dependencies are not met"
-      (let [ctx {:input [(File. "a")
-                         (File. "c")]}
+      (let [ctx {:input [(File. "ballot.txt")
+                         (File. "precinct.txt")]}
             out-ctx (validator ctx)]
-        (assert-some-problem out-ctx [:file-dependencies "a"])
-        (assert-some-problem out-ctx [:file-dependencies "c"])))))
+        (assert-some-problem out-ctx [:ballots :global :missing-dependency])
+        (assert-some-problem out-ctx [:precincts :global :missing-dependency])
+        (assert-error-format out-ctx)))))

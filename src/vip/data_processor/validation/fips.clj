@@ -24,9 +24,8 @@
 
 (defn validate-valid-source-vip-id [ctx]
   (let [sources (get-in ctx [:tables :sources])
-        vip-id (-> (korma/select sources (korma/fields :vip_id))
-                   first
-                   :vip_id)]
-    (if (valid-fips? vip-id)
+        source (-> sources (korma/select (korma/fields :id :vip_id)) first)
+        {:keys [id vip_id]} source]
+    (if (valid-fips? vip_id)
       ctx
-      (assoc-in ctx [:errors :source :invalid-vip-id] vip-id))))
+      (assoc-in ctx [:errors :sources id :invalid-vip-id] [vip_id]))))

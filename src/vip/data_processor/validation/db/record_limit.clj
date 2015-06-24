@@ -11,7 +11,7 @@
 
 (defn name-and-count [tables]
   "Transforms the selected tables into a map of names and counts."
-  (map 
+  (map
    (fn [[table-name table]]
      {:name table-name :count (count-rows table)})
    tables))
@@ -19,8 +19,8 @@
 (defn error-if-not-one-row [ctx count]
   "If the count of the rows is not equal to 1, add an error."
   (if-not (= 1 (:count count))
-    (assoc-in ctx [:errors (:name count) :row-constraint]
-              "File needs to contain exactly one row.")
+    (assoc-in ctx [:errors (:name count) :global :row-constraint]
+              ["File needs to contain exactly one row."])
     ctx))
 
 (defn tables-allow-only-one-record [ctx]
@@ -30,5 +30,3 @@
   (let [tables (select-keys (:tables ctx) single-record-files)
         counts (name-and-count tables)]
     (reduce error-if-not-one-row ctx counts)))
-
-

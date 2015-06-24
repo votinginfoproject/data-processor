@@ -10,9 +10,9 @@
 
 (defn validate-no-duplicated-ids [ctx]
   (let [dupes (dupe-ids/duplicated-ids ctx)]
-    (if-not (empty? dupes)
-      (assoc-in ctx [:errors :import :duplicated-ids] dupes)
-      ctx)))
+    (reduce (fn [ctx [id tables]]
+              (assoc-in ctx [:errors :import id :duplicate-ids] tables))
+            ctx dupes)))
 
 (defn validate-no-duplicated-rows [{:keys [data-specs] :as ctx}]
   (reduce dupe-records/validate-no-duplicated-rows-in-table ctx data-specs))
@@ -41,9 +41,11 @@
                       (map vals)
                       (map set)
                       set)]
-    (if (seq overlaps)
-      (assoc-in ctx [:errors :street-segments :overlaps] overlaps)
-      ctx)))
+    (reduce (fn [ctx overlap]
+              (let [[id overlap-id] (sort overlap)]
+                (update-in ctx [:errors :street-segments id :overlaps]
+                           conj overlap-id)))
+            ctx overlaps)))
 
 (defn validate-election-administration-addresses [ctx]
   (admin-addresses/validate-addresses ctx))

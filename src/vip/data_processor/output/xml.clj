@@ -138,7 +138,7 @@
       (.validate validator (StreamSource. (.toFile xml-output-file)))
       ctx
       (catch SAXParseException e
-        (assoc-in ctx [:fatal :xml-generation :validation] (.getMessage e))))))
+        (assoc-in ctx [:fatal :xml-generation :global :invalid-xml] [(.getMessage e)])))))
 
 (def pipeline
   [create-xml-file

@@ -16,11 +16,13 @@
                                  validate-valid-source-vip-id]}
                      (sqlite/temp-db "invalid-source-vip-id-csv"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :source :invalid-vip-id]))))
+      (is (= ["5199955554447"] (get-in out-ctx [:errors :sources 1 :invalid-vip-id])))
+      (assert-error-format out-ctx)))
   (testing "adds an error if the source's vip_id is bad from a xml"
     (let [ctx (merge {:input (xml-input "invalid-source-vip-id.xml")
                       :data-specs data-spec/data-specs
                       :pipeline [xml/load-xml validate-valid-source-vip-id]}
                      (sqlite/temp-db "invalid-source-vip-id-xml"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= "99999" (get-in out-ctx [:errors :source :invalid-vip-id]))))))
+      (is (= ["99999"] (get-in out-ctx [:errors :sources 0 :invalid-vip-id])))
+      (assert-error-format out-ctx))))
