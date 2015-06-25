@@ -104,9 +104,6 @@
    :error_type (name error-type)
    :error_data (pr-str error-data)})
 
-;;; TODO:
-;;; 2. bulk insert? (partition into groups?)
-
 (defn validation-values [{:keys [import-id] :as ctx}]
   (mapcat
    (fn [severity]
