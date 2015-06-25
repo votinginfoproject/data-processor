@@ -1,7 +1,8 @@
 (ns vip.data-processor.test-helpers
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [vip.data-processor.util :as util]))
 
 (set! *print-length* 10)
 
@@ -44,18 +45,11 @@
                             (korma/fields column)
                             (korma/order :id :ASC))))))
 
-(defn flatten-keys* [a ks m]
-  (if (map? m)
-    (reduce into (map (fn [[k v]] (flatten-keys* a (conj ks k) v)) (seq m)))
-    (assoc a ks m)))
-
-(defn flatten-keys [m] (flatten-keys* {} [] m))
-
 (defn assert-error-format
   [out-ctx]
   (doseq [severity problem-types]
     (if-let [errors (get out-ctx severity)]
-      (let [flattened (flatten-keys errors)]
+      (let [flattened (util/flatten-keys errors)]
         (doseq [[path-to-errors errors] flattened]
           (is (keyword? (first path-to-errors)))
           (is (= 3 (count path-to-errors)))

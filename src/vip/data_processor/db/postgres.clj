@@ -7,7 +7,8 @@
             [korma.core :as korma]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.statistics :as stats]
-            [vip.data-processor.db.util :as util]
+            [vip.data-processor.db.util :as db.util]
+            [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]))
 
 (defn url []
@@ -39,7 +40,7 @@
   (korma/defentity statistics
     (korma/database results-db))
   (def import-entities
-    (util/make-entities results-db util/postgres-import-entity-names)))
+    (db.util/make-entities results-db db.util/postgres-import-entity-names)))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
@@ -87,38 +88,49 @@
   (korma/select results
                 (korma/where {:id (:import-id ctx)})))
 
-(defn insert-validation [id severity scopes scope-key]
-  (let [scope (get scopes scope-key)
-        description (-> scope keys first)
-        message (-> scope vals first)]
-    (korma/insert validations
-                  (korma/values {:result_id id
-                                 :severity (name severity)
-                                 :scope (if (keyword? scope-key)
-                                          (name scope-key)
-                                          scope-key)
-                                 :description (if (keyword? description)
-                                                (name description)
-                                                description)
-                                 :message (pr-str message)}))))
+(def global-identifier -1)
 
-(defn insert-validations [{:keys [warnings errors critical fatal] :as ctx}]
-  (log/info "Inserting validations")
-  (let [result-id (:import-id ctx)
-        insert-severity-fn (fn [type scopes]
-                             (doseq [scope (keys scopes)]
-                               (insert-validation result-id type scopes scope)))]
-    (when warnings (insert-severity-fn 'warnings warnings))
-    (when errors (insert-severity-fn 'errors errors))
-    (when critical (insert-severity-fn 'critical critical))
-    (when fatal (insert-severity-fn 'fatal fatal))
-    ctx))
+(defn identifier->int [identifier]
+  (cond
+    (= :global identifier) global-identifier
+    (string? identifier) (BigDecimal. identifier)
+    :else identifier))
+
+(defn validation-value [results-id severity scope identifier error-type error-data]
+  {:results_id results-id
+   :severity (name severity)
+   :scope (name scope)
+   :identifier (identifier->int identifier)
+   :error_type (name error-type)
+   :error_data (pr-str error-data)})
+
+;;; TODO:
+;;; 2. bulk insert? (partition into groups?)
+
+(defn validation-values [{:keys [import-id] :as ctx}]
+  (mapcat
+   (fn [severity]
+     (let [errors (get ctx severity)]
+       (when-not (empty? errors)
+         (let [errors (util/flatten-keys errors)]
+           (mapcat (fn [[[scope identifier error-type] error-data]]
+                     (map (fn [error-data]
+                               (validation-value import-id severity scope identifier error-type error-data))
+                             error-data))
+                   errors)))))
+   [:warnings :errors :critical :fatal]))
 
 (def statement-parameter-limit 3000)
-(def bulk-import (partial util/bulk-import statement-parameter-limit))
+(def bulk-import (partial db.util/bulk-import statement-parameter-limit))
+
+(defn insert-validations [ctx]
+  (log/info "Inserting validations")
+  (let [validation-values (validation-values ctx)]
+    (bulk-import validations validation-values))
+  ctx)
 
 (defn import-from-sqlite [{:keys [import-id db data-specs] :as ctx}]
-  (doseq [ent util/postgres-import-entity-names]
+  (doseq [ent db.util/postgres-import-entity-names]
     (let [table (get-in ctx [:tables ent])
           vals (korma/select table)
           vals (map #(assoc % :results_id import-id) vals)

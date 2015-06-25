@@ -46,6 +46,7 @@
   (let [specs (data-specs-with-stats (:data-specs ctx))]
     (into {} (map (juxt :table (partial stats-for-table ctx)) specs))))
 
+;;; TODO: fix this
 (defn stats-map [ctx]
   (let [stats (stats ctx)]
     (->> stats
