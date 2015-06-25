@@ -1,6 +1,7 @@
 (ns vip.data-processor.db.statistics
   (:require [clojure.string :as str]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [vip.data-processor.util :as util]))
 
 (defn data-specs-with-stats [data-specs]
   (filter :stats data-specs))
@@ -13,16 +14,13 @@
       :cnt))
 
 (defn error-count [table-name {:keys [warnings errors critical fatal]}]
-  (letfn [(count-errors [acc error-or-errors]
-          (cond
-            (map? error-or-errors) (+ acc (reduce count-errors 0 (vals error-or-errors)))
-            (coll? error-or-errors) (+ acc (count error-or-errors))
-            (nil? error-or-errors) acc
-            :else (inc acc)))]
-    (->> [warnings errors critical fatal]
-         (map table-name)
-         (map (partial count-errors 0))
-         (reduce + 0))))
+  (transduce (comp (map table-name)
+                   (remove nil?)
+                   (map util/flatten-keys)
+                   (mapcat vals)
+                   (map count))
+             + 0
+             [warnings errors critical fatal]))
 
 (defn complete [row-count error-count]
   (cond
