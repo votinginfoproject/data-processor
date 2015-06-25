@@ -90,7 +90,14 @@
 
 (def global-identifier -1)
 
-(defn identifier->int [identifier]
+(def coercable-identifier?
+  (some-fn string? number? nil? #{:global}))
+
+(defn coerce-identifier
+  "Coerce an error identifier to something that can be inserted as a
+  Postgres BIGINT or NULL"
+  [identifier]
+  {:pre [(coercable-identifier? identifier)]}
   (cond
     (= :global identifier) global-identifier
     (string? identifier) (BigDecimal. identifier)
@@ -100,7 +107,7 @@
   {:results_id results-id
    :severity (name severity)
    :scope (name scope)
-   :identifier (identifier->int identifier)
+   :identifier (coerce-identifier identifier)
    :error_type (name error-type)
    :error_data (pr-str error-data)})
 

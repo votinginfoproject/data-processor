@@ -22,11 +22,15 @@
     (is (= "invalid-4" (build-public-id nil nil nil 4)))
     (is (= "invalid-4" (build-public-id "" nil "" 4)))))
 
-(deftest identifier->int-test
-  (is (= global-identifier (identifier->int :global)))
-  (is (= (BigDecimal. 4) (identifier->int "4")))
-  (is (= 5 (identifier->int 5)))
-  (is (nil? (identifier->int nil))))
+(deftest coerce-identifier-test
+  (testing "coerces valid identifiers"
+    (is (= global-identifier (coerce-identifier :global)))
+    (is (= (BigDecimal. 4) (coerce-identifier "4")))
+    (is (= 5 (coerce-identifier 5)))
+    (is (nil? (coerce-identifier nil))))
+  (testing "throws when given an invalid identifier"
+    (is (thrown? AssertionError (coerce-identifier :garbage)))
+    (is (thrown? AssertionError (coerce-identifier '(a list))))))
 
 (deftest validation-values-test
   (testing "generates validation values for all kinds of errors"
