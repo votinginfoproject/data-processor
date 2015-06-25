@@ -111,7 +111,17 @@
    :error_type (name error-type)
    :error_data (pr-str error-data)})
 
-(defn validation-values [{:keys [import-id] :as ctx}]
+(defn validation-values
+  "Create insertable validations from the processing context map.
+
+    (validation-values {:import-id 493
+                                  :errors {:candidates {3 {:missing-values [name\" \"email\"]}}}
+                                  :critical {:candidates {:global {:missing-columns [\"party\"]}}}})
+    ;; =>
+       ({:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"name\\\"\"}
+        {:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"email\\\"\"}
+        {:results_id 493 :severity \"critical\" :scope \"candidates\" :identifier -1 :error_type \"missing-columns\" :error_data \"\\\"party\\\"\"})"
+  [{:keys [import-id] :as ctx}]
   (mapcat
    (fn [severity]
      (let [errors (get ctx severity)]
