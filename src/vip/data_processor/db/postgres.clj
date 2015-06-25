@@ -40,7 +40,7 @@
   (korma/defentity statistics
     (korma/database results-db))
   (def import-entities
-    (db.util/make-entities results-db db.util/postgres-import-entity-names)))
+    (db.util/make-entities results-db db.util/import-entity-names)))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
@@ -130,7 +130,7 @@
   ctx)
 
 (defn import-from-sqlite [{:keys [import-id db data-specs] :as ctx}]
-  (doseq [ent db.util/postgres-import-entity-names]
+  (doseq [ent db.util/import-entity-names]
     (let [table (get-in ctx [:tables ent])
           vals (korma/select table)
           vals (map #(assoc % :results_id import-id) vals)

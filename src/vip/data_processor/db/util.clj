@@ -12,7 +12,7 @@
   (-> (korma/create-entity (kw->table-name ent))
       (korma/database db)))
 
-(def postgres-import-entity-names
+(def import-entity-names
   [:ballot-candidates
    :ballot-line-results
    :ballot-responses
@@ -41,10 +41,8 @@
    :referendums
    :sources
    :state-early-vote-sites
-   :states])
-
-(def sqlite-import-entity-names
-  (conj postgres-import-entity-names :street-segments))
+   :states
+   :street-segments])
 
 (defn make-entities [db entity-names]
   (zipmap entity-names (map (partial simple-entity db) entity-names)))
