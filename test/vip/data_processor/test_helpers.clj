@@ -1,7 +1,8 @@
 (ns vip.data-processor.test-helpers
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [vip.data-processor.util :as util]))
 
 (set! *print-length* 10)
 
@@ -43,3 +44,14 @@
               (korma/select (get-in ctx [:tables table])
                             (korma/fields column)
                             (korma/order :id :ASC))))))
+
+(defn assert-error-format
+  [out-ctx]
+  (doseq [severity problem-types]
+    (if-let [errors (get out-ctx severity)]
+      (let [flattened (util/flatten-keys errors)]
+        (doseq [[path-to-errors errors] flattened]
+          (is (keyword? (first path-to-errors)))
+          (is (= 3 (count path-to-errors)))
+          (is (sequential? errors))
+          (is (not (empty? errors))))))))

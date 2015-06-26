@@ -24,13 +24,10 @@
                                           table
                                           (:name column)
                                           (:references column))]
-                (if (seq unmatched-references)
-                  (update-in ctx [:errors
-                                  table
-                                  :reference-error
-                                  (:name column)]
-                             conj unmatched-references)
-                  ctx)))
+                (reduce (fn [ctx unmatched-reference]
+                          (update-in ctx [:errors table (:id unmatched-reference) :unmatched-reference]
+                                     conj {(:name column) (get unmatched-reference (keyword (:name column)))}))
+                        ctx unmatched-references)))
             ctx
             reference-columns)))
 
@@ -54,7 +51,7 @@
 (defn validate-jurisdiction-reference [ctx {:keys [filename table]}]
   (let [unmatched-references (unmatched-jurisdiction-references
                               (:tables ctx) table)]
-    (if (seq unmatched-references)
-      (update-in ctx [:errors table :reference-error :jurisdiction-id]
-                 conj unmatched-references)
-      ctx)))
+    (reduce (fn [ctx unmatched-reference]
+              (update-in ctx [:errors table (:id unmatched-reference) :unmatched-reference]
+                         conj (select-keys unmatched-reference [:jurisdiction_id])))
+            ctx unmatched-references)))

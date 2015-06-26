@@ -108,8 +108,9 @@
                       :pipeline [load-xml]}
                      (sqlite/temp-db "non-utf-8"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= (get-in out-ctx [:errors :candidates "name"])
-             {"90001" "Is not valid UTF-8."})))))
+      (is (= (get-in out-ctx [:errors :candidates "90001" "name"])
+             ["Is not valid UTF-8."]))
+      (assert-error-format out-ctx))))
 
 (deftest full-good-run-test
   (testing "a good XML file produces no erorrs or warnings"
@@ -130,7 +131,8 @@
                      (sqlite/temp-db "duplicated-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= #{"precincts" "localities"}
-             (set (get-in out-ctx [:errors :import :duplicated-ids 101])))))))
+             (set (get-in out-ctx [:errors :import 101 :duplicate-ids]))))
+      (assert-error-format out-ctx))))
 
 (deftest validate-no-duplicated-rows-test
   (testing "returns a warning if two nodes have the same data"
@@ -139,7 +141,9 @@
                       :pipeline [load-xml db/validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicated-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (empty? (get-in out-ctx [:warnings :ballots :duplicated-rows])))))))
+      (is (get-in out-ctx [:warnings :ballots 80000 :duplicate-rows]))
+      (is (get-in out-ctx [:warnings :ballots 80001 :duplicate-rows]))
+      (assert-error-format out-ctx))))
 
 (deftest validate-references-test
   (testing "returns an error if there are unreferenced objects"
@@ -148,7 +152,8 @@
                       :pipeline [load-xml db/validate-references]}
                      (sqlite/temp-db "unreferenced-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :localities :reference-error])))))
+      (is (= '({"state_id" 99}) (get-in out-ctx [:errors :localities 101 :unmatched-reference])))
+      (assert-error-format out-ctx))))
 
 (deftest validate-jurisdiction-references-test
   (testing "returns an error if there are unreferenced jurisdiction references"
@@ -157,7 +162,8 @@
                       :pipeline [load-xml db/validate-jurisdiction-references]}
                      (sqlite/temp-db "unreferenced-jurisdictions"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :ballot-line-results :reference-error])))))
+      (is (= '({:jurisdiction_id 99999}) (get-in out-ctx [:errors :ballot-line-results 91008 :unmatched-reference])))
+      (assert-error-format out-ctx))))
 
 (deftest validate-one-record-limit-test
   (testing "returns an error if particular nodes are duplicated more than once"
@@ -166,10 +172,11 @@
                       :pipeline [load-xml db/validate-one-record-limit]}
                      (sqlite/temp-db "one-record-limit"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (= "File needs to contain exactly one row."
-             (get-in out-ctx [:errors :elections :row-constraint])))
-      (is (= "File needs to contain exactly one row."
-             (get-in out-ctx [:errors :sources :row-constraint]))))))
+      (is (= ["File needs to contain exactly one row."]
+             (get-in out-ctx [:errors :elections :global :row-constraint])))
+      (is (= ["File needs to contain exactly one row."]
+             (get-in out-ctx [:errors :sources :global :row-constraint])))
+      (assert-error-format out-ctx))))
 
 (deftest validate-no-unreferenced-rows
   (testing "returns a warning if it finds rows that are unreferenced"
@@ -178,7 +185,8 @@
                       :pipeline [load-xml db/validate-no-unreferenced-rows]}
                      (sqlite/temp-db "unreferenced-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:warnings :candidates :unreferenced-rows])))))
+      (is (get-in out-ctx [:warnings :candidates 90000 :unreferenced-row]))
+      (assert-error-format out-ctx))))
 
 (deftest validate-no-overlapping-street-segments
   (testing "returns an error if street segments overlap"
@@ -187,7 +195,8 @@
                       :pipeline [load-xml db/validate-no-overlapping-street-segments]}
                      (sqlite/temp-db "overlapping-street-segments"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :street-segments :overlaps])))))
+      (is (= '(1210003) (get-in out-ctx [:errors :street-segments 1210002 :overlaps])))
+      (assert-error-format out-ctx))))
 
 (deftest validate-election-administration-addresses
   (testing "returns an error if either the physical or mailing address is incomplete"
@@ -197,10 +206,11 @@
                                  db/validate-election-administration-addresses]}
                      (sqlite/temp-db "incomplete-election-administrations"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :election-administrations
+      (is (get-in out-ctx [:errors :election-administrations 3456
                            :incomplete-physical-address]))
-      (is (get-in out-ctx [:errors :election-administrations
-                           :incomplete-mailing-address])))))
+      (is (get-in out-ctx [:errors :election-administrations 3456
+                           :incomplete-mailing-address]))
+      (assert-error-format out-ctx))))
 
 (deftest validate-data-formats
   (let [ctx (merge {:input (xml-input "bad-data-values.xml")
@@ -209,9 +219,11 @@
                    (sqlite/temp-db "bad-data-values"))
         out-ctx (pipeline/run-pipeline ctx)]
     (testing "adds fatal errors for missing required fields"
-      (is (get-in out-ctx [:fatal :candidates "name" "90001"])))
+      (is (get-in out-ctx [:fatal :candidates "90001" "name"])))
     (testing "adds errors for values that fail format validation"
-      (is (get-in out-ctx [:errors :candidates "candidate_url" "90001"]))
-      (is (get-in out-ctx [:errors :candidates "phone" "90001"]))
-      (is (get-in out-ctx [:errors :candidates "email" "90001"]))
-      (is (get-in out-ctx [:errors :candidates "sort_order" "90001"])))))
+      (is (get-in out-ctx [:errors :candidates "90001" "candidate_url"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "phone"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "email"]))
+      (is (get-in out-ctx [:errors :candidates "90001" "sort_order"])))
+    (testing "puts errors in the right format"
+      (assert-error-format out-ctx))))

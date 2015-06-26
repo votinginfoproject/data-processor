@@ -17,7 +17,7 @@
                         :url url}
                    :migrator "resources/processing-migrations"})
     {:db db
-     :tables (util/make-entities db util/sqlite-import-entity-names)}))
+     :tables (util/make-entities db util/import-entity-names)}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection

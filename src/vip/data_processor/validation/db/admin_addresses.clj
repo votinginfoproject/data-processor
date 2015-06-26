@@ -22,8 +22,10 @@
                            (map :id))
         error-name (keyword (str "incomplete-" (name address-type) "-address"))]
     (if (seq bad-addresses)
-      (assoc-in ctx [:errors :election-administrations error-name]
-                bad-addresses)
+      (reduce (fn [ctx bad-address-id]
+                (assoc-in ctx [:errors :election-administrations bad-address-id error-name]
+                          ["Incomplete address"]))
+              ctx bad-addresses)
       ctx)))
 
 (defn validate-addresses [ctx]

@@ -388,14 +388,14 @@
         (cond
           (empty? val)
           (if required
-            (assoc-in ctx [:fatal scope name id] (str "Missing " name))
+            (assoc-in ctx [:fatal scope id name] [(str "Missing " name)])
             ctx)
 
           (invalid-utf-8? val)
-          (assoc-in ctx [:errors scope name id] "Is not valid UTF-8.")
+          (assoc-in ctx [:errors scope id name] ["Is not valid UTF-8."])
 
           (not (test-fn val))
-          (assoc-in ctx [:errors scope name id] message)
+          (assoc-in ctx [:errors scope id name] [message])
 
           :else ctx)))))
 
@@ -439,3 +439,9 @@
         coercions (map map-col-coercion coercable-cols)
         coercion-xf (apply comp coercions)]
     (sequence coercion-xf rows)))
+
+(defn filename->table [filename]
+  (->> data-specs
+       (filter #(= (:filename %) filename))
+       first
+       :table))

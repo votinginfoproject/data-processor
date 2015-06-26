@@ -70,6 +70,7 @@
 (defn validate-no-unreferenced-rows-for-table [ctx [table-id references-map]]
   (let [tables (:tables ctx)
         unreferenced-rows (find-unreferenced-rows tables table-id references-map)]
-    (if (seq unreferenced-rows)
-      (assoc-in ctx [:warnings table-id :unreferenced-rows] unreferenced-rows)
-      ctx)))
+    (reduce (fn [ctx unreferenced-row]
+              (update-in ctx [:warnings table-id (:id unreferenced-row) :unreferenced-row]
+                         conj unreferenced-row))
+            ctx unreferenced-rows)))

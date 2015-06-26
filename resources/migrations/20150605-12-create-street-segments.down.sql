@@ -1,1 +1,1 @@
--- street segments are not imported into Postgres
+DROP TABLE street_segments;

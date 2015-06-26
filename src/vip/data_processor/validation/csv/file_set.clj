@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.csv.file-set
   (:require [vip.data-processor.validation.csv :as csv]
+            [vip.data-processor.validation.data-spec :as data-spec]
             [clojure.string :as str]
             [clojure.walk :as walk]))
 
@@ -32,15 +33,16 @@
   [& mappings]
   (when (seq mappings)
     (let [filename (first mappings)
-          next-mappings (next (next mappings))]
+          next-mappings (next (next mappings))
+          error-scope (data-spec/filename->table filename)]
       (if-let [dependencies (second mappings)]
         (let [ctx (gensym)
               pred (build-dependency-pred ctx dependencies)]
           `(let [validator# (fn [~ctx]
                               (if ~pred
                                 ~ctx
-                                (assoc-in ~ctx [:errors :file-dependencies ~filename]
-                                          (error-message-for '~dependencies))))]
+                                (assoc-in ~ctx [:errors ~error-scope :global :missing-dependency]
+                                          [(error-message-for '~dependencies)])))]
              (merge {~filename validator#} (build-dependencies ~@next-mappings))))
         (throw (IllegalArgumentException.
                 "build-dependencies requires an even number of forms"))))))
