@@ -1,0 +1,2 @@
+CREATE INDEX street_segments_precinct_id_idx on street_segments (precinct_id);
+CREATE INDEX street_segments_precinct_split_id_idx on street_segments (precinct_split_id);
