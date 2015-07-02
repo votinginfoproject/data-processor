@@ -1,0 +1,2 @@
+DROP INDEX street_segments_precinct_id_idx;
+DROP INDEX street_segments_precinct_split_id_idx;
