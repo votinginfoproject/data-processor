@@ -153,8 +153,11 @@
                        first
                        :columns)
           vals (data-spec/coerce-rows columns vals)]
-      (when (seq vals)
-        (bulk-import (ent import-entities) vals))))
+      (bulk-import (ent import-entities)
+                   (->> table
+                        (db.util/select-*-lazily 100)
+                        (map #(assoc % :results_id import-id))
+                        (data-spec/coerce-rows columns)))))
   ctx)
 
 (defn store-stats [{:keys [import-id] :as ctx}]

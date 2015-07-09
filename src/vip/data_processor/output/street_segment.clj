@@ -1,5 +1,6 @@
 (ns vip.data-processor.output.street-segment
-  (:require [vip.data-processor.output.address :refer [address]]
+  (:require [vip.data-processor.db.util :as util]
+            [vip.data-processor.output.address :refer [address]]
             [vip.data-processor.output.xml-helpers :refer :all]
             [korma.core :as korma]))
 
@@ -25,17 +26,5 @@
 
 (defn xml-nodes [ctx]
   (let [sql-table (get-in ctx [:tables :street-segments])
-        total (-> (korma/select sql-table
-                                (korma/aggregate (count "*") :cnt))
-                  first
-                  :cnt)]
-    (letfn [(chunked-sexps [page]
-              (let [offset (* page chunk-size)]
-                (when (< offset total)
-                  (lazy-cat
-                   (let [street-segments (korma/select sql-table
-                                                       (korma/offset offset)
-                                                       (korma/limit chunk-size))]
-                     (map ->xml street-segments))
-                   (chunked-sexps (inc page))))))]
-      (chunked-sexps 0))))
+        street-segments (util/select-*-lazily chunk-size sql-table)]
+    (map ->xml street-segments)))
