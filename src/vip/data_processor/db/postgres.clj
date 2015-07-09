@@ -146,13 +146,10 @@
 (defn import-from-sqlite [{:keys [import-id db data-specs] :as ctx}]
   (doseq [ent db.util/import-entity-names]
     (let [table (get-in ctx [:tables ent])
-          vals (korma/select table)
-          vals (map #(assoc % :results_id import-id) vals)
           columns (->> data-specs
                        (filter #(= ent (:table %)))
                        first
-                       :columns)
-          vals (data-spec/coerce-rows columns vals)]
+                       :columns)]
       (bulk-import (ent import-entities)
                    (->> table
                         (db.util/select-*-lazily 100)
