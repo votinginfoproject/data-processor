@@ -134,7 +134,7 @@
                    errors)))))
    [:warnings :errors :critical :fatal]))
 
-(def statement-parameter-limit 3000)
+(def statement-parameter-limit 10000)
 (def bulk-import (partial db.util/bulk-import statement-parameter-limit))
 
 (defn insert-validations [ctx]
@@ -152,7 +152,7 @@
                        :columns)]
       (bulk-import (ent import-entities)
                    (->> table
-                        (db.util/select-*-lazily 100)
+                        (db.util/select-*-lazily 5000)
                         (map #(assoc % :results_id import-id))
                         (data-spec/coerce-rows columns)))))
   ctx)
