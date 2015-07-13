@@ -134,7 +134,7 @@
                    errors)))))
    [:warnings :errors :critical :fatal]))
 
-(def statement-parameter-limit 3000)
+(def statement-parameter-limit 10000)
 (def bulk-import (partial db.util/bulk-import statement-parameter-limit))
 
 (defn insert-validations [ctx]
@@ -146,15 +146,15 @@
 (defn import-from-sqlite [{:keys [import-id db data-specs] :as ctx}]
   (doseq [ent db.util/import-entity-names]
     (let [table (get-in ctx [:tables ent])
-          vals (korma/select table)
-          vals (map #(assoc % :results_id import-id) vals)
           columns (->> data-specs
                        (filter #(= ent (:table %)))
                        first
-                       :columns)
-          vals (data-spec/coerce-rows columns vals)]
-      (when (seq vals)
-        (bulk-import (ent import-entities) vals))))
+                       :columns)]
+      (bulk-import (ent import-entities)
+                   (->> table
+                        (db.util/select-*-lazily 5000)
+                        (map #(assoc % :results_id import-id))
+                        (data-spec/coerce-rows columns)))))
   ctx)
 
 (defn store-stats [{:keys [import-id] :as ctx}]

@@ -102,4 +102,4 @@
 
 (defn load-xml [ctx]
   (let [xml-file (first (:input ctx))]
-    (reduce load-elements ctx (partition-by-n :tag 100 (:content (xml/parse (io/reader xml-file)))))))
+    (reduce load-elements ctx (partition-by-n :tag 5000 (:content (xml/parse (io/reader xml-file)))))))

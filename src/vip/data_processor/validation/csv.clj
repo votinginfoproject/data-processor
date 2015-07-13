@@ -4,6 +4,8 @@
             [clojure.set :as set]
             [clojure.string :as str]
             [clojure.tools.logging :as log]
+            [korma.core :as korma]
+            [vip.data-processor.db.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]))
 
@@ -28,68 +30,64 @@
             (assoc :input good-files)))
       ctx)))
 
-(defn read-csv-with-headers [file-handle]
-  (let [raw-rows (csv/read-csv file-handle)
-        headers (first raw-rows)
-        rows (rest raw-rows)]
-    {:headers headers
-     :contents (map (partial zipmap headers) rows)
-     :bad-rows (remove (fn [[_ row]] (= (count headers) (count row)))
-                       (map list (iterate inc 2) rows))}))
-
-(defn report-bad-rows [ctx table expected-number bad-rows]
-  (if-not (empty? bad-rows)
-    (reduce (fn [ctx [line-number row]]
-              (let [expected (str "Expected " expected-number
-                                  " values, found " (count row))]
-                (assoc-in ctx [:critical table line-number :number-of-values]
-                          [expected])))
-            ctx bad-rows)
-    ctx))
-
 (defn find-input-file [ctx filename]
   (->> ctx
        :input
        (filter #(= filename (.getName %)))
        first))
 
-(defn validate-format-rules [ctx rows {:keys [filename columns]}]
-  (let [format-rules (data-spec/create-format-rules filename columns)
-        line-number (atom 1)]
-    (log/info "Validating" filename)
-    (reduce (fn [ctx row]
-              (data-spec/apply-format-rules format-rules ctx row (swap! line-number inc)))
-            ctx rows)))
-
-(defn load-csv [ctx {:keys [filename table columns] :as data-spec}]
+(defn bulk-import-and-validate-csv
+  "Bulk importing and CSV validation is done in one go, so that it can
+  be done without holding the entire file in memory at once."
+  [ctx {:keys [filename table columns] :as data-spec}]
   (if-let [file-to-load (find-input-file ctx filename)]
-    (with-open [in-file (io/reader file-to-load :encoding "UTF-8")]
+    (do
       (log/info "Loading" filename)
-      (let [sql-table (get-in ctx [:tables table])
-            column-names (map :name columns)
-            required-header-names (->> columns (filter :required) (map :name))
-            {:keys [headers contents bad-rows]} (read-csv-with-headers in-file)
-            extraneous-headers (seq (set/difference (set headers) (set column-names)))
-            ctx (if extraneous-headers
-                  (assoc-in ctx [:warnings table :global :extraneous-headers]
-                            extraneous-headers)
-                  ctx)
-            ctx (report-bad-rows ctx table (count headers) bad-rows)
-            contents (map #(select-keys % column-names) contents)]
-        (if (empty? (set/intersection (set headers) (set column-names)))
-          (assoc-in ctx [:critical table :global :no-header] ["No header row"])
-          (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
-            (assoc-in ctx [:critical table :global :missing-headers]
-                      missing-headers)
-            (let [ctx (validate-format-rules ctx contents data-spec)
-                  transforms (apply comp (data-spec/translation-fns columns))
-                  transformed-contents (map transforms contents)]
-              (sqlite/bulk-import sql-table transformed-contents)
-              ctx)))))
+      (with-open [in-file (io/reader file-to-load :encoding "UTF-8")]
+        (let [headers (-> in-file
+                          .readLine
+                          csv/read-csv
+                          first)
+              headers-count (count headers)
+              sql-table (get-in ctx [:tables table])
+              column-names (map :name columns)
+              required-header-names (->> columns
+                                         (filter :required)
+                                         (map :name))
+              extraneous-headers (seq (set/difference (set headers) (set column-names)))
+              transforms (apply comp (data-spec/translation-fns columns))
+              format-rules (data-spec/create-format-rules filename columns)
+              ctx (if extraneous-headers
+                    (assoc-in ctx [:warnings table :global :extraneous-headers]
+                              extraneous-headers)
+                    ctx)
+              line-number (atom 1)]
+          (if (empty? (set/intersection (set headers) (set column-names)))
+            (assoc-in ctx [:critical table :global :no-header] ["No header row"])
+            (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
+              (assoc-in ctx [:critical table :global :missing-headers] missing-headers)
+              (reduce (fn [ctx chunk]
+                        (if (seq chunk)
+                          (let [ctx (reduce (fn [ctx row]
+                                              (swap! line-number inc)
+                                              (let [row-map (zipmap headers row)
+                                                    row-count (count row)
+                                                    ctx (data-spec/apply-format-rules format-rules ctx row-map @line-number)]
+                                                (if (= headers-count row-count)
+                                                  ctx
+                                                  (assoc-in ctx [:critical table @line-number :number-of-values]
+                                                            [(str "Expected " headers-count
+                                                                  " values, found " row-count)]))))
+                                            ctx chunk)]
+                            (korma/insert sql-table (korma/values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)))
+                            ctx)
+                          ctx))
+                      ctx (util/chunk-rows (csv/read-csv in-file)
+                                           sqlite/statement-parameter-limit)))))))
     ctx))
 
 (defn load-csvs [ctx]
-  (reduce load-csv ctx (:data-specs ctx)))
+  (reduce bulk-import-and-validate-csv ctx (:data-specs ctx)))
 
 (defn add-report-on-missing-file-fn
   "Generates a validation function generator that takes a filename and
