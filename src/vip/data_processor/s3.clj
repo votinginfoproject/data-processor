@@ -38,11 +38,11 @@
 (defn xml-filename [ctx]
   (let [fips (->> (get-in ctx [:tables :sources])
                   korma/select first :vip_id)
-        formatted-fips (if (< (count fips) 2)
-                         (format "%02d" (Integer/parseInt fips))
-                         (if (< (count fips) 5)
-                           (format "%05d" (Integer/parseInt fips))
-                           fips))
+        formatted-fips (cond
+                         (nil? fips) "XX"
+                         (< (count fips) 2) (format "%02d" (Integer/parseInt fips))
+                         (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
+                         :else fips)
         election-date (->> (get-in ctx [:tables :elections])
                            korma/select first :date)
         timestamp (.getTime (java.util.Date.))]
