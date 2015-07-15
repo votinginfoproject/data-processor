@@ -1,7 +1,7 @@
 CREATE TABLE contest_results (id INTEGER PRIMARY KEY,
                               contest_id INTEGER,
                               jurisdiction_id INTEGER,
-                              entire_district BOOLEAN NOT NULL CHECK (entire_district IN (0,1)),
+                              entire_district BOOLEAN CHECK (entire_district IN (0,1,NULL)),
                               total_votes INTEGER,
                               total_valid_votes INTEGER,
                               overvotes INTEGER,
