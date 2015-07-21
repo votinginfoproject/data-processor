@@ -27,16 +27,28 @@
       (xml-file? path) (assoc ctx :input path)
       :else (assoc ctx :stop (str path " is not a zip or xml file!")))))
 
+(defn zip-contents
+  "Returns a seq of Files from the path of a extracted zip file. If
+  the zip file included a directory named 'data' it will be the files
+  in that directory. Otherwise, it will be the files from the
+  top-level."
+  [path]
+  (let [data-dir (-> path
+                     (.resolve "data")
+                     .toFile)
+        base-dir (if (.exists data-dir)
+                   data-dir
+                   (.toFile path))]
+    (-> base-dir
+        .listFiles
+        seq)))
+
 (defn extracted-contents [ctx]
   (let [path (:input ctx)]
     (if (xml-file? path)
       (assoc ctx :input
              [(.toFile path)])
-      (let [files (-> path
-                      (.resolve "data")
-                      .toFile
-                      .listFiles
-                      seq)]
+      (let [files (zip-contents path)]
         (-> ctx
             (assoc :input files)
             (update :to-be-cleaned concat files))))))
