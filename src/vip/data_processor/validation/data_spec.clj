@@ -2,16 +2,20 @@
   (:require [vip.data-processor.validation.data-spec.value-format :as format]))
 
 (defn boolean-value [x]
-  (if (re-find #"\A(?i:yes)\z" x) 1 0))
+  (cond
+    (re-find #"\A(?i:yes)\z" x) 1
+    (re-find #"\A(?i:no)\z" x) 0
+    :else nil))
 
 (defn add-data-specs [data-specs]
   (fn [ctx]
     (assoc ctx :data-specs data-specs)))
 
-(defn coerce-integer [v]
+(defn unsafe-coerce-integer [v]
   (cond (= v "") nil
         (string? v) (Integer/parseInt v)
-        :else v))
+        (number? v) v
+        :else nil))
 
 (defn coerce-boolean [v]
   (condp = v
@@ -19,13 +23,24 @@
     0 false
     nil))
 
-(defn coerce-date [v]
+(defn unsafe-coerce-date [v]
   (cond (= v "") nil
         (string? v) (-> v
                         org.joda.time.DateTime/parse
                         .getMillis
                         java.sql.Date.)
-        :else v))
+        (instance? java.sql.Date v) v
+        :else nil))
+
+(defn safe-coerce [coercion-fn]
+  (fn [v]
+    (try
+      (coercion-fn v)
+      (catch Throwable t
+        nil))))
+
+(def coerce-integer (safe-coerce unsafe-coerce-integer))
+(def coerce-date (safe-coerce unsafe-coerce-date))
 
 (def data-specs
   [{:filename "ballot.txt"
