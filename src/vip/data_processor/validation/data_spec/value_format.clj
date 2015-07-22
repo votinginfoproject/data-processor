@@ -17,7 +17,7 @@
    :message "Invalid date format"})
 
 (def election-type
-  {:check ["Federal" "State" "County" "City" "Town"]
+  {:check ["federal" "state" "county" "city" "town"]
    :message "Invalid election_type"})
 
 (def electoral-district-type
@@ -41,7 +41,7 @@
    :message "Invalid phone number format"})
 
 (def street-direction
-  {:check ["N" "S" "E" "W" "NW" "NE" "SW" "SE"]
+  {:check ["n" "s" "e" "w" "nw" "ne" "sw" "se"]
    :message "Invalid street direction"})
 
 (def url
@@ -49,5 +49,5 @@
    :message "Invalid url format"})
 
 (def yes-no
-  {:check #"\A(?i:yes|no)\z"
+  {:check ["yes" "no"]
    :message "Must be yes or no"})

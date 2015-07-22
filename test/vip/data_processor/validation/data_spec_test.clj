@@ -68,7 +68,11 @@
           (is (= (ffirst (get-in (format-rule ctx {column "YEP!"} line-number) [:errors filename line-number]))
               column))
           (is (= (ffirst (get-in (format-rule ctx {column "no way"} line-number) [:errors filename line-number]))
-              column)))))
+                 column)))
+        (testing "matches of all kinds of cases"
+          (is (= ctx (format-rule ctx {column "YES"} line-number)))
+          (is (= ctx (format-rule ctx {column "NO"} line-number)))
+          (is (= ctx (format-rule ctx {column "Yes"} line-number))))))
     (testing "a check that is a function"
       (let [palindrome? (fn [v] (= v (clojure.string/reverse v)))
             format-rule (create-format-rule filename {:name column :format {:check palindrome? :message "Not a palindrome"}})]
