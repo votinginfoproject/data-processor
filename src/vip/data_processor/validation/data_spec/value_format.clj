@@ -21,7 +21,28 @@
    :message "Invalid election_type"})
 
 (def electoral-district-type
-  {:check ["statewide" "state senate" "state house" "fire district" "congressional district" "school district" "county"]
+  {:check #"\A(?ix: state(?:wide)? |
+                    u\.?s\.?\ senate |
+                    u\.?s\.?\ (?:rep(?:resentative)?|house) |
+                    congressional |
+                    (?:[a-tv-z][a-tv-z]|ut|state)\ senate |
+                    (?:[a-tv-z][a-rt-z]|ut|state)\ (?:rep(?:resentative)?|house(?:\ of\ delegates)?) |
+                    house\ of\ delegates |
+                    house |
+                    county(?:wide)? |
+                    county\ offices |
+                    mayor |
+                    municipality |
+                    county\ commission(?:er)? |
+                    ward |
+                    school |
+                    school\ district |
+                    school\ member\ district |
+                    local\ school\ board |
+                    prosecutorial\ district |
+                    superior\ court |
+                    town(?:ship)? |
+                    sanitary)\z"
    :message "Invalid type"})
 
 (def email
