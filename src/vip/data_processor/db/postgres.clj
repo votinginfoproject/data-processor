@@ -84,6 +84,11 @@
                                      :end_time (korma/sqlfn now)})
                   (korma/where {:id id}))))
 
+(defn fail-run [id exception]
+  (korma/update results
+                (korma/set-fields {:exception exception})
+                (korma/where {:id id})))
+
 (defn get-run [ctx]
   (korma/select results
                 (korma/where {:id (:import-id ctx)})))

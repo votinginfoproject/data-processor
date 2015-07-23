@@ -1,6 +1,7 @@
 (ns vip.data-processor.pipeline
   (:require [clojure.tools.logging :as log]
-            [clojure.stacktrace :as stacktrace]))
+            [clojure.stacktrace :as stacktrace]
+            [vip.data-processor.db.postgres :as psql]))
 
 (defn try-processing-fn
   "Attempt to run the processing function on the context. If the
@@ -49,6 +50,8 @@
         result (run-pipeline ctx)]
     (log/info (select-keys result [:import-id :db :xml-output-file]))
     (when-let [ex (:exception result)]
+      (psql/fail-run (:import-id result)
+                     (with-out-str (stacktrace/print-throwable ex)))
       (log/error (with-out-str (stacktrace/print-stack-trace ex)))
       (throw (ex-info "Exception during processing" {:exception ex
                                                      :initial-ctx ctx})))
