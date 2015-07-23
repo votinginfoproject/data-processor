@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.data-spec
-  (:require [vip.data-processor.validation.data-spec.value-format :as format]))
+  (:require [clojure.string :as str]
+            [vip.data-processor.validation.data-spec.value-format :as format]))
 
 (defn boolean-value [x]
   (cond
@@ -394,7 +395,9 @@
   [scope {:keys [name required format]}]
   (let [{:keys [check message]} format
         test-fn (cond
-                 (sequential? check) (fn [val] (some #{val} check))
+                 (sequential? check) (fn [val]
+                                       (let [lower-case-val (str/lower-case val)]
+                                         (some #{lower-case-val} check)))
                  (instance? clojure.lang.IFn check) check
                  (instance? java.util.regex.Pattern check) (fn [val] (re-find check val))
                  :else (constantly true))]
