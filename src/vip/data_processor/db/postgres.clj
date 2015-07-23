@@ -86,7 +86,8 @@
 
 (defn fail-run [id exception]
   (korma/update results
-                (korma/set-fields {:exception exception})
+                (korma/set-fields {:exception exception
+                                   :end_time (korma/sqlfn now)})
                 (korma/where {:id id})))
 
 (defn get-run [ctx]
