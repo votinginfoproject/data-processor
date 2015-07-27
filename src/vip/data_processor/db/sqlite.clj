@@ -32,5 +32,5 @@
             (recur (conj columns (.getString result-set "name")))
             columns))))))
 
-(def statement-parameter-limit 999)
+(def statement-parameter-limit 500)
 (def bulk-import (partial util/bulk-import statement-parameter-limit))
