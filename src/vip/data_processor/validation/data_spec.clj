@@ -346,8 +346,8 @@
     :tag-name :street_segment
     :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "start_house_number" :required true}
-              {:name "end_house_number" :required true}
+              {:name "start_house_number" :required true :format format/all-digits :coerce coerce-integer}
+              {:name "end_house_number" :required true :format format/all-digits :coerce coerce-integer}
               {:name "odd_even_both" :format format/odd-even-both}
               {:name "start_apartment_number" :format format/all-digits :coerce coerce-integer}
               {:name "end_apartment_number" :format format/all-digits :coerce coerce-integer}
