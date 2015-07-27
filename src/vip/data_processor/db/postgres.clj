@@ -73,7 +73,7 @@
     (korma/update results
                   (korma/set-fields {:public_id public-id})
                   (korma/where {:id id}))
-    ctx))
+    (assoc ctx :public-id public-id)))
 
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
