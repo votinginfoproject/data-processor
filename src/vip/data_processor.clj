@@ -45,10 +45,11 @@
                           (let [result (pipeline/process pipeline message)]
                             (psql/complete-run result)
                             (log/info "New run completed:"
-                                      (psql/get-run result)))
-                          (q/publish {:initial-input message
-                                      :status :complete}
-                                     "processing.complete"))))
+                                      (psql/get-run result))
+                            (q/publish {:initial-input message
+                                        :status :complete
+                                        :public-id (:public-id result)}
+                                       "processing.complete")))))
 
 (defn -main [& args]
   (let [id (java.util.UUID/randomUUID)]
