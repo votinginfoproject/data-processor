@@ -16,10 +16,6 @@
   {:check #"\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\z"
    :message "Invalid date format"})
 
-(def election-type
-  {:check ["federal" "state" "county" "city" "town"]
-   :message "Invalid election_type"})
-
 (def electoral-district-type
   {:check #"\A(?ix: state(?:wide)? |
                     u\.?s\.?\ senate |
@@ -48,10 +44,6 @@
 (def email
   {:check #"\A.+@.+\..+\z"
    :message "Invalid email format"})
-
-(def locality-type
-  {:check ["county" "city" "town" "township" "borough" "parish" "village" "region"]
-   :message "Invalid locality_type"})
 
 (def odd-even-both
   {:check ["odd" "even" "both"]
