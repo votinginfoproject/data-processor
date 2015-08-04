@@ -172,7 +172,7 @@
     :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "date" :required true :format format/date :coerce coerce-date}
-              {:name "election_type" :format format/election-type}
+              {:name "election_type"}
               {:name "state_id" :required true :format format/all-digits :references :states :coerce coerce-integer}
               {:name "statewide" :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "registration_info" :format format/url}
@@ -241,7 +241,7 @@
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name" :required true}
               {:name "state_id" :required true :format format/all-digits :references :states :coerce coerce-integer}
-              {:name "type" :required true :format format/locality-type}
+              {:name "type" :required true}
               {:name "election_administration_id" :format format/all-digits :references :election-administrations :coerce coerce-integer}]}
    {:filename "locality_early_vote_site.txt"
     :table :locality-early-vote-sites
