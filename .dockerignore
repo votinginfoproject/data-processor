@@ -1,0 +1,10 @@
+.git
+data-processor@.service
+dev-resources
+dev-src
+target
+script
+.DS_Store
+.gitignore
+.lein-*
+.nrepl-port
