@@ -14,6 +14,13 @@ if [[ ! -e ${SERVICE}@.service ]]; then
   exit 1
 fi
 
+if [[ ! -e $PEM_FILE ]]; then
+  echo "Please provide a .pem file for the fleet"
+  exit 1
+fi
+
+ssh-add $PEM_FILE
+
 fleetctl destroy ${SERVICE}@.service
 fleetctl submit ${SERVICE}@.service
 
