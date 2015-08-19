@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -eo pipefail
+
+SERVICE=data-processor
+
+if hash buildkite-agent 2>/dev/null ; then
+  echo '--- retrieving service file'
+  buildkite-agent artifact download ${SERVICE}@.service .
+fi
+
+if [[ ! -e ${SERVICE}@.service ]]; then
+  echo "${SERVICE}@.service file is missing. Run script/build to create it."
+  exit 1
+fi
+
+fleetctl destroy ${SERVICE}@.service
+fleetctl submit ${SERVICE}@.service
+
+echo '--- (re-)starting fleet service instances'
+for i in {1..3}; do
+  fleetctl destroy ${SERVICE}@$i
+  fleetctl start ${SERVICE}@$i
+  # TODO: Use consul to see if ${SERVICE}@$i is healthy yet before moving on
+done
