@@ -19,6 +19,7 @@ if [[ ! -e $PEM_FILE ]]; then
   exit 1
 fi
 
+eval "$(ssh-agent -s)"
 ssh-add $PEM_FILE
 
 fleetctl destroy ${SERVICE}@.service
