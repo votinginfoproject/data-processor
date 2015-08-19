@@ -6,7 +6,7 @@ SERVICE=data-processor
 
 if hash buildkite-agent 2>/dev/null ; then
   echo '--- retrieving service file'
-  buildkite-agent artifact download ${SERVICE}@.service .
+  buildkite-agent build-artifact download ${SERVICE}@.service .
 fi
 
 if [[ ! -e ${SERVICE}@.service ]]; then
