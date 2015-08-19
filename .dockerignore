@@ -1,5 +1,6 @@
 .git
 data-processor@.service
+data-processor@.service.template
 dev-resources
 dev-src
 target
