@@ -35,7 +35,7 @@
                 (into-array [StandardCopyOption/REPLACE_EXISTING]))
     tmp-path))
 
-(defn xml-filename [ctx]
+(defn zip-filename [ctx]
   (let [fips (->> (get-in ctx [:tables :sources])
                   korma/select first :vip_id)
         formatted-fips (cond
@@ -44,20 +44,19 @@
                          (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
                          :else fips)
         election-date (->> (get-in ctx [:tables :elections])
-                           korma/select first :date)
-        timestamp (.getTime (java.util.Date.))]
-    (join "-" ["vipfeed" fips election-date timestamp])))
+                           korma/select first :date)]
+    (join "-" ["vipfeed" fips election-date])))
 
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
   [ctx]
-  (let [zip-filename (str (xml-filename ctx) ".zip")
+  (let [zip-name (str (zip-filename ctx) ".zip")
         xml-file (-> ctx :xml-output-file .toFile)
-        zip-file (ZipFile. zip-filename)
+        zip-file (ZipFile. zip-name)
         zip-params (doto (ZipParameters.)
                      (.setCompressionLevel
                       Zip4jConstants/DEFLATE_LEVEL_NORMAL))]
     (.createZipFile zip-file xml-file zip-params)
-    (put-object (str "processed-feeds/" zip-filename)
-                (File. zip-filename))
-    (assoc ctx :generated-xml-filename zip-filename)))
+    (put-object (str "processed-feeds/" zip-name)
+                (File. zip-name))
+    (assoc ctx :generated-xml-filename zip-name)))
