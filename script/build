@@ -31,5 +31,5 @@ perl -p -i -e "s|^Environment=DOCKER_IMAGE=.*$|Environment=DOCKER_IMAGE=${DOCKER
 
 if [[ $CI = "true" && $BUILDKITE_BRANCH = "master" ]]; then
   echo '--- saving service file'
-  buildkite-agent build-artifact upload ${SERVICE}@.service
+  buildkite-agent artifact upload ${SERVICE}@.service
 fi
