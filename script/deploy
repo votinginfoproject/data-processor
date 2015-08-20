@@ -22,6 +22,10 @@ fi
 eval "$(ssh-agent -s)"
 ssh-add $PEM_FILE
 
+if ! grep $FLEETCTL_TUNNEL ~/.ssh/known_hosts; then
+    ssh-keyscan $FLEETCTL_TUNNEL >> ~/.ssh/known_hosts
+fi
+
 fleetctl destroy ${SERVICE}@.service
 fleetctl submit ${SERVICE}@.service
 
