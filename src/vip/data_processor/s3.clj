@@ -13,12 +13,12 @@
 
 (defn- get-object [key]
   (s3/get-object (config :aws :creds)
-                 (config :aws :s3 :bucket)
+                 (config :aws :s3 :unprocessed-bucket)
                  key))
 
 (defn put-object [key value]
   (s3/put-object (config :aws :creds)
-                 (config :aws :s3 :bucket)
+                 (config :aws :s3 :processed-bucket)
                  key value))
 
 (def tmp-path-prefix "vip-data-processor")
@@ -58,6 +58,5 @@
                      (.setCompressionLevel
                       Zip4jConstants/DEFLATE_LEVEL_NORMAL))]
     (.createZipFile zip-file xml-file zip-params)
-    (put-object (str "processed-feeds/" zip-filename)
-                (File. zip-filename))
+    (put-object zip-filename (File. zip-filename))
     (assoc ctx :generated-xml-filename zip-filename)))

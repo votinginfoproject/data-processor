@@ -1,6 +1,7 @@
 {:aws {:creds {:access-key #resource-config/env "VIP_DP_AWS_ACCESS_KEY"
                :secret-key #resource-config/env "VIP_DP_AWS_SECRET_KEY"}
-       :s3 {:bucket #resource-config/env "VIP_DP_S3_BUCKET"}
+       :s3 {:unprocessed-bucket #resource-config/env "VIP_DP_S3_UNPROCESSED_BUCKET"
+            :processed-bucket #resource-config/env "VIP_DP_S3_PROCESSED_BUCKET"}
        :sqs {:region #aws/region #resource-config/env "VIP_DP_SQS_REGION"
              :queue #resource-config/env "VIP_DP_SQS_QUEUE"
              :fail-queue #resource-config/env "VIP_DP_SQS_FAIL_QUEUE"}}
