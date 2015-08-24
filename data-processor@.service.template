@@ -24,7 +24,8 @@ ExecStart=/bin/bash -c 'docker run --name ${CONTAINER} --restart=always \
   --link rabbitmq:rabbitmq \
   --env VIP_DP_AWS_ACCESS_KEY=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/aws/access-key?raw) \
   --env VIP_DP_AWS_SECRET_KEY=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/aws/secret-key?raw) \
-  --env VIP_DP_S3_BUCKET=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/s3/imports?raw) \
+  --env VIP_DP_S3_UNPROCESSED_BUCKET=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/s3/unprocessed-bucket?raw) \
+  --env VIP_DP_S3_PROCESSED_BUCKET=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/s3/processed-bucket?raw) \
   --env VIP_DP_SQS_REGION=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/sqs/region?raw) \
   --env VIP_DP_SQS_QUEUE=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/sqs/queue?raw) \
   --env VIP_DP_SQS_FAIL_QUEUE=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/sqs/fail-queue?raw) \
