@@ -58,4 +58,4 @@
                       Zip4jConstants/DEFLATE_LEVEL_NORMAL))]
     (.createZipFile zip-file xml-file zip-params)
     (put-object zip-name (File. zip-name))
-    (assoc ctx :generated-xml-filename zip-filename)))
+    (assoc ctx :generated-xml-filename zip-name)))
