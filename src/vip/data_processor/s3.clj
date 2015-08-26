@@ -57,5 +57,5 @@
                      (.setCompressionLevel
                       Zip4jConstants/DEFLATE_LEVEL_NORMAL))]
     (.createZipFile zip-file xml-file zip-params)
-    (put-object zip-filename (File. zip-filename))
+    (put-object zip-name (File. zip-name))
     (assoc ctx :generated-xml-filename zip-filename)))

@@ -8,7 +8,7 @@
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.s3 :refer [xml-filename]]
+            [vip.data-processor.s3 :refer [zip-filename]]
             [democracyworks.squishy.data-readers]))
 
 (def pipeline
@@ -33,6 +33,6 @@
         result (pipeline/process pipeline file)]
     (when-let [xml-output-file (:xml-output-file result)]
       (println "XML:" (.toString xml-output-file))
-      (let [filename (xml-filename result)
+      (let [filename (zip-filename result)
             results (assoc result :generated-xml-filename filename)]
         (psql/complete-run results)))))
