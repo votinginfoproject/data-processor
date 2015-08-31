@@ -4,10 +4,6 @@
   {:check #"\A\d+\z"
    :message "Invalid data type"})
 
-(def contest-election-type
-  {:check ["general" "primary" "run-off" "referendum" "judge retention"]
-   :message "Invalid election_type"})
-
 (def date
   {:check #"\A\d{4}-\d{2}-\d{2}\z"
    :message "Invalid date format"})
