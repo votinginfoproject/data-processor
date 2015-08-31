@@ -108,7 +108,7 @@
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "election_id" :required true :format format/all-digits :references :elections :coerce coerce-integer}
               {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts :coerce coerce-integer}
-              {:name "type" :required true :format format/contest-election-type}
+              {:name "type" :required true}
               {:name "partisan" :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "primary_party"}
               {:name "electorate_specifications"}
