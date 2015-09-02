@@ -73,3 +73,22 @@
       (is (get-in out-ctx [:critical :contests 3 :number-of-values]))
       (is (get-in out-ctx [:critical :contests 5 :number-of-values]))
       (assert-error-format out-ctx))))
+
+(deftest in-file-duplicate-ids-test
+  (let [db (sqlite/temp-db "in-file-duplicate-ids")
+        ctx (merge {:input (csv-inputs ["in-file-duplicate-ids/contest.txt"])
+                    :data-specs data-specs}
+                   db)]
+    (korma/insert (get-in db [:tables :contests])
+                  (korma/values {:id 6}))
+    (let [out-ctx (load-csvs ctx)]
+      (testing "reports fatal errors for duplicate ids"
+        (is (get-in out-ctx [:fatal :contests "3" :duplicate-ids]))
+        (is (get-in out-ctx [:fatal :contests "5" :duplicate-ids]))
+        (is (get-in out-ctx [:fatal :contests "6" :duplicate-ids]))
+        (is (= [1 2 4 6]
+               (map :id
+                    (korma/select (get-in db [:tables :contests])
+                                  (korma/fields :id)
+                                  (korma/order :id :ASC)))))
+        (assert-error-format out-ctx)))))

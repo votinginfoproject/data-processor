@@ -5,6 +5,7 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [korma.core :as korma]
+            [korma.db :as db]
             [vip.data-processor.db.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]))
@@ -35,6 +36,33 @@
        :input
        (filter #(= filename (.getName %)))
        first))
+
+(defn retry-chunk-without-dupe-ids
+  "If inserting a chunk has failed, retry trying to remove duplicate ids"
+  [ctx sql-table chunk-values]
+  (binding [db/*current-conn* (db/get-connection (:db sql-table))]
+    (db/transaction
+     (let [table (-> sql-table :name keyword)
+           existing-ids (->> (korma/select sql-table
+                                           (korma/fields :id)
+                                           (korma/where {:id [in (map #(Integer/parseInt (get % "id")) chunk-values)]}))
+                             (map (comp str :id))
+                             set)
+           local-dupe-ids (->> chunk-values
+                               (map #(get % "id"))
+                               frequencies
+                               (filter (fn [[k v]] (> v 1)))
+                               (map first)
+                               set)
+           chunk-without-dupe-ids (remove (fn [{:strs [id]}]
+                                            (or (existing-ids id)
+                                                (local-dupe-ids id)))
+                                          chunk-values)]
+       (korma/insert sql-table (korma/values chunk-without-dupe-ids))
+       (reduce (fn [ctx dupe-id]
+                 (assoc-in ctx [:fatal table dupe-id :duplicate-ids]
+                           ["Duplicate id"]))
+               ctx (set/union existing-ids local-dupe-ids))))))
 
 (defn bulk-import-and-validate-csv
   "Bulk importing and CSV validation is done in one go, so that it can
@@ -78,9 +106,17 @@
                                                   (assoc-in ctx [:critical table @line-number :number-of-values]
                                                             [(str "Expected " headers-count
                                                                   " values, found " row-count)]))))
-                                            ctx chunk)]
-                            (korma/insert sql-table (korma/values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)))
-                            ctx)
+                                            ctx chunk)
+                                chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)]
+                            (try
+                              (korma/insert sql-table (korma/values chunk-values))
+                              ctx
+                              (catch java.sql.SQLException e
+                                (let [message (.getMessage e)]
+                                  (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
+                                    (retry-chunk-without-dupe-ids ctx sql-table chunk-values)
+                                    (assoc-in ctx [:fatal table @line-number :unknown-sql-error]
+                                              [message]))))))
                           ctx))
                       ctx (util/chunk-rows (csv/read-csv in-file)
                                            sqlite/statement-parameter-limit)))))))
