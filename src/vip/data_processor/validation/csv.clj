@@ -40,6 +40,15 @@
 (defn retry-chunk-without-dupe-ids
   "If inserting a chunk has failed, retry trying to remove duplicate ids"
   [ctx sql-table chunk-values]
+  ;; We need to query for existing ids and retry in the insert in a
+  ;; single transaction to be sure we have a consistent view of what
+  ;; ids already exist. Otherwise, rows that are still "in flight"
+  ;; from the previous commit may get commited between this read and
+  ;; write.
+  ;;
+  ;; Korma's `db/transaction` macro uses a dynamic var to choose which
+  ;; database do the transaction on. We bind it here to ensure that it
+  ;; uses the SQLite database for the table in question.
   (binding [db/*current-conn* (db/get-connection (:db sql-table))]
     (db/transaction
      (let [table (-> sql-table :name keyword)
