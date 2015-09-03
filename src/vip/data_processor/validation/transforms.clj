@@ -17,7 +17,7 @@
     (assoc ctx :stop "No filename!")))
 
 (defn attach-sqlite-db [ctx]
-  (let [db (sqlite/temp-db (:filename ctx))
+  (let [db (sqlite/temp-db (:import-id ctx))
         db-file (get-in db [:db :db])]
     (-> ctx
         (merge db)
