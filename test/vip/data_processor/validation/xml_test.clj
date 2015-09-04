@@ -110,6 +110,17 @@
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= (get-in out-ctx [:errors :candidates "90001" "name"])
              ["Is not valid UTF-8."]))
+      (assert-error-format out-ctx)))
+  (testing "can continue after reaching malformed XML"
+    (let [ctx (merge {:input (xml-input "malformed.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml]}
+                     (sqlite/temp-db "malformed-xml"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:critical :import :global :malformed-xml]))
+      (testing "but still loads data before the malformation!"
+        (is (= [{:id 39 :name "Ohio" :election_administration_id 3456}]
+               (korma/select (get-in out-ctx [:tables :states])))))
       (assert-error-format out-ctx))))
 
 (deftest full-good-run-test

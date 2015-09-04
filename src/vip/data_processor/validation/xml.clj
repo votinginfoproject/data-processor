@@ -100,6 +100,31 @@
            run (cons fst (take-while #(= fv (f %)) next-n))]
        (cons run (partition-by-n f n (seq (drop (count run) s))))))))
 
-(defn load-xml [ctx]
-  (let [xml-file (first (:input ctx))]
-    (reduce load-elements ctx (partition-by-n :tag 5000 (:content (xml/parse (io/reader xml-file)))))))
+(defn load-xml
+  "Load the XML input file into the database, validating as we go.
+
+  Since XML is parsed as a lazy stream, reading off elements may
+  eventually blow up. If `reduce` were used on that stream, we would
+  lose any work completed up to that point. By explicitly looping, we
+  may catch the exception and continue with further validations of
+  what has been captured."
+  [ctx]
+  (let [xml-file (first (:input ctx))
+        partitioned-xml-elements (partition-by-n :tag 5000 (:content (xml/parse (io/reader xml-file))))]
+    (loop [ctx ctx
+           xml-elements partitioned-xml-elements]
+      (let [partition-or-error (try
+                                 (first xml-elements)
+                                 (catch javax.xml.stream.XMLStreamException e
+                                   e))]
+        (cond
+          ;; If there was nothing to take, we're done
+          (nil? partition-or-error) ctx
+
+          ;; If we get a XMLStreamException, add error and finish
+          (instance? javax.xml.stream.XMLStreamException partition-or-error)
+          (assoc-in ctx [:critical :import :global :malformed-xml]
+                    [(.getMessage partition-or-error)])
+
+          ;; otherwise, load and continue
+          :else (recur (load-elements ctx partition-or-error) (rest xml-elements)))))))
