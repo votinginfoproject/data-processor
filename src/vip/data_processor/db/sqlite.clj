@@ -6,11 +6,11 @@
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
-(defn create-temp-db-file [prefix]
-  (Files/createTempFile (str prefix "-") ".db" (into-array FileAttribute [])))
+(defn create-temp-db-file [import-id]
+  (Files/createTempFile (str "import-" import-id "-") ".db" (into-array FileAttribute [])))
 
-(defn temp-db [upload-filename]
-  (let [temp-file (create-temp-db-file upload-filename)
+(defn temp-db [import-id]
+  (let [temp-file (create-temp-db-file import-id)
         url (str "jdbc:sqlite:" temp-file)
         db (db/sqlite3 {:db temp-file})]
     (j/migrate-db {:db {:type :sql
