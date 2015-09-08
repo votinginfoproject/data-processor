@@ -40,6 +40,14 @@
    (csv-files/validate-dependencies csv-files/file-dependencies)
    csv/load-csvs])
 
+(defn remove-invalid-extensions [ctx]
+  (let [files (:input ctx)
+        valid-extensions #{"csv" "txt" "xml"}]
+    (assoc ctx :input 
+           (remove #(not (some valid-extensions
+                               (-> % .getName 
+                                   (s/split #"\.")))) files))))
+
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
                              :input
