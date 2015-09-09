@@ -17,7 +17,8 @@
     (is (= "2015-06-18-federal-4" (build-public-id "2015-06-18" "federal" "" 4)))
     (is (= "2015-06-18-4" (build-public-id "2015-06-18" "" "" 4)))
     (is (= "federal-4" (build-public-id "" "federal" "" 4)))
-    (is (= "Ohio-4" (build-public-id "" "" "Ohio" 4))))
+    (is (= "Ohio-4" (build-public-id "" "" "Ohio" 4)))
+    (is (= "2015-06-18-federal-Ohio-4" (build-public-id "6/18/2015" "federal" "Ohio" 4))))
   (testing "gives an 'invalid' named id if all of date, election-type and state are nil"
     (is (= "invalid-4" (build-public-id nil nil nil 4)))
     (is (= "invalid-4" (build-public-id "" nil "" 4)))))
