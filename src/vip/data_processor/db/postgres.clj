@@ -51,7 +51,9 @@
 (defn build-public-id [date election-type state import-id]
   (let [nil-or-empty? (some-fn nil? empty?)
         formatted-date (util/format-date date)
-        good-parts (remove nil-or-empty? [formatted-date election-type state])]
+        good-parts (->> [formatted-date election-type state]
+                        (remove nil-or-empty?)
+                        (map #(str/trim %)))]
     (if (empty? good-parts)
       (str "invalid-" import-id)
       (str/join "-" (concat good-parts [import-id])))))
