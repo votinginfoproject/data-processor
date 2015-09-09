@@ -12,9 +12,12 @@
   ;; making it through to the database. This fix will keep
   ;; the entire feed from breaking Metis while we investigate
   ;; the issue.
-  (let [format-fn (fn [d] (->> d java.util.Date.
-                               (.format 
-                                (java.text.SimpleDateFormat. 
-                                 "yyyy-MM-dd"))))]
+  (let [format-fn (fn [d] (try (->> d java.util.Date.
+                                    (.format 
+                                     (java.text.SimpleDateFormat. 
+                                      "yyyy-MM-dd")))
+                               (catch Throwable _
+                                 nil)))]
     (if (and (seq date) (re-find #"\/" date))
-      (format-fn date) date)))
+      (format-fn date) 
+      date)))
