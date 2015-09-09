@@ -42,11 +42,16 @@
 
 (defn remove-invalid-extensions [ctx]
   (let [files (:input ctx)
-        valid-extensions #{"csv" "txt" "xml"}]
-    (assoc ctx :input 
-           (remove #(not (some valid-extensions
-                               (-> % .getName 
-                                   (s/split #"\.")))) files))))
+        valid-extensions #{"csv" "txt" "xml"}
+        invalid-fn (fn [file] 
+                     (not (some valid-extensions
+                                (-> file .getName 
+                                    (s/split #"\.")))))
+        {valid-files false invalid-files true} (group-by invalid-fn files)]
+    (-> ctx 
+        (assoc :input valid-files)
+        (assoc-in [:warnings :import :global :invalid-extensions] 
+                  (map #(.getName %) invalid-files)))))
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
