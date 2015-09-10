@@ -149,22 +149,23 @@
 (defn insert-validations [ctx]
   (log/info "Inserting validations")
   (let [validation-values (validation-values ctx)]
-    (bulk-import validations validation-values))
-  ctx)
+    (bulk-import ctx validations validation-values)))
 
 (defn import-from-sqlite [{:keys [import-id db data-specs] :as ctx}]
-  (doseq [ent db.util/import-entity-names]
-    (let [table (get-in ctx [:tables ent])
-          columns (->> data-specs
-                       (filter #(= ent (:table %)))
-                       first
-                       :columns)]
-      (bulk-import (ent import-entities)
-                   (->> table
-                        (db.util/select-*-lazily 5000)
-                        (map #(assoc % :results_id import-id))
-                        (data-spec/coerce-rows columns)))))
-  ctx)
+  (reduce (fn [ctx ent]
+            (let [table (get-in ctx [:tables ent])
+                  columns (->> data-specs
+                               (filter #(= ent (:table %)))
+                               first
+                               :columns)]
+              (bulk-import ctx
+                           (ent import-entities)
+                           (->> table
+                                (db.util/select-*-lazily 5000)
+                                (map #(assoc % :results_id import-id))
+                                (data-spec/coerce-rows columns)))))
+          ctx
+          db.util/import-entity-names))
 
 (defn store-stats [{:keys [import-id] :as ctx}]
   (korma/insert statistics

@@ -65,10 +65,12 @@
          join-elements)))
 
 (defn import-joins [ctx {:keys [xml-references] :as data-spec} elements]
-  (doseq [{:keys [join-table id joined-id]} xml-references]
-    (let [sql-table (get-in ctx [:tables join-table])
-          join-contents (mapcat (partial element->joins id joined-id) elements)]
-      (sqlite/bulk-import sql-table join-contents))))
+  (reduce (fn [ctx {:keys [join-table id joined-id]}]
+            (let [sql-table (get-in ctx [:tables join-table])
+                  join-contents (mapcat (partial element->joins id joined-id) elements)]
+              (sqlite/bulk-import ctx sql-table join-contents)))
+          ctx
+          xml-references))
 
 (defn load-elements [ctx elements]
   (let [tag (:tag (first elements))]
@@ -83,8 +85,7 @@
             transforms (apply comp (data-spec/translation-fns columns))
             transformed-contents (map transforms contents)]
         (import-joins ctx data-spec elements)
-        (sqlite/bulk-import sql-table transformed-contents)
-        ctx)
+        (sqlite/bulk-import ctx sql-table transformed-contents))
       (update-in ctx [:critical :import :global :unknown-tags] conj tag))))
 
 (defn partition-by-n

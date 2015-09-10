@@ -238,3 +238,19 @@
       (is (get-in out-ctx [:errors :candidates "90001" "sort_order"])))
     (testing "puts errors in the right format"
       (assert-error-format out-ctx))))
+
+(deftest same-element-duplicate-ids-test
+  (testing "doesn't die when elements share ids"
+    (let [ctx (merge {:input (xml-input "same-element-duplicated-ids.xml")
+                      :data-specs data-spec/data-specs
+                      :pipeline [load-xml]}
+                     (sqlite/temp-db "same-element-duplicated-ids"))
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:fatal :localities "101" :duplicate-ids]))
+      (is (get-in out-ctx [:fatal :precincts "10101" :duplicate-ids]))
+      (is (get-in out-ctx [:fatal :precincts "10103" :duplicate-ids]))
+      (testing "but still loads some data"
+        (is (= [{:id 103}]
+               (korma/select (get-in out-ctx [:tables :localities])
+                             (korma/fields :id)))))
+      (assert-error-format out-ctx))))

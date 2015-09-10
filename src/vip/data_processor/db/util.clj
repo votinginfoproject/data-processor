@@ -1,7 +1,9 @@
 (ns vip.data-processor.db.util
   (:require [clojure.tools.logging :as log]
+            [clojure.set :as set]
             [clojure.string :as str]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [korma.db :as db]))
 
 (defn kw->table-name [kw]
   (-> kw
@@ -66,11 +68,57 @@
                        size-with-next-row
                        (rest to-go))))))))
 
-(defn bulk-import [statement-parameter-limit table rows]
+(defn retry-chunk-without-dupe-ids
+  "If inserting a chunk has failed, retry trying to remove duplicate ids"
+  [ctx sql-table chunk-values]
+  ;; We need to query for existing ids and retry in the insert in a
+  ;; single transaction to be sure we have a consistent view of what
+  ;; ids already exist. Otherwise, rows that are still "in flight"
+  ;; from the previous commit may get commited between this read and
+  ;; write.
+  ;;
+  ;; Korma's `db/transaction` macro uses a dynamic var to choose which
+  ;; database do the transaction on. We bind it here to ensure that it
+  ;; uses the SQLite database for the table in question.
+  (binding [db/*current-conn* (db/get-connection (:db sql-table))]
+    (db/transaction
+     (let [table (-> sql-table :name keyword)
+           existing-ids (->> (korma/select sql-table
+                                           (korma/fields :id)
+                                           (korma/where {:id [in (map #(BigInteger. (get % "id")) chunk-values)]}))
+                             (map (comp str :id))
+                             set)
+           local-dupe-ids (->> chunk-values
+                               (map #(get % "id"))
+                               frequencies
+                               (filter (fn [[k v]] (> v 1)))
+                               (map first)
+                               set)
+           chunk-without-dupe-ids (remove (fn [{:strs [id]}]
+                                            (or (existing-ids id)
+                                                (local-dupe-ids id)))
+                                          chunk-values)]
+       (korma/insert sql-table (korma/values chunk-without-dupe-ids))
+       (reduce (fn [ctx dupe-id]
+                 (assoc-in ctx [:fatal table dupe-id :duplicate-ids]
+                           ["Duplicate id"]))
+               ctx (set/union existing-ids local-dupe-ids))))))
+
+(defn bulk-import [statement-parameter-limit ctx table rows]
   (log/info "Bulk importing" (:name table))
-  (doseq [chunk (chunk-rows rows statement-parameter-limit)]
-    (when-not (empty? chunk)
-      (korma/insert table (korma/values chunk)))))
+  (reduce (fn [ctx rows]
+            (if (empty? rows)
+              ctx
+              (try
+                (korma/insert table (korma/values rows))
+                ctx
+                (catch java.sql.SQLException e
+                  (let [message (.getMessage e)]
+                    (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
+                      (retry-chunk-without-dupe-ids ctx table rows)
+                      (assoc-in ctx [:fatal table :global :unknown-sql-error]
+                                [message])))))))
+          ctx (chunk-rows rows statement-parameter-limit)))
 
 (defn select-*-lazily [chunk-size sql-table]
   (let [total (-> sql-table
