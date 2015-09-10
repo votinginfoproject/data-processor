@@ -17,6 +17,7 @@
            zip/extracted-contents
            t/attach-sqlite-db
            (data-spec/add-data-specs data-spec/data-specs)
+           t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id]
           db/validations

@@ -24,3 +24,15 @@
       (is (nil? (:stop results-ctx)))
       (is (nil? (:exception results-ctx)))
       (assert-no-problems results-ctx []))))
+
+(deftest remove-invalid-extensions-test
+  (testing "removes non-csv, txt, or xml files from :input"
+    (let [ctx {:input [(File. "good-file.xml")
+                       (File. "not-so-good-file.xls")
+                       (File. "logo.ai")]}
+          results-ctx (remove-invalid-extensions ctx)]
+      (is (= 1 (count (:input results-ctx))))
+      (is (= "good-file.xml" (-> results-ctx :input first .getName)))
+      (is (= #{"not-so-good-file.xls" "logo.ai"} (set (get-in results-ctx [:warnings :import :global :invalid-extensions])))))))
+
+
