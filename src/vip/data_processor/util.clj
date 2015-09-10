@@ -6,3 +6,18 @@
     (assoc a ks m)))
 
 (defn flatten-keys [m] (flatten-keys* {} [] m))
+
+(defn format-date [date]
+  ;; Currently, invalid date formats (eg. 8/7/2015) are somehow
+  ;; making it through to the database. This fix will keep
+  ;; the entire feed from breaking Metis while we investigate
+  ;; the issue.
+  (let [format-fn (fn [d] (try (->> d java.util.Date.
+                                    (.format 
+                                     (java.text.SimpleDateFormat. 
+                                      "yyyy-MM-dd")))
+                               (catch Throwable _
+                                 nil)))]
+    (if (and (seq date) (re-find #"\/" date))
+      (format-fn date) 
+      date)))

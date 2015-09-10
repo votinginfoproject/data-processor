@@ -3,7 +3,8 @@
             [clojure.java.io :as io]
             [turbovote.resource-config :refer [config]]
             [korma.core :as korma]
-            [clojure.string :refer [join]])
+            [clojure.string :refer [join]]
+            [vip.data-processor.util :as util])
   (:import [java.io File]
            [java.nio.file Files CopyOption StandardCopyOption]
            [java.nio.file.attribute FileAttribute]
@@ -44,7 +45,8 @@
                          (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
                          :else fips)
         election-date (->> (get-in ctx [:tables :elections])
-                           korma/select first :date)]
+                           korma/select first :date
+                           util/format-date)]
     (join "-" ["vipfeed" fips election-date])))
 
 (defn upload-to-s3
