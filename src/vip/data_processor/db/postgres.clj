@@ -12,8 +12,8 @@
             [vip.data-processor.validation.data-spec :as data-spec]))
 
 (defn url []
-  (let [{:keys [host port user password]} (config :postgres)]
-    (str "jdbc:postgresql://" host ":" port "/?user=" user "&password=" password)))
+  (let [{:keys [host port user password database]} (config :postgres)]
+    (str "jdbc:postgresql://" host ":" port "/" database "?user=" user "&password=" password)))
 
 (defn migrate []
   (j/migrate-db {:db {:type :sql
