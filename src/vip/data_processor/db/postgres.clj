@@ -30,7 +30,7 @@
   (migrate)
   (let [opts (-> :postgres
                  config
-                 (assoc :db (config :postgres :user)))]
+                 (assoc :db (config :postgres :database)))]
     (db/defdb results-db (db/postgres opts))
     (db/defdb validations-db (db/postgres opts)))
   (korma/defentity results
