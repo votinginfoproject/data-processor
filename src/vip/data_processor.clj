@@ -1,5 +1,6 @@
 (ns vip.data-processor
   (:require [clojure.tools.logging :as log]
+            [com.climate.newrelic.trace :refer [defn-traced]]
             [democracyworks.squishy :as sqs]
             [korma.core :as korma]
             [vip.data-processor.cleanup :as cleanup]
@@ -37,20 +38,21 @@
            psql/store-stats
            cleanup/cleanup]))
 
+(defn-traced process-message [message]
+  (q/publish {:initial-input message
+              :status :started}
+             "processing.started")
+  (let [result (pipeline/process pipeline message)]
+    (psql/complete-run result)
+    (log/info "New run completed:"
+              (psql/get-run result))
+    (q/publish {:initial-input message
+                :status :complete
+                :public-id (:public-id result)}
+               "processing.complete")))
+
 (defn consume []
-  (sqs/consume-messages (sqs/client)
-                        (fn [message]
-                          (q/publish {:initial-input message
-                                      :status :started}
-                                     "processing.started")
-                          (let [result (pipeline/process pipeline message)]
-                            (psql/complete-run result)
-                            (log/info "New run completed:"
-                                      (psql/get-run result))
-                            (q/publish {:initial-input message
-                                        :status :complete
-                                        :public-id (:public-id result)}
-                                       "processing.complete")))))
+  (sqs/consume-messages (sqs/client) process-message))
 
 (defn -main [& args]
   (let [id (java.util.UUID/randomUUID)]

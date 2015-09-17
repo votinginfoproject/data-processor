@@ -4,6 +4,7 @@
             [clojure.set :as set]
             [clojure.string :as str]
             [clojure.tools.logging :as log]
+            [com.climate.newrelic.trace :refer [defn-traced]]
             [korma.core :as korma]
             [korma.db :as db]
             [vip.data-processor.db.util :as util]
@@ -19,7 +20,7 @@
   (let [filename (file-name file)]
     (contains? csv-filenames filename)))
 
-(defn remove-bad-filenames [ctx]
+(defn-traced remove-bad-filenames [ctx]
   (let [input (:input ctx)
         {good-files true bad-files false} (group-by good-filename? input)]
     (if (seq bad-files)
@@ -37,7 +38,7 @@
        (filter #(= filename (.getName %)))
        first))
 
-(defn bulk-import-and-validate-csv
+(defn-traced bulk-import-and-validate-csv
   "Bulk importing and CSV validation is done in one go, so that it can
   be done without holding the entire file in memory at once."
   [ctx {:keys [filename table columns] :as data-spec}]
@@ -95,7 +96,7 @@
                                            sqlite/statement-parameter-limit)))))))
     ctx))
 
-(defn load-csvs [ctx]
+(defn-traced load-csvs [ctx]
   (reduce bulk-import-and-validate-csv ctx (:data-specs ctx)))
 
 (defn add-report-on-missing-file-fn

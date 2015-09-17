@@ -18,6 +18,7 @@
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
             [clojure.walk :as walk]
+            [com.climate.newrelic.trace :refer [defn-traced]]
             [vip.data-processor.output.ballot :as ballot]
             [vip.data-processor.output.ballot-line-result :as ballot-line-result]
             [vip.data-processor.output.ballot-response :as ballot-response]
@@ -109,7 +110,7 @@
       (.write writer (name tag))
       (.write writer CLOSE-TAG))))
 
-(defn write-xml
+(defn-traced write-xml
   "Writes out the XML elements of nodes from `xml-node-fns` as
   children of the base `vip_object` element."
   [{:keys [xml-output-file xml-children] :as ctx}]
