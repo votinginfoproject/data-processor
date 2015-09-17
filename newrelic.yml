@@ -63,7 +63,7 @@ test:
 
 production:
   <<: *default_settings
-  app_name: Data Production (Production)
+  app_name: Data Processor (Production)
 
 staging:
   <<: *default_settings
