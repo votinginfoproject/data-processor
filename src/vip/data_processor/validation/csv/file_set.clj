@@ -2,8 +2,7 @@
   (:require [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
             [clojure.string :as str]
-            [clojure.walk :as walk]
-            [com.climate.newrelic.trace :refer [defn-traced]]))
+            [clojure.walk :as walk]))
 
 (defn- build-dependency-pred [ctx-sym dependencies]
   (walk/postwalk
@@ -162,7 +161,7 @@
     (validator ctx)
     ctx))
 
-(defn-traced validate-dependencies
+(defn validate-dependencies
   "Create a validator that validates that the dependencies of each
   file included in the context is met. file-dependencies should be
   built with build-dependencies."
