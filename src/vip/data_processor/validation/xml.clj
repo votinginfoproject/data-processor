@@ -2,6 +2,7 @@
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]
             [clojure.walk :refer [stringify-keys]]
+            [com.climate.newrelic.trace :refer [defn-traced]]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.validation.data-spec :as data-spec]))
 
@@ -49,7 +50,7 @@
       (into (map node->key-value content))
       flatten-address-elements))
 
-(defn validate-format-rules [ctx rows {:keys [table columns]}]
+(defn-traced validate-format-rules [ctx rows {:keys [table columns]}]
   (let [format-rules (data-spec/create-format-rules table columns)]
     (reduce (fn [ctx row]
               (data-spec/apply-format-rules format-rules ctx row (row "id")))
@@ -64,7 +65,7 @@
     (map (fn [join-elem] {id-name id joined-id (first (:content join-elem))})
          join-elements)))
 
-(defn import-joins [ctx {:keys [xml-references] :as data-spec} elements]
+(defn-traced import-joins [ctx {:keys [xml-references] :as data-spec} elements]
   (reduce (fn [ctx {:keys [join-table id joined-id]}]
             (let [sql-table (get-in ctx [:tables join-table])
                   join-contents (mapcat (partial element->joins id joined-id) elements)]
@@ -72,7 +73,7 @@
           ctx
           xml-references))
 
-(defn load-elements [ctx elements]
+(defn-traced load-elements [ctx elements]
   (let [tag (:tag (first elements))]
     (if-let [data-spec (first (filter #(= tag (:tag-name %)) data-spec/data-specs))]
       (let [element-maps (map element->map elements)
@@ -101,7 +102,7 @@
            run (cons fst (take-while #(= fv (f %)) next-n))]
        (cons run (partition-by-n f n (seq (drop (count run) s))))))))
 
-(defn load-xml
+(defn-traced load-xml
   "Load the XML input file into the database, validating as we go.
 
   Since XML is parsed as a lazy stream, reading off elements may
