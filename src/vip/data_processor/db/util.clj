@@ -116,7 +116,7 @@
                   (let [message (.getMessage e)]
                     (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
                       (retry-chunk-without-dupe-ids ctx table rows)
-                      (assoc-in ctx [:fatal table :global :unknown-sql-error]
+                      (assoc-in ctx [:fatal (:name table) :global :unknown-sql-error]
                                 [message])))))))
           ctx (chunk-rows rows statement-parameter-limit)))
 

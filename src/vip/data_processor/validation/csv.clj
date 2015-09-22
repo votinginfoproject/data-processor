@@ -89,7 +89,7 @@
                                 (let [message (.getMessage e)]
                                   (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
                                     (util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
-                                    (assoc-in ctx [:fatal table @line-number :unknown-sql-error]
+                                    (assoc-in ctx [:fatal (:name table) @line-number :unknown-sql-error]
                                               [message]))))))
                           ctx))
                       ctx (util/chunk-rows (csv/read-csv in-file)
