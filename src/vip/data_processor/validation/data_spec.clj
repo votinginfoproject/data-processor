@@ -355,13 +355,13 @@
               {:name "non_house_address_house_number_prefix"}
               {:name "non_house_address_house_number_suffix"}
               {:name "non_house_address_street_direction" :format format/street-direction}
-              {:name "non_house_address_street_name"}
+              {:name "non_house_address_street_name" :required true}
               {:name "non_house_address_street_suffix"}
               {:name "non_house_address_address_direction" :format format/street-direction}
               {:name "non_house_address_apartment"}
-              {:name "non_house_address_city"}
-              {:name "non_house_address_state"}
-              {:name "non_house_address_zip"}
+              {:name "non_house_address_city" :required true}
+              {:name "non_house_address_state" :required true}
+              {:name "non_house_address_zip" :required true}
               {:name "precinct_id" :required true :format format/all-digits :references :precincts :coerce coerce-integer}
               {:name "precinct_split_id" :format format/all-digits :references :precinct-splits :coerce coerce-integer}]}
    {:filename "source.txt"
