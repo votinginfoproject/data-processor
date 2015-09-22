@@ -98,6 +98,7 @@
                 (korma/where {:id (:import-id ctx)})))
 
 (def global-identifier -1)
+(def invalid-identifier -2)
 
 (def coercable-identifier?
   (some-fn string? number? nil? #{:global}))
@@ -106,10 +107,13 @@
   "Coerce an error identifier to something that can be inserted as a
   Postgres BIGINT or NULL"
   [identifier]
-  {:pre [(coercable-identifier? identifier)]}
   (cond
+    (not (coercable-identifier? identifier)) invalid-identifier
     (= :global identifier) global-identifier
-    (string? identifier) (BigDecimal. identifier)
+    (string? identifier) (try
+                           (BigDecimal. identifier)
+                           (catch java.lang.NumberFormatException _
+                             invalid-identifier))
     :else identifier))
 
 (defn validation-value [results-id severity scope identifier error-type error-data]

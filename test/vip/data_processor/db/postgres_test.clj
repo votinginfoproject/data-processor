@@ -31,9 +31,10 @@
     (is (= (BigDecimal. 4) (coerce-identifier "4")))
     (is (= 5 (coerce-identifier 5)))
     (is (nil? (coerce-identifier nil))))
-  (testing "throws when given an invalid identifier"
-    (is (thrown? AssertionError (coerce-identifier :garbage)))
-    (is (thrown? AssertionError (coerce-identifier '(a list))))))
+  (testing "uses the invalid-identifier when given an invalid identifier"
+    (is (= invalid-identifier (coerce-identifier :garbage)))
+    (is (= invalid-identifier (coerce-identifier '(a list))))
+    (is (= invalid-identifier (coerce-identifier "ABC")))))
 
 (deftest validation-values-test
   (testing "generates validation values for all kinds of errors"
