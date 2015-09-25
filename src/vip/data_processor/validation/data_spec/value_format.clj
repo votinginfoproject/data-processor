@@ -46,7 +46,7 @@
    :message "Must be \"odd\", \"even\", or \"both\""})
 
 (def phone
-  {:check #"\A\(\d{3}\) \d{3}-\d{4}\z"
+  {:check #"(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}"
    :message "Invalid phone number format"})
 
 (def street-direction

@@ -27,3 +27,19 @@
         "parliament"
         "prom court"
         "Kang v Kodos"))))
+
+(deftest phone-regex-test
+  (let [phone-regex (:check phone)]
+    (testing "matches a lot of expected values"
+      (are [s] (re-find phone-regex s)
+        "(555) 555-5555"
+        "555-555-5555"
+        "555.555.5555"
+        "+55 555 555 5555"
+        "(555) 555 5555 x123"
+        "Call this number: (555) 555 5555 x123"))
+    (testing "does not match nonsense"
+      (are [s] (nil? (re-find phone-regex s))
+        "123456"
+        "call me"
+        "Call this number: (555)"))))
