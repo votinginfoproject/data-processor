@@ -6,6 +6,8 @@ After=consul@%i.service
 Wants=consul@%i.service
 After=rabbitmq@%i.service
 Requires=rabbitmq@%i.service
+After=loggly@%i.service
+Requires=loggly@%i.service
 
 [Service]
 EnvironmentFile=/etc/environment
@@ -22,6 +24,7 @@ ExecStartPre=/usr/bin/docker pull ${DOCKER_IMAGE}
 
 ExecStart=/bin/bash -c 'docker run --name ${CONTAINER} --restart=always \
   --link rabbitmq:rabbitmq \
+  --link loggly:syslog \
   --env VIP_DP_AWS_ACCESS_KEY=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/aws/access-key?raw) \
   --env VIP_DP_AWS_SECRET_KEY=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/aws/secret-key?raw) \
   --env VIP_DP_S3_UNPROCESSED_BUCKET=$(curl -s http://${COREOS_PRIVATE_IPV4}:8500/v1/kv/data-suite/s3/unprocessed-bucket?raw) \

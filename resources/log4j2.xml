@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Properties>
+    <Property name="SYSLOG_PORT_514_UDP_ADDR">localhost</Property>
+    <Property name="SYSLOG_PORT_514_UDP_PORT">514</Property>
+  </Properties>
+  <Appenders>
+    <Syslog name="Syslog" format="RFC5424" appName="DataProcessor"
+            host="${env:SYSLOG_PORT_514_UDP_ADDR}" port="${env:SYSLOG_PORT_514_UDP_PORT}"
+            protocol="UDP" mdcId="mdc" messageId="DATAPROCESSOR">
+      <LoggerFields>
+        <KeyValuePair key="thread" value="%t"/>
+      </LoggerFields>
+    </Syslog>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="Syslog"/>
+    </Root>
+  </Loggers>
+</Configuration>
