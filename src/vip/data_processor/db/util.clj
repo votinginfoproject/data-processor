@@ -98,7 +98,8 @@
                                             (or (existing-ids id)
                                                 (local-dupe-ids id)))
                                           chunk-values)]
-       (korma/insert sql-table (korma/values chunk-without-dupe-ids))
+       (when (seq chunk-without-dupe-ids)
+         (korma/insert sql-table (korma/values chunk-without-dupe-ids)))
        (reduce (fn [ctx dupe-id]
                  (assoc-in ctx [:fatal table dupe-id :duplicate-ids]
                            ["Duplicate id"]))
