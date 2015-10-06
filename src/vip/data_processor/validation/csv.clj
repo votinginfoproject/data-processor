@@ -1,12 +1,12 @@
 (ns vip.data-processor.validation.csv
   (:require [clojure.data.csv :as csv]
-            [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [com.climate.newrelic.trace :refer [defn-traced]]
             [korma.core :as korma]
             [korma.db :as db]
+            [vip.data-processor.util :as bom]
             [vip.data-processor.db.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]))
@@ -45,7 +45,7 @@
   (if-let [file-to-load (find-input-file ctx filename)]
     (do
       (log/info "Loading" filename)
-      (with-open [in-file (io/reader file-to-load :encoding "UTF-8")]
+      (with-open [in-file (bom/bom-safe-reader file-to-load :encoding "UTF-8")]
         (let [headers (-> in-file
                           .readLine
                           csv/read-csv

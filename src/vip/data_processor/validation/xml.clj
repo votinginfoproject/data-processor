@@ -1,9 +1,9 @@
 (ns vip.data-processor.validation.xml
   (:require [clojure.data.xml :as xml]
-            [clojure.java.io :as io]
             [clojure.walk :refer [stringify-keys]]
             [com.climate.newrelic.trace :refer [defn-traced]]
             [vip.data-processor.db.sqlite :as sqlite]
+            [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]))
 
 (def address-elements
@@ -112,7 +112,8 @@
   what has been captured."
   [ctx]
   (let [xml-file (first (:input ctx))
-        partitioned-xml-elements (partition-by-n :tag 5000 (:content (xml/parse (io/reader xml-file))))]
+        reader (util/bom-safe-reader xml-file)
+        partitioned-xml-elements (partition-by-n :tag 5000 (:content (xml/parse reader)))]
     (loop [ctx ctx
            xml-elements partitioned-xml-elements]
       (let [partition-or-error (try
