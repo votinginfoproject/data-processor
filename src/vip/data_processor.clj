@@ -46,10 +46,15 @@
     (psql/complete-run result)
     (log/info "New run completed:"
               (psql/get-run result))
-    (q/publish {:initial-input message
-                :status :complete
-                :public-id (:public-id result)}
-               "processing.complete")))
+    (let [exception (:exception result)
+          completed-message (cond-> {:initial-input message
+                                     :status :complete
+                                     :public-id (:public-id result)}
+                              exception (assoc :exception (.getMessage exception)))]
+      (q/publish completed-message
+                 "processing.complete")
+      (when exception
+        (throw exception)))))
 
 (defn consume []
   (sqs/consume-messages (sqs/client) process-message))

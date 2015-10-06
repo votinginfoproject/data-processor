@@ -38,8 +38,7 @@
   pipeline.
 
   Runs the pipeline, returning the final context. An exception on the
-  context will result in logging the exception, and this function
-  throwing it."
+  context will result in logging the exception."
   [pipeline initial-input]
   (let [ctx {:input initial-input
              :warnings {}
@@ -52,7 +51,5 @@
     (when-let [ex (:exception result)]
       (psql/fail-run (:import-id result)
                      (with-out-str (stacktrace/print-throwable ex)))
-      (log/error (with-out-str (stacktrace/print-stack-trace ex)))
-      (throw (ex-info "Exception during processing" {:exception ex
-                                                     :initial-ctx ctx})))
+      (log/error (with-out-str (stacktrace/print-stack-trace ex))))
     result))
