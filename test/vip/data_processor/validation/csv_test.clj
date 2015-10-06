@@ -92,3 +92,17 @@
                                   (korma/fields :id)
                                   (korma/order :id :ASC)))))
         (assert-error-format out-ctx)))))
+
+(deftest byte-order-marker-test
+  (let [db (sqlite/temp-db "byte-order-marker")
+        ctx (merge {:input (csv-inputs ["byte-order-marker/source.txt"])
+                    :data-specs data-specs}
+                   db)
+        out-ctx (load-csvs ctx)]
+    (testing "loads successfully"
+      (is (= ["Colorado Secretary of State"]
+             (map :name
+                  (korma/select
+                   (get-in out-ctx [:tables :sources])
+                   (korma/fields :name)))))
+      (assert-error-format out-ctx))))

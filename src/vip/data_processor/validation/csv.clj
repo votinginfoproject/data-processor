@@ -46,10 +46,11 @@
     (do
       (log/info "Loading" filename)
       (with-open [in-file (io/reader file-to-load :encoding "UTF-8")]
-        (let [headers (-> in-file
-                          .readLine
-                          csv/read-csv
-                          first)
+        (let [headers (->> in-file
+                           .readLine
+                           csv/read-csv
+                           first
+                           (map #(clojure.string/replace % #"\W" "")))
               headers-count (count headers)
               sql-table (get-in ctx [:tables table])
               column-names (map :name columns)
