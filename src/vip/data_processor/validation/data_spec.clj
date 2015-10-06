@@ -413,7 +413,7 @@
           (assoc-in ctx [:errors scope id name] ["Is not valid UTF-8."])
 
           (not (test-fn val))
-          (assoc-in ctx [:errors scope id name] [message])
+          (assoc-in ctx [:errors scope id name] [(str message ": " val)])
 
           :else ctx)))))
 
