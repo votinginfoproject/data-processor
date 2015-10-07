@@ -1,4 +1,6 @@
-(ns vip.data-processor.util)
+(ns vip.data-processor.util
+  (:require [clojure.java.io :as io]
+            [clojure.tools.logging :as log]))
 
 (defn flatten-keys* [a ks m]
   (if (map? m)
@@ -21,3 +23,17 @@
     (if (and (seq date) (re-find #"\/" date))
       (format-fn date) 
       date)))
+
+(def BOM 0xFEFF)
+
+(defn bom-safe-reader
+  "Returns a reader from io/reader, which has advanced past a byte
+  order marker if one exists."
+  [x & opts]
+  (let [reader (apply io/reader x opts)]
+    (.mark reader 10)
+    (let [first-char (.read reader)]
+      (if (= first-char BOM)
+        (log/info x "had byte order marker")
+        (.reset reader))
+      reader)))
