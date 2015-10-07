@@ -6,8 +6,8 @@
             [com.climate.newrelic.trace :refer [defn-traced]]
             [korma.core :as korma]
             [korma.db :as db]
-            [vip.data-processor.util :as bom]
-            [vip.data-processor.db.util :as util]
+            [vip.data-processor.util :as util]
+            [vip.data-processor.db.util :as db.util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]))
 
@@ -45,7 +45,7 @@
   (if-let [file-to-load (find-input-file ctx filename)]
     (do
       (log/info "Loading" filename)
-      (with-open [in-file (bom/bom-safe-reader file-to-load :encoding "UTF-8")]
+      (with-open [in-file (util/bom-safe-reader file-to-load :encoding "UTF-8")]
         (let [headers (-> in-file
                           .readLine
                           csv/read-csv
@@ -88,12 +88,12 @@
                               (catch java.sql.SQLException e
                                 (let [message (.getMessage e)]
                                   (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
-                                    (util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
+                                    (db.util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
                                     (assoc-in ctx [:fatal (:name table) @line-number :unknown-sql-error]
                                               [message]))))))
                           ctx))
-                      ctx (util/chunk-rows (csv/read-csv in-file)
-                                           sqlite/statement-parameter-limit)))))))
+                      ctx (db.util/chunk-rows (csv/read-csv in-file)
+                                              sqlite/statement-parameter-limit)))))))
     ctx))
 
 (defn-traced load-csvs [ctx]
