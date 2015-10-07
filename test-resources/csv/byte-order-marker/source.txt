@@ -1,0 +1,2 @@
+﻿name,vip_id,datetime,description,organization_url,feed_contact_id,tou_url,id
+Colorado Secretary of State,8,2014-05-19T12:05:21,"The Secretary of State's office is the source for state election information in Colorado. This feed provides information on election dates, districts, and precinct boundaries",http://www.elections.colorado.gov,,,100
