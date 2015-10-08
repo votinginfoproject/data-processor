@@ -15,3 +15,5 @@ id,start_house_number,end_house_number,odd_even_both,non_house_address_street_na
 24,100,200,even,DIFFERENT STREET NAME,Beverly Hills,CA,90210,1
 25,100,200,even,SAME PRECINCT_ID IS OKAY,Beverly Hills,CA,90210,1
 26,150,250,even,SAME PRECINCT_ID IS OKAY,Beverly Hills,CA,90210,1
+27,100,200,even,IF ONE HAS NULL ODD_EVEN_BOTH,Beverly Hills,CA,90210,1
+28,140,140,,IF ONE HAS NULL ODD_EVEN_BOTH,Beverly Hills,CA,90210,2
