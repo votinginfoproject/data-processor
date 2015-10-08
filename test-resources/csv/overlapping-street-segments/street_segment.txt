@@ -1,15 +1,17 @@
 id,start_house_number,end_house_number,odd_even_both,non_house_address_street_name,non_house_address_city,non_house_address_state,non_house_address_zip,precinct_id
 11,100,200,even,IDENTICAL ROWS,Beverly Hills,CA,90210,1
-12,100,200,even,IDENTICAL ROWS,Beverly Hills,CA,90210,1
+12,100,200,even,IDENTICAL ROWS,Beverly Hills,CA,90210,2
 13,100,200,even,CONTAINED IN ANOTHER,Beverly Hills,CA,90210,1
-14,150,160,even,CONTAINED IN ANOTHER,Beverly Hills,CA,90210,1
+14,150,160,even,CONTAINED IN ANOTHER,Beverly Hills,CA,90210,2
 15,100,200,even,OVERLAPPING,Beverly Hills,CA,90210,1
-16,150,250,even,OVERLAPPING,Beverly Hills,CA,90210,1
-17,110,120,even,OVERLAPPING,Beverly Hills,CA,90210,1
+16,150,250,even,OVERLAPPING,Beverly Hills,CA,90210,2
+17,110,120,even,OVERLAPPING,Beverly Hills,CA,90210,2
 18,100,200,even,ONE SHARED ADDRESS,Beverly Hills,CA,90210,1
-19,200,300,even,ONE SHARED ADDRESS,Beverly Hills,CA,90210,1
+19,200,300,even,ONE SHARED ADDRESS,Beverly Hills,CA,90210,2
 20,100,200,even,OVERLAP BOTH/NON-BOTH,Beverly Hills,CA,90210,1
-21,150,250,both,OVERLAP BOTH/NON-BOTH,Beverly Hills,CA,90210,1
+21,150,250,both,OVERLAP BOTH/NON-BOTH,Beverly Hills,CA,90210,2
 22,100,200,even,ODD/EVEN NOT OVERLAPPING,Beverly Hills,CA,90210,1
-23,151,201,odd,ODD/EVEN NOT OVERLAPPING,Beverly Hills,CA,90210,1
+23,151,201,odd,ODD/EVEN NOT OVERLAPPING,Beverly Hills,CA,90210,2
 24,100,200,even,DIFFERENT STREET NAME,Beverly Hills,CA,90210,1
+25,100,200,even,SAME PRECINCT_ID IS OKAY,Beverly Hills,CA,90210,1
+26,150,250,even,SAME PRECINCT_ID IS OKAY,Beverly Hills,CA,90210,1
