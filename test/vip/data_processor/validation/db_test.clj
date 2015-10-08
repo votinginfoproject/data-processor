@@ -118,6 +118,9 @@
     (is (not (get-in out-ctx [:errors :street-segments 22 :overlaps])))
     (is (not (get-in out-ctx [:errors :street-segments 23 :overlaps])))
     (is (not (get-in out-ctx [:errors :street-segments 24 :overlaps])))
+    (is (not (get-in out-ctx [:errors :street-segments 25 :overlaps])))
+    (is (not (get-in out-ctx [:errors :street-segments 26 :overlaps])))
+    (is (= '(28) (get-in out-ctx [:errors :street-segments 27 :overlaps])))
     (assert-error-format out-ctx)))
 
 (deftest validate-election-administration-addresses-test
