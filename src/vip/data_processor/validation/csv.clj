@@ -17,7 +17,7 @@
   (.getName file))
 
 (defn good-filename? [file]
-  (let [filename (file-name file)]
+  (let [filename (clojure.string/lower-case (file-name file))]
     (contains? csv-filenames filename)))
 
 (defn-traced remove-bad-filenames [ctx]
@@ -35,7 +35,7 @@
 (defn find-input-file [ctx filename]
   (->> ctx
        :input
-       (filter #(= filename (.getName %)))
+       (filter #(= filename (clojure.string/lower-case (.getName %))))
        first))
 
 (defn-traced bulk-import-and-validate-csv
