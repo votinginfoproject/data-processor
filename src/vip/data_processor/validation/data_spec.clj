@@ -370,7 +370,7 @@
     :stats true
     :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
               {:name "name" :required true}
-              {:name "vip_id" :required true :format format/all-digits :coerce coerce-integer}
+              {:name "vip_id" :required true :format format/all-digits}
               {:name "datetime" :required true :format format/datetime :coerce coerce-date}
               {:name "description"}
               {:name "organization_url" :format format/url}
