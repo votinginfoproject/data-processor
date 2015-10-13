@@ -1,0 +1,2 @@
+name,vip_id,datetime,description,organization_url,feed_contact_id,tou_url,id
+Alabama,01,2015-01-21T18:13:25,It's Alabama!,,,,1

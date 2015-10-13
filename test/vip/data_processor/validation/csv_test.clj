@@ -119,3 +119,17 @@
       (is (nil? (find-input-file ctx "DOES_NOT_EXIST.txt"))))
     (testing "finds files without regard to the file's case"
       (is (= upper-case-source (find-input-file ctx "source.txt"))))))
+
+(deftest low-number-vip-id-test
+  (let [db (sqlite/temp-db "low-number-vip-id-test")
+        ctx (merge {:input (csv-inputs ["low-number-vip-id/source.txt"])
+                    :data-specs data-specs}
+                   db)
+        out-ctx (load-csvs ctx)]
+    (testing "does not mangle the vip_id"
+      (is (= ["01"]
+             (map :vip_id
+                  (korma/select
+                   (get-in out-ctx [:tables :sources])
+                   (korma/fields :vip_id)))))
+      (assert-error-format out-ctx))))
