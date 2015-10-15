@@ -401,19 +401,20 @@
                  (instance? clojure.lang.IFn check) check
                  (instance? java.util.regex.Pattern check) (fn [val] (re-find check val))
                  :else (constantly true))]
-    (fn [ctx element id]
-      (let [val (element name)]
+    (fn [ctx element id-or-line-number]
+      (let [identifier (or (get element "id") id-or-line-number)
+            val (element name)]
         (cond
           (empty? val)
           (if required
-            (assoc-in ctx [:fatal scope id name] [(str "Missing " name)])
+            (assoc-in ctx [:fatal scope identifier name] [(str "Missing " name)])
             ctx)
 
           (invalid-utf-8? val)
-          (assoc-in ctx [:errors scope id name] ["Is not valid UTF-8."])
+          (assoc-in ctx [:errors scope identifier name] ["Is not valid UTF-8."])
 
           (not (test-fn val))
-          (assoc-in ctx [:errors scope id name] [(str message ": " val)])
+          (assoc-in ctx [:errors scope identifier name] [(str message ": " val)])
 
           :else ctx)))))
 
