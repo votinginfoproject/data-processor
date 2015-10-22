@@ -54,3 +54,12 @@
         (is (= 1 (->> values
                     (filter #(= "bad-format" (:error_type %)))
                     count)))))))
+
+(deftest election-id-test
+  (testing "election-id generation"
+   (is (= "2015-10-10-LOUISIANA-GENERAL"
+          (build-election-id "2015-10-10" "LOUISIANA" "GENERAL")))
+   (is (= "2015-10-10-LOUISIANA-GENERAL"
+          (build-election-id "2015-10-10" "LOUISIANA   " "GENERAL")))
+   (is (nil? (build-election-id "2015-10-10" "LOUISIANA" nil)))
+   (is (nil? (build-election-id "2015-10-10" "" "GENERAL")))))

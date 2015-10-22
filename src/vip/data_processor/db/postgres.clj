@@ -58,17 +58,35 @@
       (str "invalid-" import-id)
       (str/join "-" (concat good-parts [import-id])))))
 
-(defn generate-public-id [{:keys [import-id] :as ctx}]
+(defn build-election-id [date election-type state]
+  (let [components [date election-type state]]
+    (when (every? seq components)
+      (->> components
+           (map str/trim)
+           (str/join "-")))))
+
+(defn get-public-id-data [{:keys [import-id] :as ctx}]
   (let [state (-> ctx
-                 (get-in [:tables :states])
-                 (korma/select (korma/fields :name))
-                 first
-                 :name)
+                  (get-in [:tables :states])
+                  (korma/select (korma/fields :name))
+                  first
+                  :name)
         {:keys [date election_type]} (-> ctx
                                          (get-in [:tables :elections])
                                          (korma/select (korma/fields :date :election_type))
                                          first)]
-    (build-public-id date election_type state import-id)))
+    {:date date
+     :election-type election_type
+     :state state
+     :import-id import-id}))
+
+(defn generate-public-id [ctx]
+  (let [{:keys [date election-type state import-id]} (get-public-id-data ctx)]
+    (build-public-id date election-type state import-id)))
+
+(defn generate-election-id [ctx]
+  (let [{:keys [date election-type state]} (get-public-id-data ctx)]
+    (build-election-id date election-type state)))
 
 (defn store-public-id [ctx]
   (let [id (:import-id ctx)
