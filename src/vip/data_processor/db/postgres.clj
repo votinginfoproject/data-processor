@@ -38,6 +38,8 @@
     (korma/database results-db))
   (korma/defentity statistics
     (korma/database results-db))
+  (korma/defentity election_approvals
+    (korma/database results-db))
   (def import-entities
     (db.util/make-entities results-db db.util/import-entity-names)))
 
