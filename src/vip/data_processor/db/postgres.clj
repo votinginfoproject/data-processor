@@ -21,7 +21,7 @@
                  :migrator "resources/migrations"}))
 
 (declare results-db results
-         validations-db validations
+         validations
          import-entities
          statistics)
 
@@ -31,12 +31,11 @@
   (let [opts (-> :postgres
                  config
                  (assoc :db (config :postgres :database)))]
-    (db/defdb results-db (db/postgres opts))
-    (db/defdb validations-db (db/postgres opts)))
+    (db/defdb results-db (db/postgres opts)))
   (korma/defentity results
     (korma/database results-db))
   (korma/defentity validations
-    (korma/database validations-db))
+    (korma/database results-db))
   (korma/defentity statistics
     (korma/database results-db))
   (def import-entities
