@@ -36,10 +36,10 @@
         ctx {}]
     (testing "with an id, uses the id"
       (testing "required column"
-        (let [format-rule (create-format-rule filename {:name column :required true :format format/all-digits})]
-          (testing "if the required column is missing, adds a fatal error"
+        (let [format-rule (create-format-rule filename {:name column :required :critical :format format/all-digits})]
+          (testing "if the required column is missing, adds an error of the specified severity"
             (let [result-ctx (format-rule ctx {column "" "id" id} line-number)]
-              (is (= (ffirst (get-in result-ctx [:fatal filename id]))
+              (is (= (ffirst (get-in result-ctx [:critical filename id]))
                      column))))
           (testing "if the column doesn't have the right format, adds an error"
             (let [result-ctx (format-rule ctx {column "asdf" "id" id} line-number)]
@@ -92,8 +92,8 @@
           (is (= ctx (format-rule ctx {"id" id} line-number))))))
     (testing "without an id, uses the line number"
       (testing "required column"
-        (let [format-rule (create-format-rule filename {:name column :required true :format format/all-digits})]
-          (testing "if the required column is missing, adds a fatal error"
+        (let [format-rule (create-format-rule filename {:name column :required :fatal :format format/all-digits})]
+          (testing "if the required column is missing, adds an error of the specified severity"
             (let [result-ctx (format-rule ctx {column ""} line-number)]
               (is (= (ffirst (get-in result-ctx [:fatal filename line-number]))
                      column))))

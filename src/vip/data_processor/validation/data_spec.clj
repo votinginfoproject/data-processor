@@ -51,26 +51,26 @@
     :xml-references [{:join-table :ballot-candidates
                       :id "ballot_id"
                       :joined-id "candidate_id"}]
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
               {:name "referendum_id" :format format/all-digits :references :referendums :coerce coerce-integer}
               {:name "custom_ballot_id" :format format/all-digits :references :custom-ballots :coerce coerce-integer}
               {:name "write_in" :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "image_url" :format format/url}]}
    {:filename "ballot_candidate.txt"
     :table :ballot-candidates
-    :columns [{:name "ballot_id" :required true :format format/all-digits :references :ballots :coerce coerce-integer}
-              {:name "candidate_id" :required true :format format/all-digits :references :candidates :coerce coerce-integer}]}
+    :columns [{:name "ballot_id" :required :critical :format format/all-digits :references :ballots :coerce coerce-integer}
+              {:name "candidate_id" :required :critical :format format/all-digits :references :candidates :coerce coerce-integer}]}
    {:filename "ballot_line_result.txt"
     :table :ballot-line-results
     :tag-name :ballot_line_result
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits}
-              {:name "contest_id" :required true :format format/all-digits :references :contests :coerce coerce-integer}
-              {:name "jurisdiction_id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "entire_district" :required true :format format/yes-no :translate boolean-value :coerce coerce-boolean}
+    :columns [{:name "id" :required :critical :format format/all-digits}
+              {:name "contest_id" :required :critical :format format/all-digits :references :contests :coerce coerce-integer}
+              {:name "jurisdiction_id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "entire_district" :required :critical :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "candidate_id" :format format/all-digits :references :candidates :coerce coerce-integer}
               {:name "ballot_response_id" :format format/all-digits :references :ballot-responses :coerce coerce-integer}
-              {:name "votes" :required true :format format/all-digits :coerce coerce-integer}
+              {:name "votes" :required :critical :format format/all-digits :coerce coerce-integer}
               {:name "overvotes" :format format/all-digits :coerce coerce-integer}
               {:name "victorious" :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "certification"}]}
@@ -78,15 +78,15 @@
     :table :ballot-responses
     :tag-name :ballot_response
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "text" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "text" :required :critical}
               {:name "sort_order" :format format/all-digits :coerce coerce-integer}]}
    {:filename "candidate.txt"
     :table :candidates
     :tag-name :candidate
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :critical}
               {:name "party"}
               {:name "candidate_url" :format format/url}
               {:name "biography"}
@@ -105,10 +105,10 @@
     :table :contests
     :tag-name :contest
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "election_id" :required true :format format/all-digits :references :elections :coerce coerce-integer}
-              {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts :coerce coerce-integer}
-              {:name "type" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "election_id" :required :critical :format format/all-digits :references :elections :coerce coerce-integer}
+              {:name "electoral_district_id" :required :critical :format format/all-digits :references :electoral-districts :coerce coerce-integer}
+              {:name "type" :required :critical}
               {:name "partisan" :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "primary_party"}
               {:name "electorate_specifications"}
@@ -123,10 +123,10 @@
     :table :contest-results
     :tag-name :contest_result
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "contest_id" :required true :format format/all-digits :references :contests :coerce coerce-integer}
-              {:name "jurisdiction_id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "entire_district" :required true :format format/yes-no :translate boolean-value :coerce coerce-boolean}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "contest_id" :required :critical :format format/all-digits :references :contests :coerce coerce-integer}
+              {:name "jurisdiction_id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "entire_district" :required :critical :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "total_votes" :format format/all-digits :coerce coerce-integer}
               {:name "total_valid_votes" :format format/all-digits :coerce coerce-integer}
               {:name "overvotes" :format format/all-digits :coerce coerce-integer}
@@ -141,25 +141,25 @@
     :xml-references [{:join-table :custom-ballot-ballot-responses
                       :id "custom_ballot_id"
                       :joined-id "ballot_response_id"}]
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "heading" :required true}]}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "heading" :required :critical}]}
    {:filename "custom_ballot_ballot_response.txt"
     :table :custom-ballot-ballot-responses
-    :columns [{:name "custom_ballot_id" :required true :format format/all-digits :references :custom-ballots :coerce coerce-integer}
-              {:name "ballot_response_id" :required true :format format/all-digits :references :ballot-responses :coerce coerce-integer}
+    :columns [{:name "custom_ballot_id" :required :critical :format format/all-digits :references :custom-ballots :coerce coerce-integer}
+              {:name "ballot_response_id" :required :critical :format format/all-digits :references :ballot-responses :coerce coerce-integer}
               {:name "sort_order" :format format/all-digits :coerce coerce-integer}]}
    {:filename "early_vote_site.txt"
     :table :early-vote-sites
     :tag-name :early_vote_site
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
               {:name "name"}
               {:name "address_location_name"}
-              {:name "address_line1" :required true}
+              {:name "address_line1" :required :critical}
               {:name "address_line2"}
               {:name "address_line3"}
-              {:name "address_city" :required true}
-              {:name "address_state" :required true}
+              {:name "address_city" :required :critical}
+              {:name "address_state" :required :critical}
               {:name "address_zip"}
               {:name "directions"}
               {:name "voter_services"}
@@ -170,10 +170,10 @@
     :table :elections
     :tag-name :election
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "date" :required true :format format/date :coerce coerce-date}
+    :columns [{:name "id" :required :fatal :format format/all-digits :coerce coerce-integer}
+              {:name "date" :required :fatal :format format/date :coerce coerce-date}
               {:name "election_type"}
-              {:name "state_id" :required true :format format/all-digits :references :states :coerce coerce-integer}
+              {:name "state_id" :required :fatal :format format/all-digits :references :states :coerce coerce-integer}
               {:name "statewide" :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "registration_info" :format format/url}
               {:name "absentee_ballot_info" :format format/url}
@@ -186,7 +186,7 @@
     :table :election-administrations
     :tag-name :election_administration
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
               {:name "name"}
               {:name "eo_id" :format format/all-digits :references :election-officials :coerce coerce-integer}
               {:name "ovc_id" :format format/all-digits :coerce coerce-integer}
@@ -217,8 +217,8 @@
     :table :election-officials
     :tag-name :election_official
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :critical}
               {:name "title"}
               {:name "phone" :format format/phone}
               {:name "fax" :format format/phone}
@@ -227,8 +227,8 @@
     :table :electoral-districts
     :tag-name :electoral_district
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :critical}
               {:name "type" :format format/electoral-district-type}
               {:name "number" :format format/all-digits :coerce coerce-integer}]}
    {:filename "locality.txt"
@@ -238,26 +238,26 @@
     :xml-references [{:join-table :locality-early-vote-sites
                       :id "locality_id"
                       :joined-id "early_vote_site_id"}]
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
-              {:name "state_id" :required true :format format/all-digits :references :states :coerce coerce-integer}
-              {:name "type" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :critical}
+              {:name "state_id" :required :critical :format format/all-digits :references :states :coerce coerce-integer}
+              {:name "type" :required :critical}
               {:name "election_administration_id" :format format/all-digits :references :election-administrations :coerce coerce-integer}]}
    {:filename "locality_early_vote_site.txt"
     :table :locality-early-vote-sites
-    :columns [{:name "locality_id" :required true :format format/all-digits :references :localities :coerce coerce-integer}
-              {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites :coerce coerce-integer}]}
+    :columns [{:name "locality_id" :required :critical :format format/all-digits :references :localities :coerce coerce-integer}
+              {:name "early_vote_site_id" :required :critical :format format/all-digits :references :early-vote-sites :coerce coerce-integer}]}
    {:filename "polling_location.txt"
     :table :polling-locations
     :tag-name :polling_location
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
               {:name "address_location_name"}
-              {:name "address_line1" :required true}
+              {:name "address_line1" :required :critical}
               {:name "address_line2"}
               {:name "address_line3"}
-              {:name "address_city" :required true}
-              {:name "address_state" :required true}
+              {:name "address_city" :required :critical}
+              {:name "address_state" :required :critical}
               {:name "address_zip"}
               {:name "directions"}
               {:name "polling_hours"}
@@ -275,10 +275,10 @@
                      {:join-table :precinct-electoral-districts
                       :id "precinct_id"
                       :joined-id "electoral_district_id"}]
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :critical}
               {:name "number"}
-              {:name "locality_id" :required true :format format/all-digits :references :localities :coerce coerce-integer}
+              {:name "locality_id" :required :critical :format format/all-digits :references :localities :coerce coerce-integer}
               {:name "ward"}
               {:name "mail_only" :format format/yes-no :translate boolean-value :coerce coerce-boolean}
               {:name "ballot_style_image_url" :format format/url}]}
@@ -292,30 +292,30 @@
                      {:join-table :precinct-split-polling-locations
                       :id "precinct_split_id"
                       :joined-id "polling_location_id"}]
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
-              {:name "precinct_id" :required true :format format/all-digits :references :precincts :coerce coerce-integer}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :critical}
+              {:name "precinct_id" :required :critical :format format/all-digits :references :precincts :coerce coerce-integer}
               {:name "ballot_style_image_url" :format format/url}]}
    {:filename "precinct_early_vote_site.txt"
     :table :precinct-early-vote-sites
-    :columns [{:name "precinct_id" :required true :format format/all-digits :references :precincts :coerce coerce-integer}
-              {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites :coerce coerce-integer}]}
+    :columns [{:name "precinct_id" :required :critical :format format/all-digits :references :precincts :coerce coerce-integer}
+              {:name "early_vote_site_id" :required :critical :format format/all-digits :references :early-vote-sites :coerce coerce-integer}]}
    {:filename "precinct_electoral_district.txt"
     :table :precinct-electoral-districts
-    :columns [{:name "precinct_id" :required true :format format/all-digits :references :precincts :coerce coerce-integer}
-              {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts :coerce coerce-integer}]}
+    :columns [{:name "precinct_id" :required :critical :format format/all-digits :references :precincts :coerce coerce-integer}
+              {:name "electoral_district_id" :required :critical :format format/all-digits :references :electoral-districts :coerce coerce-integer}]}
    {:filename "precinct_polling_location.txt"
     :table :precinct-polling-locations
-    :columns [{:name "precinct_id" :required true :format format/all-digits :references :precincts :coerce coerce-integer}
-              {:name "polling_location_id" :required true :format format/all-digits :references :polling-locations :coerce coerce-integer}]}
+    :columns [{:name "precinct_id" :required :critical :format format/all-digits :references :precincts :coerce coerce-integer}
+              {:name "polling_location_id" :required :critical :format format/all-digits :references :polling-locations :coerce coerce-integer}]}
    {:filename "precinct_split_electoral_district.txt"
     :table :precinct-split-electoral-districts
-    :columns [{:name "precinct_split_id" :required true :format format/all-digits :references :precinct-splits :coerce coerce-integer}
-              {:name "electoral_district_id" :required true :format format/all-digits :references :electoral-districts :coerce coerce-integer}]}
+    :columns [{:name "precinct_split_id" :required :critical :format format/all-digits :references :precinct-splits :coerce coerce-integer}
+              {:name "electoral_district_id" :required :critical :format format/all-digits :references :electoral-districts :coerce coerce-integer}]}
    {:filename "precinct_split_polling_location.txt"
     :table :precinct-split-polling-locations
-    :columns [{:name "precinct_split_id" :required true :format format/all-digits :references :precinct-splits :coerce coerce-integer}
-              {:name "polling_location_id" :required true :format format/all-digits :references :polling-locations :coerce coerce-integer}]}
+    :columns [{:name "precinct_split_id" :required :critical :format format/all-digits :references :precinct-splits :coerce coerce-integer}
+              {:name "polling_location_id" :required :critical :format format/all-digits :references :polling-locations :coerce coerce-integer}]}
    {:filename "referendum.txt"
     :table :referendums
     :tag-name :referendum
@@ -323,31 +323,31 @@
     :xml-references [{:join-table :referendum-ballot-responses
                       :id "referendum_id"
                       :joined-id "ballot_response_id"}]
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "title" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "title" :required :critical}
               {:name "subtitle"}
               {:name "brief"}
-              {:name "text" :required true}
+              {:name "text" :required :critical}
               {:name "pro_statement"}
               {:name "con_statement"}
               {:name "passage_threshold"}
               {:name "effect_of_abstain"}]}
    {:filename "referendum_ballot_response.txt"
     :table :referendum-ballot-responses
-    :columns [{:name "referendum_id" :required true :format format/all-digits :references :referendums :coerce coerce-integer}
-              {:name "ballot_response_id" :required true :format format/all-digits :references :ballot-responses :coerce coerce-integer}
+    :columns [{:name "referendum_id" :required :critical :format format/all-digits :references :referendums :coerce coerce-integer}
+              {:name "ballot_response_id" :required :critical :format format/all-digits :references :ballot-responses :coerce coerce-integer}
               {:name "sort_order" :format format/all-digits :coerce coerce-integer}]}
    {:filename "state_early_vote_site.txt"
     :table :state-early-vote-sites
-    :columns [{:name "state_id" :required true :format format/all-digits :references :states :coerce coerce-integer}
-              {:name "early_vote_site_id" :required true :format format/all-digits :references :early-vote-sites :coerce coerce-integer}]}
+    :columns [{:name "state_id" :required :critical :format format/all-digits :references :states :coerce coerce-integer}
+              {:name "early_vote_site_id" :required :critical :format format/all-digits :references :early-vote-sites :coerce coerce-integer}]}
    {:filename "street_segment.txt"
     :table :street-segments
     :tag-name :street_segment
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "start_house_number" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "end_house_number" :required true :format format/all-digits :coerce coerce-integer}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "start_house_number" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "end_house_number" :required :critical :format format/all-digits :coerce coerce-integer}
               {:name "odd_even_both" :format format/odd-even-both}
               {:name "start_apartment_number" :format format/all-digits :coerce coerce-integer}
               {:name "end_apartment_number" :format format/all-digits :coerce coerce-integer}
@@ -355,23 +355,23 @@
               {:name "non_house_address_house_number_prefix"}
               {:name "non_house_address_house_number_suffix"}
               {:name "non_house_address_street_direction" :format format/street-direction}
-              {:name "non_house_address_street_name" :required true}
+              {:name "non_house_address_street_name" :required :critical}
               {:name "non_house_address_street_suffix"}
               {:name "non_house_address_address_direction" :format format/street-direction}
               {:name "non_house_address_apartment"}
-              {:name "non_house_address_city" :required true}
-              {:name "non_house_address_state" :required true}
-              {:name "non_house_address_zip" :required true}
-              {:name "precinct_id" :required true :format format/all-digits :references :precincts :coerce coerce-integer}
+              {:name "non_house_address_city" :required :critical}
+              {:name "non_house_address_state" :required :critical}
+              {:name "non_house_address_zip" :required :critical}
+              {:name "precinct_id" :required :critical :format format/all-digits :references :precincts :coerce coerce-integer}
               {:name "precinct_split_id" :format format/all-digits :references :precinct-splits :coerce coerce-integer}]}
    {:filename "source.txt"
     :table :sources
     :tag-name :source
     :stats true
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
-              {:name "vip_id" :required true :format format/all-digits}
-              {:name "datetime" :required true :format format/datetime :coerce coerce-date}
+    :columns [{:name "id" :required :fatal :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :fatal}
+              {:name "vip_id" :required :fatal :format format/all-digits}
+              {:name "datetime" :required :fatal :format format/datetime :coerce coerce-date}
               {:name "description"}
               {:name "organization_url" :format format/url}
               {:name "feed_contact_id" :format format/all-digits :references :election-officials :coerce coerce-integer}
@@ -382,8 +382,8 @@
     :xml-references [{:join-table :state-early-vote-sites
                       :id "state_id"
                       :joined-id "early_vote_site_id"}]
-    :columns [{:name "id" :required true :format format/all-digits :coerce coerce-integer}
-              {:name "name" :required true}
+    :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
+              {:name "name" :required :critical}
               {:name "election_administration_id" :format format/all-digits :references :election-administrations :coerce coerce-integer}]}])
 
 (defn invalid-utf-8? [string]
@@ -407,7 +407,7 @@
         (cond
           (empty? val)
           (if required
-            (assoc-in ctx [:fatal scope identifier name] [(str "Missing " name)])
+            (assoc-in ctx [required scope identifier name] [(str "Missing " name)])
             ctx)
 
           (invalid-utf-8? val)
