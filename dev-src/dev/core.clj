@@ -19,7 +19,8 @@
            (data-spec/add-data-specs data-spec/data-specs)
            t/remove-invalid-extensions
            t/xml-csv-branch
-           psql/store-public-id]
+           psql/store-public-id
+           psql/store-election-id]
           db/validations
           xml-output/pipeline
           [psql/insert-validations

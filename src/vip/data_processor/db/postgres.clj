@@ -97,6 +97,24 @@
                   (korma/where {:id id}))
     (assoc ctx :public-id public-id)))
 
+(defn save-election-id! [election-id]
+  (binding [db/*current-conn* (db/get-connection (:db election_approvals))]
+    (db/transaction
+     (when-not (seq (korma/select election_approvals
+                                  (korma/where {:election_id election-id})))
+       (korma/insert election_approvals
+                     (korma/values {:election_id election-id}))))))
+
+(defn store-election-id [ctx]
+  (if-let [election-id (generate-election-id ctx)]
+    (let [id (:import-id ctx)]
+      (save-election-id! election-id)
+      (korma/update results
+                    (korma/set-fields {:election_id election-id})
+                    (korma/where {:id id}))
+      (assoc ctx :election-id election-id))
+    ctx))
+
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
         filename (:generated-xml-filename ctx)]
