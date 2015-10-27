@@ -21,7 +21,7 @@
                  :migrator "resources/migrations"}))
 
 (declare results-db results
-         validations-db validations
+         validations
          import-entities
          statistics)
 
@@ -31,13 +31,14 @@
   (let [opts (-> :postgres
                  config
                  (assoc :db (config :postgres :database)))]
-    (db/defdb results-db (db/postgres opts))
-    (db/defdb validations-db (db/postgres opts)))
+    (db/defdb results-db (db/postgres opts)))
   (korma/defentity results
     (korma/database results-db))
   (korma/defentity validations
-    (korma/database validations-db))
+    (korma/database results-db))
   (korma/defentity statistics
+    (korma/database results-db))
+  (korma/defentity election_approvals
     (korma/database results-db))
   (def import-entities
     (db.util/make-entities results-db db.util/import-entity-names)))
@@ -58,17 +59,35 @@
       (str "invalid-" import-id)
       (str/join "-" (concat good-parts [import-id])))))
 
-(defn generate-public-id [{:keys [import-id] :as ctx}]
+(defn build-election-id [date election-type state]
+  (let [components [date election-type state]]
+    (when (every? seq components)
+      (->> components
+           (map str/trim)
+           (str/join "-")))))
+
+(defn get-public-id-data [{:keys [import-id] :as ctx}]
   (let [state (-> ctx
-                 (get-in [:tables :states])
-                 (korma/select (korma/fields :name))
-                 first
-                 :name)
+                  (get-in [:tables :states])
+                  (korma/select (korma/fields :name))
+                  first
+                  :name)
         {:keys [date election_type]} (-> ctx
                                          (get-in [:tables :elections])
                                          (korma/select (korma/fields :date :election_type))
                                          first)]
-    (build-public-id date election_type state import-id)))
+    {:date date
+     :election-type election_type
+     :state state
+     :import-id import-id}))
+
+(defn generate-public-id [ctx]
+  (let [{:keys [date election-type state import-id]} (get-public-id-data ctx)]
+    (build-public-id date election-type state import-id)))
+
+(defn generate-election-id [ctx]
+  (let [{:keys [date election-type state]} (get-public-id-data ctx)]
+    (build-election-id date election-type state)))
 
 (defn store-public-id [ctx]
   (let [id (:import-id ctx)
@@ -77,6 +96,24 @@
                   (korma/set-fields {:public_id public-id})
                   (korma/where {:id id}))
     (assoc ctx :public-id public-id)))
+
+(defn save-election-id! [election-id]
+  (binding [db/*current-conn* (db/get-connection (:db election_approvals))]
+    (db/transaction
+     (when-not (seq (korma/select election_approvals
+                                  (korma/where {:election_id election-id})))
+       (korma/insert election_approvals
+                     (korma/values {:election_id election-id}))))))
+
+(defn store-election-id [ctx]
+  (if-let [election-id (generate-election-id ctx)]
+    (let [id (:import-id ctx)]
+      (save-election-id! election-id)
+      (korma/update results
+                    (korma/set-fields {:election_id election-id})
+                    (korma/where {:id id}))
+      (assoc ctx :election-id election-id))
+    ctx))
 
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
