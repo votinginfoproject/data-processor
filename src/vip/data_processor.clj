@@ -72,4 +72,4 @@
                                    (log/info "VIP Data Processor shutting down...")
                                    (q/publish {:id id :event "stopping"} "qa-engine.status")
                                    (future-cancel consumer))))
-      (while true))))
+      @consumer)))
