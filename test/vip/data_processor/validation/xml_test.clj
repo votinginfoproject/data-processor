@@ -152,8 +152,11 @@
                       :pipeline [load-xml db/validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicated-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:warnings :ballots 80000 :duplicate-rows]))
-      (is (get-in out-ctx [:warnings :ballots 80001 :duplicate-rows]))
+      (doseq [id [900101 900102 900103]]
+        (is (get-in out-ctx [:warnings :candidates id :duplicate-rows])))
+      (testing "except for ballots"
+        (doseq [id [80000 80001]]
+          (is (nil? (get-in out-ctx [:warnings :ballots id :duplicate-rows])))))
       (assert-error-format out-ctx))))
 
 (deftest validate-references-test

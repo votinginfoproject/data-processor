@@ -319,6 +319,15 @@ Note that the ID attributes are unique throughout the file.
   <candidate id="90010">
     <name>Runner Solo</name>
   </candidate>
+  <candidate id="900101">
+    <name>Doug Kinney</name>
+  </candidate>
+  <candidate id="900102">
+    <name>Doug Kinney</name>
+  </candidate>
+  <candidate id="900103">
+    <name>Doug Kinney</name>
+  </candidate>
   <referendum id="90011">
     <title>Proposition 37</title>
     <subtitle>A referendum to ban smoking indoors</subtitle>

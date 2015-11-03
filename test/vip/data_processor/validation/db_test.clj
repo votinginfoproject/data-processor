@@ -25,7 +25,8 @@
 (deftest validate-no-duplicated-rows-test
   (testing "finds possibly duplicated rows in a table and warns"
     (let [ctx (merge {:input (csv-inputs ["duplicate-rows/candidate.txt"
-                                          "duplicate-rows/ballot_candidate.txt"])
+                                          "duplicate-rows/ballot_candidate.txt"
+                                          "duplicate-rows/ballot.txt"])
                       :pipeline [(data-spec/add-data-specs data-spec/data-specs)
                                  csv/load-csvs
                                  validate-no-duplicated-rows]}
@@ -35,6 +36,9 @@
         (is (get-in out-ctx [:warnings :candidates id :duplicate-rows])))
       (is (= #{{:candidate_id 3100047456987, :ballot_id 410004745} {:candidate_id 3100047466988, :ballot_id 410004746}}
              (set (get-in out-ctx [:warnings :ballot-candidates nil :duplicate-rows]))))
+      (testing "does not add errors for ballots"
+        (doseq [id [1 2 3]]
+          (is (nil? (get-in out-ctx [:warnings :ballots id :duplicate-rows])))))
       (assert-error-format out-ctx))))
 
 (deftest validate-one-record-limit-test

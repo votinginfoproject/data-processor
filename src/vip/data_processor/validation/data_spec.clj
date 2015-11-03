@@ -48,6 +48,7 @@
     :table :ballots
     :tag-name :ballot
     :stats true
+    :ignore-duplicate-records true
     :xml-references [{:join-table :ballot-candidates
                       :id "ballot_id"
                       :joined-id "candidate_id"}]

@@ -16,7 +16,8 @@
             ctx dupes)))
 
 (defn-traced validate-no-duplicated-rows [{:keys [data-specs] :as ctx}]
-  (reduce dupe-records/validate-no-duplicated-rows-in-table ctx data-specs))
+  (let [tables-to-check (remove :ignore-duplicate-records data-specs)]
+    (reduce dupe-records/validate-no-duplicated-rows-in-table ctx tables-to-check)))
 
 (defn-traced validate-one-record-limit [ctx]
   (record-limit/tables-allow-only-one-record ctx))
