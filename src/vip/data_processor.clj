@@ -1,7 +1,8 @@
 (ns vip.data-processor
   (:require [clojure.tools.logging :as log]
             [com.climate.newrelic.trace :refer [defn-traced]]
-            [democracyworks.squishy :as sqs]
+            [squishy.core :as sqs]
+            [turbovote.resource-config :refer [config]]
             [korma.core :as korma]
             [vip.data-processor.cleanup :as cleanup]
             [vip.data-processor.pipeline :as pipeline]
@@ -58,7 +59,12 @@
         (throw exception)))))
 
 (defn consume []
-  (sqs/consume-messages (sqs/client) process-message))
+  (let [{:keys [access-key secret-key]} (config :aws :creds)
+        {:keys [region queue fail-queue]} (config :aws :sqs)
+        creds {:access-key access-key
+               :access-secret secret-key
+               :region region}]
+    (sqs/consume-messages creds queue fail-queue process-message)))
 
 (defn -main [& args]
   (let [id (java.util.UUID/randomUUID)]
