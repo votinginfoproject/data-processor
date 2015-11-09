@@ -61,7 +61,7 @@
     (korma/exec query)))
 
 (defn find-all-referenced-tables [data-specs]
-  (into {} (for [data-spec data-specs
+  (into {} (for [data-spec (remove :ignore-unreferenced-rows data-specs)
                  :let [table (:table data-spec)
                        references (find-referencing-tables table data-specs)]
                  :when (seq references)]

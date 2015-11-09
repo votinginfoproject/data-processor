@@ -95,6 +95,7 @@
   (testing "finds rows not referenced"
     (let [ctx (merge {:input (csv-inputs ["unreferenced-rows/ballot.txt"
                                           "unreferenced-rows/candidate.txt"
+                                          "unreferenced-rows/contest.txt"
                                           "unreferenced-rows/ballot_candidate.txt"])
                       :pipeline [(data-spec/add-data-specs data-spec/data-specs)
                                  csv/load-csvs
@@ -105,6 +106,8 @@
       (is (get-in out-ctx [:warnings :ballots 3 :unreferenced-row]))
       (is (get-in out-ctx [:warnings :candidates 13 :unreferenced-row]))
       (is (get-in out-ctx [:warnings :candidates 14 :unreferenced-row]))
+      (testing "except for contests"
+        (is (nil? (get-in out-ctx [:warnings :contests 100 :unreferenced-row]))))
       (assert-error-format out-ctx))))
 
 (deftest validate-no-overlapping-street-segments-test
