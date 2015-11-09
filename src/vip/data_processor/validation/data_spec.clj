@@ -105,6 +105,7 @@
     :table :contests
     :tag-name :contest
     :stats true
+    :ignore-unreferenced-rows true
     :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce-integer}
               {:name "election_id" :required :critical :format format/all-digits :references :elections :coerce coerce-integer}
               {:name "electoral_district_id" :required :critical :format format/all-digits :references :electoral-districts :coerce coerce-integer}
