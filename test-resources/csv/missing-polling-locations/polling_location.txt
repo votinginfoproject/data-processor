@@ -1,0 +1,3 @@
+address_location_name,address_line1,address_line2,address_line3,address_city,address_state,address_zip,directions,polling_hours,photo_url,id
+Macon Vol. Fire Dept.,6377 Old Buckingham Rd,,,Powhatan,VA,23139,,6:00 AM - 7:00 PM,,80000
+ST. MARK MISSIONARY BAPTIST CHURCH,2714 Frederick Blvd,,,Portsmouth,VA,237046818,,6:00 AM - 7:00 PM,,80001

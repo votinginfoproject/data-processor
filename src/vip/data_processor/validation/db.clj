@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.db
   (:require [vip.data-processor.validation.db.duplicate-records :as dupe-records]
             [vip.data-processor.validation.db.duplicate-ids :as dupe-ids]
+            [vip.data-processor.validation.db.precinct :as precinct]
             [vip.data-processor.validation.db.references :as refs]
             [vip.data-processor.validation.db.record-limit :as record-limit]
             [vip.data-processor.validation.db.reverse-references :as rev-refs]
@@ -61,4 +62,5 @@
    validate-no-unreferenced-rows
    validate-no-overlapping-street-segments
    validate-election-administration-addresses
+   precinct/validate-no-missing-polling-locations
    fips/validate-valid-source-vip-id])
