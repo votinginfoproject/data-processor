@@ -132,7 +132,12 @@
           out-ctx (pipeline/run-pipeline ctx)]
       (is (nil? (:stop out-ctx)))
       (is (nil? (:exception out-ctx)))
-      (assert-no-problems out-ctx []))))
+      (assert-no-problems out-ctx [])
+      (testing "inserts values for columns not in the first element of a type"
+        (let [mail-only-precinct (first
+                                  (korma/select (get-in out-ctx [:tables :precincts])
+                                                (korma/where {:id 10203})))]
+          (is (= 1 (:mail_only mail-only-precinct))))))))
 
 (deftest validate-no-duplicated-ids-test
   (testing "returns an error when there is a duplicated id"

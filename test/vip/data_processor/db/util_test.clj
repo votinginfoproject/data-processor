@@ -20,3 +20,15 @@
               key-count (fn [coll] (apply + (map count coll)))
               no-more-than-n-keys? (fn [coll] (>= n (key-count coll)))]
           (is (every? no-more-than-n-keys? chunked)))))))
+
+(deftest hydrate-rows-test
+  (testing "Makes all rows have the same keys (the superset of all keys)"
+    (let [rows [{"id" 1}
+                {"id" 2 "name" "2nd Precinct"}
+                {"id" 3 "mail_only" 1}]
+          hydrated-rows (hydrate-rows rows)]
+      (doseq [key ["id" "name" "mail_only"]
+              row hydrated-rows]
+        (is (contains? row key)))
+      (is (nil? (get (first rows) "name")))
+      (is (nil? (get (first rows) "mail_only"))))))

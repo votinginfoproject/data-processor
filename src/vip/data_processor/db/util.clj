@@ -105,20 +105,32 @@
                            ["Duplicate id"]))
                ctx (set/union existing-ids local-dupe-ids))))))
 
+(defn hydrate-row [ks row]
+  (reduce (fn [row k]
+            (if (contains? row k)
+              row
+              (assoc row k nil)))
+          row ks))
+
+(defn hydrate-rows [rows]
+  (let [ks (apply clojure.set/union (map (comp set keys) rows))]
+    (map (partial hydrate-row ks) rows)))
+
 (defn bulk-import [statement-parameter-limit ctx table rows]
   (log/info "Bulk importing" (:name table))
   (reduce (fn [ctx rows]
             (if (empty? rows)
               ctx
-              (try
-                (korma/insert table (korma/values rows))
-                ctx
-                (catch java.sql.SQLException e
-                  (let [message (.getMessage e)]
-                    (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
-                      (retry-chunk-without-dupe-ids ctx table rows)
-                      (assoc-in ctx [:fatal (:name table) :global :unknown-sql-error]
-                                [message])))))))
+              (let [hydrated-rows (hydrate-rows rows)]
+                (try
+                  (korma/insert table (korma/values hydrated-rows))
+                  ctx
+                  (catch java.sql.SQLException e
+                    (let [message (.getMessage e)]
+                      (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
+                        (retry-chunk-without-dupe-ids ctx table hydrated-rows)
+                        (assoc-in ctx [:fatal (:name table) :global :unknown-sql-error]
+                                  [message]))))))))
           ctx (chunk-rows rows statement-parameter-limit)))
 
 (defn select-*-lazily [chunk-size sql-table]
