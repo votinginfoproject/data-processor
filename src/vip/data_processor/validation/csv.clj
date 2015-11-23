@@ -11,18 +11,19 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.db.sqlite :as sqlite]))
 
-(def csv-filenames (set (map :filename data-spec/data-specs)))
+(defn csv-filenames [data-specs]
+  (set (map :filename data-specs)))
 
 (defn file-name [file]
   (.getName file))
 
-(defn good-filename? [file]
+(defn good-filename? [data-specs file]
   (let [filename (clojure.string/lower-case (file-name file))]
-    (contains? csv-filenames filename)))
+    (contains? (csv-filenames data-specs) filename)))
 
 (defn-traced remove-bad-filenames [ctx]
   (let [input (:input ctx)
-        {good-files true bad-files false} (group-by good-filename? input)]
+        {good-files true bad-files false} (group-by (partial good-filename? (:data-specs ctx)) input)]
     (if (seq bad-files)
       (let [bad-filenames (->> bad-files (map file-name) sort)
             bad-file-list (apply str (interpose ", " bad-filenames))]
@@ -59,7 +60,7 @@
                                          (map :name))
               extraneous-headers (seq (set/difference (set headers) (set column-names)))
               transforms (apply comp (data-spec/translation-fns columns))
-              format-rules (data-spec/create-format-rules filename columns)
+              format-rules (data-spec/create-format-rules (:data-specs ctx) filename columns)
               ctx (if extraneous-headers
                     (assoc-in ctx [:warnings table :global :extraneous-headers]
                               extraneous-headers)
@@ -100,24 +101,13 @@
 (defn-traced load-csvs [ctx]
   (reduce bulk-import-and-validate-csv ctx (:data-specs ctx)))
 
-(defn add-report-on-missing-file-fn
-  "Generates a validation function generator that takes a filename and
-  associates a report-type on the context if the filename is missing."
-  [report-type]
-  (fn [filename]
-    (let [data-spec (first (filter #(= filename (:filename %)) data-spec/data-specs))
+(defn error-on-missing-file
+  "Generates a validation function that adds an error when
+  the given filename is missing from the input"
+  [filename]
+  (fn [{:keys [data-specs] :as ctx}]
+    (let [data-spec (first (filter #(= filename (:filename %)) data-specs))
           table (:table data-spec)]
-      (fn [ctx]
-        (if (find-input-file ctx filename)
-          ctx
-          (assoc-in ctx [report-type table :global :missing-csv] [(str filename " is missing")]))))))
-
-(def ^{:doc "Generates a validation function that adds a warning when
-  the given filename is missing from the input"}
-  warn-on-missing-file
-  (add-report-on-missing-file-fn :warnings))
-
-(def ^{:doc "Generates a validation function that adds an error when
-  the given filename is missing from the input"}
-  error-on-missing-file
-  (add-report-on-missing-file-fn :errors))
+      (if (find-input-file ctx filename)
+        ctx
+        (assoc-in ctx [:errors table :global :missing-csv] [(str filename " is missing")])))))

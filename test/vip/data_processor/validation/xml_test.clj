@@ -3,6 +3,7 @@
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
@@ -11,7 +12,7 @@
 (deftest load-xml-test
   (testing "loads data into the db from an XML file"
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
-                      :data-specs data-spec/data-specs}
+                      :data-specs v3-0/data-specs}
                      (sqlite/temp-db "load-xml-test"))
           out-ctx (load-xml ctx)]
       (testing "loads simple data from XML"
@@ -104,7 +105,7 @@
                  locality-early-vote-sites))))))
   (testing "adds errors for non-UTF-8 data"
     (let [ctx (merge {:input (xml-input "non-utf-8.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml]}
                      (sqlite/temp-db "non-utf-8"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -113,7 +114,7 @@
       (assert-error-format out-ctx)))
   (testing "can continue after reaching malformed XML"
     (let [ctx (merge {:input (xml-input "malformed.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml]}
                      (sqlite/temp-db "malformed-xml"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -126,7 +127,7 @@
 (deftest full-good-run-test
   (testing "a good XML file produces no erorrs or warnings"
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline (concat [load-xml] db/validations)}
                      (sqlite/temp-db "full-good-xml"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -142,7 +143,7 @@
 (deftest validate-no-duplicated-ids-test
   (testing "returns an error when there is a duplicated id"
     (let [ctx (merge {:input (xml-input "duplicated-ids.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-no-duplicated-ids]}
                      (sqlite/temp-db "duplicated-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -153,7 +154,7 @@
 (deftest validate-no-duplicated-rows-test
   (testing "returns a warning if two nodes have the same data"
     (let [ctx (merge {:input (xml-input "duplicated-rows.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicated-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -167,7 +168,7 @@
 (deftest validate-references-test
   (testing "returns an error if there are unreferenced objects"
     (let [ctx (merge {:input (xml-input "unreferenced-ids.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-references]}
                      (sqlite/temp-db "unreferenced-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -177,7 +178,7 @@
 (deftest validate-jurisdiction-references-test
   (testing "returns an error if there are unreferenced jurisdiction references"
     (let [ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-jurisdiction-references]}
                      (sqlite/temp-db "unreferenced-jurisdictions"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -187,7 +188,7 @@
 (deftest validate-one-record-limit-test
   (testing "returns an error if particular nodes are duplicated more than once"
     (let [ctx (merge {:input (xml-input "one-record-limit.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-one-record-limit]}
                      (sqlite/temp-db "one-record-limit"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -200,7 +201,7 @@
 (deftest validate-no-unreferenced-rows
   (testing "returns a warning if it finds rows that are unreferenced"
     (let [ctx (merge {:input (xml-input "unreferenced-rows.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-no-unreferenced-rows]}
                      (sqlite/temp-db "unreferenced-rows"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -210,7 +211,7 @@
 (deftest validate-no-overlapping-street-segments
   (testing "returns an error if street segments overlap"
     (let [ctx (merge {:input (xml-input "overlapping-street-segments.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-no-overlapping-street-segments]}
                      (sqlite/temp-db "overlapping-street-segments"))
           out-ctx (pipeline/run-pipeline ctx)]
@@ -220,7 +221,7 @@
 (deftest validate-election-administration-addresses
   (testing "returns an error if either the physical or mailing address is incomplete"
     (let [ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml
                                  db/validate-election-administration-addresses]}
                      (sqlite/temp-db "incomplete-election-administrations"))
@@ -233,7 +234,7 @@
 
 (deftest validate-data-formats
   (let [ctx (merge {:input (xml-input "bad-data-values.xml")
-                    :data-specs data-spec/data-specs
+                    :data-specs v3-0/data-specs
                     :pipeline [load-xml]}
                    (sqlite/temp-db "bad-data-values"))
         out-ctx (pipeline/run-pipeline ctx)]
@@ -250,7 +251,7 @@
 (deftest same-element-duplicate-ids-test
   (testing "doesn't die when elements share ids"
     (let [ctx (merge {:input (xml-input "same-element-duplicated-ids.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml]}
                      (sqlite/temp-db "same-element-duplicated-ids"))
           out-ctx (pipeline/run-pipeline ctx)]
