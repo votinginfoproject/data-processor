@@ -18,5 +18,6 @@
                      (sqlite/temp-db "missing-polling-locations"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:warnings :precincts 3 :missing-polling-location]))
+      (is (get-in out-ctx [:warnings :precincts 4 :missing-polling-location]))
       (is (nil? (get-in out-ctx [:warnings :precincts 2 :missing-polling-location])))
       (is (nil? (get-in out-ctx [:warnings :precincts 1 :missing-polling-location]))))))

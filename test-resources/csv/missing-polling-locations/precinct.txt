@@ -2,3 +2,4 @@ name,number,locality_id,ward,mail_only,ballot_style_image_url,id
 Mail Only Precinct,0034,70123,,yes,,1
 Has Polling Locations,0020,70123,,,,2
 Not Mail Only and No Polling Locations,0021,70123,,,,3
+Explicitly Not Mail Only and No Polling Locations,0022,70123,,no,,4
