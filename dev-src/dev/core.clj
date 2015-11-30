@@ -10,7 +10,7 @@
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.s3 :refer [zip-filename]]
-            [democracyworks.squishy.data-readers]))
+            [squishy.data-readers]))
 
 (def pipeline
   (concat [psql/start-run
