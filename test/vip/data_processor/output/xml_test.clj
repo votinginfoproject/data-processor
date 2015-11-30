@@ -6,6 +6,7 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.transforms :as transforms]
             [clojure.java.io :as io]
             [clojure.xml :as xml]
@@ -22,12 +23,13 @@
 (deftest write-xml-test
   (testing "generates XML from an import"
     (let [db (sqlite/temp-db "xml-output")
-          filenames (->> csv/csv-filenames
+          filenames (->> v3-0/data-specs
+                         csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
           ctx (merge {:input filenames
                       :pipeline (concat [(data-spec/add-data-specs
-                                          data-spec/data-specs)]
+                                          v3-0/data-specs)]
                                         transforms/csv-validations
                                         pipeline)} db)
           results-ctx (pipeline/run-pipeline ctx)

@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.csv :refer :all]
-            [vip.data-processor.validation.data-spec :refer [data-specs]]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma])
   (:import [java.io File]))
@@ -10,34 +10,34 @@
 (deftest remove-bad-filenames-test
   (let [bad-filenames [(File. "/data/BAD_FILE_NAME")
                        (File. "/data/BAD_FILE_NAME_2")]
-        good-filenames (map #(File. (str "/data/" %)) csv-filenames)
-        ctx {:input good-filenames}]
+        good-filenames (map #(File. (str "/data/" %)) (csv-filenames v3-0/data-specs))
+        ctx {:input good-filenames
+             :data-specs v3-0/data-specs}]
     (testing "with good filenames passes the context through"
       (is (= ctx (remove-bad-filenames ctx))))
     (testing "with bad filenames removes the bad files and warns"
       (let [ctx (update ctx :input (partial concat bad-filenames))
             out-ctx (remove-bad-filenames ctx)]
         (is (get-in out-ctx [:warnings :import :global :bad-filenames]))
-        (is (not-every? good-filename? (:input ctx)))
-        (is (every? good-filename? (:input out-ctx)))
+        (is (not-every? (partial good-filename? v3-0/data-specs) (:input ctx)))
+        (is (every? (partial good-filename? v3-0/data-specs) (:input out-ctx)))
         (assert-error-format out-ctx)))))
 
 (deftest missing-files-test
   (testing "reports errors or warnings when certain files are missing"
-    (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])}
+    (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])
+               :data-specs v3-0/data-specs}
           out-ctx (-> ctx
                       ((error-on-missing-file "election.txt"))
-                      ((error-on-missing-file "source.txt"))
-                      ((warn-on-missing-file "state.txt")))]
+                      ((error-on-missing-file "source.txt")))]
       (is (get-in out-ctx [:errors :elections :global :missing-csv]))
-      (is (get-in out-ctx [:warnings :states :global :missing-csv]))
       (is (not (contains? (:errors out-ctx) :sources)))
       (assert-error-format out-ctx))))
 
 (deftest csv-loader-test
   (testing "ignores unknown columns"
     (let [ctx (merge {:input (csv-inputs ["bad-columns/state.txt"])
-                      :data-specs data-specs}
+                      :data-specs v3-0/data-specs}
                      (sqlite/temp-db "ignore-columns-test"))
           out-ctx (load-csvs ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
@@ -47,7 +47,7 @@
         (assert-error-format out-ctx))))
   (testing "requires a header row"
     (let [ctx (merge {:input (csv-inputs ["no-header-row/ballot.txt"])
-                      :data-specs data-specs}
+                      :data-specs v3-0/data-specs}
                      (sqlite/temp-db "no-headers-test"))
           out-ctx (load-csvs ctx)]
       (is (= ["No header row"] (get-in out-ctx [:critical :ballots :global :no-header])))
@@ -55,7 +55,7 @@
 
 (deftest missing-required-columns-test
   (let [ctx (merge {:input (csv-inputs ["missing-required-columns/contest.txt"])
-                    :data-specs data-specs}
+                    :data-specs v3-0/data-specs}
                    (sqlite/temp-db "missing-required-columns"))
         out-ctx (load-csvs ctx)]
     (testing "adds a critical error for contest.txt"
@@ -66,7 +66,7 @@
 
 (deftest report-bad-rows-test
   (let [ctx (merge {:input (csv-inputs ["bad-number-of-values/contest.txt"])
-                    :data-specs data-specs}
+                    :data-specs v3-0/data-specs}
                    (sqlite/temp-db "bad-number-of-values"))
         out-ctx (load-csvs ctx)]
     (testing "reports critical errors for rows with wrong number of values"
@@ -77,7 +77,7 @@
 (deftest in-file-duplicate-ids-test
   (let [db (sqlite/temp-db "in-file-duplicate-ids")
         ctx (merge {:input (csv-inputs ["in-file-duplicate-ids/contest.txt"])
-                    :data-specs data-specs}
+                    :data-specs v3-0/data-specs}
                    db)]
     (korma/insert (get-in db [:tables :contests])
                   (korma/values {:id 6}))
@@ -96,7 +96,7 @@
 (deftest byte-order-marker-test
   (let [db (sqlite/temp-db "byte-order-marker")
         ctx (merge {:input (csv-inputs ["byte-order-marker/source.txt"])
-                    :data-specs data-specs}
+                    :data-specs v3-0/data-specs}
                    db)
         out-ctx (load-csvs ctx)]
     (testing "loads successfully"
@@ -123,7 +123,7 @@
 (deftest low-number-vip-id-test
   (let [db (sqlite/temp-db "low-number-vip-id-test")
         ctx (merge {:input (csv-inputs ["low-number-vip-id/source.txt"])
-                    :data-specs data-specs}
+                    :data-specs v3-0/data-specs}
                    db)
         out-ctx (load-csvs ctx)]
     (testing "does not mangle the vip_id"

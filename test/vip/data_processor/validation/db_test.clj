@@ -4,6 +4,7 @@
             [clojure.test :refer :all]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.pipeline :as pipeline]))
 
@@ -11,7 +12,7 @@
   (testing "finds duplicated ids across CSVs and errors"
     (let [ctx (merge {:input (csv-inputs ["duplicate-ids/contest.txt"
                                           "duplicate-ids/candidate.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-duplicated-ids]}
                      (sqlite/temp-db "duplicate-ids"))
@@ -27,7 +28,7 @@
     (let [ctx (merge {:input (csv-inputs ["duplicate-rows/candidate.txt"
                                           "duplicate-rows/ballot_candidate.txt"
                                           "duplicate-rows/ballot.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicate-ids"))
@@ -44,7 +45,7 @@
 (deftest validate-one-record-limit-test
   (testing "validates that only one row exists in certain files"
     (let [ctx (merge {:input (csv-inputs ["bad-number-of-rows/election.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-one-record-limit]}
                      (sqlite/temp-db "too-many-records"))
@@ -57,7 +58,7 @@
   (testing "finds bad references"
     (let [ctx (merge {:input (csv-inputs ["bad-references/ballot.txt"
                                           "bad-references/referendum.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-references]}
                      (sqlite/temp-db "bad-references"))
@@ -76,7 +77,7 @@
                                           "bad-references/precinct.txt"
                                           "bad-references/precinct_split.txt"
                                           "bad-references/electoral_district.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-jurisdiction-references]}
                      (sqlite/temp-db "bad-jurisdiction-references"))
@@ -97,7 +98,7 @@
                                           "unreferenced-rows/candidate.txt"
                                           "unreferenced-rows/contest.txt"
                                           "unreferenced-rows/ballot_candidate.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-unreferenced-rows]}
                      (sqlite/temp-db "unreferenced-rows"))
@@ -112,7 +113,7 @@
 
 (deftest validate-no-overlapping-street-segments-test
   (let [ctx (merge {:input (csv-inputs ["overlapping-street-segments/street_segment.txt"])
-                    :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                    :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                csv/load-csvs
                                validate-no-overlapping-street-segments]}
                    (sqlite/temp-db "overlapping-street-segments"))
@@ -133,7 +134,7 @@
 (deftest validate-election-administration-addresses-test
   (testing "errors are returned if either the physical or mailing address is incomplete"
     (let [ctx (merge {:input (csv-inputs ["bad-election-administration-addresses/election_administration.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-election-administration-addresses]}
                      (sqlite/temp-db "incomplete-addresses"))

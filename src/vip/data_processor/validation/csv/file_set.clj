@@ -33,21 +33,21 @@
   [& mappings]
   (when (seq mappings)
     (let [filename (first mappings)
-          next-mappings (next (next mappings))
-          error-scope (data-spec/filename->table filename)]
+          next-mappings (next (next mappings))]
       (if-let [dependencies (second mappings)]
         (let [ctx (gensym)
               pred (build-dependency-pred ctx dependencies)]
           `(let [validator# (fn [~ctx]
                               (if ~pred
                                 ~ctx
-                                (assoc-in ~ctx [:errors ~error-scope :global :missing-dependency]
-                                          [(error-message-for '~dependencies)])))]
+                                (let [error-scope# (data-spec/filename->table (:data-specs ~ctx) ~filename)]
+                                  (assoc-in ~ctx [:errors error-scope# :global :missing-dependency]
+                                            [(error-message-for '~dependencies)]))))]
              (merge {~filename validator#} (build-dependencies ~@next-mappings))))
         (throw (IllegalArgumentException.
                 "build-dependencies requires an even number of forms"))))))
 
-(def file-dependencies
+(def v3-0-file-dependencies
   (build-dependencies
    "ballot.txt" (and "contest.txt"
                      "electoral_district.txt"

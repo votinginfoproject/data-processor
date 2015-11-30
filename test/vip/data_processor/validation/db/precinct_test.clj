@@ -4,6 +4,7 @@
             [clojure.test :refer :all]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.pipeline :as pipeline]))
 
@@ -12,7 +13,7 @@
     (let [ctx (merge {:input (csv-inputs ["missing-polling-locations/precinct.txt"
                                           "missing-polling-locations/polling_location.txt"
                                           "missing-polling-locations/precinct_polling_location.txt"])
-                      :pipeline [(data-spec/add-data-specs data-spec/data-specs)
+                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-missing-polling-locations]}
                      (sqlite/temp-db "missing-polling-locations"))

@@ -37,20 +37,20 @@
   [csv/remove-bad-filenames
    (csv/error-on-missing-file "election.txt")
    (csv/error-on-missing-file "source.txt")
-   (csv-files/validate-dependencies csv-files/file-dependencies)
+   (csv-files/validate-dependencies csv-files/v3-0-file-dependencies) ; TODO: validate file depenencies based import version
    csv/load-csvs])
 
 (defn remove-invalid-extensions [ctx]
   (let [files (:input ctx)
         valid-extensions #{"csv" "txt" "xml"}
-        invalid-fn (fn [file] 
+        invalid-fn (fn [file]
                      (not (some valid-extensions
-                                (-> file .getName 
+                                (-> file .getName
                                     (s/split #"\.")))))
         {valid-files false invalid-files true} (group-by invalid-fn files)]
-    (-> ctx 
+    (-> ctx
         (assoc :input valid-files)
-        (assoc-in [:warnings :import :global :invalid-extensions] 
+        (assoc-in [:warnings :import :global :invalid-extensions]
                   (map #(.getName %) invalid-files)))))
 
 (defn xml-csv-branch [ctx]

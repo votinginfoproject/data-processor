@@ -51,7 +51,7 @@
       flatten-address-elements))
 
 (defn-traced validate-format-rules [ctx rows {:keys [table columns]}]
-  (let [format-rules (data-spec/create-format-rules table columns)]
+  (let [format-rules (data-spec/create-format-rules (:data-specs ctx) table columns)]
     (reduce (fn [ctx row]
               (data-spec/apply-format-rules format-rules ctx row (row "id")))
             ctx rows)))
@@ -75,7 +75,7 @@
 
 (defn-traced load-elements [ctx elements]
   (let [tag (:tag (first elements))]
-    (if-let [data-spec (first (filter #(= tag (:tag-name %)) data-spec/data-specs))]
+    (if-let [data-spec (first (filter #(= tag (:tag-name %)) (:data-specs ctx)))]
       (let [element-maps (map element->map elements)
             table-key (:table data-spec)
             sql-table (get-in ctx [:tables table-key])
