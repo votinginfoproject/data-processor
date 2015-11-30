@@ -9,15 +9,15 @@
 (defn create-temp-db-file [import-id]
   (Files/createTempFile (str "import-" import-id "-") ".db" (into-array FileAttribute [])))
 
-(defn temp-db [import-id]
+(defn temp-db [import-id version]
   (let [temp-file (create-temp-db-file import-id)
         url (str "jdbc:sqlite:" temp-file)
         db (db/sqlite3 {:db temp-file})]
     (j/migrate-db {:db {:type :sql
                         :url url}
-                   :migrator "resources/processing-migrations"})
+                   :migrator (str "resources/processing-migrations/v" version)})
     {:db db
-     :tables (util/make-entities db util/import-entity-names)}))
+     :tables (util/make-entities version db util/import-entity-names)}))
 
 (defn column-names
   "Find the names of all columns for a table. Uses a JDBC connection

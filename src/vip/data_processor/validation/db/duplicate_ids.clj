@@ -13,7 +13,7 @@
 (defn add-to-seen-ids [seen-ids table]
   (let [ids (korma/select table (korma/fields :id))]
     (reduce (fn [seen-ids {:keys [id]}]
-              (update seen-ids id conj (:table table)))
+              (update seen-ids id conj (:alias table)))
             seen-ids
             ids)))
 

@@ -111,7 +111,7 @@
   (testing "marks any value with a Unicode replacement character as invalid UTF-8 because that's what we assume we get"
     (let [ctx (merge {:input (csv-inputs ["invalid-utf8/source.txt"])
                       :data-specs v3-0/data-specs}
-                     (sqlite/temp-db "invalid-utf-8"))
+                     (sqlite/temp-db "invalid-utf-8" "3.0"))
           out-ctx (csv/load-csvs ctx)]
       (testing "reports errors for values with the Unicode replacement character"
         (is (= (get-in out-ctx [:errors :sources "1" "name"])

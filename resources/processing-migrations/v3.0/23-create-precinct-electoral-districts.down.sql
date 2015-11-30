@@ -1,0 +1,1 @@
+DROP TABLE v3_0_precinct_electoral_districts;

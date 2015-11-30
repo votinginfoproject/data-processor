@@ -22,7 +22,7 @@
 
 (deftest write-xml-test
   (testing "generates XML from an import"
-    (let [db (sqlite/temp-db "xml-output")
+    (let [db (sqlite/temp-db "xml-output" "3.0")
           filenames (->> v3-0/data-specs
                          csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))

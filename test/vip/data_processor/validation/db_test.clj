@@ -15,7 +15,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-duplicated-ids]}
-                     (sqlite/temp-db "duplicate-ids"))
+                     (sqlite/temp-db "duplicate-ids" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= #{"contests" "candidates"}
              (set (get-in out-ctx [:errors :import 5882300 :duplicate-ids]))
@@ -31,7 +31,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-duplicated-rows]}
-                     (sqlite/temp-db "duplicate-ids"))
+                     (sqlite/temp-db "duplicate-ids" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (doseq [id [3100047456984 3100047456989 3100047466988 3100047466990]]
         (is (get-in out-ctx [:warnings :candidates id :duplicate-rows])))
@@ -48,7 +48,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-one-record-limit]}
-                     (sqlite/temp-db "too-many-records"))
+                     (sqlite/temp-db "too-many-records" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= (get-in out-ctx [:errors :elections :global :row-constraint])
              ["File needs to contain exactly one row."]))
@@ -61,7 +61,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-references]}
-                     (sqlite/temp-db "bad-references"))
+                     (sqlite/temp-db "bad-references" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= 123456789 (-> out-ctx
                            (get-in [:errors :ballots 41100369 :unmatched-reference])
@@ -80,7 +80,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-jurisdiction-references]}
-                     (sqlite/temp-db "bad-jurisdiction-references"))
+                     (sqlite/temp-db "bad-jurisdiction-references" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= 8 (-> out-ctx
                    (get-in [:errors :ballot-line-results 100 :unmatched-reference])
@@ -101,7 +101,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-unreferenced-rows]}
-                     (sqlite/temp-db "unreferenced-rows"))
+                     (sqlite/temp-db "unreferenced-rows" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:warnings :ballots 2 :unreferenced-row]))
       (is (get-in out-ctx [:warnings :ballots 3 :unreferenced-row]))
@@ -116,7 +116,7 @@
                     :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                csv/load-csvs
                                validate-no-overlapping-street-segments]}
-                   (sqlite/temp-db "overlapping-street-segments"))
+                   (sqlite/temp-db "overlapping-street-segments" "3.0"))
         out-ctx (pipeline/run-pipeline ctx)]
     (is (= '(12) (get-in out-ctx [:errors :street-segments 11 :overlaps])))
     (is (= '(14) (get-in out-ctx [:errors :street-segments 13 :overlaps])))
@@ -137,7 +137,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-election-administration-addresses]}
-                     (sqlite/temp-db "incomplete-addresses"))
+                     (sqlite/temp-db "incomplete-addresses" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:errors :election-administrations 99990
                            :incomplete-physical-address]))

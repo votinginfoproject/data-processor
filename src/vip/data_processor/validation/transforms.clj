@@ -17,7 +17,7 @@
     (assoc ctx :stop "No filename!")))
 
 (defn attach-sqlite-db [ctx]
-  (let [db (sqlite/temp-db (:import-id ctx))
+  (let [db (sqlite/temp-db (:import-id ctx) "3.0") ; TODO: set version according to import version
         db-file (get-in db [:db :db])]
     (-> ctx
         (merge db)
