@@ -4,6 +4,7 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.output.xml :as xml-output]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.zip :as zip]
@@ -16,7 +17,7 @@
            zip/assoc-file
            zip/extracted-contents
            t/attach-sqlite-db
-           (data-spec/add-data-specs data-spec/data-specs)
+           (data-spec/add-data-specs v3-0/data-specs) ; TODO: decide which specs to add based on import
            t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id
