@@ -14,7 +14,7 @@
 
 (deftest csv-validations-test
   (testing "full run on good files"
-    (let [db (sqlite/temp-db "good-run-test")
+    (let [db (sqlite/temp-db "good-run-test" "3.0")
           filenames (->> v3-0/data-specs
                          csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))

@@ -16,7 +16,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-missing-polling-locations]}
-                     (sqlite/temp-db "missing-polling-locations"))
+                     (sqlite/temp-db "missing-polling-locations" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:warnings :precincts 3 :missing-polling-location]))
       (is (get-in out-ctx [:warnings :precincts 4 :missing-polling-location]))

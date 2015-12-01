@@ -38,7 +38,7 @@
   (testing "ignores unknown columns"
     (let [ctx (merge {:input (csv-inputs ["bad-columns/state.txt"])
                       :data-specs v3-0/data-specs}
-                     (sqlite/temp-db "ignore-columns-test"))
+                     (sqlite/temp-db "ignore-columns-test" "3.0"))
           out-ctx (load-csvs ctx)]
       (is (= [{:id 1 :name "NORTH CAROLINA" :election_administration_id 8}]
              (korma/select (get-in out-ctx [:tables :states]))))
@@ -48,7 +48,7 @@
   (testing "requires a header row"
     (let [ctx (merge {:input (csv-inputs ["no-header-row/ballot.txt"])
                       :data-specs v3-0/data-specs}
-                     (sqlite/temp-db "no-headers-test"))
+                     (sqlite/temp-db "no-headers-test" "3.0"))
           out-ctx (load-csvs ctx)]
       (is (= ["No header row"] (get-in out-ctx [:critical :ballots :global :no-header])))
       (assert-error-format out-ctx))))
@@ -56,7 +56,7 @@
 (deftest missing-required-columns-test
   (let [ctx (merge {:input (csv-inputs ["missing-required-columns/contest.txt"])
                     :data-specs v3-0/data-specs}
-                   (sqlite/temp-db "missing-required-columns"))
+                   (sqlite/temp-db "missing-required-columns" "3.0"))
         out-ctx (load-csvs ctx)]
     (testing "adds a critical error for contest.txt"
       (is (get-in out-ctx [:critical :contests :global :missing-headers]))
@@ -67,7 +67,7 @@
 (deftest report-bad-rows-test
   (let [ctx (merge {:input (csv-inputs ["bad-number-of-values/contest.txt"])
                     :data-specs v3-0/data-specs}
-                   (sqlite/temp-db "bad-number-of-values"))
+                   (sqlite/temp-db "bad-number-of-values" "3.0"))
         out-ctx (load-csvs ctx)]
     (testing "reports critical errors for rows with wrong number of values"
       (is (get-in out-ctx [:critical :contests 3 :number-of-values]))
@@ -75,7 +75,7 @@
       (assert-error-format out-ctx))))
 
 (deftest in-file-duplicate-ids-test
-  (let [db (sqlite/temp-db "in-file-duplicate-ids")
+  (let [db (sqlite/temp-db "in-file-duplicate-ids" "3.0")
         ctx (merge {:input (csv-inputs ["in-file-duplicate-ids/contest.txt"])
                     :data-specs v3-0/data-specs}
                    db)]
@@ -94,7 +94,7 @@
         (assert-error-format out-ctx)))))
 
 (deftest byte-order-marker-test
-  (let [db (sqlite/temp-db "byte-order-marker")
+  (let [db (sqlite/temp-db "byte-order-marker" "3.0")
         ctx (merge {:input (csv-inputs ["byte-order-marker/source.txt"])
                     :data-specs v3-0/data-specs}
                    db)
@@ -121,7 +121,7 @@
       (is (= upper-case-source (find-input-file ctx "source.txt"))))))
 
 (deftest low-number-vip-id-test
-  (let [db (sqlite/temp-db "low-number-vip-id-test")
+  (let [db (sqlite/temp-db "low-number-vip-id-test" "3.0")
         ctx (merge {:input (csv-inputs ["low-number-vip-id/source.txt"])
                     :data-specs v3-0/data-specs}
                    db)

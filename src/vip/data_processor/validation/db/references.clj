@@ -5,8 +5,8 @@
 (defn unmatched-references [tables from via to]
   (let [from-table (tables from)
         to-table (tables to)
-        from-table-name (:name from-table)
-        to-table-name (:name to-table)
+        from-table-name (:alias from-table)
+        to-table-name (:alias to-table)
         via-join-name (util/column-name from-table-name via)
         to-id-name (util/column-name to-table-name "id")]
     (korma/select from-table
@@ -33,14 +33,24 @@
 
 (defn unmatched-jurisdiction-references [tables from-table]
   (let [table (tables from-table)
-        table-name (:name table)
+        table-name (:alias table)
         jurisdiction-id (util/column-name table-name "jurisdiction_id")]
     (korma/select table
-                  (korma/join :left (:states tables) (= :states.id jurisdiction-id))
-                  (korma/join :left (:localities tables) (= :localities.id jurisdiction-id))
-                  (korma/join :left (:precincts tables) (= :precincts.id jurisdiction-id))
-                  (korma/join :left (:precinct-splits tables) (= :precinct_splits.id jurisdiction-id))
-                  (korma/join :left (:electoral-districts tables) (= :electoral_districts.id jurisdiction-id))
+                  (korma/join :left
+                              [(:states tables) :states]
+                              (= :states.id jurisdiction-id))
+                  (korma/join :left
+                              [(:localities tables) :localities]
+                              (= :localities.id jurisdiction-id))
+                  (korma/join :left
+                              [(:precincts tables) :precincts]
+                              (= :precincts.id jurisdiction-id))
+                  (korma/join :left
+                              [(:precinct-splits tables) :precinct_splits]
+                              (= :precinct_splits.id jurisdiction-id))
+                  (korma/join :left
+                              [(:electoral-districts tables) :electoral_districts]
+                              (= :electoral_districts.id jurisdiction-id))
                   (korma/where (and (not= jurisdiction-id "")
                                     (= :states.id nil)
                                     (= :localities.id nil)

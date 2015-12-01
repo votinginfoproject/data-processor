@@ -15,7 +15,7 @@
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-valid-source-vip-id]}
-                     (sqlite/temp-db "invalid-source-vip-id-csv"))
+                     (sqlite/temp-db "invalid-source-vip-id-csv" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= ["5199955554447"] (get-in out-ctx [:errors :sources 1 :invalid-vip-id])))
       (assert-error-format out-ctx)))
@@ -23,7 +23,7 @@
     (let [ctx (merge {:input (xml-input "invalid-source-vip-id.xml")
                       :data-specs v3-0/data-specs
                       :pipeline [xml/load-xml validate-valid-source-vip-id]}
-                     (sqlite/temp-db "invalid-source-vip-id-xml"))
+                     (sqlite/temp-db "invalid-source-vip-id-xml" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= ["99999"] (get-in out-ctx [:errors :sources 0 :invalid-vip-id])))
       (assert-error-format out-ctx))))

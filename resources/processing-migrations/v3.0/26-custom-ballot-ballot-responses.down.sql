@@ -1,0 +1,1 @@
+DROP TABLE v3_0_custom_ballot_ballot_responses;

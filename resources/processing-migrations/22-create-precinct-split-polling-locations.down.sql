@@ -1,1 +1,0 @@
-DROP TABLE precinct_split_polling_locations;

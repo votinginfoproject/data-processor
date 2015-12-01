@@ -2,7 +2,8 @@
   (:require [korma.core :as korma]))
 
 (defn query-overlaps [street-segments]
-  (korma/select street-segments
+  (korma/select [street-segments :street_segments]
+                (korma/database (:db street-segments))
                 (korma/fields :street_segments.id :street_segments2.id)
                 (korma/join :inner [street-segments :street_segments2]
                             (and (>= :street_segments.start_house_number :street_segments2.start_house_number)
