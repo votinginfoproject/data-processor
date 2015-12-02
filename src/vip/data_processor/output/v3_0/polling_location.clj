@@ -1,5 +1,5 @@
-(ns vip.data-processor.output.polling-location
-  (:require [vip.data-processor.output.address :refer [address]]
+(ns vip.data-processor.output.v3-0.polling-location
+  (:require [vip.data-processor.output.v3-0.address :refer [address]]
             [vip.data-processor.output.xml-helpers :refer :all]
             [korma.core :as korma]))
 

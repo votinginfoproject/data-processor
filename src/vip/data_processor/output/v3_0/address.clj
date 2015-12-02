@@ -1,4 +1,4 @@
-(ns vip.data-processor.output.address
+(ns vip.data-processor.output.v3-0.address
   (:require [vip.data-processor.output.xml-helpers :refer :all]))
 
 (defn address-parts [address-type object]

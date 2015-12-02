@@ -1,6 +1,6 @@
-(ns vip.data-processor.output.street-segment
+(ns vip.data-processor.output.v3-0.street-segment
   (:require [vip.data-processor.db.util :as util]
-            [vip.data-processor.output.address :refer [address]]
+            [vip.data-processor.output.v3-0.address :refer [address]]
             [vip.data-processor.output.xml-helpers :refer :all]
             [korma.core :as korma]))
 
