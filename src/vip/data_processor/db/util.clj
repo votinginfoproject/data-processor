@@ -127,7 +127,7 @@
     (map (partial hydrate-row ks) rows)))
 
 (defn bulk-import [statement-parameter-limit ctx table rows]
-  (log/info "Bulk importing" (:alias table))
+  (log/info "Bulk importing" (:alias table (:name table)))
   (reduce (fn [ctx rows]
             (if (empty? rows)
               ctx
