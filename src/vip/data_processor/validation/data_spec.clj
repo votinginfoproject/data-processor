@@ -162,7 +162,7 @@
               {:name "address_line3"}
               {:name "address_city" :required :critical}
               {:name "address_state" :required :critical}
-              {:name "address_zip"}
+              {:name "address_zip" :required :errors}
               {:name "directions"}
               {:name "voter_services"}
               {:name "start_date" :format format/date :coerce coerce-date}
@@ -260,7 +260,7 @@
               {:name "address_line3"}
               {:name "address_city" :required :critical}
               {:name "address_state" :required :critical}
-              {:name "address_zip"}
+              {:name "address_zip" :required :errors}
               {:name "directions"}
               {:name "polling_hours"}
               {:name "photo_url" :format format/url}]}
