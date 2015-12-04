@@ -19,26 +19,7 @@
             [clojure.java.io :as io]
             [clojure.walk :as walk]
             [com.climate.newrelic.trace :refer [defn-traced]]
-            [vip.data-processor.output.ballot :as ballot]
-            [vip.data-processor.output.ballot-line-result :as ballot-line-result]
-            [vip.data-processor.output.ballot-response :as ballot-response]
-            [vip.data-processor.output.candidate :as candidate]
-            [vip.data-processor.output.contest :as contest]
-            [vip.data-processor.output.contest-result :as contest-result]
-            [vip.data-processor.output.custom-ballot :as custom-ballot]
-            [vip.data-processor.output.early-vote-site :as early-vote-site]
-            [vip.data-processor.output.election :as election]
-            [vip.data-processor.output.election-administration :as election-administration]
-            [vip.data-processor.output.election-official :as election-official]
-            [vip.data-processor.output.electoral-district :as electoral-district]
-            [vip.data-processor.output.locality :as locality]
-            [vip.data-processor.output.polling-location :as polling-location]
-            [vip.data-processor.output.precinct :as precinct]
-            [vip.data-processor.output.precinct-split :as precinct-split]
-            [vip.data-processor.output.referendum :as referendum]
-            [vip.data-processor.output.source :as source]
-            [vip.data-processor.output.state :as state]
-            [vip.data-processor.output.street-segment :as street-segment])
+            [vip.data-processor.output.v3-0.xml :as v3-0])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [javax.xml XMLConstants]
@@ -46,37 +27,6 @@
            [javax.xml.validation SchemaFactory]
            [org.xml.sax SAXParseException]
            [org.apache.commons.lang StringEscapeUtils]))
-
-(def xml-node-fns [ballot/xml-nodes
-                   ballot-line-result/xml-nodes
-                   ballot-response/xml-nodes
-                   candidate/xml-nodes
-                   contest/xml-nodes
-                   contest-result/xml-nodes
-                   custom-ballot/xml-nodes
-                   early-vote-site/xml-nodes
-                   election/xml-nodes
-                   election-administration/xml-nodes
-                   election-official/xml-nodes
-                   electoral-district/xml-nodes
-                   locality/xml-nodes
-                   polling-location/xml-nodes
-                   precinct/xml-nodes
-                   precinct-split/xml-nodes
-                   referendum/xml-nodes
-                   source/xml-nodes
-                   state/xml-nodes
-                   street-segment/xml-nodes])
-
-(def vip-object-attrs
-  {:xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"
-   :xsi:noNamespaceSchemaLocation "http://election-info-standard.googlecode.com/files/election_spec_v3.0.xsd"
-   :schemaVersion "3.0"})
-
-(def vip-object
-  {:tag :vip_object
-   :attrs vip-object-attrs
-   :content []})
 
 (defn create-xml-file [{:keys [filename] :as ctx}]
   (let [xml-file (Files/createTempFile filename ".xml" (into-array FileAttribute []))]
@@ -113,27 +63,33 @@
 (defn-traced write-xml
   "Writes out the XML elements of nodes from `xml-node-fns` as
   children of the base `vip_object` element."
-  [{:keys [xml-output-file xml-children] :as ctx}]
-  (with-open [out-file (io/writer (.toFile xml-output-file))]
-    (let [[opening-tag closing-tag] (-> vip-object
-                                        xml/emit-element
-                                        with-out-str
-                                        (string/split #"\n"))
-          counter (atom 0)]
-      (.write out-file "<?xml version='1.0' encoding='UTF-8'?>\n")
-      (.write out-file opening-tag)
-      (doseq [xml-node-fn xml-node-fns
-              xml-child (xml-node-fn ctx)]
-        (swap! counter inc)
-        (when (zero? (mod @counter 1000))
-          (log/info "Wrote" @counter "XML nodes"))
-        (emit-element out-file xml-child))
-      (.write out-file closing-tag)))
+  [{:keys [xml-output-file vip-version] :as ctx}]
+  ;; TODO: select `xml-node-fns` based on `vip-version`
+  (let [xml-node-fns v3-0/xml-node-fns
+        ;; TODO: select `vip-object` based on `vip-version`
+        vip-object v3-0/vip-object]
+    (with-open [out-file (io/writer (.toFile xml-output-file))]
+      (let [[opening-tag closing-tag] (-> vip-object
+                                          xml/emit-element
+                                          with-out-str
+                                          (string/split #"\n"))
+            counter (atom 0)]
+        (.write out-file "<?xml version='1.0' encoding='UTF-8'?>\n")
+        (.write out-file opening-tag)
+        (doseq [xml-node-fn xml-node-fns
+                xml-child (xml-node-fn ctx)]
+          (swap! counter inc)
+          (when (zero? (mod @counter 1000))
+            (log/info "Wrote" @counter "XML nodes"))
+          (emit-element out-file xml-child))
+        (.write out-file closing-tag))))
   ctx)
 
-(defn validate-xml-output [{:keys [xml-output-file] :as ctx}]
-  (let [schema-factory (SchemaFactory/newInstance XMLConstants/W3C_XML_SCHEMA_NS_URI)
-        schema (.newSchema schema-factory (io/resource "specs/vip_spec_v3.0.xsd"))
+(defn validate-xml-output [{:keys [xml-output-file vip-version] :as ctx}]
+  ;; TODO: choose `spec-resource` based on `vip-version`
+  (let [spec-resource "specs/vip_spec_v3.0.xsd"
+        schema-factory (SchemaFactory/newInstance XMLConstants/W3C_XML_SCHEMA_NS_URI)
+        schema (.newSchema schema-factory (io/resource spec-resource))
         validator (.newValidator schema)]
     (try
       (.validate validator (StreamSource. (.toFile xml-output-file)))

@@ -1,4 +1,4 @@
-(ns vip.data-processor.output.referendum
+(ns vip.data-processor.output.v3-0.referendum
   (:require [vip.data-processor.output.xml-helpers :refer :all]
             [korma.core :as korma]))
 

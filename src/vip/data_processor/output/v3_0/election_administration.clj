@@ -1,6 +1,6 @@
-(ns vip.data-processor.output.election-administration
+(ns vip.data-processor.output.v3-0.election-administration
   (:require [vip.data-processor.output.xml-helpers :refer :all]
-            [vip.data-processor.output.address :refer :all]
+            [vip.data-processor.output.v3-0.address :refer :all]
             [korma.core :as korma]))
 
 (defn ->xml [{:keys [id

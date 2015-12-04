@@ -1,4 +1,4 @@
-(ns vip.data-processor.output.contest
+(ns vip.data-processor.output.v3-0.contest
   (:require [vip.data-processor.output.xml-helpers :refer :all]
             [korma.core :as korma]))
 
