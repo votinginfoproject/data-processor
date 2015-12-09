@@ -101,13 +101,14 @@
 (defn-traced load-csvs [ctx]
   (reduce bulk-import-and-validate-csv ctx (:data-specs ctx)))
 
-(defn error-on-missing-file
-  "Generates a validation function that adds an error when
-  the given filename is missing from the input"
-  [filename]
-  (fn [{:keys [data-specs] :as ctx}]
-    (let [data-spec (first (filter #(= filename (:filename %)) data-specs))
-          table (:table data-spec)]
-      (if (find-input-file ctx filename)
-        ctx
-        (assoc-in ctx [:errors table :global :missing-csv] [(str filename " is missing")])))))
+(defn error-on-missing-files
+  "Add errors for any file with the :required key in the data-spec."
+  [{:keys [data-specs] :as ctx}]
+  (let [required-files (filter :required data-specs)]
+    (reduce (fn [ctx {:keys [filename required table]}]
+              (if (find-input-file ctx filename)
+                ctx
+                (assoc-in ctx
+                          [required table :global :missing-csv]
+                          [(str filename " is missing")])))
+            ctx required-files)))

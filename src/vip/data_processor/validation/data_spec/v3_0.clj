@@ -128,6 +128,7 @@
               {:name "end_date" :format format/date :coerce coerce/coerce-date}
               {:name "days_times_open"}]}
    {:filename "election.txt"
+    :required :errors
     :table :elections
     :tag-name :election
     :stats true
@@ -326,6 +327,7 @@
               {:name "precinct_id" :required :critical :format format/all-digits :references :precincts :coerce coerce/coerce-integer}
               {:name "precinct_split_id" :format format/all-digits :references :precinct-splits :coerce coerce/coerce-integer}]}
    {:filename "source.txt"
+    :required :errors
     :table :sources
     :tag-name :source
     :stats true
