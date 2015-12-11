@@ -1,5 +1,5 @@
-(ns vip.data-processor.validation.db.precinct-test
-  (:require [vip.data-processor.validation.db.precinct :refer :all]
+(ns vip.data-processor.validation.db.v3-0.precinct-test
+  (:require [vip.data-processor.validation.db.v3-0.precinct :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [clojure.test :refer :all]
             [vip.data-processor.validation.csv :as csv]

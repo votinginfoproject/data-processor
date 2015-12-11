@@ -1,4 +1,4 @@
-(ns vip.data-processor.validation.db.precinct
+(ns vip.data-processor.validation.db.v3-0.precinct
   (:require [korma.core :as korma]))
 
 (defn validate-no-missing-polling-locations

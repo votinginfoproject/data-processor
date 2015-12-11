@@ -69,29 +69,6 @@
                            (get "referendum_id"))))
       (assert-error-format out-ctx))))
 
-(deftest validate-jurisdiction-references-test
-  (testing "finds bad jurisdiction references"
-    (let [ctx (merge {:input (csv-inputs ["bad-references/ballot_line_result.txt"
-                                          "bad-references/state.txt"
-                                          "bad-references/locality.txt"
-                                          "bad-references/precinct.txt"
-                                          "bad-references/precinct_split.txt"
-                                          "bad-references/electoral_district.txt"])
-                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
-                                 csv/load-csvs
-                                 validate-jurisdiction-references]}
-                     (sqlite/temp-db "bad-jurisdiction-references" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= 8 (-> out-ctx
-                   (get-in [:errors :ballot-line-results 100 :unmatched-reference])
-                   first
-                   :jurisdiction_id)))
-      (is (= 800 (-> out-ctx
-                     (get-in [:errors :ballot-line-results 101 :unmatched-reference])
-                     first
-                     :jurisdiction_id)))
-      (assert-error-format out-ctx))))
-
 (deftest validate-no-unreferenced-rows-test
   (testing "finds rows not referenced"
     (let [ctx (merge {:input (csv-inputs ["unreferenced-rows/ballot.txt"
@@ -109,38 +86,4 @@
       (is (get-in out-ctx [:warnings :candidates 14 :unreferenced-row]))
       (testing "except for contests"
         (is (nil? (get-in out-ctx [:warnings :contests 100 :unreferenced-row]))))
-      (assert-error-format out-ctx))))
-
-(deftest validate-no-overlapping-street-segments-test
-  (let [ctx (merge {:input (csv-inputs ["overlapping-street-segments/street_segment.txt"])
-                    :pipeline [(data-spec/add-data-specs v3-0/data-specs)
-                               csv/load-csvs
-                               validate-no-overlapping-street-segments]}
-                   (sqlite/temp-db "overlapping-street-segments" "3.0"))
-        out-ctx (pipeline/run-pipeline ctx)]
-    (is (= '(12) (get-in out-ctx [:errors :street-segments 11 :overlaps])))
-    (is (= '(14) (get-in out-ctx [:errors :street-segments 13 :overlaps])))
-    (is (= #{16 17} (set (get-in out-ctx [:errors :street-segments 15 :overlaps]))))
-    (is (= '(19) (get-in out-ctx [:errors :street-segments 18 :overlaps])))
-    (is (= '(21) (get-in out-ctx [:errors :street-segments 20 :overlaps])))
-    (is (not (get-in out-ctx [:errors :street-segments 22 :overlaps])))
-    (is (not (get-in out-ctx [:errors :street-segments 23 :overlaps])))
-    (is (not (get-in out-ctx [:errors :street-segments 24 :overlaps])))
-    (is (not (get-in out-ctx [:errors :street-segments 25 :overlaps])))
-    (is (not (get-in out-ctx [:errors :street-segments 26 :overlaps])))
-    (is (= '(28) (get-in out-ctx [:errors :street-segments 27 :overlaps])))
-    (assert-error-format out-ctx)))
-
-(deftest validate-election-administration-addresses-test
-  (testing "errors are returned if either the physical or mailing address is incomplete"
-    (let [ctx (merge {:input (csv-inputs ["bad-election-administration-addresses/election_administration.txt"])
-                      :pipeline [(data-spec/add-data-specs v3-0/data-specs)
-                                 csv/load-csvs
-                                 validate-election-administration-addresses]}
-                     (sqlite/temp-db "incomplete-addresses" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :election-administrations 99990
-                           :incomplete-physical-address]))
-      (is (get-in out-ctx [:errors :election-administrations 99991
-                           :incomplete-mailing-address]))
       (assert-error-format out-ctx))))

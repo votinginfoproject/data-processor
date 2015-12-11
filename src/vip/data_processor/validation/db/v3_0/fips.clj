@@ -1,4 +1,4 @@
-(ns vip.data-processor.validation.fips
+(ns vip.data-processor.validation.db.v3-0.fips
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io]
             [korma.core :as korma]))
