@@ -35,8 +35,7 @@
 
 (def csv-validations
   [csv/remove-bad-filenames
-   (csv/error-on-missing-file "election.txt")
-   (csv/error-on-missing-file "source.txt")
+   csv/error-on-missing-files
    (csv-files/validate-dependencies csv-files/v3-0-file-dependencies) ; TODO: validate file depenencies based import version
    csv/load-csvs])
 

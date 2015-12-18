@@ -1,7 +1,7 @@
-(ns vip.data-processor.validation.fips-test
+(ns vip.data-processor.validation.db.v3-0.fips-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
-            [vip.data-processor.validation.fips :refer :all]
+            [vip.data-processor.validation.db.v3-0.fips :refer :all]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.xml :as xml]
             [vip.data-processor.validation.data-spec :as data-spec]

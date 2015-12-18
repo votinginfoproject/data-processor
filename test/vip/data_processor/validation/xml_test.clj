@@ -5,6 +5,9 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
+            [vip.data-processor.validation.db.v3-0.admin-addresses :as admin-addresses]
+            [vip.data-processor.validation.db.v3-0.jurisdiction-references :as jurisdiction-references]
+            [vip.data-processor.validation.db.v3-0.street-segment :as street-segment]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma]))
@@ -179,7 +182,7 @@
   (testing "returns an error if there are unreferenced jurisdiction references"
     (let [ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
                       :data-specs v3-0/data-specs
-                      :pipeline [load-xml db/validate-jurisdiction-references]}
+                      :pipeline [load-xml jurisdiction-references/validate-jurisdiction-references]}
                      (sqlite/temp-db "unreferenced-jurisdictions" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= '({:jurisdiction_id 99999}) (get-in out-ctx [:errors :ballot-line-results 91008 :unmatched-reference])))
@@ -212,7 +215,7 @@
   (testing "returns an error if street segments overlap"
     (let [ctx (merge {:input (xml-input "overlapping-street-segments.xml")
                       :data-specs v3-0/data-specs
-                      :pipeline [load-xml db/validate-no-overlapping-street-segments]}
+                      :pipeline [load-xml street-segment/validate-no-overlapping-street-segments]}
                      (sqlite/temp-db "overlapping-street-segments" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= '(1210003) (get-in out-ctx [:errors :street-segments 1210002 :overlaps])))
@@ -223,7 +226,7 @@
     (let [ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
                       :data-specs v3-0/data-specs
                       :pipeline [load-xml
-                                 db/validate-election-administration-addresses]}
+                                 admin-addresses/validate-addresses]}
                      (sqlite/temp-db "incomplete-election-administrations" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:errors :election-administrations 3456

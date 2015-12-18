@@ -128,6 +128,8 @@
               {:name "end_date" :format format/date :coerce coerce/coerce-date}
               {:name "days_times_open"}]}
    {:filename "election.txt"
+    :required :errors
+    :single-row true
     :table :elections
     :tag-name :election
     :stats true
@@ -326,6 +328,8 @@
               {:name "precinct_id" :required :critical :format format/all-digits :references :precincts :coerce coerce/coerce-integer}
               {:name "precinct_split_id" :format format/all-digits :references :precinct-splits :coerce coerce/coerce-integer}]}
    {:filename "source.txt"
+    :required :errors
+    :single-row true
     :table :sources
     :tag-name :source
     :stats true
@@ -339,6 +343,7 @@
               {:name "tou_url" :format format/url}]}
    {:filename "state.txt"
     :table :states
+    :single-row true
     :tag-name :state
     :xml-references [{:join-table :state-early-vote-sites
                       :id "state_id"

@@ -1,10 +1,6 @@
 (ns vip.data-processor.validation.db.record-limit
   (:require [korma.core :as korma]))
 
-(def single-record-files
-  "A list of those files which are allowed only a single record."
-  [:elections :sources :states])
-
 (defn count-rows [table]
   "Takes a single table and counts the number of rows in it."
   (:cnt (first (korma/select table (korma/aggregate (count "*") :cnt)))))
@@ -23,10 +19,14 @@
               ["File needs to contain exactly one row."])
     ctx))
 
-(defn tables-allow-only-one-record [ctx]
-  "Sort through the ctx to select out specific tables as defined
-   in single-record-files. Then, count the rows and return errors
-   for any that do not have exactly one row."
-  (let [tables (select-keys (:tables ctx) single-record-files)
+(defn tables-allow-only-one-record
+  "Sort through the ctx to select out specific tables as defined in
+  the data spec. Then, count the rows and return errors for any that
+  do not have exactly one row."
+  [{:keys [data-specs tables] :as ctx}]
+  (let [tables (->> data-specs
+                    (filter :single-row)
+                    (map :table)
+                    (select-keys tables))
         counts (name-and-count tables)]
     (reduce error-if-not-one-row ctx counts)))

@@ -28,10 +28,10 @@
     (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])
                :data-specs v3-0/data-specs}
           out-ctx (-> ctx
-                      ((error-on-missing-file "election.txt"))
-                      ((error-on-missing-file "source.txt")))]
-      (is (get-in out-ctx [:errors :elections :global :missing-csv]))
-      (is (not (contains? (:errors out-ctx) :sources)))
+                      error-on-missing-files)]
+      (is (get-in out-ctx [:errors :elections :global :missing-csv])) ;required, missing
+      (is (not (contains? (:errors out-ctx) :sources))) ; required, present
+      (is (not (contains? (:errors out-ctx) :contests))) ; not required, missing
       (assert-error-format out-ctx))))
 
 (deftest csv-loader-test

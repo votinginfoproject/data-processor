@@ -1,5 +1,6 @@
-(ns vip.data-processor.validation.db.street-segment
-  (:require [korma.core :as korma]))
+(ns vip.data-processor.validation.db.v3-0.street-segment
+  (:require [korma.core :as korma]
+            [com.climate.newrelic.trace :refer [defn-traced]]))
 
 (defn query-overlaps [street-segments]
   (korma/select [street-segments :street_segments]
@@ -26,3 +27,16 @@
                                      (= :street_segments.odd_even_both "")
                                      (= :street_segments2.odd_even_both ""))
                                  (not= :street_segments.id :street_segments2.id)))))
+
+(defn-traced validate-no-overlapping-street-segments [ctx]
+  (let [street-segments (get-in ctx [:tables :street-segments])
+        overlaps (->> street-segments
+                      query-overlaps
+                      (map vals)
+                      (map set)
+                      set)]
+    (reduce (fn [ctx overlap]
+              (let [[id overlap-id] (sort overlap)]
+                (update-in ctx [:errors :street-segments id :overlaps]
+                           conj overlap-id)))
+            ctx overlaps)))
