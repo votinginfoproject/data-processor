@@ -43,13 +43,13 @@
   [tables table-id references-map]
   (let [basis (table-id tables)
         where-clause-parts (map (fn [[table-id column]]
-                                  (let [table-name (:name (table-id tables))]
-                                    (where-clause-part table-name column)))
+                                  (let [table-alias (:alias (table-id tables))]
+                                    (where-clause-part table-alias column)))
                                 references-map)
         where-clause (concat '(and) where-clause-parts)
         join-clauses (map (fn [[table-id column]]
-                            (let [table-name (:name (table-id tables))]
-                              [table-id (join-clause table-name column (:name basis))]))
+                            (let [table-alias (:alias (table-id tables))]
+                              [table-id (join-clause table-alias column (:alias basis))]))
                           references-map)
         query (-> (korma/select* (table-id tables))
                   (korma/where* (eng/pred-map (eval (eng/parse-where where-clause)))))

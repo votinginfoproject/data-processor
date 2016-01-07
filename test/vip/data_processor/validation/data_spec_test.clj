@@ -3,6 +3,8 @@
             [vip.data-processor.validation.data-spec :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.csv :as csv]
+            [vip.data-processor.validation.data-spec.coerce :as coerce]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.data-spec.value-format :as format]
             [vip.data-processor.db.sqlite :as sqlite]))
 
@@ -18,10 +20,10 @@
             result (coerce-rows cols rows)]
         (is (= result rows))))
     (testing "with coercions, coerces rows"
-      (let [cols [{:name "id" :coerce coerce-integer}
+      (let [cols [{:name "id" :coerce coerce/coerce-integer}
                   {:name "race"}
-                  {:name "partisan" :coerce coerce-boolean}
-                  {:name "date" :coerce coerce-date}]
+                  {:name "partisan" :coerce coerce/coerce-boolean}
+                  {:name "date" :coerce coerce/coerce-date}]
             result (coerce-rows cols rows)]
         (is (= (map :id result) [1 2 3]))
         (is (= (map :race result) (map :race rows)))
@@ -108,36 +110,9 @@
 (deftest invalid-utf-8-test
   (testing "marks any value with a Unicode replacement character as invalid UTF-8 because that's what we assume we get"
     (let [ctx (merge {:input (csv-inputs ["invalid-utf8/source.txt"])
-                    :data-specs data-specs}
-                   (sqlite/temp-db "invalid-utf-8"))
+                      :data-specs v3-0/data-specs}
+                     (sqlite/temp-db "invalid-utf-8" "3.0"))
           out-ctx (csv/load-csvs ctx)]
-    (testing "reports errors for values with the Unicode replacement character"
-      (is (= (get-in out-ctx [:errors :sources "1" "name"])
-             ["Is not valid UTF-8."]))))))
-
-(deftest coerce-integer-test
-  (testing "returns the number if passed an integer"
-    (are [n] (= n (coerce-integer n))
-      1
-      0
-      1000
-      12))
-  (testing "parses strings and returns integers"
-    (are [s n] (= n (coerce-integer s))
-      "1" 1
-      "0" 0
-      "1234" 1234
-      "8" 8))
-  (testing "returns nil for strings not parsable as integers"
-    (are [s] (nil? (coerce-integer s))
-      "nope"
-      "not a number"
-      "1x3"
-      "eleven"))
-  (testing "returns nil for anything else"
-    (are [v] (nil? (coerce-integer v))
-      nil
-      :symbol
-      'keyword
-      {:map 1}
-      #{2 3 5})))
+      (testing "reports errors for values with the Unicode replacement character"
+        (is (= (get-in out-ctx [:errors :sources "1" "name"])
+               ["Is not valid UTF-8."]))))))

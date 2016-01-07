@@ -4,24 +4,27 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.output.xml :as xml-output]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
+            [vip.data-processor.validation.db.v3-0 :as db.v3-0]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.s3 :refer [zip-filename]]
-            [democracyworks.squishy.data-readers]))
+            [squishy.data-readers]))
 
 (def pipeline
   (concat [psql/start-run
            zip/assoc-file
            zip/extracted-contents
            t/attach-sqlite-db
-           (data-spec/add-data-specs data-spec/data-specs)
+           (data-spec/add-data-specs v3-0/data-specs) ; TODO: decide which specs to add based on import
            t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id
            psql/store-election-id]
           db/validations
+          db.v3-0/validations ; TODO: choose extra validations based on import
           xml-output/pipeline
           [psql/insert-validations
            psql/import-from-sqlite

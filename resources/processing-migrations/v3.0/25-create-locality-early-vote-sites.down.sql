@@ -1,0 +1,1 @@
+DROP TABLE v3_0_locality_early_vote_sites;

@@ -7,7 +7,9 @@
             [vip.data-processor.cleanup :as cleanup]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
+            [vip.data-processor.validation.db.v3-0 :as db.v3-0]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.queue :as q]
@@ -27,12 +29,13 @@
 
 (def pipeline
   (concat download-pipeline
-          [(data-spec/add-data-specs data-spec/data-specs)
+          [(data-spec/add-data-specs v3-0/data-specs) ; TODO: decide which specs to add based on import
            t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id
            psql/store-election-id]
           db/validations
+          db.v3-0/validations ; TODO: choose extra validations based on import
           xml-output/pipeline
           [s3/upload-to-s3]
           [psql/insert-validations

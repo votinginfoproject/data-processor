@@ -1,0 +1,1 @@
+DROP TABLE v3_0_precinct_early_vote_sites;

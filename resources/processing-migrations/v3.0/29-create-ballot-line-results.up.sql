@@ -1,0 +1,10 @@
+CREATE TABLE v3_0_ballot_line_results (id INTEGER PRIMARY KEY,
+                                       contest_id INTEGER,
+                                       jurisdiction_id INTEGER,
+                                       entire_district BOOLEAN CHECK (entire_district IN (0,1,NULL)),
+                                       candidate_id INTEGER,
+                                       ballot_response_id INTEGER,
+                                       votes INTEGER,
+                                       overvotes INTEGER,
+                                       victorious BOOLEAN CHECK (victorious IN (0,1,NULL)),
+                                       certification TEXT);

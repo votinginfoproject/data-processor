@@ -1,0 +1,11 @@
+CREATE TABLE v3_0_contest_results (id INTEGER PRIMARY KEY,
+                                   contest_id INTEGER,
+                                   jurisdiction_id INTEGER,
+                                   entire_district BOOLEAN CHECK (entire_district IN (0,1,NULL)),
+                                   total_votes INTEGER,
+                                   total_valid_votes INTEGER,
+                                   overvotes INTEGER,
+                                   blank_votes INTEGER,
+                                   accepted_provisional_votes INTEGER,
+                                   rejected_votes INTEGER,
+                                   certification TEXT);

@@ -5,13 +5,22 @@
             [korma.core :as korma]
             [korma.db :as db]))
 
-(defn kw->table-name [kw]
-  (-> kw
-      name
-      (str/replace "-" "_")))
+(defn sqlize-str [s]
+  (-> s
+      (str/replace "-" "_")
+      (str/replace "." "_")))
 
-(defn simple-entity [db ent]
-  (-> (korma/create-entity (kw->table-name ent))
+(defn kw->table-name [version kw]
+  (as-> kw
+    table-name
+    (name table-name)
+    (str "v" version "_" table-name)
+    (sqlize-str table-name)))
+
+(defn simple-entity [version db ent]
+  (-> (korma/create-entity (kw->table-name version ent))
+      (assoc :alias (sqlize-str (name ent)))
+      (assoc :kw ent)
       (korma/database db)))
 
 (def import-entity-names
@@ -46,8 +55,8 @@
    :states
    :street-segments])
 
-(defn make-entities [db entity-names]
-  (zipmap entity-names (map (partial simple-entity db) entity-names)))
+(defn make-entities [version db entity-names]
+  (zipmap entity-names (map (partial simple-entity version db) entity-names)))
 
 (defn chunk-rows
   "Given a seq of maps, split them into groups, such that no group
@@ -83,6 +92,7 @@
   (binding [db/*current-conn* (db/get-connection (:db sql-table))]
     (db/transaction
      (let [table (-> sql-table :name keyword)
+           entity (-> sql-table :kw keyword)
            existing-ids (->> (korma/select sql-table
                                            (korma/fields :id)
                                            (korma/where {:id [in (map #(BigInteger. (get % "id")) chunk-values)]}))
@@ -101,7 +111,7 @@
        (when (seq chunk-without-dupe-ids)
          (korma/insert sql-table (korma/values chunk-without-dupe-ids)))
        (reduce (fn [ctx dupe-id]
-                 (assoc-in ctx [:fatal table dupe-id :duplicate-ids]
+                 (assoc-in ctx [:fatal entity dupe-id :duplicate-ids]
                            ["Duplicate id"]))
                ctx (set/union existing-ids local-dupe-ids))))))
 
@@ -117,7 +127,7 @@
     (map (partial hydrate-row ks) rows)))
 
 (defn bulk-import [statement-parameter-limit ctx table rows]
-  (log/info "Bulk importing" (:name table))
+  (log/info "Bulk importing" (:alias table (:name table)))
   (reduce (fn [ctx rows]
             (if (empty? rows)
               ctx

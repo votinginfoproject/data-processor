@@ -17,7 +17,7 @@
     (assoc ctx :stop "No filename!")))
 
 (defn attach-sqlite-db [ctx]
-  (let [db (sqlite/temp-db (:import-id ctx))
+  (let [db (sqlite/temp-db (:import-id ctx) "3.0") ; TODO: set version according to import version
         db-file (get-in db [:db :db])]
     (-> ctx
         (merge db)
@@ -35,22 +35,21 @@
 
 (def csv-validations
   [csv/remove-bad-filenames
-   (csv/error-on-missing-file "election.txt")
-   (csv/error-on-missing-file "source.txt")
-   (csv-files/validate-dependencies csv-files/file-dependencies)
+   csv/error-on-missing-files
+   (csv-files/validate-dependencies csv-files/v3-0-file-dependencies) ; TODO: validate file depenencies based import version
    csv/load-csvs])
 
 (defn remove-invalid-extensions [ctx]
   (let [files (:input ctx)
         valid-extensions #{"csv" "txt" "xml"}
-        invalid-fn (fn [file] 
+        invalid-fn (fn [file]
                      (not (some valid-extensions
-                                (-> file .getName 
+                                (-> file .getName
                                     (s/split #"\.")))))
         {valid-files false invalid-files true} (group-by invalid-fn files)]
-    (-> ctx 
+    (-> ctx
         (assoc :input valid-files)
-        (assoc-in [:warnings :import :global :invalid-extensions] 
+        (assoc-in [:warnings :import :global :invalid-extensions]
                   (map #(.getName %) invalid-files)))))
 
 (defn xml-csv-branch [ctx]

@@ -22,7 +22,7 @@
 
 (declare results-db results
          validations
-         import-entities
+         v3-0-import-entities
          statistics)
 
 (defn initialize []
@@ -40,8 +40,8 @@
     (korma/database results-db))
   (korma/defentity election_approvals
     (korma/database results-db))
-  (def import-entities
-    (db.util/make-entities results-db db.util/import-entity-names)))
+  (def v3-0-import-entities
+    (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
@@ -200,7 +200,7 @@
                                first
                                :columns)]
               (bulk-import ctx
-                           (ent import-entities)
+                           (ent v3-0-import-entities) ; TODO: choose import-entities based on import version
                            (->> table
                                 (db.util/select-*-lazily 5000)
                                 (map #(assoc % :results_id import-id))

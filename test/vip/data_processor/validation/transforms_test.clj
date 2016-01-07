@@ -4,6 +4,7 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.transforms :refer :all]
             [vip.data-processor.db.sqlite :as sqlite]
@@ -13,11 +14,12 @@
 
 (deftest csv-validations-test
   (testing "full run on good files"
-    (let [db (sqlite/temp-db "good-run-test")
-          filenames (->> csv/csv-filenames
+    (let [db (sqlite/temp-db "good-run-test" "3.0")
+          filenames (->> v3-0/data-specs
+                         csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
-          ctx (merge {:input filenames :pipeline (concat [(data-spec/add-data-specs data-spec/data-specs)]
+          ctx (merge {:input filenames :pipeline (concat [(data-spec/add-data-specs v3-0/data-specs)]
                                                          csv-validations
                                                          db/validations)} db)
           results-ctx (pipeline/run-pipeline ctx)]
@@ -34,5 +36,3 @@
       (is (= 1 (count (:input results-ctx))))
       (is (= "good-file.xml" (-> results-ctx :input first .getName)))
       (is (= #{"not-so-good-file.xls" "logo.ai"} (set (get-in results-ctx [:warnings :import :global :invalid-extensions])))))))
-
-

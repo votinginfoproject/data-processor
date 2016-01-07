@@ -3,7 +3,11 @@
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
+            [vip.data-processor.validation.db.v3-0.admin-addresses :as admin-addresses]
+            [vip.data-processor.validation.db.v3-0.jurisdiction-references :as jurisdiction-references]
+            [vip.data-processor.validation.db.v3-0.street-segment :as street-segment]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma]))
@@ -11,8 +15,8 @@
 (deftest load-xml-test
   (testing "loads data into the db from an XML file"
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
-                      :data-specs data-spec/data-specs}
-                     (sqlite/temp-db "load-xml-test"))
+                      :data-specs v3-0/data-specs}
+                     (sqlite/temp-db "load-xml-test" "3.0"))
           out-ctx (load-xml ctx)]
       (testing "loads simple data from XML"
         (is (= [{:id 39 :name "Ohio" :election_administration_id 3456}]
@@ -104,18 +108,18 @@
                  locality-early-vote-sites))))))
   (testing "adds errors for non-UTF-8 data"
     (let [ctx (merge {:input (xml-input "non-utf-8.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml]}
-                     (sqlite/temp-db "non-utf-8"))
+                     (sqlite/temp-db "non-utf-8" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= (get-in out-ctx [:errors :candidates "90001" "name"])
              ["Is not valid UTF-8."]))
       (assert-error-format out-ctx)))
   (testing "can continue after reaching malformed XML"
     (let [ctx (merge {:input (xml-input "malformed.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml]}
-                     (sqlite/temp-db "malformed-xml"))
+                     (sqlite/temp-db "malformed-xml" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:critical :import :global :malformed-xml]))
       (testing "but still loads data before the malformation!"
@@ -126,9 +130,9 @@
 (deftest full-good-run-test
   (testing "a good XML file produces no erorrs or warnings"
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline (concat [load-xml] db/validations)}
-                     (sqlite/temp-db "full-good-xml"))
+                     (sqlite/temp-db "full-good-xml" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (nil? (:stop out-ctx)))
       (is (nil? (:exception out-ctx)))
@@ -142,9 +146,9 @@
 (deftest validate-no-duplicated-ids-test
   (testing "returns an error when there is a duplicated id"
     (let [ctx (merge {:input (xml-input "duplicated-ids.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-no-duplicated-ids]}
-                     (sqlite/temp-db "duplicated-ids"))
+                     (sqlite/temp-db "duplicated-ids" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= #{"precincts" "localities"}
              (set (get-in out-ctx [:errors :import 101 :duplicate-ids]))))
@@ -153,9 +157,9 @@
 (deftest validate-no-duplicated-rows-test
   (testing "returns a warning if two nodes have the same data"
     (let [ctx (merge {:input (xml-input "duplicated-rows.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-no-duplicated-rows]}
-                     (sqlite/temp-db "duplicated-rows"))
+                     (sqlite/temp-db "duplicated-rows" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (doseq [id [900101 900102 900103]]
         (is (get-in out-ctx [:warnings :candidates id :duplicate-rows])))
@@ -167,9 +171,9 @@
 (deftest validate-references-test
   (testing "returns an error if there are unreferenced objects"
     (let [ctx (merge {:input (xml-input "unreferenced-ids.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-references]}
-                     (sqlite/temp-db "unreferenced-ids"))
+                     (sqlite/temp-db "unreferenced-ids" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= '({"state_id" 99}) (get-in out-ctx [:errors :localities 101 :unmatched-reference])))
       (assert-error-format out-ctx))))
@@ -177,9 +181,9 @@
 (deftest validate-jurisdiction-references-test
   (testing "returns an error if there are unreferenced jurisdiction references"
     (let [ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
-                      :data-specs data-spec/data-specs
-                      :pipeline [load-xml db/validate-jurisdiction-references]}
-                     (sqlite/temp-db "unreferenced-jurisdictions"))
+                      :data-specs v3-0/data-specs
+                      :pipeline [load-xml jurisdiction-references/validate-jurisdiction-references]}
+                     (sqlite/temp-db "unreferenced-jurisdictions" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= '({:jurisdiction_id 99999}) (get-in out-ctx [:errors :ballot-line-results 91008 :unmatched-reference])))
       (assert-error-format out-ctx))))
@@ -187,9 +191,9 @@
 (deftest validate-one-record-limit-test
   (testing "returns an error if particular nodes are duplicated more than once"
     (let [ctx (merge {:input (xml-input "one-record-limit.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-one-record-limit]}
-                     (sqlite/temp-db "one-record-limit"))
+                     (sqlite/temp-db "one-record-limit" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= ["File needs to contain exactly one row."]
              (get-in out-ctx [:errors :elections :global :row-constraint])))
@@ -200,9 +204,9 @@
 (deftest validate-no-unreferenced-rows
   (testing "returns a warning if it finds rows that are unreferenced"
     (let [ctx (merge {:input (xml-input "unreferenced-rows.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml db/validate-no-unreferenced-rows]}
-                     (sqlite/temp-db "unreferenced-rows"))
+                     (sqlite/temp-db "unreferenced-rows" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:warnings :candidates 90000 :unreferenced-row]))
       (assert-error-format out-ctx))))
@@ -210,9 +214,9 @@
 (deftest validate-no-overlapping-street-segments
   (testing "returns an error if street segments overlap"
     (let [ctx (merge {:input (xml-input "overlapping-street-segments.xml")
-                      :data-specs data-spec/data-specs
-                      :pipeline [load-xml db/validate-no-overlapping-street-segments]}
-                     (sqlite/temp-db "overlapping-street-segments"))
+                      :data-specs v3-0/data-specs
+                      :pipeline [load-xml street-segment/validate-no-overlapping-street-segments]}
+                     (sqlite/temp-db "overlapping-street-segments" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= '(1210003) (get-in out-ctx [:errors :street-segments 1210002 :overlaps])))
       (assert-error-format out-ctx))))
@@ -220,10 +224,10 @@
 (deftest validate-election-administration-addresses
   (testing "returns an error if either the physical or mailing address is incomplete"
     (let [ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml
-                                 db/validate-election-administration-addresses]}
-                     (sqlite/temp-db "incomplete-election-administrations"))
+                                 admin-addresses/validate-addresses]}
+                     (sqlite/temp-db "incomplete-election-administrations" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:errors :election-administrations 3456
                            :incomplete-physical-address]))
@@ -233,9 +237,9 @@
 
 (deftest validate-data-formats
   (let [ctx (merge {:input (xml-input "bad-data-values.xml")
-                    :data-specs data-spec/data-specs
+                    :data-specs v3-0/data-specs
                     :pipeline [load-xml]}
-                   (sqlite/temp-db "bad-data-values"))
+                   (sqlite/temp-db "bad-data-values" "3.0"))
         out-ctx (pipeline/run-pipeline ctx)]
     (testing "adds critical errors for missing required fields in candidates"
       (is (get-in out-ctx [:critical :candidates "90001" "name"])))
@@ -250,9 +254,9 @@
 (deftest same-element-duplicate-ids-test
   (testing "doesn't die when elements share ids"
     (let [ctx (merge {:input (xml-input "same-element-duplicated-ids.xml")
-                      :data-specs data-spec/data-specs
+                      :data-specs v3-0/data-specs
                       :pipeline [load-xml]}
-                     (sqlite/temp-db "same-element-duplicated-ids"))
+                     (sqlite/temp-db "same-element-duplicated-ids" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx [:fatal :localities "101" :duplicate-ids]))
       (is (get-in out-ctx [:fatal :precincts "10101" :duplicate-ids]))
