@@ -22,9 +22,9 @@
   been completed or until a `:stop` key is added to the context."
   [c]
   (loop [ctx c]
-    (let [pipeline (:pipeline ctx)]
-      (if-let [next-step (first pipeline)]
-        (let [ctx-with-rest-pipeline (assoc ctx :pipeline (rest pipeline))
+    (let [[next-step & rest-pipeline] (:pipeline ctx)]
+      (if next-step
+        (let [ctx-with-rest-pipeline (assoc ctx :pipeline rest-pipeline)
               next-ctx (try-processing-fn next-step ctx-with-rest-pipeline)]
           (if (:stop next-ctx)
             next-ctx
