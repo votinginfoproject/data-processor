@@ -131,3 +131,22 @@
 
           ;; otherwise, load and continue
           :else (recur (load-elements ctx partition-or-error) (rest xml-elements)))))))
+
+(defn determine-spec-version [ctx]
+  (let [xml-file (first (:input ctx))]
+    (with-open [reader (util/bom-safe-reader xml-file)]
+      (let [vip-object (xml/parse reader)
+            version (get-in vip-object [:attrs :schemaVersion])]
+        (assoc ctx :xml-version version)))))
+
+(defn unsupported-version [{:keys [xml-version] :as ctx}]
+  (assoc ctx :stop (str "Unsupported XML version: " xml-version)))
+
+(def version-pipelines
+  {"3.0" [load-xml]
+   "5.0" [unsupported-version]})
+
+(defn branch-on-spec-version [{:keys [xml-version] :as ctx}]
+  (if-let [pipeline (get version-pipelines xml-version)]
+    (update ctx :pipeline (partial concat pipeline))
+    (unsupported-version ctx)))

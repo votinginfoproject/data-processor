@@ -31,7 +31,8 @@
         (assoc :input file))))
 
 (def xml-validations
-  [xml/load-xml])
+  [xml/determine-spec-version
+   xml/branch-on-spec-version])
 
 (def csv-validations
   [csv/remove-bad-filenames

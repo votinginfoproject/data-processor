@@ -131,7 +131,9 @@
   (testing "a good XML file produces no erorrs or warnings"
     (let [ctx (merge {:input (xml-input "full-good-run.xml")
                       :data-specs v3-0/data-specs
-                      :pipeline (concat [load-xml] db/validations)}
+                      :pipeline (concat [determine-spec-version
+                                         branch-on-spec-version]
+                                        db/validations)}
                      (sqlite/temp-db "full-good-xml" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)]
       (is (nil? (:stop out-ctx)))
@@ -266,3 +268,25 @@
                (korma/select (get-in out-ctx [:tables :localities])
                              (korma/fields :id)))))
       (assert-error-format out-ctx))))
+
+(deftest determine-spec-version-test
+  (testing "finds and assocs the schemaVersion of the xml feed"
+    (let [ctx {:input (xml-input "full-good-run.xml")}
+          out-ctx (determine-spec-version ctx)]
+      (is (= "3.0" (get out-ctx :xml-version))))))
+
+(deftest branch-on-spec-version-test
+  (testing "adds load-xml to the front of the pipeline for 3.0 feeds"
+    (let [ctx {:xml-version "3.0"}
+          out-ctx (branch-on-spec-version ctx)]
+      (is (= load-xml (first (:pipeline out-ctx))))))
+  (testing "stops with unsupported version for 5.0 feeds"
+    (let [ctx {:xml-version "5.0"
+               :pipeline [branch-on-spec-version]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (.startsWith (:stop out-ctx) "Unsupported XML version"))))
+  (testing "stops with unsupported version for other versions"
+    (let [ctx {:xml-version "2.0"  ; 2.0 is too old
+               :pipeline [branch-on-spec-version]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (.startsWith (:stop out-ctx) "Unsupported XML version")))))
