@@ -130,3 +130,15 @@
         (assoc ctx :spec-version version)))
     (assoc-in ctx [:fatal :sources :global :missing-csv]
               ["source.txt is missing"])))
+
+(defn unsupported-version [{:keys [spec-version] :as ctx}]
+  (assoc ctx :stop (str "Unsupported CSV version: " spec-version)))
+
+(def version-pipelines
+  {"3.0" [load-csvs]
+   "5.0" [unsupported-version]})
+
+(defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
+  (if-let [pipeline (get version-pipelines spec-version)]
+    (update ctx :pipeline (partial concat pipeline))
+    (unsupported-version ctx)))

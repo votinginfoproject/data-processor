@@ -37,8 +37,9 @@
 (def csv-validations
   [csv/remove-bad-filenames
    csv/error-on-missing-files
+   csv/determine-spec-version
    (csv-files/validate-dependencies csv-files/v3-0-file-dependencies) ; TODO: validate file depenencies based import version
-   csv/load-csvs])
+   csv/branch-on-spec-version])
 
 (defn remove-invalid-extensions [ctx]
   (let [files (:input ctx)
