@@ -39,6 +39,15 @@
        (filter #(= filename (clojure.string/lower-case (.getName %))))
        first))
 
+(defn read-one-line
+  "Reads one line at a time from a reader and parses it as a CSV
+  string. Does not close the reader at the end, that's your job."
+  [reader]
+  (->> reader
+       .readLine
+       csv/read-csv
+       first))
+
 (defn-traced bulk-import-and-validate-csv
   "Bulk importing and CSV validation is done in one go, so that it can
   be done without holding the entire file in memory at once."
@@ -48,9 +57,7 @@
       (log/info "Loading" filename)
       (with-open [in-file (util/bom-safe-reader file-to-load :encoding "UTF-8")]
         (let [headers (->> in-file
-                           .readLine
-                           csv/read-csv
-                           first
+                           read-one-line
                            (map #(clojure.string/replace % #"\W" "")))
               headers-count (count headers)
               sql-table (get-in ctx [:tables table])
@@ -112,3 +119,14 @@
                           [required table :global :missing-csv]
                           [(str filename " is missing")])))
             ctx required-files)))
+
+(defn determine-spec-version [ctx]
+  (if-let [source-file (find-input-file ctx "source.txt")]
+    (with-open [reader (util/bom-safe-reader source-file :encoding "UTF-8")]
+      (let [headers (read-one-line reader)
+            line1 (read-one-line reader)
+            csv-map (zipmap headers line1)
+            version (get csv-map "version" "3.0")]
+        (assoc ctx :spec-version version)))
+    (assoc-in ctx [:fatal :sources :global :missing-csv]
+              ["source.txt is missing"])))

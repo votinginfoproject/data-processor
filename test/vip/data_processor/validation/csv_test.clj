@@ -133,3 +133,13 @@
                    (get-in out-ctx [:tables :sources])
                    (korma/fields :vip_id)))))
       (assert-error-format out-ctx))))
+
+(deftest determine-spec-version-test
+  (testing "finds and assocs the version of the csv feed for 3.0 files"
+    (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])}
+          out-ctx (determine-spec-version ctx)]
+      (is (= "3.0" (get out-ctx :spec-version)))))
+  (testing "finds and assocs the version of the csv feed for 5.0 files"
+    (let [ctx {:input (csv-inputs ["5-0/spec-version/source.txt"])}
+          out-ctx (determine-spec-version ctx)]
+      (is (= "5.0" (get out-ctx :spec-version))))))
