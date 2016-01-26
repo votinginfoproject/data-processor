@@ -273,20 +273,20 @@
   (testing "finds and assocs the schemaVersion of the xml feed"
     (let [ctx {:input (xml-input "full-good-run.xml")}
           out-ctx (determine-spec-version ctx)]
-      (is (= "3.0" (get out-ctx :schema-version))))))
+      (is (= "3.0" (get out-ctx :spec-version))))))
 
 (deftest branch-on-spec-version-test
   (testing "adds load-xml to the front of the pipeline for 3.0 feeds"
-    (let [ctx {:schema-version "3.0"}
+    (let [ctx {:spec-version "3.0"}
           out-ctx (branch-on-spec-version ctx)]
       (is (= load-xml (first (:pipeline out-ctx))))))
   (testing "stops with unsupported version for 5.0 feeds"
-    (let [ctx {:schema-version "5.0"
+    (let [ctx {:spec-version "5.0"
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported XML version"))))
   (testing "stops with unsupported version for other versions"
-    (let [ctx {:schema-version "2.0"  ; 2.0 is too old
+    (let [ctx {:spec-version "2.0"  ; 2.0 is too old
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported XML version")))))
