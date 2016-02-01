@@ -146,10 +146,12 @@
       (is (= "5.0" (get out-ctx :spec-version))))))
 
 (deftest branch-on-spec-version-test
-  (testing "adds load-csvs to the front of the pipeline for 3.0 feeds"
+  (testing "add the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
     (let [ctx {:spec-version "3.0"}
-          out-ctx (branch-on-spec-version ctx)]
-      (is (= load-csvs (first (:pipeline out-ctx))))))
+          out-ctx (branch-on-spec-version ctx)
+          three-point-0-pipeline (get version-pipelines "3.0")]
+      (is (= three-point-0-pipeline
+             (take (count three-point-0-pipeline) (:pipeline out-ctx))))))
   (testing "stops with unsupported version for 5.0 feeds"
     (let [ctx {:spec-version "5.0"
                :pipeline [branch-on-spec-version]}

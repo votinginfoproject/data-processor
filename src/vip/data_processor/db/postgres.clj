@@ -40,6 +40,9 @@
     (korma/database results-db))
   (korma/defentity election_approvals
     (korma/database results-db))
+  (korma/defentity v5-0-xml-values
+    (korma/table "v5_0_xml_values")
+    (korma/database results-db))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 

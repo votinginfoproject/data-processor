@@ -17,7 +17,6 @@
   (concat [psql/start-run
            zip/assoc-file
            zip/extracted-contents
-           t/attach-sqlite-db
            (data-spec/add-data-specs v3-0/data-specs) ; TODO: decide which specs to add based on import
            t/remove-invalid-extensions
            t/xml-csv-branch

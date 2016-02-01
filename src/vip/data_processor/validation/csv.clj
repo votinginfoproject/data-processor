@@ -135,7 +135,8 @@
   (assoc ctx :stop (str "Unsupported CSV version: " spec-version)))
 
 (def version-pipelines
-  {"3.0" [load-csvs]
+  {"3.0" [sqlite/attach-sqlite-db
+          load-csvs]
    "5.0" [unsupported-version]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
