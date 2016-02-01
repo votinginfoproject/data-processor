@@ -4,6 +4,7 @@
             [vip.data-processor.validation.csv :refer :all]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
+            [vip.data-processor.pipeline :as pipeline]
             [korma.core :as korma])
   (:import [java.io File]))
 
@@ -133,3 +134,29 @@
                    (get-in out-ctx [:tables :sources])
                    (korma/fields :vip_id)))))
       (assert-error-format out-ctx))))
+
+(deftest determine-spec-version-test
+  (testing "finds and assocs the version of the csv feed for 3.0 files"
+    (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])}
+          out-ctx (determine-spec-version ctx)]
+      (is (= "3.0" (get out-ctx :spec-version)))))
+  (testing "finds and assocs the version of the csv feed for 5.0 files"
+    (let [ctx {:input (csv-inputs ["5-0/spec-version/source.txt"])}
+          out-ctx (determine-spec-version ctx)]
+      (is (= "5.0" (get out-ctx :spec-version))))))
+
+(deftest branch-on-spec-version-test
+  (testing "adds load-csvs to the front of the pipeline for 3.0 feeds"
+    (let [ctx {:spec-version "3.0"}
+          out-ctx (branch-on-spec-version ctx)]
+      (is (= load-csvs (first (:pipeline out-ctx))))))
+  (testing "stops with unsupported version for 5.0 feeds"
+    (let [ctx {:spec-version "5.0"
+               :pipeline [branch-on-spec-version]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (.startsWith (:stop out-ctx) "Unsupported CSV version"))))
+  (testing "stops with unsupported version for other versions"
+    (let [ctx {:spec-version "2.0"  ; 2.0 is too old
+               :pipeline [branch-on-spec-version]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (.startsWith (:stop out-ctx) "Unsupported CSV version")))))

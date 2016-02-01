@@ -137,16 +137,16 @@
     (with-open [reader (util/bom-safe-reader xml-file)]
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]
-        (assoc ctx :xml-version version)))))
+        (assoc ctx :spec-version version)))))
 
-(defn unsupported-version [{:keys [xml-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported XML version: " xml-version)))
+(defn unsupported-version [{:keys [spec-version] :as ctx}]
+  (assoc ctx :stop (str "Unsupported XML version: " spec-version)))
 
 (def version-pipelines
   {"3.0" [load-xml]
    "5.0" [unsupported-version]})
 
-(defn branch-on-spec-version [{:keys [xml-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines xml-version)]
+(defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
+  (if-let [pipeline (get version-pipelines spec-version)]
     (update ctx :pipeline (partial concat pipeline))
     (unsupported-version ctx)))
