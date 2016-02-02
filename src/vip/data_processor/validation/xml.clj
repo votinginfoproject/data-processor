@@ -213,8 +213,6 @@
     (.setType "ltree")
     (.setValue path)))
 
-;;; TODO: write up stuff in the research card
-;;; TODO: Commit this stuff for reference in above
 (defn load-xml-ltree
   [ctx]
   (let [xml-file (first (:input ctx))
