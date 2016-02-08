@@ -229,7 +229,7 @@
                                          (update :parent_with_id path->ltree)
                                          (assoc :results_id import-id)))
                                    chunk))))]
-        (korma/insert postgres/v5-0-xml-values
+        (korma/insert postgres/xml-tree-values
                       (korma/values pvs))))))
 
 (defn determine-spec-version [ctx]
