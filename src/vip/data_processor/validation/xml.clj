@@ -230,7 +230,8 @@
                                          (assoc :results_id import-id)))
                                    chunk))))]
         (korma/insert postgres/xml-tree-values
-                      (korma/values pvs))))))
+          (korma/values pvs))))
+    ctx))
 
 (defn determine-spec-version [ctx]
   (let [xml-file (first (:input ctx))]
