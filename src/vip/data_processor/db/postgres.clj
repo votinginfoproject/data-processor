@@ -49,6 +49,13 @@
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 
+(defn ltree-match
+  "Helper function for generating WHERE clases using ~"
+  [table column path]
+  (korma/raw (str (korma.sql.engine/table-alias table)
+                  "." (name column)
+                  " ~ '" path "'")))
+
 (defn start-run [ctx]
   (let [results (korma/insert results
                               (korma/values {:start_time (korma/sqlfn now)
@@ -72,7 +79,7 @@
            (map str/trim)
            (str/join "-")))))
 
-(defn get-public-id-data [{:keys [import-id] :as ctx}]
+(defn get-v3-public-id-data [{:keys [import-id] :as ctx}]
   (let [state (-> ctx
                   (get-in [:tables :states])
                   (korma/select (korma/fields :name))
@@ -86,6 +93,37 @@
      :election-type election_type
      :state state
      :import-id import-id}))
+
+(defn find-single-xml-tree-value [results-id path]
+  (-> (korma/select xml-tree-values
+        (korma/fields :value)
+        (korma/where {:results_id results-id})
+        (korma/where (ltree-match xml-tree-values
+                                  :path
+                                  path)))
+      first
+      :value))
+
+(defn get-xml-tree-public-id-data [{:keys [import-id] :as ctx}]
+  (let [state (find-single-xml-tree-value
+               import-id
+               "VipObject.0.State.*{1}.Name.*{1}")
+        date (find-single-xml-tree-value
+              import-id
+              "VipObject.0.Election.*{1}.Date.*{1}")
+        election-type (find-single-xml-tree-value
+                       import-id
+                       "VipObject.0.Election.*{1}.ElectionType.*{1}")]
+    {:date date
+     :election-type election-type
+     :state state
+     :import-id import-id}))
+
+(defn get-public-id-data [{:keys [spec-version] :as ctx}]
+  (condp = spec-version
+    "3.0" (get-v3-public-id-data ctx)
+    "5.0" (get-xml-tree-public-id-data ctx)
+    {}))
 
 (defn generate-public-id [ctx]
   (let [{:keys [date election-type state import-id]} (get-public-id-data ctx)]
