@@ -6,7 +6,8 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec])
+            [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.v5 :as v5-validations])
   (:import [org.postgresql.util PGobject]))
 
 (def address-elements
@@ -230,7 +231,8 @@
                                          (assoc :results_id import-id)))
                                    chunk))))]
         (korma/insert postgres/xml-tree-values
-                      (korma/values pvs))))))
+          (korma/values pvs))))
+    ctx))
 
 (defn determine-spec-version [ctx]
   (let [xml-file (first (:input ctx))]
@@ -245,7 +247,8 @@
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           load-xml]
-   "5.0" [load-xml-ltree]})
+   "5.0" (concat [load-xml-ltree]
+                 v5-validations/validations)})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

@@ -13,21 +13,27 @@
             [vip.data-processor.s3 :refer [zip-filename]]
             [squishy.data-readers]))
 
-(def pipeline
-  (concat [psql/start-run
-           zip/assoc-file
-           zip/extracted-contents
-           (data-spec/add-data-specs v3-0/data-specs) ; TODO: decide which specs to add based on import
-           t/remove-invalid-extensions
-           t/xml-csv-branch
-           psql/store-public-id
-           psql/store-election-id]
-          db/validations
-          db.v3-0/validations ; TODO: choose extra validations based on import
+(def v3-pipeline
+  (concat db/validations
+          db.v3-0/validations
           xml-output/pipeline
           [psql/insert-validations
            psql/import-from-sqlite
            psql/store-stats]))
+
+(def pipeline
+  [psql/start-run
+   zip/assoc-file
+   zip/extracted-contents
+   (data-spec/add-data-specs v3-0/data-specs) ; TODO: dont't do this for non-3.0 feeds
+   t/remove-invalid-extensions
+   t/xml-csv-branch
+   psql/store-public-id
+   psql/store-election-id
+   (fn [ctx]
+     (if (= "3.0" (:spec-version ctx))
+       (update ctx :pipeline concat v3-pipeline)
+       ctx))])
 
 (defn -main [filename]
   (psql/initialize)
