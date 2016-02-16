@@ -37,9 +37,12 @@
   (let [files (:input ctx)
         valid-extensions #{"csv" "txt" "xml"}
         invalid-fn (fn [file]
-                     (not (some valid-extensions
-                                (-> file .getName
-                                    (s/split #"\.")))))
+                     (not (get valid-extensions
+                               (-> file
+                                   .getName
+                                   (s/split #"\.")
+                                   last
+                                   s/lower-case))))
         {valid-files false invalid-files true} (group-by invalid-fn files)]
     (-> ctx
         (assoc :input valid-files)
@@ -49,7 +52,7 @@
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx
                              :input
-                             (map #(-> % str (s/split #"\.") last))
+                             (map #(-> % str (s/split #"\.") last s/lower-case))
                              set)
         filetype-validations (condp set/superset? file-extensions
                                #{"txt" "csv"} csv-validations

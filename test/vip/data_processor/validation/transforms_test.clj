@@ -35,4 +35,15 @@
           results-ctx (remove-invalid-extensions ctx)]
       (is (= 1 (count (:input results-ctx))))
       (is (= "good-file.xml" (-> results-ctx :input first .getName)))
-      (is (= #{"not-so-good-file.xls" "logo.ai"} (set (get-in results-ctx [:warnings :import :global :invalid-extensions])))))))
+      (is (= #{"not-so-good-file.xls" "logo.ai"} (set (get-in results-ctx [:warnings :import :global :invalid-extensions]))))))
+  (testing "allows uppercase file extensions"
+    (let [ctx {:input [(File. "this-is-okay.XML")
+                       (File. "so-is-this.TXT")
+                       (File. "but-not-this.NAIL")]}
+          results-ctx (remove-invalid-extensions ctx)]
+      (is (= [(File. "this-is-okay.XML")
+              (File. "so-is-this.TXT")]
+             (:input results-ctx)))
+      (is (= ["but-not-this.NAIL"]
+             (get-in results-ctx
+                     [:warnings :import :global :invalid-extensions]))))))
