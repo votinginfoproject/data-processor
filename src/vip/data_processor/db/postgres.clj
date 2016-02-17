@@ -50,11 +50,15 @@
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 
 (defn ltree-match
-  "Helper function for generating WHERE clases using ~"
+  "Helper function for generating WHERE clases using ~. Accepts a keyword as a
+  table alias, or a korma entity"
   [table column path]
-  (korma/raw (str (korma.sql.engine/table-alias table)
-                  "." (name column)
-                  " ~ '" path "'")))
+  (let [tablename (if (keyword? table)
+                    (name table)
+                    (korma.sql.engine/table-alias table))]
+    (korma/raw (str tablename
+                    "." (name column)
+                    " ~ '" path "'"))))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
