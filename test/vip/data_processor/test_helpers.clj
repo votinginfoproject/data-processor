@@ -61,29 +61,36 @@
           (is (sequential? errors))
           (is (not (empty? errors))))))))
 
+(defonce setup-postgres-has-run (atom false))
+
 (defn setup-postgres
-  "A :once test fixture to drop and create the test database."
+  "A :once test fixture to drop and create the test database. This can only be
+  run once due to an undiagnosed connection leakage"
   [f]
-  (log/info "Recreating the test database")
-  (let [database-name (config :postgres :database)
-        jdbc-config {:dbtype "postgresql"
-                     :dbname ""  ; do not connect to a db for creating/dropping
-                     :host (config :postgres :host)
-                     :port (config :postgres :port)
-                     :user (config :postgres :user)
-                     :password (config :postgres :password)}]
-    (jdbc/execute! jdbc-config [(str "DROP DATABASE IF EXISTS " database-name)] :transaction? false)
-    (jdbc/execute! jdbc-config [(str "CREATE DATABASE " database-name)] :transaction? false)
-    (psql/initialize)
-    ;; these vars will be unbound until after psql/initialize, so
-    ;; don't set psql-tables until after that's been run
-    (def psql-tables [psql/xml-tree-validations
-                      psql/xml-tree-values
-                      psql/election_approvals
-                      psql/statistics
-                      psql/validations
-                      psql/results])
-    (f)))
+  (when-not @setup-postgres-has-run
+    (log/info "Recreating the test database")
+    (let [database-name (config :postgres :database)
+          jdbc-config {:dbtype "postgresql"
+                       :dbname ""  ; do not connect to a db for creating/dropping
+                       :host (config :postgres :host)
+                       :port (config :postgres :port)
+                       :user (config :postgres :user)
+                       :password (config :postgres :password)}]
+
+      (jdbc/execute! jdbc-config [(str "DROP DATABASE IF EXISTS " database-name)] :transaction? false)
+      (jdbc/execute! jdbc-config [(str "CREATE DATABASE " database-name)] :transaction? false)
+
+      (psql/initialize)
+      ;; these vars will be unbound until after psql/initialize, so
+      ;; don't set psql-tables until after that's been run
+      (def psql-tables [psql/xml-tree-validations
+                        psql/xml-tree-values
+                        psql/election_approvals
+                        psql/statistics
+                        psql/validations
+                        psql/results])
+      (reset! setup-postgres-has-run true)))
+  (f))
 
 (defn with-clean-postgres
   "An :each test fixture to clear out tables in the test database. "
