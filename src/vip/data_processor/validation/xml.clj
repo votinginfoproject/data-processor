@@ -228,6 +228,14 @@
           (korma/values pvs))))
     ctx))
 
+(defn load-xml-tree-validations
+  [ctx]
+  (let [results-id (:import-id ctx)
+        errors (postgres/xml-tree-validation-values ctx)]
+    (korma/insert postgres/xml-tree-validations
+      (korma/values errors)))
+  ctx)
+
 (defn determine-spec-version [ctx]
   (let [xml-file (first (:input ctx))]
     (with-open [reader (util/bom-safe-reader xml-file)]
@@ -242,7 +250,8 @@
   {"3.0" [sqlite/attach-sqlite-db
           load-xml]
    "5.0" (concat [load-xml-ltree]
-                 v5-validations/validations)})
+                 v5-validations/validations
+                 [load-xml-tree-validations])})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

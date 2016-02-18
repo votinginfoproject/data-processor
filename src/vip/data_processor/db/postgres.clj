@@ -215,12 +215,21 @@
    :error_type (name error-type)
    :error_data (pr-str error-data)})
 
+(defn xml-tree-validation-value
+  [results-id severity scope path error-type error-data]
+  {:results_id results-id
+   :severity (name severity)
+   :scope (name scope)
+   :error_type (name error-type)
+   :error_data (pr-str error-data)
+   :path (when-not (= :global path) (path->ltree path))})
+
 (defn validation-values
-  "Create insertable validations from the processing context map.
+  "Create insertable validations from the processing context map. Suitable for the 3.0 schema.
 
     (validation-values {:import-id 493
-                                  :errors {:candidates {3 {:missing-values [name\" \"email\"]}}}
-                                  :critical {:candidates {:global {:missing-columns [\"party\"]}}}})
+                        :errors {:candidates {3 {:missing-values [name\" \"email\"]}}}
+                        :critical {:candidates {:global {:missing-columns [\"party\"]}}}})
     ;; =>
        ({:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"name\\\"\"}
         {:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"email\\\"\"}
@@ -233,10 +242,26 @@
          (let [errors (util/flatten-keys errors)]
            (mapcat (fn [[[scope identifier error-type] error-data]]
                      (map (fn [error-data]
-                               (validation-value import-id severity scope identifier error-type error-data))
-                             error-data))
+                            (validation-value import-id severity scope identifier error-type error-data))
+                          error-data))
                    errors)))))
    [:warnings :errors :critical :fatal]))
+
+(defn xml-tree-validation-values
+  "Create insertable validations from the processing context map. Suitable for the 5.0 schema."
+  [{:keys [import-id] :as ctx}]
+  (mapcat
+   (fn [severity]
+     (let [errors (get ctx severity)]
+       (when-not (empty? errors)
+         (let [errors (util/flatten-keys errors)]
+           (mapcat (fn [[[scope path error-type] error-data]]
+                     (map (fn [error-value]
+                            (xml-tree-validation-value import-id severity scope path error-type error-value))
+                          error-data))
+                errors)))))
+   [:warnings :errors :critical :fatal]))
+
 
 (def statement-parameter-limit 10000)
 (def bulk-import (partial db.util/bulk-import statement-parameter-limit))

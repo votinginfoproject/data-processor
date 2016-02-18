@@ -26,6 +26,35 @@
                  :value)
              "51")))))
 
+(deftest ^:postgres load-xml-tree-validations-test
+  (testing "well-formed 5.0 style errors will be saved to the database"
+    (let [ctx {:fatal {:id
+                       {"VipObject.0.Election.1.id"
+                        {:duplicate ["ele0001"]}
+                        "VipObject.0.Election.2.id"
+                        {:duplicate ["ele0001"]}}}
+               :warnings {:import
+                          {:global
+                           {:invalid-extensions [".exemell" ".seeesvee"]}}}
+               :pipeline [psql/start-run
+                          load-xml-tree-validations]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= (-> (korma/select psql/xml-tree-validations
+                   (korma/where {:results_id (:import-id out-ctx)})
+                   (korma/where (psql/ltree-match
+                                 psql/xml-tree-validations
+                                 :path
+                                 "VipObject.0.Election.1.id")))
+                 first
+                 :error_data)
+             "\"ele0001\""))
+      (is (= (->> (korma/select psql/xml-tree-validations
+                   (korma/where {:results_id (:import-id out-ctx)
+                                 :path nil}))
+                 (map :error_data)
+                 set)
+             #{"\".exemell\"" "\".seeesvee\""})))))
+
 (deftest ^:postgres validate-emails-test
   (testing "adds errors to the context for badly formatted emails"
     (let [ctx {:input (xml-input "v5-bad-emails.xml")
