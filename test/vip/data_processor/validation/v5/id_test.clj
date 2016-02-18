@@ -17,10 +17,11 @@
         out-ctx (pipeline/run-pipeline ctx)]
 
     (testing "duplicate IDs are flagged"
-      (is (= (set (get-in out-ctx [:fatal :id :duplicates "super-duper"]))
-             #{"VipObject.0.ElectionAuthority.0.id"
-               "VipObject.0.ElectionAuthority.1.id"})))
+      (is (= (get-in out-ctx [:fatal :id :duplicates "VipObject.0.ElectionAuthority.0.id"])
+             "super-duper"))
+      (is (= (get-in out-ctx [:fatal :id :duplicates "VipObject.0.ElectionAuthority.1.id"])
+             "super-duper")))
 
     (testing "unique IDs are not flagged"
-      (is (not (get-in out-ctx [:fatal :id :duplicated "you-nique"])))
-      (is (not (get-in out-ctx [:fatal :id :duplicated "mo-nique"]))))))
+      (is (not (get-in out-ctx [:fatal :id :duplicated "VipObject.0.ElectionAuthority.2.id"])))
+      (is (not (get-in out-ctx [:fatal :id :duplicated "VipObject.0.ElectionAuthority.3.id"]))))))
