@@ -9,7 +9,8 @@
             [vip.data-processor.db.statistics :as stats]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec]))
+            [vip.data-processor.validation.data-spec :as data-spec])
+  (:import [org.postgresql.util PGobject]))
 
 (defn url []
   (let [{:keys [host port user password database]} (config :postgres)]
@@ -48,6 +49,11 @@
     (korma/database results-db))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
+
+(defn path->ltree [path]
+  (doto (PGobject.)
+    (.setType "ltree")
+    (.setValue path)))
 
 (defn ltree-match
   "Helper function for generating WHERE clases using ~. Accepts a keyword as a
