@@ -224,7 +224,21 @@
    :error_data (pr-str error-data)
    :path (when-not (= :global path) (path->ltree path))})
 
-(defn validation-values
+(defn validation-values-from [values-fn]
+  (fn [{:keys [import-id] :as ctx}]
+    (mapcat
+     (fn [severity]
+       (let [errors (get ctx severity)]
+         (when-not (empty? errors)
+           (let [errors (util/flatten-keys errors)]
+             (mapcat (fn [[[scope identifier error-type] error-data]]
+                       (map (fn [error-data]
+                              (values-fn import-id severity scope identifier error-type error-data))
+                            error-data))
+                     errors)))))
+     [:warnings :errors :critical :fatal])))
+
+(def validation-values
   "Create insertable validations from the processing context map. Suitable for the 3.0 schema.
 
     (validation-values {:import-id 493
@@ -234,34 +248,11 @@
        ({:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"name\\\"\"}
         {:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"email\\\"\"}
         {:results_id 493 :severity \"critical\" :scope \"candidates\" :identifier -1 :error_type \"missing-columns\" :error_data \"\\\"party\\\"\"})"
-  [{:keys [import-id] :as ctx}]
-  (mapcat
-   (fn [severity]
-     (let [errors (get ctx severity)]
-       (when-not (empty? errors)
-         (let [errors (util/flatten-keys errors)]
-           (mapcat (fn [[[scope identifier error-type] error-data]]
-                     (map (fn [error-data]
-                            (validation-value import-id severity scope identifier error-type error-data))
-                          error-data))
-                   errors)))))
-   [:warnings :errors :critical :fatal]))
+  (validation-values-from validation-value))
 
-(defn xml-tree-validation-values
+(def xml-tree-validation-values
   "Create insertable validations from the processing context map. Suitable for the 5.0 schema."
-  [{:keys [import-id] :as ctx}]
-  (mapcat
-   (fn [severity]
-     (let [errors (get ctx severity)]
-       (when-not (empty? errors)
-         (let [errors (util/flatten-keys errors)]
-           (mapcat (fn [[[scope path error-type] error-data]]
-                     (map (fn [error-value]
-                            (xml-tree-validation-value import-id severity scope path error-type error-value))
-                          error-data))
-                errors)))))
-   [:warnings :errors :critical :fatal]))
-
+  (validation-values-from xml-tree-validation-value))
 
 (def statement-parameter-limit 10000)
 (def bulk-import (partial db.util/bulk-import statement-parameter-limit))
