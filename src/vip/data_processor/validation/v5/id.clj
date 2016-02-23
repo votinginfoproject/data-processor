@@ -19,5 +19,5 @@
     (reduce (fn [ctx row]
               (let [id (:value row)
                     path (-> row :path .getValue)]
-                (assoc-in ctx [:fatal :id :duplicates path] id)))
+                (update-in ctx [:fatal :id path :duplicates] conj id)))
             ctx duplicate-ids)))

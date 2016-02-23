@@ -14,7 +14,7 @@
               (if (re-find (:check value-format/email)
                            (:value row))
                 ctx
-                (assoc-in ctx
-                          [:errors :email :format (-> row :path .getValue)]
-                          (:value row))))
+                (update-in ctx
+                          [:errors :email (-> row :path .getValue) :format]
+                          conj (:value row))))
             ctx emails)))

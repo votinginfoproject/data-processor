@@ -62,7 +62,7 @@
                           load-xml-ltree
                           v5.email/validate-emails]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :email :format "VipObject.0.Person.0.ContactInformation.0.Email.0"]))
-      (is (get-in out-ctx [:errors :email :format "VipObject.0.Person.1.ContactInformation.0.Email.0"]))
+      (is (get-in out-ctx [:errors :email "VipObject.0.Person.0.ContactInformation.0.Email.0" :format]))
+      (is (get-in out-ctx [:errors :email "VipObject.0.Person.1.ContactInformation.0.Email.0" :format]))
       (testing "but not for good emails"
-        (is (nil? (get-in out-ctx [:errors :email :format "VipObject.0.Person.2.ContactInformation.0.Email.0"])))))))
+        (is (nil? (get-in out-ctx [:errors :email "VipObject.0.Person.2.ContactInformation.0.Email.0" :format])))))))
