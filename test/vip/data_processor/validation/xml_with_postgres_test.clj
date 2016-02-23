@@ -1,4 +1,4 @@
-(ns vip.data-processor.validation.xml-test-with-postgres
+(ns vip.data-processor.validation.xml-with-postgres-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
