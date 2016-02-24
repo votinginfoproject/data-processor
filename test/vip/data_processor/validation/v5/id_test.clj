@@ -17,11 +17,23 @@
         out-ctx (pipeline/run-pipeline ctx)]
 
     (testing "duplicate IDs are flagged"
-      (is (= (get-in out-ctx [:fatal :id :duplicates "VipObject.0.ElectionAuthority.0.id"])
-             "super-duper"))
-      (is (= (get-in out-ctx [:fatal :id :duplicates "VipObject.0.ElectionAuthority.1.id"])
-             "super-duper")))
+      (is (= (get-in out-ctx [:fatal :id "VipObject.0.ElectionAuthority.0.id" :duplicates])
+             ["super-duper"]))
+      (is (= (get-in out-ctx [:fatal :id "VipObject.0.ElectionAuthority.1.id" :duplicates])
+             ["super-duper"])))
 
     (testing "unique IDs are not flagged"
-      (is (not (get-in out-ctx [:fatal :id :duplicated "VipObject.0.ElectionAuthority.2.id"])))
-      (is (not (get-in out-ctx [:fatal :id :duplicated "VipObject.0.ElectionAuthority.3.id"]))))))
+      (is (not (get-in out-ctx [:fatal :id "VipObject.0.ElectionAuthority.2.id" :duplicates])))
+      (is (not (get-in out-ctx [:fatal :id "VipObject.0.ElectionAuthority.3.id" :duplicates]))))))
+
+(deftest ^:postgres validate-no-missing-ids-test
+  (let [ctx {:input (xml-input "v5-missing-ids.xml")
+             :pipeline [psql/start-run
+                        load-xml-ltree
+                        v5.id/validate-no-missing-ids]}
+        out-ctx (pipeline/run-pipeline ctx)]
+    (testing "missing IDs are flagged"
+      (is (get-in out-ctx [:fatal :id "VipObject.0.Person.0.id" :missing]))
+      (is (get-in out-ctx [:fatal :id "VipObject.0.Person.2.id" :missing])))
+    (testing "doesn't for those that aren't"
+      (is (not (get-in out-ctx [:fatal :id "VipObject.0.Person.1.id" :missing]))))))

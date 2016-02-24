@@ -7,8 +7,7 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.v5 :as v5-validations])
-  (:import [org.postgresql.util PGobject]))
+            [vip.data-processor.validation.v5 :as v5-validations]))
 
 (def address-elements
   #{"address"
@@ -209,11 +208,6 @@
                         (:content node))]
      (apply concat attribute-entries child-entries))))
 
-(defn path->ltree [path]
-  (doto (PGobject.)
-    (.setType "ltree")
-    (.setValue path)))
-
 (defn load-xml-ltree
   [ctx]
   (let [xml-file (first (:input ctx))
@@ -226,13 +220,21 @@
                        (map (fn [chunk]
                               (map (fn [path-map]
                                      (-> path-map
-                                         (update :path path->ltree)
-                                         (update :parent_with_id path->ltree)
+                                         (update :path postgres/path->ltree)
+                                         (update :parent_with_id postgres/path->ltree)
                                          (assoc :results_id import-id)))
                                    chunk))))]
         (korma/insert postgres/xml-tree-values
           (korma/values pvs))))
     ctx))
+
+(defn load-xml-tree-validations
+  [ctx]
+  (let [results-id (:import-id ctx)
+        errors (postgres/xml-tree-validation-values ctx)]
+    (korma/insert postgres/xml-tree-validations
+      (korma/values errors)))
+  ctx)
 
 (defn determine-spec-version [ctx]
   (let [xml-file (first (:input ctx))]
@@ -248,7 +250,8 @@
   {"3.0" [sqlite/attach-sqlite-db
           load-xml]
    "5.0" (concat [load-xml-ltree]
-                 v5-validations/validations)})
+                 v5-validations/validations
+                 [load-xml-tree-validations])})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]
