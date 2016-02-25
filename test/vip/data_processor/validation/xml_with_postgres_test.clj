@@ -18,10 +18,10 @@
                           load-xml-ltree]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (= (-> (korma/select psql/xml-tree-values
-                     (korma/where {:results_id (:import-id out-ctx)})
-                     (korma/where (psql/ltree-match psql/xml-tree-values
-                                                    :path
-                                                    "VipObject.0.Source.*{1}.VipId.*{1}")))
+                   (korma/where {:results_id (:import-id out-ctx)})
+                   (korma/where (psql/ltree-match psql/xml-tree-values
+                                                  :path
+                                                  "VipObject.0.Source.*{1}.VipId.*{1}")))
                  first
                  :value)
              "51")))))
@@ -49,11 +49,11 @@
                  :error_data)
              "\"ele0001\""))
       (is (= (->> (korma/select psql/xml-tree-validations
-                   (korma/where {:results_id (:import-id out-ctx)
-                                 :path nil}))
-                 (map :error_data)
-                 set)
-             #{"\".exemell\"" "\".seeesvee\""})))))
+                    (korma/where {:results_id (:import-id out-ctx)
+                                  :path nil}))
+                  (map :error_data)
+                  set)
+             #{"\".exemell\"" "\".seeesvee\""}))))
 
 (deftest ^:postgres validate-emails-test
   (testing "adds errors to the context for badly formatted emails"
