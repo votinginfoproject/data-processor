@@ -55,6 +55,18 @@
                   set)
              #{"\".exemell\"" "\".seeesvee\""}))))
 
+  (testing "when there are no errors, the errors table doesn't grow"
+    (let [ctx {:fatal {}
+               :warnings {:import
+                          {:global
+                           {:invalid-extensions []}}}
+               :errors {}
+               :pipeline [psql/start-run
+                          load-xml-tree-validations]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (= 0 (count (korma/select psql/xml-tree-validations
+                        (korma/where {:results_id (:import-id out-ctx)}))))))))
+
 (deftest ^:postgres validate-emails-test
   (testing "adds errors to the context for badly formatted emails"
     (let [ctx {:input (xml-input "v5-bad-emails.xml")
