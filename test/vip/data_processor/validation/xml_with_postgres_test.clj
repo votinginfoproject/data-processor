@@ -57,6 +57,7 @@
 
   (testing "when there are no errors, the errors table doesn't grow"
     (let [ctx {:fatal {}
+               :critical {}
                :warnings {:import
                           {:global
                            {:invalid-extensions []}}}
