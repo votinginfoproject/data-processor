@@ -4,4 +4,5 @@
 
 (def validations
   [email/validate-emails
-   id/validate-unique-ids])
+   id/validate-unique-ids
+   id/validate-no-missing-ids])
