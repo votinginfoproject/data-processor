@@ -232,8 +232,9 @@
   [ctx]
   (let [results-id (:import-id ctx)
         errors (postgres/xml-tree-validation-values ctx)]
-    (korma/insert postgres/xml-tree-validations
-      (korma/values errors)))
+    (when-not (empty? errors)
+      (korma/insert postgres/xml-tree-validations
+        (korma/values errors))))
   ctx)
 
 (defn determine-spec-version [ctx]
