@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <Candidate id="can001">
+    <PostElectionStatus>advanced-to-runoff</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can002">
+    <PostElectionStatus>projected-winner</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can003">
+    <PostElectionStatus>winner</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can004">
+    <PostElectionStatus>withdrawn</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can005">
+    <PostElectionStatus>won twice</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can006">
+    <PostElectionStatus>didn't even lose</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can007">
+  </Candidate>
+</VipObject>
