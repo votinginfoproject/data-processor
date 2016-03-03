@@ -40,7 +40,7 @@
 
 (def missing-ballot-name-query-string
   "SELECT xtv.path
-    FROM (SELECT DISTINCT subltree(path, 0, 4) || 'BallotName.0' AS path
+    FROM (SELECT DISTINCT subltree(path, 0, 4) || 'BallotName' AS path
           FROM xml_tree_values WHERE results_id = ?
           AND subltree(path, 0, 4) ~ 'VipObject.0.Candidate.*{1}'
           AND nlevel(subltree(path, 0, 4)) = 4) xtv

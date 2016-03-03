@@ -7,8 +7,13 @@
     <PostElectionStatus>projected-winner</PostElectionStatus>
   </Candidate>
   <Candidate id="can003">
-    <BallotName>The Ballot</BallotName>
+    <BallotName><Text language="en">The Ballot</Text></BallotName>
     <PreElectionStatus>withdrawn</PreElectionStatus>
     <PostElectionStatus>winner</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can004">
+    <PreElectionStatus>withdrawn</PreElectionStatus>
+    <PostElectionStatus>winner</PostElectionStatus>
+    <BallotName><Text language="en">The Ballot</Text></BallotName>
   </Candidate>
 </VipObject>

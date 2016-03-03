@@ -76,7 +76,9 @@
                         v5.candidate/validate-no-missing-ballot-names]}
         out-ctx (pipeline/run-pipeline ctx)]
     (testing "missing BallotNames are flagged"
-      (is (get-in out-ctx [:errors :candidates "VipObject.0.Candidate.0.BallotName.0" :missing]))
-      (is (get-in out-ctx [:errors :candidates "VipObject.0.Candidate.1.BallotName.0" :missing])))
+      (is (get-in out-ctx [:errors :candidates "VipObject.0.Candidate.0.BallotName" :missing]))
+      (is (get-in out-ctx [:errors :candidates "VipObject.0.Candidate.1.BallotName" :missing])))
     (testing "doesn't for those that aren't"
-      (is (not (get-in out-ctx [:fatal :id "VipObject.0.Candidate.2.BallotName.0" :missing]))))))
+      (is (not (get-in out-ctx [:fatal :id "VipObject.0.Candidate.2.BallotName" :missing]))))
+    (testing "doesn't care if BallotName isn't first"
+      (is (not (get-in out-ctx [:fatal :id "VipObject.0.Candidate.3.BallotName" :missing]))))))
