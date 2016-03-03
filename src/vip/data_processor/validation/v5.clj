@@ -4,7 +4,8 @@
             [vip.data-processor.validation.v5.id :as id]))
 
 (def validations
-  [candidate/validate-post-election-statuses
+  [candidate/validate-no-missing-ballot-names
+   candidate/validate-post-election-statuses
    email/validate-emails
    id/validate-unique-ids
    id/validate-no-missing-ids])
