@@ -22,7 +22,6 @@
   [t/read-edn-sqs-message
    t/assert-filename
    psql/start-run
-   t/attach-sqlite-db
    t/download-from-s3
    zip/assoc-file
    zip/extracted-contents])

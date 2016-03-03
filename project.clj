@@ -29,6 +29,9 @@
              :dev {:source-paths ["dev-src"]
                    :resource-paths ["dev-resources"]
                    :main dev.core}}
+  :test-selectors {:default (complement :postgres)
+                   :postgres :postgres
+                   :all (constantly true)}
   :java-agents [[com.newrelic.agent.java/newrelic-agent "3.20.0"]]
   :jar-copier {:java-agents true
                :destination "resources/jars"}

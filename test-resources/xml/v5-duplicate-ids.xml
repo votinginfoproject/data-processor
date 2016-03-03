@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<VipObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.0" xsi:noNamespaceSchemaLocation="http://votinginfoproject.github.com/vip-specification/vip_spec.xsd">
+  <ElectionAuthority id="super-duper"></ElectionAuthority>
+  <ElectionAuthority id="super-duper"></ElectionAuthority>
+  <ElectionAuthority id="you-nique"></ElectionAuthority>
+  <ElectionAuthority id="mo-nique"></ElectionAuthority>
+</VipObject>

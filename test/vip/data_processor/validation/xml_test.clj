@@ -276,15 +276,19 @@
       (is (= "3.0" (get out-ctx :spec-version))))))
 
 (deftest branch-on-spec-version-test
-  (testing "adds load-xml to the front of the pipeline for 3.0 feeds"
+  (testing "adds the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
     (let [ctx {:spec-version "3.0"}
-          out-ctx (branch-on-spec-version ctx)]
-      (is (= load-xml (first (:pipeline out-ctx))))))
-  (testing "stops with unsupported version for 5.0 feeds"
+          out-ctx (branch-on-spec-version ctx)
+          v3-pipeline (get version-pipelines "3.0")]
+      (is (= v3-pipeline
+             (take (count v3-pipeline) (:pipeline out-ctx))))))
+  (testing "adds the 5.0 import pipeline to the front of the pipeline for 5.0 feeds"
     (let [ctx {:spec-version "5.0"
                :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported XML version"))))
+          out-ctx (branch-on-spec-version ctx)
+          v5-pipeline (get version-pipelines "5.0")]
+      (is (= v5-pipeline
+             (take (count v5-pipeline) (:pipeline out-ctx))))))
   (testing "stops with unsupported version for other versions"
     (let [ctx {:spec-version "2.0"  ; 2.0 is too old
                :pipeline [branch-on-spec-version]}

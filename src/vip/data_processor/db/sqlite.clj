@@ -34,3 +34,10 @@
 
 (def statement-parameter-limit 500)
 (def bulk-import (partial util/bulk-import statement-parameter-limit))
+
+(defn attach-sqlite-db [{:keys [import-id spec-version] :as ctx}]
+  (let [db (temp-db import-id spec-version)
+        db-file (get-in db [:db :db])]
+    (-> ctx
+        (merge db)
+        (update :to-be-cleaned conj db-file))))

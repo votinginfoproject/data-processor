@@ -1,0 +1,4 @@
+DROP INDEX xml_tree_validations_result_path_idx;
+DROP INDEX xml_tree_validations_result_type_idx;
+
+DROP TABLE xml_tree_validations;
