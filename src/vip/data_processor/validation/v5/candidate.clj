@@ -42,8 +42,7 @@
   "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 4) || 'BallotName' AS path
           FROM xml_tree_values WHERE results_id = ?
-          AND subltree(path, 0, 4) ~ 'VipObject.0.Candidate.*{1}'
-          AND nlevel(subltree(path, 0, 4)) = 4) xtv
+          AND subltree(path, 0, 4) ~ 'VipObject.0.Candidate.*{1}') xtv
     LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
     ON xtv.path = subltree(xtv2.path, 0, 5)
     WHERE xtv2.path IS NULL")
