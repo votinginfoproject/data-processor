@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <Candidate id="can001">
+  </Candidate>
+  <Candidate id="can002">
+    <PreElectionStatus>qualified</PreElectionStatus>
+    <PostElectionStatus>projected-winner</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can003">
+    <BallotName><Text language="en">The Ballot</Text></BallotName>
+    <PreElectionStatus>withdrawn</PreElectionStatus>
+    <PostElectionStatus>winner</PostElectionStatus>
+  </Candidate>
+  <Candidate id="can004">
+    <PreElectionStatus>withdrawn</PreElectionStatus>
+    <PostElectionStatus>winner</PostElectionStatus>
+    <BallotName><Text language="en">The Ballot</Text></BallotName>
+  </Candidate>
+</VipObject>
