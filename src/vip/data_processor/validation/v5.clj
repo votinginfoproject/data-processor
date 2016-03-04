@@ -5,6 +5,7 @@
 
 (def validations
   [candidate/validate-no-missing-ballot-names
+   candidate/validate-pre-election-statuses
    candidate/validate-post-election-statuses
    email/validate-emails
    id/validate-unique-ids
