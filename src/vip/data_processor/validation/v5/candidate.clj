@@ -45,7 +45,7 @@
           AND subltree(path, 0, 4) ~ 'VipObject.0.Candidate.*{1}'
           AND nlevel(subltree(path, 0, 4)) = 4) xtv
     LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
-    ON xtv.path = xtv2.path
+    ON xtv.path = subltree(xtv2.path, 0, 5)
     WHERE xtv2.path IS NULL")
 
 (defn missing-ballot-name-query
