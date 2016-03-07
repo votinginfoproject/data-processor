@@ -1,7 +1,5 @@
 (ns vip.data-processor.validation.v5.retention-contest
-  (:require [korma.core :as korma]
-            [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.validation.v5.util :as util]))
+  (:require [vip.data-processor.validation.v5.util :as util]))
 
 (def validate-no-missing-candidate-ids
   (util/build-xml-tree-value-query-validator
