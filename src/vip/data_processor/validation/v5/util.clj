@@ -11,7 +11,7 @@
 (defn build-xml-tree-value-query-validator
   "Generate a validator that adds a validation error for every path in
   the results of the query. The params-fn must be a fn of one argument (the
-  context), which reutrns a vector of params for the query."
+  context) which returns a vector of params for the query."
   [severity scope error-type error-data query params-fn]
   (fn [{:keys [import-id] :as ctx}]
     (let [missing-paths (korma/exec-raw
