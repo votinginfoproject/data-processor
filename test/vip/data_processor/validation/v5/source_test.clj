@@ -23,7 +23,7 @@
                           xml/load-xml-ltree
                           v5.source/validate-one-source]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (get-in out-ctx [:fatal :source "VipObject.0.Source" :count]))))))
+      (assert-no-problems out-ctx []))))
 
 (deftest ^:postgres validate-name-test
   (testing "missing Name is a fatal error"
@@ -40,14 +40,14 @@
                           xml/load-xml-ltree
                           v5.source/validate-name]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (:fatal out-ctx)))))
+      (assert-no-problems out-ctx [])))
   (testing "Name present is OK even if it's not first"
     (let [ctx {:input (xml-input "v5-source-second-with-name-second.xml")
                :pipeline [psql/start-run
                           xml/load-xml-ltree
                           v5.source/validate-name]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (:fatal out-ctx))))))
+      (assert-no-problems out-ctx []))))
 
 (deftest ^:postgres validate-date-time-test
   (testing "missing DateTime is a fatal error"
@@ -64,14 +64,14 @@
                           xml/load-xml-ltree
                           v5.source/validate-date-time]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (:fatal out-ctx)))))
+      (assert-no-problems out-ctx [])))
   (testing "DateTime present is OK even if it's not first"
     (let [ctx {:input (xml-input "v5-source-second-with-date-time-second.xml")
                :pipeline [psql/start-run
                           xml/load-xml-ltree
                           v5.source/validate-date-time]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (:fatal out-ctx))))))
+      (assert-no-problems out-ctx []))))
 
 (deftest ^:postgres validate-vip-id-test
   (testing "missing VipId is a fatal error"
@@ -88,7 +88,7 @@
                           xml/load-xml-ltree
                           v5.source/validate-vip-id]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (:fatal out-ctx))))))
+      (assert-no-problems out-ctx []))))
 
 (deftest ^:postgres validate-vip-id-valid-fips-test
   (testing "invalid 2-digit FIPS in VipId is a critical error"
@@ -105,7 +105,7 @@
                           xml/load-xml-ltree
                           v5.source/validate-vip-id-valid-fips]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (:critical out-ctx)))))
+      (assert-no-problems out-ctx [])))
   (testing "invalid 5-digit FIPS in VipId is a critical error"
     (let [ctx {:input (xml-input "v5-source-vip-id-invalid-5-digit-fips.xml")
                :pipeline [psql/start-run
@@ -120,4 +120,4 @@
                           xml/load-xml-ltree
                           v5.source/validate-vip-id-valid-fips]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (:critical out-ctx))))))
+      (assert-no-problems out-ctx []))))
