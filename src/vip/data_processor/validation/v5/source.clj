@@ -20,7 +20,7 @@
       ctx)))
 
 (defn validate-source-name [{:keys [import-id] :as ctx}]
-  (let [path "VipObject.0.Source.0.Name.0"
+  (let [path "VipObject.0.Source.*{1}.Name.*{1}"
         source-name (-> (korma/select postgres/xml-tree-values
                                       (korma/where {:results_id import-id})
                                       (korma/where

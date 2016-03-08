@@ -32,7 +32,7 @@
                           xml/load-xml-ltree
                           v5.source/validate-source-name]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.0.Name.0"
+      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.*{1}.Name.*{1}"
                            :missing]))))
   (testing "blank name is a fatal error"
     (let [ctx {:input (xml-input "v5-source-with-blank-name.xml")
@@ -41,13 +41,19 @@
                           v5.source/validate-source-name]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (get-in out-ctx
-                  [:fatal :source "VipObject.0.Source.0.Name.0" :missing]))))
+                  [:fatal :source "VipObject.0.Source.*{1}.Name.*{1}"
+                   :missing]))))
   (testing "name present is OK"
     (let [ctx {:input (xml-input "v5-source-with-name.xml")
                :pipeline [psql/start-run
                           xml/load-xml-ltree
                           v5.source/validate-source-name]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (not (get-in out-ctx
-                       [:fatal :source "VipObject.0.Source.0.Name.0"
-                        :missing]))))))
+      (is (not (:fatal out-ctx)))))
+  (testing "name present is OK even if it's not first"
+    (let [ctx {:input (xml-input "v5-source-second-with-name-second.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-source-name]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (not (:fatal out-ctx))))))
