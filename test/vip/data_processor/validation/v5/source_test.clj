@@ -24,3 +24,30 @@
                           v5.source/validate-one-source]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (not (get-in out-ctx [:fatal :source "VipObject.0.Source" :count]))))))
+
+(deftest ^:postgres validate-source-name-test
+  (testing "missing name is a fatal error"
+    (let [ctx {:input (xml-input "v5-source-without-name.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-source-name]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.0.Name.0"
+                           :missing]))))
+  (testing "blank name is a fatal error"
+    (let [ctx {:input (xml-input "v5-source-with-blank-name.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-source-name]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx
+                  [:fatal :source "VipObject.0.Source.0.Name.0" :missing]))))
+  (testing "name present is OK"
+    (let [ctx {:input (xml-input "v5-source-with-name.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-source-name]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (not (get-in out-ctx
+                       [:fatal :source "VipObject.0.Source.0.Name.0"
+                        :missing]))))))
