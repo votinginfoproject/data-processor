@@ -72,3 +72,20 @@
                           v5.source/validate-date-time]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (not (:fatal out-ctx))))))
+
+(deftest ^:postgres validate-vip-id-test
+  (testing "missing VipId is a fatal error"
+    (let [ctx {:input (xml-input "v5-source-without-vip-id.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-vip-id]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.*{1}.VipId.*{1}"
+                           :missing]))))
+  (testing "VipId present is OK"
+    (let [ctx {:input (xml-input "v5-source-with-vip-id.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-vip-id]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (not (:fatal out-ctx))))))

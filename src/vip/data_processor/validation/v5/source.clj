@@ -45,3 +45,17 @@
       ctx
       (update-in ctx [:fatal :source path :missing]
                  conj :missing-date-time))))
+
+(defn validate-vip-id [{:keys [import-id] :as ctx}]
+  (let [path "VipObject.0.Source.*{1}.VipId.*{1}"
+        source-vip-id (-> (korma/select postgres/xml-tree-values
+                                        (korma/where {:results_id import-id})
+                                        (korma/where
+                                         (postgres/ltree-match
+                                          postgres/xml-tree-values :path path)))
+                          first
+                          :value)]
+    (if source-vip-id
+      ctx
+      (update-in ctx [:fatal :source path :missing]
+                 conj :missing-vip-id))))
