@@ -3,6 +3,7 @@
             [vip.data-processor.validation.v5.email :as email]
             [vip.data-processor.validation.v5.id :as id]
             [vip.data-processor.validation.v5.precinct :as precinct]
+            [vip.data-processor.validation.v5.retention-contest :as retention-contest]
             [vip.data-processor.validation.v5.state :as state]))
 
 (def validations
@@ -14,4 +15,5 @@
    id/validate-no-missing-ids
    precinct/validate-no-missing-names
    precinct/validate-no-missing-locality-ids
+   retention-contest/validate-no-missing-candidate-ids
    state/validate-no-missing-names])
