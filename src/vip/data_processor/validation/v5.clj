@@ -4,7 +4,8 @@
             [vip.data-processor.validation.v5.id :as id]
             [vip.data-processor.validation.v5.precinct :as precinct]
             [vip.data-processor.validation.v5.source :as source]
-            [vip.data-processor.validation.v5.retention-contest :as retention-contest]))
+            [vip.data-processor.validation.v5.retention-contest :as retention-contest]
+            [vip.data-processor.validation.v5.state :as state]))
 
 (def validations
   [candidate/validate-no-missing-ballot-names
@@ -20,4 +21,5 @@
    source/validate-date-time
    source/validate-vip-id
    source/validate-vip-id-valid-fips
-   retention-contest/validate-no-missing-candidate-ids])
+   retention-contest/validate-no-missing-candidate-ids
+   state/validate-no-missing-names])
