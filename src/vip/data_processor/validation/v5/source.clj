@@ -1,7 +1,6 @@
 (ns vip.data-processor.validation.v5.source
   (:require [korma.core :as korma]
-            [vip.data-processor.db.postgres :as postgres]
-            [clojure.string :as str]))
+            [vip.data-processor.db.postgres :as postgres]))
 
 (defn validate-one-source [{:keys [import-id] :as ctx}]
   (let [result (korma/exec-raw
@@ -28,10 +27,10 @@
                                         postgres/xml-tree-values :path path)))
                         first
                         :value)]
-    (if (str/blank? source-name)
+    (if source-name
+      ctx
       (update-in ctx [:fatal :source path :missing]
-                 conj :missing-name)
-      ctx)))
+                 conj :missing-name))))
 
 (defn validate-date-time [{:keys [import-id] :as ctx}]
   (let [path "VipObject.0.Source.*{1}.DateTime.*{1}"
@@ -42,7 +41,7 @@
                                              postgres/xml-tree-values :path path)))
                              first
                              :value)]
-    (if (str/blank? source-date-time)
+    (if source-date-time
+      ctx
       (update-in ctx [:fatal :source path :missing]
-                 conj :missing-date-time)
-      ctx)))
+                 conj :missing-date-time))))
