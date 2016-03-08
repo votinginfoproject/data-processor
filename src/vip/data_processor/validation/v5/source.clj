@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.v5.source
   (:require [korma.core :as korma]
-            [vip.data-processor.db.postgres :as postgres]))
+            [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.validation.fips :as fips]))
 
 (defn validate-one-source [{:keys [import-id] :as ctx}]
   (let [result (korma/exec-raw
@@ -59,3 +60,17 @@
       ctx
       (update-in ctx [:fatal :source path :missing]
                  conj :missing-vip-id))))
+
+(defn validate-vip-id-valid-fips [{:keys [import-id] :as ctx}]
+  (let [path "VipObject.0.Source.*{1}.VipId.*{1}"
+        vip-ids (korma/select postgres/xml-tree-values
+                              (korma/where {:results_id import-id})
+                              (korma/where
+                               (postgres/ltree-match
+                                postgres/xml-tree-values :path path)))
+        invalid-vip-ids (remove (comp fips/valid-fips? :value) vip-ids)]
+    (reduce (fn [ctx row]
+              (update-in ctx
+                         [:critical :source (-> row :path .getValue) :invalid-fips]
+                         conj (:value row)))
+            ctx invalid-vip-ids)))

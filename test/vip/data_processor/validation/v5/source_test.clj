@@ -89,3 +89,35 @@
                           v5.source/validate-vip-id]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (not (:fatal out-ctx))))))
+
+(deftest ^:postgres validate-vip-id-valid-fips-test
+  (testing "invalid 2-digit FIPS in VipId is a critical error"
+    (let [ctx {:input (xml-input "v5-source-vip-id-invalid-2-digit-fips.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-vip-id-valid-fips]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:critical :source "VipObject.0.Source.1.VipId.2"
+                           :invalid-fips]))))
+  (testing "valid 2-digit FIPS in VipId is OK"
+    (let [ctx {:input (xml-input "v5-source-vip-id-valid-2-digit-fips.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-vip-id-valid-fips]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (not (:critical out-ctx)))))
+  (testing "invalid 5-digit FIPS in VipId is a critical error"
+    (let [ctx {:input (xml-input "v5-source-vip-id-invalid-5-digit-fips.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-vip-id-valid-fips]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:critical :source "VipObject.0.Source.1.VipId.2"
+                           :invalid-fips]))))
+  (testing "valid 5-digit FIPS in VipId is OK"
+    (let [ctx {:input (xml-input "v5-source-vip-id-valid-5-digit-fips.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-vip-id-valid-fips]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (not (:critical out-ctx))))))
