@@ -19,4 +19,4 @@
       (is (get-in out-ctx [:fatal :states "VipObject.0.State.0.Name" :missing]))
       (is (get-in out-ctx [:fatal :states "VipObject.0.State.1.Name" :missing])))
     (testing "doesn't for those that aren't"
-      (is (not (get-in out-ctx [:fatal :states "VipObject.0.State.2.Name" :missing]))))))
+      (assert-no-problems out-ctx [:states "VipObject.0.State.2.Name"]))))
