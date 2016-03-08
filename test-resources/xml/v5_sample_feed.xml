@@ -898,6 +898,10 @@
     <BallotName>
       <Text language="en">Barack H. Obama</Text>
     </BallotName>
+    <!-- Additions for tests -->
+    <PreElectionStatus>filed</PreElectionStatus>
+    <PostElectionStatus>projected-winner</PostElectionStatus>
+    <!-- End of additions for tests -->
     <FileDate>2015-06-01</FileDate>
     <PartyId>par0003</PartyId>
     <PersonId>per10861a</PersonId>
@@ -2183,6 +2187,13 @@
     <PollingLocationId>pl81273</PollingLocationId>
     <PollingLocationId>pl81213</PollingLocationId>
   </Precinct>
+
+  <!-- Additions for tests -->
+  <!-- Retention Contests -->
+  <RetentionContest id="rc0001">
+    <CandidateId>can10214</CandidateId>
+  </RetentionContest>
+  <!-- End of additions for tests -->
 
   <!-- Street segments -->
   <StreetSegment id="ss999999">
