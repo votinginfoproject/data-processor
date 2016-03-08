@@ -48,15 +48,27 @@
                           v5.source/validate-name]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (not (:fatal out-ctx))))))
+
+(deftest ^:postgres validate-date-time-test
+  (testing "missing DateTime is a fatal error"
+    (let [ctx {:input (xml-input "v5-source-without-date-time.xml")
                :pipeline [psql/start-run
                           xml/load-xml-ltree
-                          v5.source/validate-source-name]}
+                          v5.source/validate-date-time]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.*{1}.DateTime.*{1}"
+                           :missing]))))
+  (testing "DateTime present is OK"
+    (let [ctx {:input (xml-input "v5-source-with-date-time.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-date-time]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (not (:fatal out-ctx)))))
-  (testing "name present is OK even if it's not first"
-    (let [ctx {:input (xml-input "v5-source-second-with-name-second.xml")
+  (testing "DateTime present is OK even if it's not first"
+    (let [ctx {:input (xml-input "v5-source-second-with-date-time-second.xml")
                :pipeline [psql/start-run
                           xml/load-xml-ltree
-                          v5.source/validate-source-name]}
+                          v5.source/validate-date-time]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (not (:fatal out-ctx))))))
