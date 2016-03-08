@@ -3,7 +3,7 @@
 
 (def validate-no-missing-names
   (util/build-xml-tree-value-query-validator
-   :errors :states :missing :missing-name
+   :fatal :states :missing :missing-name
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 4) || 'Name' AS path
           FROM xml_tree_values WHERE results_id = ?
