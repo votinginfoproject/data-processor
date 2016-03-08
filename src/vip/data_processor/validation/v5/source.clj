@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.v5.source
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.validation.fips :as fips]))
+            [vip.data-processor.validation.fips :as fips]
+            [vip.data-processor.validation.v5.util :as util]))
 
 (defn validate-one-source [{:keys [import-id] :as ctx}]
   (let [result (korma/exec-raw
@@ -19,47 +20,41 @@
                  conj :more-than-one)
       ctx)))
 
-(defn validate-name [{:keys [import-id] :as ctx}]
-  (let [path "VipObject.0.Source.*{1}.Name.*{1}"
-        source-name (-> (korma/select postgres/xml-tree-values
-                                      (korma/where {:results_id import-id})
-                                      (korma/where
-                                       (postgres/ltree-match
-                                        postgres/xml-tree-values :path path)))
-                        first
-                        :value)]
-    (if source-name
-      ctx
-      (update-in ctx [:fatal :source path :missing]
-                 conj :missing-name))))
+(def validate-name
+  (util/build-xml-tree-value-query-validator
+   :fatal :source :missing :missing-name
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 4) || 'Name' AS path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(path, 0, 4) ~ 'VipObject.0.Source.*{1}') xtv
+    LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
+    ON xtv.path = subltree(xtv2.path, 0, 5)
+    WHERE xtv2.path IS NULL"
+   util/two-import-ids))
 
-(defn validate-date-time [{:keys [import-id] :as ctx}]
-  (let [path "VipObject.0.Source.*{1}.DateTime.*{1}"
-        source-date-time (-> (korma/select postgres/xml-tree-values
-                                           (korma/where {:results_id import-id})
-                                           (korma/where
-                                            (postgres/ltree-match
-                                             postgres/xml-tree-values :path path)))
-                             first
-                             :value)]
-    (if source-date-time
-      ctx
-      (update-in ctx [:fatal :source path :missing]
-                 conj :missing-date-time))))
+(def validate-date-time
+  (util/build-xml-tree-value-query-validator
+   :fatal :source :missing :missing-date-time
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 4) || 'DateTime' AS path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(path, 0, 4) ~ 'VipObject.0.Source.*{1}') xtv
+    LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
+    ON xtv.path = subltree(xtv2.path, 0, 5)
+    WHERE xtv2.path IS NULL"
+   util/two-import-ids))
 
-(defn validate-vip-id [{:keys [import-id] :as ctx}]
-  (let [path "VipObject.0.Source.*{1}.VipId.*{1}"
-        source-vip-id (-> (korma/select postgres/xml-tree-values
-                                        (korma/where {:results_id import-id})
-                                        (korma/where
-                                         (postgres/ltree-match
-                                          postgres/xml-tree-values :path path)))
-                          first
-                          :value)]
-    (if source-vip-id
-      ctx
-      (update-in ctx [:fatal :source path :missing]
-                 conj :missing-vip-id))))
+(def validate-vip-id
+  (util/build-xml-tree-value-query-validator
+   :fatal :source :missing :missing-name
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 4) || 'VipId' AS path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(path, 0, 4) ~ 'VipObject.0.Source.*{1}') xtv
+    LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
+    ON xtv.path = subltree(xtv2.path, 0, 5)
+    WHERE xtv2.path IS NULL"
+   util/two-import-ids))
 
 (defn validate-vip-id-valid-fips [{:keys [import-id] :as ctx}]
   (let [path "VipObject.0.Source.*{1}.VipId.*{1}"

@@ -32,7 +32,7 @@
                           xml/load-xml-ltree
                           v5.source/validate-name]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.*{1}.Name.*{1}"
+      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.0.Name"
                            :missing]))))
   (testing "Name present is OK"
     (let [ctx {:input (xml-input "v5-source-with-name.xml")
@@ -56,7 +56,7 @@
                           xml/load-xml-ltree
                           v5.source/validate-date-time]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.*{1}.DateTime.*{1}"
+      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.0.DateTime"
                            :missing]))))
   (testing "DateTime present is OK"
     (let [ctx {:input (xml-input "v5-source-with-date-time.xml")
@@ -80,7 +80,7 @@
                           xml/load-xml-ltree
                           v5.source/validate-vip-id]}
           out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.*{1}.VipId.*{1}"
+      (is (get-in out-ctx [:fatal :source "VipObject.0.Source.0.VipId"
                            :missing]))))
   (testing "VipId present is OK"
     (let [ctx {:input (xml-input "v5-source-with-vip-id.xml")
