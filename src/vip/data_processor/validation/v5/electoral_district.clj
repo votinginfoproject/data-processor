@@ -34,7 +34,7 @@
 (defn valid-type? [type] (types type))
 
 (defn validate-type-formats [{:keys [import-id] :as ctx}]
-  (let [imported-types (util/select-path
+  (let [imported-types (util/select-lquery
                         import-id
                         "VipObject.0.ElectoralDistrict.*{1}.Type.*{1}")
         invalid-types (remove (comp valid-type? :value) imported-types)]
