@@ -1,7 +1,7 @@
 (ns vip.data-processor.validation.v5.electoral-district
   (:require [vip.data-processor.validation.v5.util :as util]))
 
-(def validate-name
+(def validate-no-missing-names
   (util/build-xml-tree-value-query-validator
    :errors :electoral-district :missing :missing-name
    "SELECT xtv.path
@@ -13,7 +13,7 @@
     WHERE xtv2.path IS NULL"
    util/two-import-ids))
 
-(def validate-type
+(def validate-no-missing-types
   (util/build-xml-tree-value-query-validator
    :errors :electoral-district :missing :missing-type
    "SELECT xtv.path
@@ -33,7 +33,7 @@
 
 (defn valid-type? [type] (types type))
 
-(defn validate-type-format [{:keys [import-id] :as ctx}]
+(defn validate-type-formats [{:keys [import-id] :as ctx}]
   (let [imported-types (util/select-path
                         import-id
                         "VipObject.0.ElectoralDistrict.*{1}.Type.*{1}")

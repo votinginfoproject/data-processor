@@ -8,13 +8,13 @@
 (use-fixtures :once setup-postgres)
 (use-fixtures :each with-clean-postgres)
 
-(deftest ^:postgres validate-name-test
+(deftest ^:postgres validate-no-missing-names-test
   (testing "missing Name is an error"
     (let [ctx {:input (xml-input "v5-electoral-districts.xml")}
           out-ctx (-> ctx
                       psql/start-run
                       xml/load-xml-ltree
-                      v5.electoral-district/validate-name)]
+                      v5.electoral-district/validate-no-missing-names)]
       (is (get-in out-ctx [:errors :electoral-district
                            "VipObject.0.ElectoralDistrict.4.Name" :missing]))
       (is (not (get-in out-ctx [:errors :electoral-district
@@ -28,13 +28,13 @@
       (is (not (get-in out-ctx [:errors :electoral-district
                                 "VipObject.0.ElectoralDistrict.5.Name"]))))))
 
-(deftest ^:postgres validate-type-test
+(deftest ^:postgres validate-no-missing-types-test
   (testing "missing Type is an error"
     (let [ctx {:input (xml-input "v5-electoral-districts.xml")}
           out-ctx (-> ctx
                       psql/start-run
                       xml/load-xml-ltree
-                      v5.electoral-district/validate-type)]
+                      v5.electoral-district/validate-no-missing-types)]
       (is (get-in out-ctx [:errors :electoral-district
                            "VipObject.0.ElectoralDistrict.5.Type" :missing]))
       (is (not (get-in out-ctx [:errors :electoral-district
@@ -48,13 +48,13 @@
       (is (not (get-in out-ctx [:errors :electoral-district
                                 "VipObject.0.ElectoralDistrict.4.Type"]))))))
 
-(deftest ^:postgres validate-type-format-test
+(deftest ^:postgres validate-type-formats-test
   (testing "invalid Type is an error"
     (let [ctx {:input (xml-input "v5-electoral-districts.xml")}
           out-ctx (-> ctx
                       psql/start-run
                       xml/load-xml-ltree
-                      v5.electoral-district/validate-type-format)]
+                      v5.electoral-district/validate-type-formats)]
       (is (get-in out-ctx [:errors :electoral-district
                            "VipObject.0.ElectoralDistrict.2.Type.1" :format]))
       (is (get-in out-ctx [:errors :electoral-district
