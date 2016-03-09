@@ -8,15 +8,12 @@
 
 (defn validate-times [{:keys [import-id] :as ctx}]
   (let [hours-open-path "VipObject.0.HoursOpen.*{1}.Schedule.*{1}.Hours.*{1}"
-        start-times (util/select-path import-id
-                                      (str hours-open-path ".StartTime.*{1}"))
-        end-times (util/select-path import-id
-                                    (str hours-open-path ".EndTime.*{1}"))
-        invalid-times #(remove (comp valid-time-with-zone? :value) %)
-        invalid-start-times (invalid-times start-times)
-        invalid-end-times (invalid-times end-times)]
+        times (util/select-lquery
+               import-id
+               (str hours-open-path ".StartTime|EndTime.*{1}"))
+        invalid-times (remove (comp valid-time-with-zone? :value) times)]
     (reduce (fn [ctx row]
               (update-in ctx
                          [:errors :hours-open (-> row :path .getValue) :format]
                          conj (:value row)))
-            ctx (concat invalid-start-times invalid-end-times))))
+            ctx invalid-times)))

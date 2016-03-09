@@ -25,13 +25,13 @@
                                 conj error-data))
                    ctx)))))
 
-(defn select-path
+(defn select-lquery
   "Returns the xml-tree-values whose results_id matches the given `import-id`
   and that match an ltree query on `path`. Returns a korma results collection.
 
-  Example: (select-path 1 \"VipObject.0.Source.id\") will run a query like:
+  Example: (select-lquery 1 \"VipObject.0.Source.*{1}\") will run a query like:
            SELECT * FROM xml_tree_values WHERE results_id = 1
-           AND path ~ 'VipObject.0.Source.id'"
+           AND path ~ 'VipObject.0.Source.*{1}'"
   [import-id path]
   (korma/select postgres/xml-tree-values
                 (korma/where {:results_id import-id})
