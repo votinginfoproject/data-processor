@@ -6,7 +6,8 @@
             [vip.data-processor.validation.v5.source :as source]
             [vip.data-processor.validation.v5.retention-contest :as retention-contest]
             [vip.data-processor.validation.v5.state :as state]
-            [vip.data-processor.validation.v5.hours-open :as hours-open]))
+            [vip.data-processor.validation.v5.hours-open :as hours-open]
+            [vip.data-processor.validation.v5.electoral-district :as electoral-district]))
 
 (def validations
   [candidate/validate-no-missing-ballot-names
@@ -24,4 +25,7 @@
    source/validate-vip-id-valid-fips
    retention-contest/validate-no-missing-candidate-ids
    state/validate-no-missing-names
-   hours-open/validate-times])
+   hours-open/validate-times
+   electoral-district/validate-name
+   electoral-district/validate-type
+   electoral-district/validate-type-format])
