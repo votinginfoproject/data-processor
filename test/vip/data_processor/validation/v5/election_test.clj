@@ -27,7 +27,7 @@
 
 (deftest ^:postgres validate-date-test
   (testing "Date element missing is a fatal error"
-    (let [ctx {:input (xml-input "v5-election-without-date.xml")}
+    (let [ctx {:input (xml-input "v5-one-election.xml")}
           out-ctx (-> ctx
                       psql/start-run
                       xml/load-xml-ltree
@@ -44,7 +44,7 @@
 
 (deftest ^:postgres validate-state-id-test
   (testing "StateId element missing is a fatal error"
-    (let [ctx {:input (xml-input "v5-election-without-state-id.xml")}
+    (let [ctx {:input (xml-input "v5-one-election.xml")}
           out-ctx (-> ctx
                       psql/start-run
                       xml/load-xml-ltree
