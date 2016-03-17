@@ -66,7 +66,7 @@
 (defn paths-for-element [element version]
   (let [ancestors (ancestry element)]
     (reduce (fn [paths ancestor]
-              (condp = (.getTagName ancestor)
+              (case (.getTagName ancestor)
                 "xs:element" (conj paths (.getAttribute ancestor "name"))
                 "xs:complexType" (if-let [type-paths (seq (paths-for-type (.getAttribute ancestor "name") version))]
                                    (conj paths type-paths)
