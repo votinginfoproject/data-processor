@@ -9,6 +9,7 @@
             [vip.data-processor.validation.v5.state :as state]
             [vip.data-processor.validation.v5.hours-open :as hours-open]
             [vip.data-processor.validation.v5.electoral-district :as electoral-district]
+            [vip.data-processor.validation.v5.election-administration :as election-admin]
             [vip.data-processor.validation.v5.election :as election]))
 
 (def validations
@@ -33,6 +34,8 @@
    electoral-district/validate-no-missing-names
    electoral-district/validate-no-missing-types
    electoral-district/validate-type-formats
+   election-admin/validate-no-missing-departments
+   election-admin/validate-voter-service-type-format
    election/validate-one-election
    election/validate-date
    election/validate-state-id])

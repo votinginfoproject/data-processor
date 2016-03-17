@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <ElectionAdministration id="ea001">
+    <Department>
+      <VoterService>
+        <Type>polling-places</Type>
+      </VoterService>
+    </Department>
+  </ElectionAdministration>
+  <ElectionAdministration id="ea002">
+    <Department>
+      <VoterService>
+        <Type>not-a-real-type</Type>
+      </VoterService>
+    </Department>
+  </ElectionAdministration>
+  <ElectionAdministration id="ea003">
+    <AmIRegisteredUri>http://www.example.com/</AmIRegisteredUri>
+  </ElectionAdministration>
+</VipObject>
