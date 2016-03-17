@@ -1,5 +1,5 @@
-(ns vip.data-processor.validation.xml.xpath-test
-  (:require [vip.data-processor.validation.xml.xpath :refer :all]
+(ns vip.data-processor.validation.xml.spec-test
+  (:require [vip.data-processor.validation.xml.spec :refer :all]
             [clojure.test :refer :all]))
 
 (deftest type->lqueries-test
