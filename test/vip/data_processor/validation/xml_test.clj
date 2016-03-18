@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
+            [clojure.data.xml :as data.xml]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
@@ -294,3 +295,27 @@
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported XML version")))))
+
+(deftest path-and-values-test
+  (let [node (data.xml/element :country
+                               {:id "country1"
+                                :founded "1788"}
+                               (data.xml/element :state
+                                                 {:id "state1"}
+                                                 "Delaware")
+                               (data.xml/element :state
+                                                 {:id "state11"}
+                                                 "New York"))
+        pvs (path-and-values node)]
+    (is (= 6 (count pvs)))
+    (is (= #{"country.id" "country.founded" "country.state" "country.state.id"}
+           (set (map :simple_path pvs))))
+    (is (= #{"country.0.id" "country.0.founded"
+             "country.0.state.0" "country.0.state.0.id"
+             "country.0.state.1" "country.0.state.1.id"}
+           (set (map :path pvs))))
+    (is (some #{{:path "country.0.state.1.id"
+                 :simple_path "country.state.id"
+                 :value "state11"
+                 :parent_with_id "country.0.state.1"}}
+              pvs))))
