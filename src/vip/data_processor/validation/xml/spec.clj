@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.xml.spec
   (:import [javax.xml.parsers DocumentBuilder DocumentBuilderFactory]
            [javax.xml.xpath XPathFactory XPathConstants])
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojure.string :as str]))
 
 (defn spec-resource [version]
   (let [path (str "specs/vip_spec_v" version ".xsd")]
@@ -89,18 +90,16 @@
               (recur (map #(concat lqueries %) forked-paths)
                      xs)))))
 
-(defn path->lquery [path]
+(defn path->simple-path [path]
   (->> path
-       (interleave (repeat "*{1}"))
-       (interpose ".")
        reverse
-       (apply str)))
+       (str/join ".")))
 
-(defn type->lqueries
-  "Generates a list of lqueries to find all elements of type in the
-  version of the specification."
+(defn type->simple-paths
+  "Generates a list of simple-paths to find all elements of type in
+  the version of the specification."
   [type version]
   {:pre [(contains? spec-docs version)]}
   (->> (paths-for-type type version)
        (mapcat explode-paths)
-       (map path->lquery)))
+       (map path->simple-path)))
