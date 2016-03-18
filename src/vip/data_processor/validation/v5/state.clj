@@ -7,7 +7,7 @@
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 4) || 'Name' AS path
           FROM xml_tree_values WHERE results_id = ?
-          AND subltree(path, 0, 4) ~ 'VipObject.0.State.*{1}') xtv
+          AND subltree(simple_path, 0, 2) = 'VipObject.State') xtv
     LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
     ON xtv.path = subltree(xtv2.path, 0, 5)
     WHERE xtv2.path IS NULL"
