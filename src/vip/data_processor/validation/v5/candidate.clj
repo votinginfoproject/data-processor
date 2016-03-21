@@ -12,11 +12,8 @@
 
 (defn validate-pre-election-statuses [{:keys [import-id] :as ctx}]
   (let [statuses (korma/select postgres/xml-tree-values
-                               (korma/where {:results_id import-id})
-                               (korma/where
-                                (postgres/ltree-match
-                                 postgres/xml-tree-values :path
-                                 "VipObject.0.Candidate.*{1}.PreElectionStatus.*{1}")))
+                   (korma/where {:results_id import-id
+                                 :simple_path (postgres/path->ltree "VipObject.Candidate.PreElectionStatus")}))
         invalid-statuses (remove valid-pre-election-status? statuses)]
     (reduce (fn [ctx row]
               (update-in ctx
@@ -26,11 +23,8 @@
 
 (defn validate-post-election-statuses [{:keys [import-id] :as ctx}]
   (let [statuses (korma/select postgres/xml-tree-values
-                               (korma/where {:results_id import-id})
-                               (korma/where
-                                (postgres/ltree-match
-                                 postgres/xml-tree-values :path
-                                 "VipObject.0.Candidate.*{1}.PostElectionStatus.*{1}")))
+                   (korma/where {:results_id import-id
+                                 :simple_path (postgres/path->ltree "VipObject.Candidate.PostElectionStatus")}))
         invalid-statuses (remove valid-post-election-status? statuses)]
     (reduce (fn [ctx row]
               (update-in ctx
@@ -44,7 +38,7 @@
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 4) || 'BallotName' AS path
           FROM xml_tree_values WHERE results_id = ?
-          AND subltree(path, 0, 4) ~ 'VipObject.0.Candidate.*{1}') xtv
+          AND subltree(simple_path, 0, 2) = 'VipObject.Candidate') xtv
     LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
     ON xtv.path = subltree(xtv2.path, 0, 5)
     WHERE xtv2.path IS NULL"
