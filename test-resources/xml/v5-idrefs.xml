@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<VipObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.0" xsi:noNamespaceSchemaLocation="http://votinginfoproject.github.com/vip-specification/vip_spec.xsd">
+  <Person id="per01">
+    <FirstName>Alice</FirstName>
+    <PartyId>par001</PartyId>
+  </Person>
+  <Person id="per02">
+    <FirstName>Bob</FirstName>
+    <PartyId>par003</PartyId>
+  </Person>
+  <Person id="per03">
+    <FirstName>Carol</FirstName>
+    <PartyId>par002</PartyId>
+  </Person>
+  <Person id="per03">
+    <FirstName>Dave</FirstName>
+    <PartyId>par004</PartyId>
+  </Person>
+  <Party id="par001">
+    <Name><Text language="en">Democratic</Text></Name>
+  </Party>
+  <Party id="par002">
+    <Name><Text language="en">Republican</Text></Name>
+  </Party>
+</VipObject>
