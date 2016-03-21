@@ -20,6 +20,7 @@
    external-identifiers/validate-no-missing-values
    id/validate-unique-ids
    id/validate-no-missing-ids
+   id/validate-idrefs-refer
    precinct/validate-no-missing-names
    precinct/validate-no-missing-locality-ids
    source/validate-one-source
