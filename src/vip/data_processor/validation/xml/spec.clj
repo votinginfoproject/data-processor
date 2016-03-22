@@ -1,8 +1,29 @@
 (ns vip.data-processor.validation.xml.spec
   (:import [javax.xml.parsers DocumentBuilder DocumentBuilderFactory]
-           [javax.xml.xpath XPathFactory XPathConstants])
+           [javax.xml.xpath XPathFactory XPathConstants]
+           [javax.xml XMLConstants]
+           [javax.xml.namespace NamespaceContext])
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
+
+(def ns-context
+  "A NamespaceContext aware of the xs namespace."
+  (reify NamespaceContext
+    (getNamespaceURI [this prefix]
+      (case prefix
+        XMLConstants/DEFAULT_NS_PREFIX XMLConstants/NULL_NS_URI
+        "xs" "http://www.w3.org/2001/XMLSchema"
+        (throw IllegalArgumentException (str "Unknown prefix: " prefix))))
+    (getPrefix [this namespace-uri]
+      (case namespace-uri
+        XMLConstants/NULL_NS_URI XMLConstants/DEFAULT_NS_PREFIX
+        XMLConstants/XML_NS_URI XMLConstants/XML_NS_PREFIX
+        XMLConstants/XMLNS_ATTRIBUTE_NS_URI XMLConstants/XMLNS_ATTRIBUTE
+        "http://www.w3.org/2001/XMLSchema" "xs"
+        (throw IllegalArgumentException (str "Unknown namespace-uri: " namespace-uri))))
+    (getPrefixes [this namespace-uri]
+      ;; not implemented
+      nil)))
 
 (defn spec-resource [version]
   (let [path (str "specs/vip_spec_v" version ".xsd")]
@@ -27,7 +48,8 @@
   "Given an XPath expression and a specification version returns all
   nodes that match."
   [path version]
-  (let [xpath (.newXPath xpath-factory)
+  (let [xpath (doto (.newXPath xpath-factory)
+                (.setNamespaceContext ns-context))
         expr (.compile xpath path)
         spec-doc (spec-docs version)]
     (.evaluate expr spec-doc XPathConstants/NODESET)))
@@ -51,16 +73,23 @@
     (if ancestor
       (recur (conj ancestors ancestor)
              (.getParentNode ancestor))
-      ;; drop the "document" element
-      (drop 1 ancestors))))
+      (->> ancestors
+           (drop 1) ;; drop the "document" element
+           reverse))))
+
+(defn query->elements [query version]
+  (-> query
+      (query-spec version)
+      nodeset->seq))
 
 (defn type->elements
   "Query a spec for all elements of the type."
   [type version]
-  (let [type-query-expr (str "//*[@type='" type "']")]
-    (-> type-query-expr
-        (query-spec version)
-        nodeset->seq)))
+  (let [type-query-expr (str "//*[@type='" type "']")
+        extension-query-expr (str "//xs:extension[@base='" type "']")]
+    (concat
+     (query->elements type-query-expr version)
+     (query->elements extension-query-expr version))))
 
 (declare paths-for-type)
 
@@ -68,32 +97,20 @@
   (let [ancestors (ancestry element)]
     (reduce (fn [paths ancestor]
               (case (.getTagName ancestor)
-                "xs:element" (conj paths (.getAttribute ancestor "name"))
-                "xs:complexType" (if-let [type-paths (seq (paths-for-type (.getAttribute ancestor "name") version))]
-                                   (conj paths type-paths)
-                                   paths)
+                "xs:element" (map #(conj % (.getAttribute ancestor "name")) paths)
+                "xs:complexType" (let [name (.getAttribute ancestor "name")]
+                                   (if (= "" name)
+                                     paths
+                                     (let [type-paths (paths-for-type name version)]
+                                       (map #(concat % paths) type-paths))))
                 paths))
-            nil ancestors)))
+            '(()) ancestors)))
 
 (defn paths-for-type [type version]
   (let [elements (type->elements type version)]
-    (map #(paths-for-element % version) elements)))
-
-(defn explode-paths [paths]
-  (loop [lqueries [[]]
-         [x & xs] paths]
-    (cond
-      (nil? x) (map flatten lqueries)
-      (string? x) (recur (map #(conj % x) lqueries)
-                         xs)
-      :else (let [forked-paths (map explode-paths x)]
-              (recur (map #(concat lqueries %) forked-paths)
-                     xs)))))
-
-(defn path->simple-path [path]
-  (->> path
-       reverse
-       (str/join ".")))
+    (->> elements
+         (mapcat #(paths-for-element % version))
+         (map flatten))))
 
 (defn type->simple-paths
   "Generates a list of simple-paths to find all elements of type in
@@ -101,5 +118,4 @@
   [type version]
   {:pre [(contains? spec-docs version)]}
   (->> (paths-for-type type version)
-       (mapcat explode-paths)
-       (map path->simple-path)))
+       (map (partial str/join "."))))
