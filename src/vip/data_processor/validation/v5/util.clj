@@ -1,6 +1,8 @@
 (ns vip.data-processor.validation.v5.util
   (:require [korma.core :as korma]
-            [vip.data-processor.db.postgres :as postgres]))
+            [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.validation.xml.spec :as spec]
+            [clojure.string :as str]))
 
 (defn two-import-ids
   "A common params-fn for build-xml-tree-value-query-validator that
@@ -38,3 +40,37 @@
                 (korma/where
                  (postgres/ltree-match
                   postgres/xml-tree-values :path path))))
+
+(defn keyword->xml-name
+  "Converts Clojure kebaab-case keywords into XML camel-case strings."
+  [kw]
+  (let [components (-> kw name (str/split #"-"))]
+    (str/join (map str/capitalize components))))
+
+(defn build-no-missing-validators
+  "Returns a coll of fns that validates whether every element of `schema-type`
+  has a child `element` in the import identified by `import-id`."
+  [schema-type element import-id]
+  (let [xml-schema-type (keyword->xml-name schema-type)
+        paths (spec/type->simple-paths xml-schema-type "5.0")
+        path-element (keyword->xml-name element)]
+    (for [p paths]
+      (let [simple-path-nlevel (-> p
+                                   (str/split #"\.")
+                                   count)
+            path-nlevel (* 2 simple-path-nlevel)
+            path2-nlevel (inc path-nlevel)]
+        (build-xml-tree-value-query-validator
+         :errors schema-type :missing (->> element
+                                           name
+                                           (str "missing-")
+                                           keyword)
+         "SELECT xtv.path
+          FROM (SELECT DISTINCT subltree(path, 0, CAST(? AS INT)) || ? AS path
+                FROM xml_tree_values WHERE results_id = ?
+                AND subltree(simple_path, 0, CAST(? AS INT)) = text2ltree(?)) xtv
+          LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
+          ON xtv.path = subltree(xtv2.path, 0, CAST(? AS INT))
+          WHERE xtv2.path IS NULL"
+         (constantly [path-nlevel path-element import-id simple-path-nlevel p
+                      import-id path2-nlevel]))))))
