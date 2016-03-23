@@ -1,5 +1,5 @@
 (ns vip.data-processor.validation.v5.internationalized-text-test
-  (:require [vip.data-processor.validation.v5.internationalized-text :as v5.int-text]
+  (:require [vip.data-processor.validation.v5.internationalized-text :as v5.intl-text]
             [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
@@ -13,7 +13,7 @@
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.int-text/validate-no-missing-texts)]
+                    v5.intl-text/validate-no-missing-texts)]
     (testing "Text present is OK"
       (are [element-path] (is (not (get-in out-ctx
                                            [:errors :internationalized-text
