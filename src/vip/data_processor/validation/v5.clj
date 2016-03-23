@@ -10,7 +10,8 @@
             [vip.data-processor.validation.v5.hours-open :as hours-open]
             [vip.data-processor.validation.v5.electoral-district :as electoral-district]
             [vip.data-processor.validation.v5.election-administration :as election-admin]
-            [vip.data-processor.validation.v5.election :as election]))
+            [vip.data-processor.validation.v5.election :as election]
+            [vip.data-processor.validation.v5.locality :as locality]))
 
 (def validations
   [candidate/validate-no-missing-ballot-names
@@ -21,6 +22,7 @@
    external-identifiers/validate-no-missing-values
    id/validate-unique-ids
    id/validate-no-missing-ids
+   id/validate-idrefs-refer
    precinct/validate-no-missing-names
    precinct/validate-no-missing-locality-ids
    source/validate-one-source
@@ -38,4 +40,7 @@
    election-admin/validate-voter-service-type-format
    election/validate-one-election
    election/validate-date
-   election/validate-state-id])
+   election/validate-state-id
+   locality/validate-no-missing-names
+   locality/validate-no-missing-state-ids
+   locality/validate-types])

@@ -25,7 +25,7 @@
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 4) || 'Date' AS path
           FROM xml_tree_values WHERE results_id = ?
-          AND subltree(path, 0, 4) ~ 'VipObject.0.Election.*{1}') xtv
+          AND subltree(simple_path, 0, 2) = 'VipObject.Election') xtv
     LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
     ON xtv.path = subltree(xtv2.path, 0, 5)
     WHERE xtv2.path IS NULL"
@@ -37,7 +37,7 @@
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 4) || 'StateId' AS path
           FROM xml_tree_values WHERE results_id = ?
-          AND subltree(path, 0, 4) ~ 'VipObject.0.Election.*{1}') xtv
+          AND subltree(simple_path, 0, 2) = 'VipObject.Election') xtv
     LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
     ON xtv.path = subltree(xtv2.path, 0, 5)
     WHERE xtv2.path IS NULL"

@@ -184,16 +184,16 @@
   the first child of the `baz` element which is the second child of
   the `foo` element, which is the first element in the document."
   ([node]
-   (path-and-values node nil 0 nil))
-  ([node current-path]
-   (path-and-values node current-path 0 nil))
-  ([node current-path n nearest-path-with-id]
+   (path-and-values node nil nil 0 nil))
+  ([node current-path current-simple-path n nearest-path-with-id]
    (let [element-path (ltree-path-join current-path (:tag node) n)
+         simple-path (ltree-path-join current-simple-path (:tag node))
          nearest-path-with-id (if (get-in node [:attrs :id])
                                 element-path
                                 nearest-path-with-id)
          attribute-entries (map (fn [[k v]]
                                   {:path (ltree-path-join element-path k)
+                                   :simple_path (ltree-path-join simple-path k)
                                    :value v
                                    :parent_with_id nearest-path-with-id})
                                 (:attrs node))
@@ -201,10 +201,11 @@
                         (fn [n value]
                           (if (simple-value? value)
                             [{:path element-path
+                              :simple_path simple-path
                               :value value
                               :parent_with_id nearest-path-with-id}]
-                            (path-and-values value element-path n
-                                             nearest-path-with-id)))
+                            (path-and-values value element-path simple-path
+                                             n nearest-path-with-id)))
                         (:content node))]
      (apply concat attribute-entries child-entries))))
 
@@ -222,6 +223,7 @@
                                      (-> path-map
                                          (update :path postgres/path->ltree)
                                          (update :parent_with_id postgres/path->ltree)
+                                         (update :simple_path postgres/path->ltree)
                                          (assoc :results_id import-id)))
                                    chunk))))]
         (korma/insert postgres/xml-tree-values
