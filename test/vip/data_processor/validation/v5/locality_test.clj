@@ -33,3 +33,19 @@
     (testing "state-id present is OK"
       (is (not (get-in out-ctx [:errors :locality
                                 "VipObject.0.Locality.1.StateId" :missing]))))))
+
+(deftest ^:postgres validate-types-test
+  (let [ctx {:input (xml-input "v5-localities.xml")}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.locality/validate-types)]
+    (testing "type missing is OK"
+      (is (not (get-in out-ctx [:errors :locality
+                                "VipObject.0.Locality.0.Type" :missing]))))
+    (testing "type present and valid is OK"
+      (is (not (get-in out-ctx [:errors :locality
+                                "VipObject.0.Locality.1.Type.2" :format]))))
+    (testing "type present and invalid is an error"
+      (is (get-in out-ctx [:errors :locality
+                           "VipObject.0.Locality.2.Type.2" :format])))))
