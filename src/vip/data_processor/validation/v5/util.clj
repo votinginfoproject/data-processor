@@ -74,3 +74,14 @@
           WHERE xtv2.path IS NULL"
          (constantly [path-nlevel path-element import-id simple-path-nlevel p
                       import-id path2-nlevel]))))))
+
+(defn validate-no-missing-elements
+  "Returns a fn that takes a validation `ctx` and runs 'no-missing' validators
+  on all elements of `schema-type` in that import, checking that they all have
+  `element` children."
+  [schema-type element]
+  (fn [{:keys [import-id] :as ctx}]
+    (let [validators (build-no-missing-validators schema-type
+                                                  element
+                                                  import-id)]
+      (reduce (fn [ctx validator] (validator ctx)) ctx validators))))

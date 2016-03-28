@@ -10,14 +10,11 @@
     "state-senate" "town" "township" "utility" "village" "ward" "water"
     "other"})
 
-(defn validate-no-missing-names [{:keys [import-id] :as ctx}]
-  (let [validators (util/build-no-missing-validators :locality :name import-id)]
-    (reduce (fn [ctx validator] (validator ctx)) ctx validators)))
+(def validate-no-missing-names
+  (util/validate-no-missing-elements :locality :name))
 
-(defn validate-no-missing-state-ids [{:keys [import-id] :as ctx}]
-  (let [validators (util/build-no-missing-validators :locality :state-id
-                                                     import-id)]
-    (reduce (fn [ctx validator] (validator ctx)) ctx validators)))
+(def validate-no-missing-state-ids
+  (util/validate-no-missing-elements :locality :state-id))
 
 (defn valid-type? [type] (valid-types type))
 
