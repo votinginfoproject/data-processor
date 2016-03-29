@@ -100,27 +100,35 @@
                                                   import-id)]
       (reduce (fn [ctx validator] (validator ctx)) ctx validators))))
 
-(defn validate-enum-elements
-  "Returns a fn that takes a validation `ctx` and runs an enumerated values
-  validation on all elements of `schema-type` in the `ctx`'s import, checking
-  that all of their values are one of those enumerated as valid by the schema."
-  [schema-type]
+(defn elements-for-simple-path
+  "Returns all elements in `import-id` whose `simple-path` matches the given
+  arg."
+  [import-id simple-path]
+  (korma/select postgres/xml-tree-values
+    (korma/where
+     {:results_id import-id
+      :simple_path (postgres/path->ltree simple-path)})))
+
+(defn nth-to-last-path-element
+  "Returns the ltree path element `n` segments from the end."
+  [path n]
+  (-> path
+      (str/split #"\.")
+      reverse
+      (nth n)))
+
+(defn validate-elements
+  "Returns a fn that takes a validation `ctx` and runs the supplied `valid?`
+  predicate fn on every element of `schema-type` in the `ctx`'s import."
+  [schema-type valid?]
   (fn [ctx]
     (let [xml-schema-type (keyword->xml-name schema-type)
-          valid-values (spec/enumeration-values xml-schema-type "5.0")
-          valid? #(valid-values %)
           validators (for [p (spec/type->simple-paths xml-schema-type "5.0")]
                        (let [parent-element (-> p
-                                                (str/split #"\.")
-                                                reverse
-                                                second
+                                                (nth-to-last-path-element 1)
                                                 xml-name->keyword)]
                          (fn [{:keys [import-id] :as ctx}]
-                           (let [elements (korma/select postgres/xml-tree-values
-                                            (korma/where
-                                             {:results_id import-id
-                                              :simple_path
-                                              (postgres/path->ltree p)}))
+                           (let [elements (elements-for-simple-path import-id p)
                                  invalid-elements (remove (comp valid? :value)
                                                           elements)]
                              (reduce (fn [ctx row]
@@ -131,3 +139,15 @@
                                         conj (:value row)))
                                      ctx invalid-elements)))))]
       (reduce (fn [ctx validator] (validator ctx)) ctx validators))))
+
+(defn validate-enum-elements
+  "Returns a fn that takes a validation context and runs an enumerated values
+  validation on all elements of `schema-type` in the context's import, checking
+  that all of their values are one of those enumerated as valid by the schema.
+
+  See `validate-elements` for more details."
+  [schema-type]
+  (let [xml-schema-type (keyword->xml-name schema-type)
+        valid-values (spec/enumeration-values xml-schema-type "5.0")
+        valid? #(valid-values %)]
+    (validate-elements schema-type valid?)))
