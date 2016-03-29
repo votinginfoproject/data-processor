@@ -119,8 +119,10 @@
 
 (defn validate-elements
   "Returns a fn that takes a validation `ctx` and runs the supplied `valid?`
-  predicate fn on every element of `schema-type` in the `ctx`'s import."
-  [schema-type valid?]
+  predicate fn on every element of `schema-type` in the `ctx`'s import. It will
+  add errors to the context for any that `valid?` returns a falsey value at the
+  `error-severity` level with an `error-type` key."
+  [schema-type valid? error-severity error-type]
   (fn [ctx]
     (let [xml-schema-type (keyword->xml-name schema-type)
           validators (for [p (spec/type->simple-paths xml-schema-type "5.0")]
@@ -134,8 +136,8 @@
                              (reduce (fn [ctx row]
                                        (update-in
                                         ctx
-                                        [:errors parent-element
-                                         (-> row :path .getValue) :format]
+                                        [error-severity parent-element
+                                         (-> row :path .getValue) error-type]
                                         conj (:value row)))
                                      ctx invalid-elements)))))]
       (reduce (fn [ctx validator] (validator ctx)) ctx validators))))
@@ -144,10 +146,11 @@
   "Returns a fn that takes a validation context and runs an enumerated values
   validation on all elements of `schema-type` in the context's import, checking
   that all of their values are one of those enumerated as valid by the schema.
+  It will add errors to the context for any that `valid?` returns a falsey value
+  at the `error-severity` level.
 
   See `validate-elements` for more details."
-  [schema-type]
+  [schema-type error-severity]
   (let [xml-schema-type (keyword->xml-name schema-type)
-        valid-values (spec/enumeration-values xml-schema-type "5.0")
-        valid? #(valid-values %)]
-    (validate-elements schema-type valid?)))
+        valid? (spec/enumeration-values xml-schema-type "5.0")]
+    (validate-elements schema-type valid? error-severity :format)))

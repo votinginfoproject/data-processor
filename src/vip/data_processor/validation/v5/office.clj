@@ -8,4 +8,4 @@
   (util/validate-no-missing-elements :office [:term :type]))
 
 (def validate-term-types
-  (util/validate-enum-elements :office-term-type))
+  (util/validate-enum-elements :office-term-type :errors))
