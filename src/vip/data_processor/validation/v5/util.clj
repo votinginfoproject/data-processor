@@ -42,27 +42,40 @@
                   postgres/xml-tree-values :path path))))
 
 (defn keyword->xml-name
-  "Converts Clojure kebaab-case keywords into XML camel-case strings."
+  "Converts Clojure kebab-case keywords into XML camel-case strings."
   [kw]
   (let [components (-> kw name (str/split #"-"))]
     (str/join (map str/capitalize components))))
 
+(defn xml-name->keyword
+  "Converts XML camel-case strings into Clojure kebab-case keywords."
+  [xml-name]
+  (->> xml-name
+       (re-seq #"[A-Z][a-z0-9]*")
+       (map str/lower-case)
+       (str/join "-")
+       keyword))
+
 (defn build-no-missing-validators
   "Returns a coll of fns that validates whether every element of `schema-type`
-  has a child `element` in the import identified by `import-id`."
-  [schema-type element import-id]
+  has a child at `element-path` (a vec of kebaab-case element names) in the
+  import identified by `import-id`."
+  [schema-type element-path import-id]
   (let [xml-schema-type (keyword->xml-name schema-type)
         paths (spec/type->simple-paths xml-schema-type "5.0")
-        path-element (keyword->xml-name element)]
+        xml-element-path (mapv keyword->xml-name element-path)]
     (for [p paths]
-      (let [simple-path-nlevel (-> p
-                                   (str/split #"\.")
-                                   count)
+      (let [path-to-parent-components (-> p
+                                          (str/split #"\.")
+                                          (concat (butlast xml-element-path)))
+            path-to-parent (str/join "." path-to-parent-components)
+            simple-path-nlevel (count path-to-parent-components)
             path-nlevel (* 2 simple-path-nlevel)
             path2-nlevel (inc path-nlevel)]
         (build-xml-tree-value-query-validator
-         :errors schema-type :missing (->> element
-                                           name
+         :errors schema-type :missing (->> element-path
+                                           (map name)
+                                           (str/join "-")
                                            (str "missing-")
                                            keyword)
          "SELECT xtv.path
@@ -72,16 +85,49 @@
           LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
           ON xtv.path = subltree(xtv2.path, 0, CAST(? AS INT))
           WHERE xtv2.path IS NULL"
-         (constantly [path-nlevel path-element import-id simple-path-nlevel p
-                      import-id path2-nlevel]))))))
+         (constantly [path-nlevel (last xml-element-path) import-id
+                      simple-path-nlevel path-to-parent import-id
+                      path2-nlevel]))))))
 
 (defn validate-no-missing-elements
   "Returns a fn that takes a validation `ctx` and runs 'no-missing' validators
-  on all elements of `schema-type` in that import, checking that they all have
-  `element` children."
-  [schema-type element]
+  on all elements of `schema-type` in the `ctx`'s import, checking that they
+  all have `element` children."
+  [schema-type element-path]
   (fn [{:keys [import-id] :as ctx}]
     (let [validators (build-no-missing-validators schema-type
-                                                  element
+                                                  element-path
                                                   import-id)]
+      (reduce (fn [ctx validator] (validator ctx)) ctx validators))))
+
+(defn validate-enum-elements
+  "Returns a fn that takes a validation `ctx` and runs an enumerated values
+  validation on all elements of `schema-type` in the `ctx`'s import, checking
+  that all of their values are one of those enumerated as valid by the schema."
+  [schema-type]
+  (fn [ctx]
+    (let [xml-schema-type (keyword->xml-name schema-type)
+          valid-values (spec/enumeration-values xml-schema-type "5.0")
+          valid? #(valid-values %)
+          validators (for [p (spec/type->simple-paths xml-schema-type "5.0")]
+                       (let [parent-element (-> p
+                                                (str/split #"\.")
+                                                reverse
+                                                second
+                                                xml-name->keyword)]
+                         (fn [{:keys [import-id] :as ctx}]
+                           (let [elements (korma/select postgres/xml-tree-values
+                                            (korma/where
+                                             {:results_id import-id
+                                              :simple_path
+                                              (postgres/path->ltree p)}))
+                                 invalid-elements (remove (comp valid? :value)
+                                                          elements)]
+                             (reduce (fn [ctx row]
+                                       (update-in
+                                        ctx
+                                        [:errors parent-element
+                                         (-> row :path .getValue) :format]
+                                        conj (:value row)))
+                                     ctx invalid-elements)))))]
       (reduce (fn [ctx validator] (validator ctx)) ctx validators))))
