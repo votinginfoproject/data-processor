@@ -47,21 +47,3 @@
                                 "VipObject.0.ElectoralDistrict.3.Type"])))
       (is (not (get-in out-ctx [:errors :electoral-district
                                 "VipObject.0.ElectoralDistrict.4.Type"]))))))
-
-(deftest ^:postgres validate-type-formats-test
-  (testing "invalid Type is an error"
-    (let [ctx {:input (xml-input "v5-electoral-districts.xml")}
-          out-ctx (-> ctx
-                      psql/start-run
-                      xml/load-xml-ltree
-                      v5.electoral-district/validate-type-formats)]
-      (is (get-in out-ctx [:errors :electoral-district
-                           "VipObject.0.ElectoralDistrict.2.Type.1" :format]))
-      (is (get-in out-ctx [:errors :electoral-district
-                           "VipObject.0.ElectoralDistrict.3.Type.1" :format]))
-      (is (not (get-in out-ctx [:errors :electoral-district
-                                "VipObject.0.ElectoralDistrict.0.Type.1"])))
-      (is (not (get-in out-ctx [:errors :electoral-district
-                                "VipObject.0.ElectoralDistrict.1.Type.1"])))
-      (is (not (get-in out-ctx [:errors :electoral-district
-                                "VipObject.0.ElectoralDistrict.4.Type.0"]))))))

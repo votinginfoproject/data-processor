@@ -38,7 +38,6 @@
    hours-open/validate-times
    electoral-district/validate-no-missing-names
    electoral-district/validate-no-missing-types
-   electoral-district/validate-type-formats
    election-admin/validate-no-missing-departments
    election-admin/validate-voter-service-type-format
    election/validate-one-election
