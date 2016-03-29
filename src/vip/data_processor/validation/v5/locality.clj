@@ -11,12 +11,12 @@
     "other"})
 
 (def validate-no-missing-names
-  (util/validate-no-missing-elements :locality :name))
+  (util/validate-no-missing-elements :locality [:name]))
 
 (def validate-no-missing-state-ids
-  (util/validate-no-missing-elements :locality :state-id))
 
 (defn valid-type? [type] (valid-types type))
+  (util/validate-no-missing-elements :locality [:state-id]))
 
 (defn validate-types [ctx]
   (let [validators (for [p (spec/type->simple-paths "Locality" "5.0")]
