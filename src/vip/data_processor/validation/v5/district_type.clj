@@ -3,4 +3,4 @@
 
 (def validate
   "Validates all DistrictType elements' formats."
-  (util/validate-enum-elements :district-type))
+  (util/validate-enum-elements :district-type :errors))
