@@ -8,12 +8,14 @@
             [vip.data-processor.validation.v5.retention-contest :as retention-contest]
             [vip.data-processor.validation.v5.state :as state]
             [vip.data-processor.validation.v5.hours-open :as hours-open]
+            [vip.data-processor.validation.v5.electoral-district :as electoral-district]
             [vip.data-processor.validation.v5.election-administration :as election-admin]
             [vip.data-processor.validation.v5.election :as election]
             [vip.data-processor.validation.v5.locality :as locality]
             [vip.data-processor.validation.v5.internationalized-text :as intl-text]
             [vip.data-processor.validation.v5.district-type :as district-type]
             [vip.data-processor.validation.v5.office :as office]
+            [vip.data-processor.validation.v5.party-selection :as party-selection]
             [vip.data-processor.validation.v5.ordered-contest :as ordered-contest]))
 
 (def validations
@@ -36,6 +38,8 @@
    retention-contest/validate-no-missing-candidate-ids
    state/validate-no-missing-names
    hours-open/validate-times
+   electoral-district/validate-no-missing-names
+   electoral-district/validate-no-missing-types
    election-admin/validate-no-missing-departments
    election-admin/validate-voter-service-type-format
    election/validate-one-election
@@ -48,4 +52,5 @@
    office/validate-no-missing-names
    office/validate-no-missing-term-types
    office/validate-term-types
+   party-selection/validate-no-missing-party-ids
    ordered-contest/validate-no-missing-contest-ids])
