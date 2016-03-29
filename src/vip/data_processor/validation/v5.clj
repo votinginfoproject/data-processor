@@ -12,6 +12,7 @@
             [vip.data-processor.validation.v5.election :as election]
             [vip.data-processor.validation.v5.locality :as locality]
             [vip.data-processor.validation.v5.internationalized-text :as intl-text]
+            [vip.data-processor.validation.v5.district-type :as district-type]
             [vip.data-processor.validation.v5.office :as office]))
 
 (def validations
@@ -41,8 +42,8 @@
    election/validate-state-id
    locality/validate-no-missing-names
    locality/validate-no-missing-state-ids
-   locality/validate-types
    intl-text/validate-no-missing-texts
+   district-type/validate
    office/validate-no-missing-names
    office/validate-no-missing-term-types
    office/validate-term-types])
