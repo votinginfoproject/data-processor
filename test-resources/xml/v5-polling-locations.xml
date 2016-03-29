@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <PollingLocation id="pl001">
+  </PollingLocation>
+  <PollingLocation id="pl002">
+    <AddressLine>I'm an address line</AddressLine>
+  </PollingLocation>
+</VipObject>
