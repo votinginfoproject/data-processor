@@ -119,3 +119,9 @@
   {:pre [(contains? spec-docs version)]}
   (->> (paths-for-type type version)
        (map (partial str/join "."))))
+
+(defn enumeration-values [type version]
+  (let [query (str "//xs:simpleType[@name='" type "']//xs:enumeration")]
+    (->> (query->elements query version)
+         (map #(.getAttribute % "value"))
+         set)))
