@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <PartySelection id="ps001">
+  </PartySelection>
+  <PartySelection id="ps002">
+    <PartyId>54321</PartyId>
+  </PartySelection>
+</VipObject>
