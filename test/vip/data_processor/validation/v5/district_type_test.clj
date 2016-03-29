@@ -24,5 +24,21 @@
       (testing "type present and invalid is an error"
         (is (get-in out-ctx [:errors :locality
                              "VipObject.0.Locality.2.Type.2" :format])))))
-  (testing "ElectoralDistrict elements" ; TODO
-    ))
+  (testing "ElectoralDistrict elements"
+    (let [ctx {:input (xml-input "v5-electoral-districts.xml")}
+          out-ctx (-> ctx
+                      psql/start-run
+                      xml/load-xml-ltree
+                      v5.district-type/validate)]
+      (testing "type valid is OK"
+        (is (not (get-in out-ctx [:errors :electoral-district
+                                  "VipObject.0.ElectoralDistrict.0.Type.1" :format])))
+        (is (not (get-in out-ctx [:errors :electoral-district
+                                  "VipObject.0.ElectoralDistrict.1.Type.1" :format])))
+        (is (not (get-in out-ctx [:errors :electoral-district
+                                  "VipObject.0.ElectoralDistrict.4.Type.0" :format]))))
+      (testing "type invalid is an error"
+        (is (get-in out-ctx [:errors :electoral-district
+                             "VipObject.0.ElectoralDistrict.2.Type.1" :format]))
+        (is (get-in out-ctx [:errors :electoral-district
+                             "VipObject.0.ElectoralDistrict.3.Type.1" :format]))))))

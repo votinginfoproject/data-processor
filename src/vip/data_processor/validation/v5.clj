@@ -8,6 +8,7 @@
             [vip.data-processor.validation.v5.retention-contest :as retention-contest]
             [vip.data-processor.validation.v5.state :as state]
             [vip.data-processor.validation.v5.hours-open :as hours-open]
+            [vip.data-processor.validation.v5.electoral-district :as electoral-district]
             [vip.data-processor.validation.v5.election-administration :as election-admin]
             [vip.data-processor.validation.v5.election :as election]
             [vip.data-processor.validation.v5.locality :as locality]
@@ -35,6 +36,8 @@
    retention-contest/validate-no-missing-candidate-ids
    state/validate-no-missing-names
    hours-open/validate-times
+   electoral-district/validate-no-missing-names
+   electoral-district/validate-no-missing-types
    election-admin/validate-no-missing-departments
    election-admin/validate-voter-service-type-format
    election/validate-one-election
