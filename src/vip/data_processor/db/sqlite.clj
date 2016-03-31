@@ -2,7 +2,9 @@
   (:require [joplin.core :as j]
             [joplin.jdbc.database]
             [korma.db :as db]
-            [vip.data-processor.db.util :as util])
+            [vip.data-processor.db.util :as util]
+            [clojure.string :as str]
+            [clojure.java.jdbc :as jdbc])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
@@ -20,17 +22,13 @@
      :tables (util/make-entities version db util/import-entity-names)}))
 
 (defn column-names
-  "Find the names of all columns for a table. Uses a JDBC connection
-  directly."
+  "Find the names of all columns for a table."
   [table]
-  (let [url (str "jdbc:sqlite:" (get-in table [:db :db]))]
-    (with-open [conn (java.sql.DriverManager/getConnection url)]
-      (let [statement (.createStatement conn)
-            result-set (.executeQuery statement (str "PRAGMA table_info(" (:name table) ")"))]
-        (loop [columns []]
-          (if (.next result-set)
-            (recur (conj columns (.getString result-set "name")))
-            columns))))))
+  (let [db (:db table)]
+    (jdbc/with-db-metadata [md db]
+      (let [results (jdbc/metadata-result
+                     (.getColumns md nil nil (:name table) nil))]
+        (mapv :column_name results)))))
 
 (def statement-parameter-limit 500)
 (def bulk-import (partial util/bulk-import statement-parameter-limit))
