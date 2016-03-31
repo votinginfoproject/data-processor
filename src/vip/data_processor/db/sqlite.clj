@@ -3,7 +3,6 @@
             [joplin.jdbc.database]
             [korma.db :as db]
             [vip.data-processor.db.util :as util]
-            [clojure.string :as str]
             [clojure.java.jdbc :as jdbc])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
