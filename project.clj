@@ -16,7 +16,7 @@
                                                               org.slf4j/slf4j-simple
                                                               org.slf4j/slf4j-api]]
                  [net.lingala.zip4j/zip4j "1.3.2"]
-                 [turbovote.resource-config "0.1.4"]
+                 [turbovote.resource-config "0.2.0"]
                  [joplin.jdbc "0.3.6"]
                  [korma "0.4.2"]
                  [org.clojure/java.jdbc "0.5.0"]

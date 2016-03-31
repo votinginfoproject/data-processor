@@ -61,8 +61,8 @@
         (throw exception)))))
 
 (defn consume []
-  (let [{:keys [access-key secret-key]} (config :aws :creds)
-        {:keys [region queue fail-queue]} (config :aws :sqs)
+  (let [{:keys [access-key secret-key]} (config [:aws :creds])
+        {:keys [region queue fail-queue]} (config [:aws :sqs])
         creds {:access-key access-key
                :access-secret secret-key
                :region region}]
