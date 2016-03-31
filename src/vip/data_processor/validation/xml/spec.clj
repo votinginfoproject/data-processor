@@ -13,14 +13,14 @@
       (case prefix
         XMLConstants/DEFAULT_NS_PREFIX XMLConstants/NULL_NS_URI
         "xs" "http://www.w3.org/2001/XMLSchema"
-        (throw IllegalArgumentException (str "Unknown prefix: " prefix))))
+        (throw (IllegalArgumentException. (str "Unknown prefix: " prefix)))))
     (getPrefix [this namespace-uri]
       (case namespace-uri
         XMLConstants/NULL_NS_URI XMLConstants/DEFAULT_NS_PREFIX
         XMLConstants/XML_NS_URI XMLConstants/XML_NS_PREFIX
         XMLConstants/XMLNS_ATTRIBUTE_NS_URI XMLConstants/XMLNS_ATTRIBUTE
         "http://www.w3.org/2001/XMLSchema" "xs"
-        (throw IllegalArgumentException (str "Unknown namespace-uri: " namespace-uri))))
+        (throw (IllegalArgumentException. (str "Unknown namespace-uri: " namespace-uri)))))
     (getPrefixes [this namespace-uri]
       ;; not implemented
       nil)))
