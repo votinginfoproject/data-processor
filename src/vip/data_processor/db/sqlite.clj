@@ -34,7 +34,7 @@
 
 (defn attach-sqlite-db [{:keys [import-id spec-version] :as ctx}]
   (let [db (temp-db import-id spec-version)
-        db-file (get-in db [:db :db])]
+        db-file (get-in db [:db :subname])]
     (-> ctx
         (merge db)
         (update :to-be-cleaned conj db-file))))
