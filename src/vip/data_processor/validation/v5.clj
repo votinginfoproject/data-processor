@@ -15,6 +15,7 @@
             [vip.data-processor.validation.v5.internationalized-text :as intl-text]
             [vip.data-processor.validation.v5.district-type :as district-type]
             [vip.data-processor.validation.v5.office :as office]
+            [vip.data-processor.validation.v5.party :as party]
             [vip.data-processor.validation.v5.party-selection :as party-selection]
             [vip.data-processor.validation.v5.ordered-contest :as ordered-contest]))
 
@@ -52,5 +53,6 @@
    office/validate-no-missing-names
    office/validate-no-missing-term-types
    office/validate-term-types
+   party/validate-colors
    party-selection/validate-no-missing-party-ids
    ordered-contest/validate-no-missing-contest-ids])
