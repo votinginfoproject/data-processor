@@ -13,13 +13,13 @@
            [net.lingala.zip4j.util Zip4jConstants]))
 
 (defn- get-object [key]
-  (s3/get-object (config :aws :creds)
-                 (config :aws :s3 :unprocessed-bucket)
+  (s3/get-object (config [:aws :creds])
+                 (config [:aws :s3 :unprocessed-bucket])
                  key))
 
 (defn put-object [key value]
-  (s3/put-object (config :aws :creds)
-                 (config :aws :s3 :processed-bucket)
+  (s3/put-object (config [:aws :creds])
+                 (config [:aws :s3 :processed-bucket])
                  key value))
 
 (def tmp-path-prefix "vip-data-processor")

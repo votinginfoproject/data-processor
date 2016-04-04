@@ -13,7 +13,7 @@
   (:import [org.postgresql.util PGobject]))
 
 (defn url []
-  (let [{:keys [host port user password database]} (config :postgres)]
+  (let [{:keys [host port user password database]} (config [:postgres])]
     (str "jdbc:postgresql://" host ":" port "/" database "?user=" user "&password=" password)))
 
 (defn migrate []
@@ -29,9 +29,9 @@
 (defn initialize []
   (log/info "Initializing Postgres")
   (migrate)
-  (let [opts (-> :postgres
+  (let [opts (-> [:postgres]
                  config
-                 (assoc :db (config :postgres :database)))]
+                 (assoc :db (config [:postgres :database])))]
     (db/defdb results-db (db/postgres opts)))
   (korma/defentity results
     (korma/database results-db))
