@@ -16,7 +16,8 @@
             [vip.data-processor.validation.v5.district-type :as district-type]
             [vip.data-processor.validation.v5.office :as office]
             [vip.data-processor.validation.v5.party-selection :as party-selection]
-            [vip.data-processor.validation.v5.ordered-contest :as ordered-contest]))
+            [vip.data-processor.validation.v5.ordered-contest :as ordered-contest]
+            [vip.data-processor.validation.v5.street-segment :as street-segment]))
 
 (def validations
   [candidate/validate-no-missing-ballot-names
@@ -53,4 +54,9 @@
    office/validate-no-missing-term-types
    office/validate-term-types
    party-selection/validate-no-missing-party-ids
-   ordered-contest/validate-no-missing-contest-ids])
+   ordered-contest/validate-no-missing-contest-ids
+   street-segment/validate-no-missing-odd-even-both
+   street-segment/validate-odd-even-both-value
+   street-segment/validate-no-missing-city
+   street-segment/validate-no-missing-state
+   street-segment/validate-no-missing-zip])
