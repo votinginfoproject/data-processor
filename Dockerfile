@@ -1,4 +1,4 @@
-FROM clojure:lein-2.5.0
+FROM clojure:lein-2.5.3
 
 RUN mkdir -p /usr/src/data-processor
 WORKDIR /usr/src/data-processor

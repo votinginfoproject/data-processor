@@ -100,6 +100,26 @@
                                                   import-id)]
       (reduce (fn [ctx validator] (validator ctx)) ctx validators))))
 
+(defmacro validate-no-missing-values
+  "Create a bunch of validate-no-missing validators at once.
+
+   `(validate-no-missing-values :street-segments [:city] [:state])`
+  defs both validate-no-missing-city and validate-no-missing-state."
+  [element & element-paths]
+  (let [defs (map
+              (fn [element-path]
+                (let [validation-name
+                      (symbol (str
+                               "validate-no-missing-"
+                               (str/join "-" (map name element-path))))]
+                  `(def ~validation-name
+                     (validate-no-missing-elements ~element
+                                                   ~element-path))))
+              element-paths)]
+    `(do ~@defs)))
+
+
+
 (defn elements-for-simple-path
   "Returns all elements in `import-id` whose `simple-path` matches the given
   arg."

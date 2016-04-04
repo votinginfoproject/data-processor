@@ -69,13 +69,13 @@
   [f]
   (when-not @setup-postgres-has-run
     (log/info "Recreating the test database")
-    (let [database-name (config :postgres :database)
+    (let [database-name (config [:postgres :database])
           jdbc-config {:dbtype "postgresql"
                        :dbname ""  ; do not connect to a db for creating/dropping
-                       :host (config :postgres :host)
-                       :port (config :postgres :port)
-                       :user (config :postgres :user)
-                       :password (config :postgres :password)}]
+                       :host (config [:postgres :host])
+                       :port (config [:postgres :port])
+                       :user (config [:postgres :user])
+                       :password (config [:postgres :password])}]
 
       (jdbc/execute! jdbc-config [(str "DROP DATABASE IF EXISTS " database-name)] :transaction? false)
       (jdbc/execute! jdbc-config [(str "CREATE DATABASE " database-name)] :transaction? false)
