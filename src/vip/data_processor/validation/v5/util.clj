@@ -118,9 +118,7 @@
               element-paths)]
     `(do ~@defs)))
 
-
-
-(defn elements-for-simple-path
+(defn elements-at-simple-path
   "Returns all elements in `import-id` whose `simple-path` matches the given
   arg."
   [import-id simple-path]
@@ -129,37 +127,61 @@
      {:results_id import-id
       :simple_path (postgres/path->ltree simple-path)})))
 
-(defn nth-to-last-path-element
-  "Returns the ltree path element `n` segments from the end."
-  [path n]
-  (-> path
-      (str/split #"\.")
-      reverse
-      (nth n)))
+(defn nth-to-last
+  "Returns the element `n` segments from the end of `coll`."
+  [coll n]
+  (-> coll reverse (nth n)))
+
+(defn error-root
+  "Returns the appropriate keyword to use as the error root in the error message
+  for an error at `simple-path`. It usually uses the penultimate path segment
+  for this, but it will use the last one when the penultimate is 'VipObject'.
+
+  For example, if `simple-path` is VipObject.FooBar.BazQux.Quux then error-root
+  will be :baz-qux. If it is VipObject.FooBar then error-root will be :foo-bar."
+  [simple-path]
+  (let [path-components (str/split simple-path #"\.")
+        second-to-last (nth-to-last path-components 1)]
+    (xml-name->keyword (if (= second-to-last "VipObject")
+                         (last path-components)
+                         second-to-last))))
+
+(defn element-validators
+  "Returns the validation functions for all elements of `xml-schema-type` (a
+  string representing an XML schema type name) at `xml-element-path` (a vector
+  of strings representing XML element names) underneath those, using the `valid?`
+  predicate fn to validate the text node of each element found at that path in
+  the import context. When an error is found, it will be put into the context at
+  `error-severity` level with `error-type` as its key.
+
+  Primarily intended for use by `validate-elements`."
+  [xml-schema-type xml-element-path valid? error-severity error-type]
+  (for [p (spec/type->simple-paths xml-schema-type "5.0")]
+    (fn [{:keys [import-id] :as ctx}]
+      (let [simple-path (if (seq xml-element-path)
+                          (str p "." (str/join "." xml-element-path))
+                          p)
+            error-root-element (error-root simple-path)
+            elements (elements-at-simple-path import-id simple-path)
+            invalid-elements (remove (comp valid? :value) elements)]
+        (reduce (fn [ctx row]
+                  (update-in ctx [error-severity error-root-element
+                                  (-> row :path .getValue) error-type]
+                             conj (:value row)))
+                ctx invalid-elements)))))
 
 (defn validate-elements
   "Returns a fn that takes a validation `ctx` and runs the supplied `valid?`
-  predicate fn on every element of `schema-type` in the `ctx`'s import. It will
-  add errors to the context for any that `valid?` returns a falsey value at the
+  predicate fn on every element of `schema-type` (optionally child elements
+  below them defined by `:element-path`) in the `ctx`'s import. It will add
+  errors to the context for any that `valid?` returns a falsey value at the
   `error-severity` level with an `error-type` key."
-  [schema-type valid? error-severity error-type]
+  [schema-type element-path valid? error-severity error-type]
   (fn [ctx]
     (let [xml-schema-type (keyword->xml-name schema-type)
-          validators (for [p (spec/type->simple-paths xml-schema-type "5.0")]
-                       (let [parent-element (-> p
-                                                (nth-to-last-path-element 1)
-                                                xml-name->keyword)]
-                         (fn [{:keys [import-id] :as ctx}]
-                           (let [elements (elements-for-simple-path import-id p)
-                                 invalid-elements (remove (comp valid? :value)
-                                                          elements)]
-                             (reduce (fn [ctx row]
-                                       (update-in
-                                        ctx
-                                        [error-severity parent-element
-                                         (-> row :path .getValue) error-type]
-                                        conj (:value row)))
-                                     ctx invalid-elements)))))]
+          xml-element-path (mapv keyword->xml-name element-path)
+          validators (element-validators xml-schema-type xml-element-path valid?
+                                         error-severity error-type)]
       (reduce (fn [ctx validator] (validator ctx)) ctx validators))))
 
 (defn validate-enum-elements
@@ -173,4 +195,4 @@
   [schema-type error-severity]
   (let [xml-schema-type (keyword->xml-name schema-type)
         valid? (spec/enumeration-values xml-schema-type "5.0")]
-    (validate-elements schema-type valid? error-severity :format)))
+    (validate-elements schema-type [] valid? error-severity :format)))
