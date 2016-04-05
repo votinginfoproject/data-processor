@@ -683,6 +683,7 @@
     <Name>Judicial Retention, Supreme Court</Name>
     <CandidateId>can14444</CandidateId>
     <OfficeId>off20006</OfficeId>
+    <Type>other</Type>
   </RetentionContest>
 
   <!-- The various ballot styles in use by the different precincts. -->
@@ -2192,6 +2193,7 @@
   <!-- Retention Contests -->
   <RetentionContest id="rc0001">
     <CandidateId>can10214</CandidateId>
+    <Type>other</Type>
   </RetentionContest>
   <!-- End of additions for tests -->
 
