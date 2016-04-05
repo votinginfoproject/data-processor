@@ -12,43 +12,86 @@ reported upon.
 
 ### lein
 
-To run the processor against a local .zip file run the following:
+To run the processor against a local .zip, you'll need Postgres
+running and a minimal conifguration file.
+
+Create `dev-resources/config.edn` with a map that looks like the
+following (using values for your Postgres server):
+
+```clj
+{:postgres {:host "localhost"
+            :port 5432
+            :user "dataprocessor"
+            :password nil}}
+```
+
+Then use `lein run` to process a zip file:
 
 ```sh
 $ lein run ~/path/to/upload.zip
 ```
 
-Currently this will validate the data and produce the XML output but
-without any reporting whatsoever. Once the reporting infrastructure is
-in place, a report will be generated so you can see errors and
-warnings generated during validations.
+This will validate the data, import it into Postgres, and generate an
+XML feed.
+
+The last line logged will be a Clojure map with information about the
+run, including:
+
+* its `import-id` which is used pervasively in the Postgres database
+  as the `results_id` column in almost every table
+* the location of the SQLite scratch database used during processing
+* the location of the XML file generated
+
+When diagnosing problems with processing, those can help you get
+started.
 
 ### Docker
 
-Configuration in Docker is set with environment variables, so you'll
-need to set them when you run the container. The following variables
-need values:
+If you'd like to run data-processor locally exactly as it's run in
+production, you will need Docker.
 
-* `VIP_DP_AWS_ACCESS_KEY`
-* `VIP_DP_AWS_SECRET_KEY`
-* `VIP_DP_S3_BUCKET`
-* `VIP_DP_SQS_REGION`
-* `VIP_DP_SQS_QUEUE`
-* `VIP_DP_SQS_FAIL_QUEUE`
-* `VIP_DP_RABBITMQ_EXCHANGE`
-* `POSTGRES_USER`
-* `POSTGRES_PASSWORD`
+Configuration in Docker is set via the `.env` file in the root of the
+project. Create that file, copy the following into it and provide
+values for each environemnt variable.
 
-Running all dependent Docker containers is managed by
-[docker-compose][docker-compose]. After installing that, bringing it
-all up should be as simple as:
+```
+VIP_DP_AWS_ACCESS_KEY=
+VIP_DP_AWS_SECRET_KEY=
+VIP_DP_S3_UNPROCESSED_BUCKET=
+VIP_DP_S3_PROCESSED_BUCKET=
+VIP_DP_SQS_REGION=
+VIP_DP_SQS_QUEUE=
+VIP_DP_SQS_FAIL_QUEUE=
+VIP_DP_RABBITMQ_EXCHANGE=
+```
+
+As you can see, you'll need to have set up two S3 buckets and two SQS
+queues. The value for `VIP_DP_SQS_REGION` is in the form of
+`US_WEST_2` (not `us-west-2`). The value for
+`VIP_DP_RABBITMQ_EXCHANGE` is whatever you'd like it to be.
+
+Running it is as per usual for docker-compose:
 
 ```sh
 $ docker-compose build
 $ docker-compose up
 ```
 
-[docker-compose]: https://github.com/docker/fig
+While it's running, you can place messages on the SQS queue specified
+by `VIP_DP_SQS_QUEUE` and it will be picked up by the processor,
+downloading the file in the message, the file will be processed, the
+database populated, the XML output zipped up and placed in the bucket
+specified by `VIP_DP_S3_PROCESSED_BUCKET`, and a message sent on
+RabbitMQ.
+
+The message you send on the SQS queue must look like the following:
+
+```clj
+{:filename "some-feed.xml"}
+```
+
+It is an EDN map, with the key `:filename`, whose value is the name of
+a file in the `VIP_DP_S3_UNPROCESSED_BUCKET` S3 bucket.
 
 ## Developing
 

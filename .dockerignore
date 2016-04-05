@@ -9,3 +9,4 @@ script
 .gitignore
 .lein-*
 .nrepl-port
+.env
