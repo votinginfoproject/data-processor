@@ -12,3 +12,4 @@ script
 test-resources/config.edn
 docker-compose-postgres-tests.yml
 docker-compose.yml
+.env

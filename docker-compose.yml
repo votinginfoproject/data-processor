@@ -3,15 +3,7 @@ processor:
   links:
     - rabbitmq
     - db
-  environment:
-    VIP_DP_AWS_ACCESS_KEY:
-    VIP_DP_AWS_SECRET_KEY:
-    VIP_DP_S3_UNPROCESSED_BUCKET:
-    VIP_DP_S3_PROCESSED_BUCKET:
-    VIP_DP_SQS_REGION:
-    VIP_DP_SQS_QUEUE:
-    VIP_DP_SQS_FAIL_QUEUE:
-    VIP_DP_RABBITMQ_EXCHANGE:
+  env_file: .env
 rabbitmq:
   image: rabbitmq:3.5.3-management
   ports:
@@ -22,5 +14,5 @@ db:
   ports:
     - "5432"
   environment:
-    POSTGRES_USER:
-    POSTGRES_PASSWORD:
+    POSTGRES_USER: dataprocessor
+    POSTGRES_PASSWORD: vip2016
