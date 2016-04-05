@@ -2,7 +2,6 @@
   (:require [clojure.edn :as edn]
             [clojure.set :as set]
             [clojure.string :as s]
-            [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.csv.file-set :as csv-files]
@@ -15,13 +14,6 @@
   (if-let [filename (get-in ctx [:input :filename])]
     (assoc ctx :filename filename)
     (assoc ctx :stop "No filename!")))
-
-(defn attach-sqlite-db [ctx]
-  (let [db (sqlite/temp-db (:import-id ctx) "3.0") ; TODO: set version according to import version
-        db-file (get-in db [:db :db])]
-    (-> ctx
-        (merge db)
-        (update :to-be-cleaned conj db-file))))
 
 (defn download-from-s3 [ctx]
   (let [filename (get-in ctx [:input :filename])

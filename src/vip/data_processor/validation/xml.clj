@@ -2,9 +2,12 @@
   (:require [clojure.data.xml :as xml]
             [clojure.walk :refer [stringify-keys]]
             [com.climate.newrelic.trace :refer [defn-traced]]
+            [korma.core :as korma]
+            [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec]))
+            [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.v5 :as v5-validations]))
 
 (def address-elements
   #{"address"
@@ -132,6 +135,110 @@
           ;; otherwise, load and continue
           :else (recur (load-elements ctx partition-or-error) (rest xml-elements)))))))
 
+(defn simple-value?
+  "In the context of dealing with xml.Elements, anything not an
+  xml.Element is a simple value."
+  [x]
+  (not (instance? clojure.data.xml.Element x)))
+
+(defn ltree-path-join
+  "Join ltree path parts together, rejecing nils, and using the name
+  of a piece if it is named (so that path parts don't include colons
+  from keywords, for example).
+
+  (ltree-path-join \"hello.1\" :hi) ;;=> \"hello.1.hi\""
+  [& parts]
+  (->> parts
+       (keep identity)
+       (map (fn [x]
+              (if (instance? clojure.lang.Named x)
+                (name x)
+                x)))
+       (interpose ".")
+       (apply str)))
+
+(defn path-and-values
+  "Lazily produces a sequence of maps of path, value, and
+  parent_with_id keys from an clojure.data.xml.Element. A map is
+  produced for each attribute and each element with a simple
+  value. For example, an XML document like:
+
+  <foo id=\"foo1\">
+    <bar>3</bar>
+    <baz id=\"baz1\">
+      <quux>hello</quux>
+    </baz>
+    <test>yes</test>
+  </foo>
+
+  Would produce the following:
+
+  ({:path \"foo.0.id\", :value \"foo1\", :parent_with_id \"foo.0\"}
+   {:path \"foo.0.bar.0\", :value \"3\", :parent_with_id \"foo.0\"}
+   {:path \"foo.0.baz.1.id\", :value \"baz1\", :parent_with_id \"foo.0.baz.1\"}
+   {:path \"foo.0.baz.1.quux.0\", :value \"hello\", :parent_with_id \"foo.0.baz.1\"}
+   {:path \"foo.0.test.2\", :value \"yes\", :parent_with_id \"foo.0\"})
+
+  The paths generated include a sequence order for
+  elements. `foo.0.baz.1.quux.0` refers to the `quux` element which is
+  the first child of the `baz` element which is the second child of
+  the `foo` element, which is the first element in the document."
+  ([node]
+   (path-and-values node nil nil 0 nil))
+  ([node current-path current-simple-path n nearest-path-with-id]
+   (let [element-path (ltree-path-join current-path (:tag node) n)
+         simple-path (ltree-path-join current-simple-path (:tag node))
+         nearest-path-with-id (if (get-in node [:attrs :id])
+                                element-path
+                                nearest-path-with-id)
+         attribute-entries (map (fn [[k v]]
+                                  {:path (ltree-path-join element-path k)
+                                   :simple_path (ltree-path-join simple-path k)
+                                   :value v
+                                   :parent_with_id nearest-path-with-id})
+                                (:attrs node))
+         child-entries (map-indexed
+                        (fn [n value]
+                          (if (simple-value? value)
+                            [{:path element-path
+                              :simple_path simple-path
+                              :value value
+                              :parent_with_id nearest-path-with-id}]
+                            (path-and-values value element-path simple-path
+                                             n nearest-path-with-id)))
+                        (:content node))]
+     (apply concat attribute-entries child-entries))))
+
+(defn load-xml-ltree
+  [ctx]
+  (let [xml-file (first (:input ctx))
+        import-id (:import-id ctx)]
+    (with-open [reader (util/bom-safe-reader xml-file)]
+      (doseq [pvs (->> reader
+                       xml/parse
+                       path-and-values
+                       (partition 5000 5000 '())
+                       (map (fn [chunk]
+                              (map (fn [path-map]
+                                     (-> path-map
+                                         (update :path postgres/path->ltree)
+                                         (update :parent_with_id postgres/path->ltree)
+                                         (update :simple_path postgres/path->ltree)
+                                         (assoc :results_id import-id)))
+                                   chunk))))]
+        (korma/insert postgres/xml-tree-values
+          (korma/values pvs))))
+    ctx))
+
+(defn load-xml-tree-validations
+  [ctx]
+  (let [results-id (:import-id ctx)
+        errors (postgres/xml-tree-validation-values ctx)]
+    (when-not (empty? errors)
+      (korma/insert postgres/xml-tree-validations
+        (korma/values errors))))
+  ctx)
+
 (defn determine-spec-version [ctx]
   (let [xml-file (first (:input ctx))]
     (with-open [reader (util/bom-safe-reader xml-file)]
@@ -143,8 +250,11 @@
   (assoc ctx :stop (str "Unsupported XML version: " spec-version)))
 
 (def version-pipelines
-  {"3.0" [load-xml]
-   "5.0" [unsupported-version]})
+  {"3.0" [sqlite/attach-sqlite-db
+          load-xml]
+   "5.0" (concat [load-xml-ltree]
+                 v5-validations/validations
+                 [load-xml-tree-validations])})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

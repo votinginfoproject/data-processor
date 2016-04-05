@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <Election id="ele001">
+    <StateId>state-id</StateId>
+  </Election>
+</VipObject>

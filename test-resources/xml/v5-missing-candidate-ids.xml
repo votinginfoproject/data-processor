@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <RetentionContest id="con001">
+  </RetentionContest>
+  <RetentionContest id="con002">
+    <CandidateId>can001</CandidateId>
+  </RetentionContest>
+</VipObject>

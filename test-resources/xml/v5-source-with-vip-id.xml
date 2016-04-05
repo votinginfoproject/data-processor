@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <Source id="src001">
+    <DateTime>2016-03-08T00:00:00</DateTime>
+    <VipId>the-vip-id</VipId>
+  </Source>
+</VipObject>

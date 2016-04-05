@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+  <HoursOpen id="ho001">
+    <Schedule>
+      <Hours>
+        <StartTime>09:00:00-06:00</StartTime>
+        <EndTime>19:00:00-06:00</EndTime>
+      </Hours>
+    </Schedule>
+  </HoursOpen>
+  <HoursOpen id="ho002">
+    <Schedule>
+      <Hours>
+        <StartTime>37:00:00-06:00</StartTime>
+        <EndTime>19:00:00-06:00</EndTime>
+      </Hours>
+    </Schedule>
+  </HoursOpen>
+  <HoursOpen id="ho003">
+    <Schedule>
+      <Hours>
+        <StartTime>09:00:00</StartTime>
+        <EndTime>19:00:00-06:00</EndTime>
+      </Hours>
+    </Schedule>
+  </HoursOpen>
+  <HoursOpen id="ho004">
+    <Schedule>
+      <Hours>
+        <StartTime>09:00:00-06:00</StartTime>
+        <EndTime>not-a-time</EndTime>
+      </Hours>
+    </Schedule>
+  </HoursOpen>
+  <HoursOpen id="ho005">
+    <Schedule>
+      <Hours>
+        <StartTime>09:00</StartTime>
+        <EndTime>42:00</EndTime>
+      </Hours>
+    </Schedule>
+  </HoursOpen>
+</VipObject>

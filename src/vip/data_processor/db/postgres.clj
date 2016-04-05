@@ -9,10 +9,11 @@
             [vip.data-processor.db.statistics :as stats]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec]))
+            [vip.data-processor.validation.data-spec :as data-spec])
+  (:import [org.postgresql.util PGobject]))
 
 (defn url []
-  (let [{:keys [host port user password database]} (config :postgres)]
+  (let [{:keys [host port user password database]} (config [:postgres])]
     (str "jdbc:postgresql://" host ":" port "/" database "?user=" user "&password=" password)))
 
 (defn migrate []
@@ -28,9 +29,9 @@
 (defn initialize []
   (log/info "Initializing Postgres")
   (migrate)
-  (let [opts (-> :postgres
+  (let [opts (-> [:postgres]
                  config
-                 (assoc :db (config :postgres :database)))]
+                 (assoc :db (config [:postgres :database])))]
     (db/defdb results-db (db/postgres opts)))
   (korma/defentity results
     (korma/database results-db))
@@ -40,8 +41,30 @@
     (korma/database results-db))
   (korma/defentity election_approvals
     (korma/database results-db))
+  (korma/defentity xml-tree-values
+    (korma/table "xml_tree_values")
+    (korma/database results-db))
+  (korma/defentity xml-tree-validations
+    (korma/table "xml_tree_validations")
+    (korma/database results-db))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
+
+(defn path->ltree [path]
+  (doto (PGobject.)
+    (.setType "ltree")
+    (.setValue path)))
+
+(defn ltree-match
+  "Helper function for generating WHERE clases using ~. Accepts a keyword as a
+  table alias, or a korma entity"
+  [table column path]
+  (let [tablename (if (keyword? table)
+                    (name table)
+                    (korma.sql.engine/table-alias table))]
+    (korma/raw (str tablename
+                    "." (name column)
+                    " ~ '" path "'"))))
 
 (defn start-run [ctx]
   (let [results (korma/insert results
@@ -66,7 +89,7 @@
            (map str/trim)
            (str/join "-")))))
 
-(defn get-public-id-data [{:keys [import-id] :as ctx}]
+(defn get-v3-public-id-data [{:keys [import-id] :as ctx}]
   (let [state (-> ctx
                   (get-in [:tables :states])
                   (korma/select (korma/fields :name))
@@ -80,6 +103,37 @@
      :election-type election_type
      :state state
      :import-id import-id}))
+
+(defn find-single-xml-tree-value [results-id path]
+  (-> (korma/select xml-tree-values
+        (korma/fields :value)
+        (korma/where {:results_id results-id})
+        (korma/where (ltree-match xml-tree-values
+                                  :path
+                                  path)))
+      first
+      :value))
+
+(defn get-xml-tree-public-id-data [{:keys [import-id] :as ctx}]
+  (let [state (find-single-xml-tree-value
+               import-id
+               "VipObject.0.State.*{1}.Name.*{1}")
+        date (find-single-xml-tree-value
+              import-id
+              "VipObject.0.Election.*{1}.Date.*{1}")
+        election-type (find-single-xml-tree-value
+                       import-id
+                       "VipObject.0.Election.*{1}.ElectionType.*{1}")]
+    {:date date
+     :election-type election-type
+     :state state
+     :import-id import-id}))
+
+(defn get-public-id-data [{:keys [spec-version] :as ctx}]
+  (condp = spec-version
+    "3.0" (get-v3-public-id-data ctx)
+    "5.0" (get-xml-tree-public-id-data ctx)
+    {}))
 
 (defn generate-public-id [ctx]
   (let [{:keys [date election-type state import-id]} (get-public-id-data ctx)]
@@ -161,28 +215,44 @@
    :error_type (name error-type)
    :error_data (pr-str error-data)})
 
-(defn validation-values
-  "Create insertable validations from the processing context map.
+(defn xml-tree-validation-value
+  [results-id severity scope path error-type error-data]
+  {:results_id results-id
+   :severity (name severity)
+   :scope (name scope)
+   :error_type (name error-type)
+   :error_data (pr-str error-data)
+   :path (when-not (= :global path) (path->ltree path))})
+
+(defn validation-values-from [values-fn]
+  (fn [{:keys [import-id] :as ctx}]
+    (mapcat
+     (fn [severity]
+       (let [errors (get ctx severity)]
+         (when-not (empty? errors)
+           (let [errors (util/flatten-keys errors)]
+             (mapcat (fn [[[scope identifier error-type] error-data]]
+                       (map (fn [error-data]
+                              (values-fn import-id severity scope identifier error-type error-data))
+                            error-data))
+                     errors)))))
+     [:warnings :errors :critical :fatal])))
+
+(def validation-values
+  "Create insertable validations from the processing context map. Suitable for the 3.0 schema.
 
     (validation-values {:import-id 493
-                                  :errors {:candidates {3 {:missing-values [name\" \"email\"]}}}
-                                  :critical {:candidates {:global {:missing-columns [\"party\"]}}}})
+                        :errors {:candidates {3 {:missing-values [name\" \"email\"]}}}
+                        :critical {:candidates {:global {:missing-columns [\"party\"]}}}})
     ;; =>
        ({:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"name\\\"\"}
         {:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"email\\\"\"}
         {:results_id 493 :severity \"critical\" :scope \"candidates\" :identifier -1 :error_type \"missing-columns\" :error_data \"\\\"party\\\"\"})"
-  [{:keys [import-id] :as ctx}]
-  (mapcat
-   (fn [severity]
-     (let [errors (get ctx severity)]
-       (when-not (empty? errors)
-         (let [errors (util/flatten-keys errors)]
-           (mapcat (fn [[[scope identifier error-type] error-data]]
-                     (map (fn [error-data]
-                               (validation-value import-id severity scope identifier error-type error-data))
-                             error-data))
-                   errors)))))
-   [:warnings :errors :critical :fatal]))
+  (validation-values-from validation-value))
+
+(def xml-tree-validation-values
+  "Create insertable validations from the processing context map. Suitable for the 5.0 schema."
+  (validation-values-from xml-tree-validation-value))
 
 (def statement-parameter-limit 10000)
 (def bulk-import (partial db.util/bulk-import statement-parameter-limit))
