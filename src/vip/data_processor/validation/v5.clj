@@ -19,7 +19,8 @@
             [vip.data-processor.validation.v5.party :as party]
             [vip.data-processor.validation.v5.party-selection :as party-selection]
             [vip.data-processor.validation.v5.ordered-contest :as ordered-contest]
-            [vip.data-processor.validation.v5.street-segment :as street-segment]))
+            [vip.data-processor.validation.v5.street-segment :as street-segment]
+            [vip.data-processor.validation.v5.polling-location :as polling-location]))
 
 (def validations
   [ballot-measure-contest/validate-ballot-measure-types
@@ -64,4 +65,9 @@
    street-segment/validate-odd-even-both-value
    street-segment/validate-no-missing-city
    street-segment/validate-no-missing-state
-   street-segment/validate-no-missing-zip])
+   street-segment/validate-no-missing-zip
+   polling-location/validate-no-missing-address-lines
+   polling-location/validate-no-missing-latitudes
+   polling-location/validate-no-missing-longitudes
+   polling-location/validate-latitude
+   polling-location/validate-longitude])
