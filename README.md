@@ -19,7 +19,8 @@ Create `dev-resources/config.edn` with a map that looks like the
 following (using values for your Postgres server):
 
 ```clj
-{:postgres {:host "localhost"
+{:postgres {:database "dataprocessor"
+            :host "localhost"
             :port 5432
             :user "dataprocessor"
             :password nil}}
