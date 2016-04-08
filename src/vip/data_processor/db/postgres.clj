@@ -47,6 +47,8 @@
   (korma/defentity xml-tree-validations
     (korma/table "xml_tree_validations")
     (korma/database results-db))
+  (korma/defentity v5-0-street-segments
+    (korma/table "v5_0_street_segments"))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 

@@ -6,6 +6,12 @@
     (re-find #"\A(?i:no)\z" x) 0
     :else nil))
 
+(defn postgres-boolean [x]
+  (cond
+    (re-find #"\A(?i:true)\z" x) true
+    (re-find #"\A(?i:false)\z" x) false
+    :else nil))
+
 (defn unsafe-coerce-integer [v]
   (cond (= v "") nil
         (string? v) (Integer/parseInt v)
