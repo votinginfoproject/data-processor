@@ -1,11 +1,11 @@
 processor:
   build: .
   links:
-    - test_db:db
+    - testdb:db
   environment:
     VIP_DP_SQS_REGION: US_WEST_2
   command: lein test :postgres
-test_db:
+testdb:
   image: postgres:9.4.1
   ports:
     - "5432"

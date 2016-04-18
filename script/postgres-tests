@@ -5,6 +5,6 @@ docker-compose -f docker-compose-postgres-tests.yml build
 docker-compose -f docker-compose-postgres-tests.yml run processor
 TEST_EXIT_STATUS=$?
 
-docker-compose -f docker-compose-postgres-tests.yml kill test_db
+docker-compose -f docker-compose-postgres-tests.yml kill testdb
 
 exit $TEST_EXIT_STATUS
