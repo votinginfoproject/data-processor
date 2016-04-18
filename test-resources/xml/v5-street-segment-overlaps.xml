@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.0">
+
+  <!-- Complete overlap. ss002 is contained fully by ss001. -->
+  <StreetSegment id="ss001">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>200</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>COMPLETE OVERLAP</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss002">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>50</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>COMPLETE OVERLAP</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!--  Partial overlap. ss003 and ss004 share some addresses. -->
+  <StreetSegment id="ss003">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>PARTIAL OVERLAP</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss004">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>50</StartHouseNumber>
+    <EndHouseNumber>150</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>PARTIAL OVERLAP</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- Just a single address. The overlap between ss005 and ss006 is a sinlge address. -->
+  <StreetSegment id="ss005">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>JUST TOUCHING</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss006">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>100</StartHouseNumber>
+    <EndHouseNumber>200</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>JUST TOUCHING</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- even/odd don't overlap. ss007 and ss008 share stretches of
+       road, but don't overlap by virtue of describing different sides
+       of the street.-->
+  <StreetSegment id="ss007">
+    <City>Chicago</City>
+    <OddEvenBoth>odd</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>ONE IS ODD, ONE IS EVEN</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss008">
+    <City>Chicago</City>
+    <OddEvenBoth>even</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>ONE IS ODD, ONE IS EVEN</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- even/both overlap. ss009 and s010 overlap because they both
+       describe the even numbered addresses in the stretch they
+       share.-->
+  <StreetSegment id="ss009">
+    <City>Chicago</City>
+    <OddEvenBoth>even</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>ONE IS EVEN, ONE IS BOTH</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss010">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>ONE IS EVEN, ONE IS BOTH</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- odd/both overlap. ss011 and s012 overlap because they both
+       describe the odd numbered addresses in the stretch they
+       share.-->
+  <StreetSegment id="ss0011">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>ONE IS ODD, ONE IS BOTH</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss012">
+    <City>Chicago</City>
+    <OddEvenBoth>odd</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>ONE IS ODD, ONE IS BOTH</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- Street segments with a shared precinct is not an overlap. ss013
+       and ss014 overlap (in the usual sense of the word), but it's
+       not an error since they share a precinct. -->
+  <StreetSegment id="ss0013">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>SHARED PRECINCT</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss014">
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>50</StartHouseNumber>
+    <EndHouseNumber>200</EndHouseNumber>
+    <State>IL</State>
+    <StreetName>SHARED PRECINCT</StreetName>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- Matching AddressDirection/StreetDirection/StreetSuffix
+       overlaps. If they're there, they gotta match. -->
+  <StreetSegment id="ss015">
+    <AddressDirection>NW</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>E</StreetDirection>
+    <StreetName>MORE FIELDS</StreetName>
+    <StreetSuffix>Ave</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss016">
+    <AddressDirection>NW</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>50</StartHouseNumber>
+    <EndHouseNumber>150</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>E</StreetDirection>
+    <StreetName>MORE FIELDS</StreetName>
+    <StreetSuffix>Ave</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- Mismatched AddressDirections don't overlap. -->
+  <StreetSegment id="ss017">
+    <AddressDirection>NW</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>E</StreetDirection>
+    <StreetName>MISMATCHED ADDRESS DIRECTION</StreetName>
+    <StreetSuffix>Ave</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss018">
+    <AddressDirection>SE</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>50</StartHouseNumber>
+    <EndHouseNumber>150</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>E</StreetDirection>
+    <StreetName>MISMATCHED ADDRESS DIRECTION</StreetName>
+    <StreetSuffix>Ave</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- Mismatched StreetDirections don't overlap. -->
+  <StreetSegment id="ss019">
+    <AddressDirection>NW</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>E</StreetDirection>
+    <StreetName>MISMATCHED STREET DIRECTION</StreetName>
+    <StreetSuffix>Ave</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss020">
+    <AddressDirection>NW</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>50</StartHouseNumber>
+    <EndHouseNumber>150</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>N</StreetDirection>
+    <StreetName>MISMATCHED STREET DIRECTION</StreetName>
+    <StreetSuffix>Ave</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+  <!-- Mismatched StreetSuffixes don't overlap. -->
+  <StreetSegment id="ss021">
+    <AddressDirection>NW</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p001</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>E</StreetDirection>
+    <StreetName>MISMATCHED STREET SUFFIX</StreetName>
+    <StreetSuffix>Ave</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss022">
+    <AddressDirection>NW</AddressDirection>
+    <City>Chicago</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>p002</PrecinctId>
+    <StartHouseNumber>50</StartHouseNumber>
+    <EndHouseNumber>150</EndHouseNumber>
+    <State>IL</State>
+    <StreetDirection>E</StreetDirection>
+    <StreetName>MISMATCHED STREET SUFFIX</StreetName>
+    <StreetSuffix>Blvd</StreetSuffix>
+    <Zip>60647</Zip>
+  </StreetSegment>
+
+</VipObject>
