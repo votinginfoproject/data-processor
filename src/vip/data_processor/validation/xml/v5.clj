@@ -39,9 +39,9 @@
   [{:keys [import-id] :as ctx}]
   (let [xml-file (first (:input ctx))]
     (with-open [reader (util/bom-safe-reader xml-file)]
-      (->> (-> reader
-               xml/parse
-               :content)
+      (->> reader
+           xml/parse
+           :content
            (filter #(= (:tag %) :StreetSegment))
            (map (fn [ss] (-> ss
                              ss->map
