@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.v5.street-segment-test
   (:require [vip.data-processor.validation.v5.street-segment :as v5.ss]
+            [vip.data-processor.validation.xml.v5 :as xml.v5]
             [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
@@ -121,3 +122,33 @@
                             [:street-segment
                              path
                              :missing])))))
+
+(deftest ^:postgres validate-no-street-segment-overlaps-test
+  (let [ctx {:input (xml-input "v5-street-segment-overlaps.xml")}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    xml.v5/load-xml-street-segments
+                    v5.ss/validate-no-street-segment-overlaps)]
+    (are [_ path overlaps] (is (= (get-in out-ctx
+                                          [:errors
+                                           :street-segment
+                                           path
+                                           :overlaps])
+                                  overlaps))
+      "simple, complete overlap"    "VipObject.0.StreetSegment.0" '("ss002")
+      "partial overlap"             "VipObject.0.StreetSegment.2" '("ss004")
+      "single address overlap"      "VipObject.0.StreetSegment.4" '("ss006")
+      "even/odd don't overlap"      "VipObject.0.StreetSegment.6" nil
+      "even/odd don't overlap"      "VipObject.0.StreetSegment.7" nil
+      "even/both overlap"           "VipObject.0.StreetSegment.8" '("ss010")
+      "odd/both overlap"            "VipObject.0.StreetSegment.10" '("ss012")
+      "shared precinct"             "VipObject.0.StreetSegment.12" nil
+      "shared precinct"             "VipObject.0.StreetSegment.13" nil
+      "matching more fields"        "VipObject.0.StreetSegment.14" '("ss016")
+      "different address direction" "VipObject.0.StreetSegment.16" nil
+      "different address direction" "VipObject.0.StreetSegment.17" nil
+      "different street direction"  "VipObject.0.StreetSegment.18" nil
+      "different street direction"  "VipObject.0.StreetSegment.19" nil
+      "different street suffix"     "VipObject.0.StreetSegment.20" nil
+      "different street suffix"     "VipObject.0.StreetSegment.21" nil)))

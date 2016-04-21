@@ -7,7 +7,8 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.v5 :as v5-validations]))
+            [vip.data-processor.validation.v5 :as v5-validations]
+            [vip.data-processor.validation.xml.v5 :as xml.v5]))
 
 (def address-elements
   #{"address"
@@ -234,10 +235,9 @@
   [ctx]
   (let [results-id (:import-id ctx)
         errors (postgres/xml-tree-validation-values ctx)]
-    (when-not (empty? errors)
-      (korma/insert postgres/xml-tree-validations
-        (korma/values errors))))
-  ctx)
+    (postgres/bulk-import ctx
+                          postgres/xml-tree-validations
+                          errors)))
 
 (defn determine-spec-version [ctx]
   (let [xml-file (first (:input ctx))]
@@ -252,7 +252,8 @@
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           load-xml]
-   "5.0" (concat [load-xml-ltree]
+   "5.0" (concat [load-xml-ltree
+                  xml.v5/load-xml-street-segments]
                  v5-validations/validations
                  [load-xml-tree-validations])})
 
