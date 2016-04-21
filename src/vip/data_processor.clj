@@ -26,20 +26,26 @@
    zip/assoc-file
    zip/extracted-contents])
 
+(def v3-validation-pipeline
+  (concat db/validations
+          db.v3-0/validations
+          xml-output/pipeline
+          [psql/insert-validations
+           psql/import-from-sqlite
+           psql/store-stats]))
+
 (def pipeline
   (concat download-pipeline
           [(data-spec/add-data-specs v3-0/data-specs) ; TODO: decide which specs to add based on import
            t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id
-           psql/store-election-id]
-          db/validations
-          db.v3-0/validations ; TODO: choose extra validations based on import
-          xml-output/pipeline
-          [s3/upload-to-s3]
-          [psql/insert-validations
-           psql/import-from-sqlite
-           psql/store-stats
+           psql/store-election-id
+           (fn [{:keys [spec-version] :as ctx}]
+             (condp = spec-version
+               "3.0" (update ctx :pipeline (partial concat v3-validation-pipeline))
+               ctx))
+           s3/upload-to-s3
            cleanup/cleanup]))
 
 (defn-traced process-message [message]
