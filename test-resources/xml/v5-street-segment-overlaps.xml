@@ -45,7 +45,7 @@
     <Zip>60647</Zip>
   </StreetSegment>
 
-  <!-- Just a single address. The overlap between ss005 and ss006 is a sinlge address. -->
+  <!-- Just a single address. The overlap between ss005 and ss006 is a single address. -->
   <StreetSegment id="ss005">
     <City>Chicago</City>
     <OddEvenBoth>both</OddEvenBoth>
