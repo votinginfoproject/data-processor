@@ -68,6 +68,15 @@
                     "." (name column)
                     " ~ '" path "'"))))
 
+(defn find-value-for-simple-path [import-id simple-path]
+  (-> xml-tree-values
+      (korma/select
+        (korma/fields :value)
+        (korma/where {:results_id import-id
+                      :simple_path (path->ltree simple-path)}))
+      first
+      :value))
+
 (defn start-run [ctx]
   (let [results (korma/insert results
                               (korma/values {:start_time (korma/sqlfn now)

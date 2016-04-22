@@ -249,13 +249,19 @@
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
   (assoc ctx :stop (str "Unsupported XML version: " spec-version)))
 
+(defn set-input-as-xml-output-file
+  [{:keys [input] :as ctx}]
+  (assoc ctx :xml-output-file
+         (first input)))
+
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           load-xml]
    "5.0" (concat [load-xml-ltree
                   xml.v5/load-xml-street-segments]
                  v5-validations/validations
-                 [load-xml-tree-validations])})
+                 [load-xml-tree-validations
+                  set-input-as-xml-output-file])})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]
