@@ -89,4 +89,4 @@
     (put-object zip-name zip-file)
     (-> ctx
         (assoc :generated-xml-filename zip-name)
-        (update :to-be-cleaned conj zip-file))))
+        (update :to-be-cleaned concat [zip-file zip-dir]))))
