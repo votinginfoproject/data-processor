@@ -152,11 +152,7 @@
           three-point-0-pipeline (get version-pipelines "3.0")]
       (is (= three-point-0-pipeline
              (take (count three-point-0-pipeline) (:pipeline out-ctx))))))
-  (testing "stops with unsupported version for 5.0 feeds"
-    (let [ctx {:spec-version "5.0"
-               :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported CSV version"))))
+
   (testing "stops with unsupported version for other versions"
     (let [ctx {:spec-version "2.0"  ; 2.0 is too old
                :pipeline [branch-on-spec-version]}
