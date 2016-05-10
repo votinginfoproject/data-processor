@@ -20,3 +20,4 @@ DROP TABLE v5_0_precinct_polling_locations;
 DROP TABLE v5_0_precinct_electoral_districts;
 DROP TABLE v5_0_locality_polling_locations;
 DROP TABLE v5_0_state_polling_locations;
+DROP TABLE v5_0_voter_services;

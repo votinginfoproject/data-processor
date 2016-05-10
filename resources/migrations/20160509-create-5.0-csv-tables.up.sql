@@ -204,40 +204,40 @@ CREATE TABLE v5_0_offices (id TEXT NOT NULL,
                            term_start_date TEXT,
                            term_end_date TEXT);
 
-CREATE TABLE v5_0_candiate_contests (id TEXT NOT NULL,
-                                     results_id BIGINT REFERENCES results (id) NOT NULL,
-                                     PRIMARY KEY (results_id, id),
-                                     abbreviation TEXT,
-                                     ballot_selection_id TEXT, -- unbounded
-                                     ballot_sub_title TEXT, -- internationalized
-                                     ballot_title TEXT, -- internationalized
-                                     electoral_district_id TEXT,
-                                     electorate_specification TEXT, -- internationalized
-                                     external_identifiers TEXT, -- unbounded
-                                     has_rotation TEXT,
-                                     name TEXT,
-                                     sequence_order TEXT,
-                                     vote_variation TEXT,
-                                     other_vote_variation TEXT,
-                                     number_elected TEXT,
-                                     primary_party_id TEXT,
-                                     votes_allowed TEXT,
-                                     office_id TEXT); -- unbounded
+CREATE TABLE v5_0_candidate_contests (id TEXT NOT NULL,
+                                      results_id BIGINT REFERENCES results (id) NOT NULL,
+                                      PRIMARY KEY (results_id, id),
+                                      abbreviation TEXT,
+                                      ballot_selection_id TEXT, -- unbounded
+                                      ballot_sub_title TEXT, -- internationalized
+                                      ballot_title TEXT, -- internationalized
+                                      electoral_district_id TEXT,
+                                      electorate_specification TEXT, -- internationalized
+                                      external_identifiers TEXT, -- unbounded
+                                      has_rotation TEXT,
+                                      name TEXT,
+                                      sequence_order TEXT,
+                                      vote_variation TEXT,
+                                      other_vote_variation TEXT,
+                                      number_elected TEXT,
+                                      primary_party_id TEXT,
+                                      votes_allowed TEXT,
+                                      office_id TEXT); -- unbounded
 
 CREATE TABLE v5_0_locality_polling_locations (locality_id TEXT NOT NULL,
-                                              polling_location_id TEXT NOT NULL
+                                              polling_location_id TEXT NOT NULL,
                                               results_id BIGINT REFERENCES results (id) NOT NULL,
                                               PRIMARY KEY (results_id, locality_id, polling_location_id));
 
 CREATE TABLE v5_0_precinct_electoral_districts (precinct_id TEXT NOT NULL,
                                                 electoral_district_id TEXT NOT NULL,
                                                 results_id BIGINT REFERENCES results (id) NOT NULL,
-                                                PRIMARY KEY (results_id, precint_id, electoral_district_id));
+                                                PRIMARY KEY (results_id, precinct_id, electoral_district_id));
 
 CREATE TABLE v5_0_precinct_polling_locations (precinct_id TEXT NOT NULL,
                                               polling_location_id TEXT NOT NULL,
                                               results_id BIGINT REFERENCES results (id) NOT NULL,
-                                              PRIMARY KEY (results_id, precint_id, polling_location_id));
+                                              PRIMARY KEY (results_id, precinct_id, polling_location_id));
 
 CREATE TABLE v5_0_state_polling_locations (state_id TEXT NOT NULL,
                                            polling_location_id TEXT NOT NULL,
