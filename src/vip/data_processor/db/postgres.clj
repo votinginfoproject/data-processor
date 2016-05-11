@@ -49,6 +49,31 @@
     (korma/database results-db))
   (korma/defentity v5-0-street-segments
     (korma/table "v5_0_street_segments"))
+  (def v5-0-tables
+    (db.util/make-entities "5.0" results-db [:offices
+                                             :voter-services
+                                             :ballot-measure-contests
+                                             :ballot-selections
+                                             :ballot-styles
+                                             :candidates
+                                             :candidate-contests
+                                             :departments
+                                             :elections
+                                             :election-administrations
+                                             :electoral-districts
+                                             :hours-open
+                                             :localities
+                                             :locality-polling-locations
+                                             :parties
+                                             :people
+                                             :polling-locations
+                                             :precincts
+                                             :precinct-electoral-districts
+                                             :precinct-polling-locations
+                                             :sources
+                                             :states
+                                             :state-polling-locations
+                                             :street-segments]))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 

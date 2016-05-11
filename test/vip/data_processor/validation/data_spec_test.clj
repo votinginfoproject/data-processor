@@ -28,7 +28,15 @@
         (is (= (map :id result) [1 2 3]))
         (is (= (map :race result) (map :race rows)))
         (is (= (map :partisan result) [false true nil]))
-        (is (= (map (comp class :date) result) [java.sql.Date java.sql.Date nil]))))))
+        (is (= (map (comp class :date) result) [java.sql.Date java.sql.Date nil]))))
+    (testing "it works with string keys also"
+      (let [rows [{"id" "100" "race" "Mayor" "partisan" 0 "date" "2016-11-08"}]
+            cols [{:name "id" :coerce coerce/coerce-integer}
+                  {:name "race"}
+                  {:name "partisan" :coerce coerce/coerce-boolean}
+                  {:name "date" :coerce coerce/coerce-date}]
+            result (first (coerce-rows cols rows))]
+        (is (= (get result "id") 100))))))
 
 (deftest create-format-rule-test
   (let [column "name"

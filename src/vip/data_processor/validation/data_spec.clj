@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.data-spec
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.tools.logging :as log]))
 
 (defn add-data-specs [data-specs]
   (fn [ctx]
@@ -62,12 +63,12 @@
   "From a data-spec column definition generate a transducer to coerce
   values for that column."
   [{:keys [name coerce]}]
-  (let [col (keyword name)]
-    (map (fn [row]
-           (let [v (get row col)]
-             (if v
-               (assoc row col (coerce v))
-               row))))))
+  (map (fn [row]
+         (let [col (if (contains? row name) name (keyword name))
+               v (get row col)]
+           (if v
+             (assoc row col (coerce v))
+             row)))))
 
 (defn coerce-rows
   "Given the column definitions from a data-spec and a sequence of
@@ -75,8 +76,9 @@
   [cols rows]
   (let [coercable-cols (filter :coerce cols)
         coercions (map map-col-coercion coercable-cols)
-        coercion-xf (apply comp coercions)]
-    (sequence coercion-xf rows)))
+        coercion-xf (apply comp coercions)
+        application (sequence coercion-xf rows)]
+    application))
 
 (defn filename->table [data-specs filename]
   (->> data-specs
