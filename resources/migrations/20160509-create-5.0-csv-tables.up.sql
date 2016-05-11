@@ -32,18 +32,27 @@ CREATE TABLE v5_0_states (id TEXT NOT NULL,
                           PRIMARY KEY (results_id, id),
                           name TEXT,
                           election_administration_id TEXT,
-                          external_identifiers TEXT);
+                          external_identifier_type TEXT,
+                          external_identifier_othertype TEXT,
+                          external_identifier_value TEXT);
 
 CREATE TABLE v5_0_hours_open (id TEXT NOT NULL,
-                              results_id BIGINT REFERENCES results (id) NOT NULL,
-                              PRIMARY KEY (results_id, id),
-                              start_time TEXT,
-                              end_time TEXT,
-                              is_only_by_appointment TEXT,
-                              is_or_by_appointment TEXT,
-                              is_subject_to_change TEXT,
-                              start_date TEXT,
-                              end_date TEXT);
+                              results_id BIGINT REFERENCES results(id) NOT NULL,
+                              schedule_id TEXT NOT NULL,
+                              PRIMARY KEY (results_id, id, schedule_id));
+
+CREATE TABLE v5_0_schedules (id TEXT NOT NULL,
+                             results_id BIGINT REFERENCES results (id) NOT NULL,
+                             PRIMARY KEY (results_id, id),
+                             start_time TEXT,
+                             end_time TEXT,
+                             start_time2 TEXT,
+                             end_time2 TEXT,
+                             is_only_by_appointment TEXT,
+                             is_or_by_appointment TEXT,
+                             is_subject_to_change TEXT,
+                             start_date TEXT,
+                             end_date TEXT);
 
 CREATE TABLE v5_0_localities (id TEXT NOT NULL,
                               results_id BIGINT REFERENCES results (id) NOT NULL,
@@ -51,28 +60,31 @@ CREATE TABLE v5_0_localities (id TEXT NOT NULL,
                               name TEXT,
                               state_id TEXT,
                               type TEXT,
-                              election_administration_id TEXT,
-                              external_identifiers TEXT,
                               other_type TEXT,
-                              polling_location_id TEXT); -- unbounded
+                              election_administration_id TEXT,
+                              external_identifier_type TEXT,
+                              external_identifier_othertype TEXT,
+                              external_identifier_value TEXT);
 
 CREATE TABLE v5_0_parties (id TEXT NOT NULL,
                            results_id BIGINT REFERENCES results (id) NOT NULL,
                            PRIMARY KEY (results_id, id),
                            abbreviation TEXT,
                            color TEXT,
-                           external_identifiers TEXT,
+                           external_identifier_type TEXT,
+                           external_identifier_othertype TEXT,
+                           external_identifier_value TEXT,
                            logo_uri TEXT,
                            name TEXT);
 
 CREATE TABLE v5_0_people (id TEXT NOT NULL,
                           results_id BIGINT REFERENCES results (id) NOT NULL,
                           PRIMARY KEY (results_id, id),
-                          contact_information_id TEXT, -- unbounded
+                          contact_information_id TEXT,
                           date_of_birth TEXT,
                           first_name TEXT,
                           last_name TEXT,
-                          middle_name TEXT, -- unbounded
+                          middle_name TEXT,
                           nickname TEXT,
                           prefix TEXT,
                           suffix TEXT,
@@ -84,10 +96,10 @@ CREATE TABLE v5_0_polling_locations (id TEXT NOT NULL,
                                      results_id BIGINT REFERENCES results (id) NOT NULL,
                                      PRIMARY KEY (results_id, id),
                                      address_line TEXT,
-                                     directions TEXT, -- internationalized
-                                     hours TEXT, -- internationalized
-                                     photo_uri TEXT,
+                                     directions TEXT,
+                                     hours TEXT,
                                      hours_open_id TEXT,
+                                     photo_uri TEXT,
                                      is_drop_box TEXT,
                                      is_early_voting TEXT,
                                      latitude TEXT,
@@ -102,7 +114,9 @@ CREATE TABLE v5_0_precincts (id TEXT NOT NULL,
                              locality_id TEXT,
                              ward TEXT,
                              is_mail_only TEXT,
-                             external_identifiers TEXT,
+                             external_identifier_type TEXT,
+                             external_identifier_othertype TEXT,
+                             external_identifier_value TEXT,
                              precinct_split_name TEXT,
                              ballot_style_id TEXT);
 
@@ -120,6 +134,7 @@ CREATE TABLE v5_0_election_administrations (id TEXT NOT NULL,
 CREATE TABLE v5_0_departments (id TEXT NOT NULL,
                                results_id BIGINT REFERENCES results (id) NOT NULL,
                                PRIMARY KEY (results_id, id),
+                               department_name TEXT,
                                election_administration_id TEXT,
                                contact_information_id TEXT,
                                election_official_person_id TEXT);
@@ -140,24 +155,25 @@ CREATE TABLE v5_0_electoral_districts (id TEXT NOT NULL,
                                        name TEXT,
                                        type TEXT,
                                        number TEXT,
-                                       external_identifiers TEXT,
+                                       external_identifier_type TEXT,
+                                       external_identifier_othertype TEXT,
+                                       external_identifier_value TEXT,
                                        other_type TEXT);
 
 
 CREATE TABLE v5_0_ballot_measure_contests (id TEXT NOT NULL,
                                            results_id BIGINT REFERENCES results (id) NOT NULL,
                                            PRIMARY KEY (results_id, id),
-                                           con_statement TEXT, -- internationalized
-                                           effect_of_abstain TEXT, -- internationalized
-                                           full_text TEXT, -- internationalized
+                                           con_statement TEXT,
+                                           effect_of_abstain TEXT,
+                                           full_text TEXT,
                                            info_uri TEXT,
-                                           passage_threshold TEXT, -- internationalized
-                                           pro_statement TEXT, -- internationalized
-                                           summary_text TEXT, -- internationalized
+                                           passage_threshold TEXT,
+                                           pro_statement TEXT,
+                                           summary_text TEXT,
                                            type TEXT,
                                            other_type TEXT);
 
--- Is this mixed with *candidate_selection* perhaps?
 CREATE TABLE v5_0_ballot_selections (id TEXT NOT NULL,
                                      results_id BIGINT REFERENCES results (id) NOT NULL,
                                      PRIMARY KEY (results_id, id),
@@ -178,8 +194,10 @@ CREATE TABLE v5_0_ballot_styles (id TEXT NOT NULL,
 CREATE TABLE v5_0_candidates (id TEXT NOT NULL,
                               results_id BIGINT REFERENCES results (id) NOT NULL,
                               PRIMARY KEY (results_id, id),
-                              ballot_name TEXT, -- internationalized
-                              external_identifiers TEXT,
+                              ballot_name TEXT,
+                              external_identifier_type TEXT,
+                              external_identifier_othertype TEXT,
+                              external_identifier_value TEXT,
                               file_date TEXT,
                               is_incumbent TEXT,
                               is_top_ticket TEXT,
@@ -190,30 +208,17 @@ CREATE TABLE v5_0_candidates (id TEXT NOT NULL,
                               sequence_order TEXT,
                               contest_id TEXT);
 
-CREATE TABLE v5_0_offices (id TEXT NOT NULL,
-                           results_id BIGINT REFERENCES results (id) NOT NULL,
-                           PRIMARY KEY (results_id, id),
-                           contact_information_id TEXT,
-                           electoral_district_id TEXT,
-                           external_identifiers TEXT,
-                           filing_deadline TEXT,
-                           is_partisan TEXT,
-                           name TEXT, -- internationalized
-                           office_holder_person_id TEXT,
-                           term_type TEXT,
-                           term_start_date TEXT,
-                           term_end_date TEXT);
-
 CREATE TABLE v5_0_candidate_contests (id TEXT NOT NULL,
                                       results_id BIGINT REFERENCES results (id) NOT NULL,
                                       PRIMARY KEY (results_id, id),
                                       abbreviation TEXT,
-                                      ballot_selection_id TEXT, -- unbounded
-                                      ballot_sub_title TEXT, -- internationalized
-                                      ballot_title TEXT, -- internationalized
+                                      ballot_sub_title TEXT,
+                                      ballot_title TEXT,
                                       electoral_district_id TEXT,
-                                      electorate_specification TEXT, -- internationalized
-                                      external_identifiers TEXT, -- unbounded
+                                      electorate_specification TEXT,
+                                      external_identifier_type TEXT,
+                                      external_identifier_othertype TEXT,
+                                      external_identifier_value TEXT,
                                       has_rotation TEXT,
                                       name TEXT,
                                       sequence_order TEXT,
@@ -222,7 +227,40 @@ CREATE TABLE v5_0_candidate_contests (id TEXT NOT NULL,
                                       number_elected TEXT,
                                       primary_party_id TEXT,
                                       votes_allowed TEXT,
-                                      office_id TEXT); -- unbounded
+                                      office_id TEXT);
+
+CREATE TABLE v5_0_candidate_contest_ballot_selections (candidate_contest_id TEXT NOT NULL,
+                                                       ballot_selection_id TEXT NOT NULL,
+                                                       results_id BIGINT REFERENCES results (id) NOT NULL,
+                                                       PRIMARY KEY (results_id, candidate_contest_id, ballot_selection_id));
+
+CREATE TABLE v5_0_contact_information (id TEXT NOT NULL,
+                                       results_id BIGINT REFERENCES results (id) NOT NULL,
+                                       address_line TEXT,
+                                       email TEXT,
+                                       fax TEXT,
+                                       hours TEXT,
+                                       hours_open_id TEXT,
+                                       name TEXT,
+                                       phone1 TEXT,
+                                       phone2 TEXT,
+                                       uri TEXT);
+
+CREATE TABLE v5_0_offices (id TEXT NOT NULL,
+                           results_id BIGINT REFERENCES results (id) NOT NULL,
+                           PRIMARY KEY (results_id, id),
+                           contact_information_id TEXT,
+                           electoral_district_id TEXT,
+                           external_identifier_type TEXT,
+                           external_identifier_othertype TEXT,
+                           external_identifier_value TEXT,
+                           filing_deadline TEXT,
+                           is_partisan TEXT,
+                           name TEXT,
+                           office_holder_person_id TEXT,
+                           term_type TEXT,
+                           term_start_date TEXT,
+                           term_end_date TEXT);
 
 CREATE TABLE v5_0_locality_polling_locations (locality_id TEXT NOT NULL,
                                               polling_location_id TEXT NOT NULL,
@@ -244,20 +282,4 @@ CREATE TABLE v5_0_state_polling_locations (state_id TEXT NOT NULL,
                                            results_id BIGINT REFERENCES results (id) NOT NULL,
                                            PRIMARY KEY (results_id, state_id, polling_location_id));
 
--- This might be adding =unit_number= only?
--- CREATE TABLE v5_0_street_segments (id TEXT NOT NULL,
---                                    results_id BIGINT REFERENCES results (id) NOT NULL,
---                                    PRIMARY KEY (results_id, id),
---                                    start_house_number TEXT,
---                                    end_house_number TEXT,
---                                    odd_even_both TEXT,
---                                    includes_all_addresses TEXT,
---                                    unit_number TEXT,
---                                    street_direction TEXT,
---                                    street_name TEXT,
---                                    street_suffix TEXT,
---                                    address_direction TEXT,
---                                    city TEXT,
---                                    state TEXT,
---                                    zip TEXT,
---                                    precinct_id TEXT);
+ALTER TABLE v5_0_street_segments ADD COLUMN unit_number TEXT;
