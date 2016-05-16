@@ -9,6 +9,7 @@
             [vip.data-processor.util :as util]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v5-0 :as v5-0]
             [vip.data-processor.db.sqlite :as sqlite]))
 
 (defn csv-filenames [data-specs]
@@ -137,7 +138,7 @@
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           load-csvs]
-   "5.0" [unsupported-version]})
+   "5.0" [(data-spec/add-data-specs v5-0/data-specs)]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]
