@@ -10,7 +10,8 @@
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v5-0 :as v5-0]
-            [vip.data-processor.db.sqlite :as sqlite]))
+            [vip.data-processor.db.sqlite :as sqlite]
+            [vip.data-processor.db.postgres :as postgres]))
 
 (defn csv-filenames [data-specs]
   (set (map :filename data-specs)))
@@ -91,7 +92,12 @@
                                                             [(str "Expected " headers-count
                                                                   " values, found " row-count)]))))
                                             ctx chunk)
-                                chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)]
+                                chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)
+                                chunk-values (if (= "postgresql" (get-in sql-table [:db :options :subprotocol]))
+                                               (->> chunk-values
+                                                    (data-spec/coerce-rows columns)
+                                                    (map #(assoc % "results_id" (:import-id ctx))))
+                                               chunk-values)]
                             (try
                               (korma/insert sql-table (korma/values chunk-values))
                               ctx
@@ -138,7 +144,9 @@
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           load-csvs]
-   "5.0" [(data-spec/add-data-specs v5-0/data-specs)]})
+   "5.0" [(data-spec/add-data-specs v5-0/data-specs)
+          (fn [ctx] (assoc ctx :tables postgres/v5-0-tables))
+          load-csvs]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

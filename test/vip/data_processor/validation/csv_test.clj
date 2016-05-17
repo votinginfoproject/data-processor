@@ -153,8 +153,21 @@
       (is (= three-point-0-pipeline
              (take (count three-point-0-pipeline) (:pipeline out-ctx))))))
 
+  (testing "add the 5.0 import pipeline to the front of the pipeline for 5.0 feeds"
+    (let [ctx {:spec-version "5.0"}
+          out-ctx (branch-on-spec-version ctx)
+          five-point-0-pipeline (get version-pipelines "5.0")]
+      (is (= five-point-0-pipeline
+             (take (count five-point-0-pipeline) (:pipeline out-ctx))))))
+
   (testing "stops with unsupported version for other versions"
     (let [ctx {:spec-version "2.0"  ; 2.0 is too old
+               :pipeline [branch-on-spec-version]}
+          out-ctx (pipeline/run-pipeline ctx)]
+      (is (.startsWith (:stop out-ctx) "Unsupported CSV version"))))
+
+  (testing "stops with unsupported version for other versions"
+    (let [ctx {:spec-version "5.1"  ; 5.1 is too new
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported CSV version")))))
