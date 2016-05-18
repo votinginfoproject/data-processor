@@ -75,8 +75,10 @@
   "Uploads the generated xml file to the specified S3 bucket."
   [{:keys [xml-output-file] :as ctx}]
   (let [zip-name (str (zip-filename ctx) ".zip")
-        zip-file (File. zip-name)
-        zip (ZipFile. zip-name)
+        zip-dir (Files/createTempDirectory tmp-path-prefix
+                                           (into-array FileAttribute []))
+        zip-file (File. (.toFile zip-dir) zip-name)
+        zip (ZipFile. zip-file)
         zip-params (doto (ZipParameters.)
                      (.setCompressionLevel
                       Zip4jConstants/DEFLATE_LEVEL_NORMAL))
@@ -87,4 +89,4 @@
     (put-object zip-name zip-file)
     (-> ctx
         (assoc :generated-xml-filename zip-name)
-        (update :to-be-cleaned conj zip-file))))
+        (update :to-be-cleaned concat [zip-file zip-dir]))))

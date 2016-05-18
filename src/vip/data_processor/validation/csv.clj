@@ -57,59 +57,62 @@
   (if-let [file-to-load (find-input-file ctx filename)]
     (do
       (log/info "Loading" filename)
-      (with-open [in-file (util/bom-safe-reader file-to-load :encoding "UTF-8")]
-        (let [headers (->> in-file
-                           read-one-line
-                           (map #(clojure.string/replace % #"\W" "")))
-              headers-count (count headers)
-              sql-table (get-in ctx [:tables table])
-              column-names (map :name columns)
-              required-header-names (->> columns
-                                         (filter :required)
-                                         (map :name))
-              extraneous-headers (seq (set/difference (set headers) (set column-names)))
-              transforms (apply comp (data-spec/translation-fns columns))
-              format-rules (data-spec/create-format-rules (:data-specs ctx) filename columns)
-              ctx (if extraneous-headers
-                    (assoc-in ctx [:warnings table :global :extraneous-headers]
-                              extraneous-headers)
-                    ctx)
-              line-number (atom 1)]
-          (if (empty? (set/intersection (set headers) (set column-names)))
-            (assoc-in ctx [:critical table :global :no-header] ["No header row"])
-            (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
-              (assoc-in ctx [:critical table :global :missing-headers] missing-headers)
-              (reduce (fn [ctx chunk]
-                        (if (seq chunk)
-                          (let [ctx (reduce (fn [ctx row]
-                                              (swap! line-number inc)
-                                              (let [row-map (zipmap headers row)
-                                                    row-count (count row)
-                                                    ctx (data-spec/apply-format-rules format-rules ctx row-map @line-number)]
-                                                (if (= headers-count row-count)
-                                                  ctx
-                                                  (assoc-in ctx [:critical table @line-number :number-of-values]
-                                                            [(str "Expected " headers-count
-                                                                  " values, found " row-count)]))))
-                                            ctx chunk)
-                                chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)
-                                chunk-values (if (= "postgresql" (get-in sql-table [:db :options :subprotocol]))
-                                               (->> chunk-values
-                                                    (data-spec/coerce-rows columns)
-                                                    (map #(assoc % "results_id" (:import-id ctx))))
-                                               chunk-values)]
-                            (try
-                              (korma/insert sql-table (korma/values chunk-values))
-                              ctx
-                              (catch java.sql.SQLException e
-                                (let [message (.getMessage e)]
-                                  (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
-                                    (db.util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
-                                    (assoc-in ctx [:fatal (:name sql-table) @line-number :unknown-sql-error]
-                                              [message]))))))
-                          ctx))
-                      ctx (db.util/chunk-rows (csv/read-csv in-file)
-                                              sqlite/statement-parameter-limit)))))))
+      (try
+        (with-open [in-file (util/bom-safe-reader file-to-load :encoding "UTF-8")]
+          (let [headers (->> in-file
+                             read-one-line
+                             (map #(clojure.string/replace % #"\W" "")))
+                headers-count (count headers)
+                sql-table (get-in ctx [:tables table])
+                column-names (map :name columns)
+                required-header-names (->> columns
+                                           (filter :required)
+                                           (map :name))
+                extraneous-headers (seq (set/difference (set headers) (set column-names)))
+                transforms (apply comp (data-spec/translation-fns columns))
+                format-rules (data-spec/create-format-rules (:data-specs ctx) filename columns)
+                ctx (if extraneous-headers
+                      (assoc-in ctx [:warnings table :global :extraneous-headers]
+                                extraneous-headers)
+                      ctx)
+                line-number (atom 1)]
+            (if (empty? (set/intersection (set headers) (set column-names)))
+              (assoc-in ctx [:critical table :global :no-header] ["No header row"])
+              (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
+                (assoc-in ctx [:critical table :global :missing-headers] missing-headers)
+                (reduce (fn [ctx chunk]
+                          (if (seq chunk)
+                            (let [ctx (reduce (fn [ctx row]
+                                                (swap! line-number inc)
+                                                (let [row-map (zipmap headers row)
+                                                      row-count (count row)
+                                                      ctx (data-spec/apply-format-rules format-rules ctx row-map @line-number)]
+                                                  (if (= headers-count row-count)
+                                                    ctx
+                                                    (assoc-in ctx [:critical table @line-number :number-of-values]
+                                                              [(str "Expected " headers-count
+                                                                    " values, found " row-count)]))))
+                                              ctx chunk)
+                                  chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)
+                                  chunk-values (if (= "postgresql" (get-in sql-table [:db :options :subprotocol]))
+                                                 (->> chunk-values
+                                                      (data-spec/coerce-rows columns)
+                                                      (map #(assoc % "results_id" (:import-id ctx))))
+                                                 chunk-values)]
+                              (try
+                                (korma/insert sql-table (korma/values chunk-values))
+                                ctx
+                                (catch java.sql.SQLException e
+                                  (let [message (.getMessage e)]
+                                    (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
+                                      (db.util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
+                                      (assoc-in ctx [:fatal (:name sql-table) @line-number :unknown-sql-error]
+                                                [message]))))))
+                            ctx))
+                        ctx (db.util/chunk-rows (csv/read-csv in-file)
+                                                sqlite/statement-parameter-limit))))))
+        (catch java.lang.Exception e
+          (update-in ctx [:fatal filename :global :csv-error] conj (.getMessage e)))))
     ctx))
 
 (defn-traced load-csvs [ctx]
