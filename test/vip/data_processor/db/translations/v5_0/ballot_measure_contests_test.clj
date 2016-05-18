@@ -1,17 +1,7 @@
 (ns vip.data-processor.db.translations.v5-0.ballot-measure-contests-test
   (:require [clojure.test :refer [deftest testing is]]
+            [vip.data-processor.db.translations.util :as util]
             [vip.data-processor.db.translations.v5-0.ballot-measure-contests :as bmc]))
-
-(deftest index-generator-test
-  (testing "repeatedly calling a generator yields new values"
-    (let [idx (bmc/index-generator 13)
-          values (into [] (take 5 (repeatedly idx)))]
-      (is (= [13 14 15 16 17] values))))
-
-  (testing "values increase monotonicly"
-    (let [idx (bmc/index-generator 0)
-          values (into [] (take 5 (repeatedly idx)))]
-      (is (every? > values)))))
 
 (def bmc
   {:ballot_title "BALLOT_TITLE",
@@ -40,13 +30,14 @@
    :sequence_order "SEQUENCE_ORDER"})
 
 (deftest abbreviation-ltree-test
-  (let [idx-fn (bmc/index-generator 0)
+  (let [idx-fn (util/index-generator 0)
         bmc-path "VipObject.0.BallotMeasureContest.0"
-        index-path "VipObject.0.BallotMeasureContest.0.id"]
+        index-path "VipObject.0.BallotMeasureContest.0.id"
+        transform-fn (util/simple-value-ltree :abbreviation)]
     (testing "creating an abbreviation entity"
       (is (= (list
               {:simple_path "VipObject.BallotMeasureContest.Abbreviation"
                :path "VipObject.0.BallotMeasureContest.0.Abbreviation.0"
                :parent_with_id index-path
                :value "ABBREVIATION"})
-             (bmc/abbreviation->ltree idx-fn bmc-path bmc))))))
+             (transform-fn idx-fn bmc-path bmc))))))
