@@ -3,15 +3,11 @@
             [vip.data-processor.db.translations.util :as util]))
 
 (deftest index-generator-test
-  (testing "a generator is a function that yields new values on each call"
+  (testing "a generator yields monotonically increasing values on each call"
     (let [idx (util/index-generator 13)
           values (into [] (take 5 (repeatedly idx)))]
-      (is (= [13 14 15 16 17] values))))
-
-  (testing "values increase monotonicly"
-    (let [idx (util/index-generator 0)
-          values (into [] (take 5 (repeatedly idx)))]
-)))
+      (is (= [13 14 15 16 17] values))
+      (is (every? > values)))))
 
 (deftest column->xml-elment-test
   (testing "column names are given as keywords"
