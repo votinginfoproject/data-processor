@@ -83,13 +83,14 @@
       (psql/initialize)
       ;; these vars will be unbound until after psql/initialize, so
       ;; don't set psql-tables until after that's been run
-      (def psql-tables [psql/v5-0-street-segments
-                        psql/xml-tree-validations
-                        psql/xml-tree-values
-                        psql/election_approvals
-                        psql/statistics
-                        psql/validations
-                        psql/results])
+      (def psql-tables (concat (vals psql/v5-0-tables)
+                               [psql/v5-0-street-segments
+                                psql/xml-tree-validations
+                                psql/xml-tree-values
+                                psql/election_approvals
+                                psql/statistics
+                                psql/validations
+                                psql/results]))
       (reset! setup-postgres-has-run true)))
   (f))
 
