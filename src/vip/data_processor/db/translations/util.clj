@@ -44,6 +44,15 @@
           {:path path
            :simple_path (path->simple-path path)
            :parent_with_id (index-path base-path)
+           :value value})))))
+  ([column-name xml-element parent-with-id]
+   (fn [idx-fn base-path row]
+     (when-let [value (get row column-name)]
+       (let [path (str base-path "." xml-element "." (idx-fn))]
+         (list
+          {:path path
+           :simple_path (path->simple-path path)
+           :parent_with_id parent-with-id
            :value value}))))))
 
 (defn internationalized-text-ltree [column-name]
@@ -64,17 +73,19 @@
             :value "en"}))))))
 
 (defn external-identifiers->ltree
-  [idx-fn base-path row]
+  [idx-fn parent-path row]
   (when-let [external-identifier-value (:external_identifier_value row)]
     (let [index (idx-fn)
-          base-path (str base-path
+          base-path (str parent-path
                          ".ExternalIdentifiers."
-                         index)
+                         index
+                         ".ExternalIdentifier.0")
+          parent-with-id (index-path parent-path)
           sub-idx-fn (index-generator 0)]
       (mapcat #(% sub-idx-fn base-path row)
-              [(simple-value-ltree :external_identifier_type "Type")
-               (simple-value-ltree :external_identifier_othertype "OtherType")
-               (simple-value-ltree :external_identifier_value "Value")]))))
+              [(simple-value-ltree :external_identifier_type "Type" parent-with-id)
+               (simple-value-ltree :external_identifier_othertype "OtherType" parent-with-id)
+               (simple-value-ltree :external_identifier_value "Value" parent-with-id)]))))
 
 (defn ltreeify [row]
   (-> row
