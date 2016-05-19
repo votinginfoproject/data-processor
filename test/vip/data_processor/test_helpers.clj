@@ -71,8 +71,9 @@
     (log/info "Recreating the test database")
     (let [database-name (config [:postgres :database])
           jdbc-config {:dbtype "postgresql"
-                       :dbname ""  ; do not connect to a db for creating/dropping
-                       :host (config [:postgres :host])
+                       :dbname "postgres"  ; connect to the default db for
+                                           ; creating/dropping your test
+                                           ; database
                        :port (config [:postgres :port])
                        :user (config [:postgres :user])
                        :password (config [:postgres :password])}]
