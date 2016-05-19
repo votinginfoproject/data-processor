@@ -23,10 +23,10 @@
     (is (= "VipObject.BallotMeasureContest"
            (util/path->simple-path "VipObject.0.BallotMeasureContest.0")))))
 
-(deftest simple-value-ltree-test
+(deftest simple-value->ltree-test
   (testing "transforming a simple thing is simple"
     (let [row {:abbreviation "DR"}
-          transform-fn (util/simple-value-ltree :abbreviation)
+          transform-fn (util/simple-value->ltree :abbreviation)
           idx-fn (util/index-generator 0)]
       (is (= (list
               {:path "VipObject.0.BallotMeasureContest.0.Abbreviation.0"
@@ -37,7 +37,7 @@
 
   (testing "alternate element names may be used where CSV and XML differ"
     (let [row {:abbreviation "JRA"}
-          transform-fn (util/simple-value-ltree :abbreviation "TLA")
+          transform-fn (util/simple-value->ltree :abbreviation "TLA")
           idx-fn (util/index-generator 0)]
       (is (= (list
               {:path "VipObject.0.BallotMeasureContest.0.TLA.0"
@@ -46,10 +46,10 @@
                :value "JRA"})
              (transform-fn idx-fn "VipObject.0.BallotMeasureContest.0" row))))))
 
-(deftest internationalized-text-ltree-test
+(deftest internationalized-text->ltree-test
   (testing "internationalized text elements will create two rows"
     (let [row {:instructions "Pat your head and rub your belly"}
-          transform-fn (util/internationalized-text-ltree :instructions)
+          transform-fn (util/internationalized-text->ltree :instructions)
           idx-fn (util/index-generator 0)]
       (is (= (list
               {:path "VipObject.0.BallotMeasureContest.0.Instructions.0.Text.0"
