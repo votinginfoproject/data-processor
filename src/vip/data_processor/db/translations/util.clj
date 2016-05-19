@@ -19,9 +19,9 @@
   Iteration 4 yields 17
   nil"
   [initial-value]
-  (let [counter (atom initial-value)]
+  (let [counter (atom (dec initial-value))]
     (fn []
-      (dec (swap! counter inc)))))
+      (swap! counter inc))))
 
 (defn column->xml-elment [column-name]
   (as-> column-name ?
