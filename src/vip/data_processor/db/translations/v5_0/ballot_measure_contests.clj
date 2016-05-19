@@ -40,6 +40,7 @@
               (util/simple-value-ltree :other_type)])
      {:path index-path
       :simple_path "VipObject.BallotMeasureContest.id"
+      :parent_with_id index-path
       :value (:id bmc)})))
 
 (def transformer (util/transformer ballot-measure-contests
