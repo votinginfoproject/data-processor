@@ -35,6 +35,13 @@
                :value "DR"})
              (transform-fn idx-fn "VipObject.0.BallotMeasureContest.0" row)))))
 
+  (testing "when a thing is empty, it is not included"
+    (let [row {:abbreviation ""}
+          transform-fn (util/simple-value->ltree :abbreviation)
+          idx-fn (util/index-generator 0)]
+      (is (nil? (transform-fn idx-fn "VipObject.0.BallotMeasureContest.0" row)))
+      (is (= 0 (idx-fn)))))
+
   (testing "alternate element names may be used where CSV and XML differ"
     (let [row {:abbreviation "JRA"}
           transform-fn (util/simple-value->ltree :abbreviation "TLA")
@@ -63,6 +70,12 @@
              (transform-fn idx-fn "VipObject.0.BallotMeasureContest.0" row))))))
 
 (deftest external-identifiers->ltree-test
+  (testing "when all three identifiers are missing, nothing happens"
+    (let [row {:external_identifier_type ""
+               :external_identifier_othertype ""
+               :external_identifier_value ""}
+          idx-fn (util/index-generator 0)]
+      (is (nil? (util/external-identifiers->ltree idx-fn "VipObject.0.BallotMeasureContest.0" row)))))
   (testing "external identifier elements will create three rows"
     (let [row {:external_identifier_type "Other"
                :external_identifier_othertype "ThisOtherType"
