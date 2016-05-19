@@ -33,9 +33,9 @@
 (defn path->simple-path [path]
   (str/join "." (str/split path #"\.\d+\.?")))
 
-(defn simple-value-ltree
+(defn simple-value->ltree
   ([column-name]
-   (simple-value-ltree column-name (column->xml-elment column-name)))
+   (simple-value->ltree column-name (column->xml-elment column-name)))
   ([column-name xml-element]
    (fn [idx-fn base-path row]
      (when-let [value (get row column-name)]
@@ -55,7 +55,7 @@
            :parent_with_id parent-with-id
            :value value}))))))
 
-(defn internationalized-text-ltree [column-name]
+(defn internationalized-text->ltree [column-name]
   (let [xml-element (column->xml-elment column-name)]
     (fn [idx-fn base-path row]
       (when-let [value (get row column-name)]
@@ -83,9 +83,9 @@
           parent-with-id (index-path parent-path)
           sub-idx-fn (index-generator 0)]
       (mapcat #(% sub-idx-fn base-path row)
-              [(simple-value-ltree :external_identifier_type "Type" parent-with-id)
-               (simple-value-ltree :external_identifier_othertype "OtherType" parent-with-id)
-               (simple-value-ltree :external_identifier_value "Value" parent-with-id)]))))
+              [(simple-value->ltree :external_identifier_type "Type" parent-with-id)
+               (simple-value->ltree :external_identifier_othertype "OtherType" parent-with-id)
+               (simple-value->ltree :external_identifier_value "Value" parent-with-id)]))))
 
 (defn ltreeify [row]
   (-> row
