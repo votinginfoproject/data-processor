@@ -49,7 +49,21 @@
               {:name "other_type"}]}
    {:filename "ballot_measure_contest.txt"
     :table :ballot-measure-contests
-    :columns [{:name "id"}
+    :columns [{:name "abbreviation"}
+              {:name "ballot_selection_ids"}
+              {:name "ballot_sub_title"}
+              {:name "ballot_title"}
+              {:name "electoral_district_id"}
+              {:name "electorate_specification"}
+              {:name "external_identifier_type"}
+              {:name "external_identifier_othertype"}
+              {:name "external_identifier_value"}
+              {:name "has_rotation"}
+              {:name "name"}
+              {:name "sequence_order"}
+              {:name "vote_variation"}
+              {:name "other_vote_variation"}
+              {:name "id"}
               {:name "con_statement"}
               {:name "effect_of_abstain"}
               {:name "full_text"}
