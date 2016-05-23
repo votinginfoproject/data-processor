@@ -1,0 +1,1 @@
+DROP TABLE v5_1_ballot_measure_selections;

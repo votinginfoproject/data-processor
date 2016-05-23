@@ -73,6 +73,11 @@
               {:name "summary_text"}
               {:name "type"}
               {:name "other_type"}]}
+   {:filename "ballot_measure_selection.txt"
+    :table :ballot-measure-selections
+    :columns [{:name "id"}
+              {:name "sequence_order"}
+              {:name "selection"}]}
    {:filename "ballot_selection.txt"
     :table :ballot-selections
     :columns [{:name "id"}
