@@ -47,10 +47,10 @@
   (korma/defentity xml-tree-validations
     (korma/table "xml_tree_validations")
     (korma/database results-db))
-  (korma/defentity v5-0-street-segments
-    (korma/table "v5_0_street_segments"))
-  (def v5-0-tables
-    (db.util/make-entities "5.0" results-db [:offices
+  (korma/defentity v5-1-street-segments
+    (korma/table "v5_1_street_segments"))
+  (def v5-1-tables
+    (db.util/make-entities "5.1" results-db [:offices
                                              :voter-services
                                              :ballot-measure-contests
                                              :ballot-selections
@@ -168,7 +168,7 @@
 (defn get-public-id-data [{:keys [spec-version] :as ctx}]
   (condp = spec-version
     "3.0" (get-v3-public-id-data ctx)
-    "5.0" (get-xml-tree-public-id-data ctx)
+    "5.1" (get-xml-tree-public-id-data ctx)
     {}))
 
 (defn generate-public-id [ctx]
@@ -287,7 +287,7 @@
   (validation-values-from validation-value))
 
 (def xml-tree-validation-values
-  "Create insertable validations from the processing context map. Suitable for the 5.0 schema."
+  "Create insertable validations from the processing context map. Suitable for the 5.1 schema."
   (validation-values-from xml-tree-validation-value))
 
 (def statement-parameter-limit 10000)

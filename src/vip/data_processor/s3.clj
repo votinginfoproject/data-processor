@@ -64,7 +64,7 @@
                             util/format-date)]
       (zip-filename* fips election-date))
 
-    "5.0"
+    "5.1"
     (let [fips (postgres/find-value-for-simple-path
                 import-id "VipObject.Source.VipId")
           election-date (postgres/find-value-for-simple-path

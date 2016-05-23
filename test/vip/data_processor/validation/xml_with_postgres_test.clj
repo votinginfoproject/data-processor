@@ -27,7 +27,7 @@
              "51")))))
 
 (deftest ^:postgres load-xml-tree-validations-test
-  (testing "well-formed 5.0 style errors will be saved to the database"
+  (testing "well-formed 5.1 style errors will be saved to the database"
     (let [ctx {:fatal {:id
                        {"VipObject.0.Election.1.id"
                         {:duplicate ["ele0001"]}
