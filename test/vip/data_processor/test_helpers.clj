@@ -100,3 +100,15 @@
   (doseq [table psql-tables]
     (korma/delete table))
   (f))
+
+(defmacro are-xml-tree-values
+  [out-ctx & args]
+  `(are [value# path#] (= value#
+                          (->
+                           (korma/select psql/xml-tree-values
+                             (korma/fields :value)
+                             (korma/where {:results_id (:import-id ~out-ctx)
+                                           :path (psql/path->ltree path#)}))
+                           first
+                           :value))
+     ~@args))
