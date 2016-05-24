@@ -34,7 +34,7 @@
               {:name "filing_deadline"}
               {:name "is_partisan"}
               {:name "name"}
-              {:name "office_holder_person_id"}
+              {:name "office_holder_person_ids"}
               {:name "term_type"}
               {:name "term_start_date"}
               {:name "term_end_date"}]}
@@ -103,7 +103,6 @@
               {:name "person_id"}
               {:name "post_election_status"}
               {:name "pre_election_status"}
-              {:name "sequence_order"}
               {:name "contest_id"}]}
    {:filename "candidate_contest.txt"
     :table :candidate-contests
@@ -111,7 +110,7 @@
               {:name "abbreviation"}
               {:name "ballot_sub_title"}
               {:name "ballot_title"}
-              ;; {:name "ballot_selection_ids" ;; this is in a join-table named 'candidate-contest-ballot-selections'
+              {:name "ballot_selection_ids"}
               {:name "electoral_district_id"}
               {:name "electorate_specification"}
               {:name "external_identifier_type"}
@@ -195,11 +194,8 @@
               {:name "election_administration_id"}
               {:name "external_identifier_type"}
               {:name "external_identifier_othertype"}
-              {:name "external_identifier_value"}]}
-   {:filename "locality_polling_location.txt"
-    :table :locality-polling-locations
-    :columns [{:name "locality_id"}
-              {:name "polling_location_id"}]}
+              {:name "external_identifier_value"}
+              {:name "polling_location_ids"}]}
    {:filename "party.txt"
     :table :parties
     :columns [{:name "id"}
@@ -224,7 +220,8 @@
               {:name "suffix"}
               {:name "title"}
               {:name "profession"}
-              {:name "party_id"}]}
+              {:name "party_id"}
+              {:name "gender"}]}
    {:filename "polling_location.txt"
     :table :polling-locations
     :columns [{:name "id"}
@@ -250,15 +247,9 @@
               {:name "external_identifier_othertype"}
               {:name "external_identifier_value"}
               {:name "precinct_split_name"}
-              {:name "ballot_style_id"}]}
-   {:filename "precinct_electoral_district.txt"
-    :table :precinct-electoral-districts
-    :columns [{:name "precinct_id"}
-              {:name "electoral_district_id"}]}
-   {:filename "precinct_polling_location.txt"
-    :table :precinct-polling-locations
-    :columns [{:name "precinct_id"}
-              {:name "polling_location_id"}]}
+              {:name "ballot_style_id"}
+              {:name "electoral_district_ids"}
+              {:name "polling_location_ids"}]}
    {:filename "source.txt"
     :table :sources
     :columns [{:name "id"}
@@ -277,11 +268,8 @@
               {:name "election_administration_id"}
               {:name "external_identifier_type"}
               {:name "external_identifier_othertype"}
-              {:name "external_identifier_value"}]}
-   {:filename "state_polling_location.txt"
-    :table :state-polling-locations
-    :columns [{:name "polling_location_id"}
-              {:name "state_id"}]}
+              {:name "external_identifier_value"}
+              {:name "polling_location_ids"}]}
    {:filename "street_segment.txt"
     :table :street-segments
     :columns [{:name "id"}
