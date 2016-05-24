@@ -22,6 +22,8 @@
   That will check there is nothing
   at [:warnings :missing :ballot], [:errors :missing :ballot], etc."
   [ctx key-path]
+  (is (nil? (:stop ctx)))
+  (is (nil? (:exception ctx)))
   (doseq [problem-type problem-types]
     (is (empty? (get-in ctx (cons problem-type key-path))))))
 
