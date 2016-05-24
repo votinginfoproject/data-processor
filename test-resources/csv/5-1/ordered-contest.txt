@@ -1,0 +1,3 @@
+id,ordered_ballot_selection_ids
+oc01,"bs01 bs05 bs02 bs05 bs03"
+oc02,"bs08 bs06 bs07 bs05 bs03 bs00 bs09"
