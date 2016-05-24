@@ -16,8 +16,8 @@
 
 (def overlap-query
   "SELECT subpath(xtv.path,0,4) AS path, ss2.id AS ss2_id
-   FROM v5_0_street_segments ss
-   INNER JOIN v5_0_street_segments ss2
+   FROM v5_1_street_segments ss
+   INNER JOIN v5_1_street_segments ss2
            ON ss2.start_house_number >= ss.start_house_number AND
               ss2.start_house_number <= ss.end_house_number AND
               ss.street_name = ss2.street_name AND
@@ -43,7 +43,7 @@
 (defn validate-no-street-segment-overlaps
   [{:keys [import-id] :as ctx}]
   (let [overlaps (korma/exec-raw
-                  (:conn postgres/v5-0-street-segments)
+                  (:conn postgres/v5-1-street-segments)
                   [overlap-query [import-id]]
                   :results)]
     (reduce (fn [ctx overlap]

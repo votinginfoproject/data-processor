@@ -5,8 +5,8 @@
 (deftest type->simple-paths-test
   (testing "generates lists of simple paths for a type for a spec"
     (are [type version expected] (= (set (type->simple-paths type version)) expected)
-      "Locality"     "5.0" #{"VipObject.Locality"}
-      "DistrictType" "5.0" #{"VipObject.ElectoralDistrict.Type"
+      "Locality"     "5.1" #{"VipObject.Locality"}
+      "DistrictType" "5.1" #{"VipObject.ElectoralDistrict.Type"
                              "VipObject.Locality.Type"}
       "xs:date"      "3.0" #{"vip_object.contest.filing_closed_date"
                              "vip_object.early_vote_site.end_date"
@@ -15,7 +15,7 @@
                              "vip_object.election.date"
                              "vip_object.election.registration_deadline"}
       ;; The big one
-      "InternationalizedText" "5.0" #{"VipObject.BallotMeasureContest.ConStatement"
+      "InternationalizedText" "5.1" #{"VipObject.BallotMeasureContest.ConStatement"
                                       "VipObject.BallotMeasureContest.BallotSubTitle"
                                       "VipObject.BallotMeasureContest.BallotTitle"
                                       "VipObject.BallotMeasureContest.EffectOfAbstain"
@@ -38,15 +38,19 @@
                                       "VipObject.Election.PollingHours"
                                       "VipObject.Election.RegistrationInfo"
                                       "VipObject.ElectionAdministration.Department.ContactInformation.Hours"
+                                      "VipObject.ElectionAdministration.Department.ContactInformation.Directions"
                                       "VipObject.ElectionAdministration.Department.VoterService.ContactInformation.Hours"
+                                      "VipObject.ElectionAdministration.Department.VoterService.ContactInformation.Directions"
                                       "VipObject.ElectionAdministration.Department.VoterService.Description"
                                       "VipObject.Office.ContactInformation.Hours"
+                                      "VipObject.Office.ContactInformation.Directions"
                                       "VipObject.Office.Name"
                                       "VipObject.Party.Name"
                                       "VipObject.PartyContest.BallotSubTitle"
                                       "VipObject.PartyContest.BallotTitle"
                                       "VipObject.PartyContest.ElectorateSpecification"
                                       "VipObject.Person.ContactInformation.Hours"
+                                      "VipObject.Person.ContactInformation.Directions"
                                       "VipObject.Person.FullName"
                                       "VipObject.Person.Profession"
                                       "VipObject.Person.Title"
@@ -62,4 +66,5 @@
                                       "VipObject.RetentionContest.BallotTitle"
                                       "VipObject.RetentionContest.ElectorateSpecification"
                                       "VipObject.Source.Description"
-                                      "VipObject.Source.FeedContactInformation.Hours"})))
+                                      "VipObject.Source.FeedContactInformation.Hours"
+                                      "VipObject.Source.FeedContactInformation.Directions"})))

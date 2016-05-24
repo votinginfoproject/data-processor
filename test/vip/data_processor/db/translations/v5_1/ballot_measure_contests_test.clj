@@ -1,7 +1,7 @@
-(ns vip.data-processor.db.translations.v5-0.ballot-measure-contests-test
+(ns vip.data-processor.db.translations.v5-1.ballot-measure-contests-test
   (:require [clojure.test :refer [deftest testing is]]
             [vip.data-processor.db.translations.util :as util]
-            [vip.data-processor.db.translations.v5-0.ballot-measure-contests :as bmc]))
+            [vip.data-processor.db.translations.v5-1.ballot-measure-contests :as bmc]))
 
 (deftest bmc->ltree-entries-test
   (testing "index numbers follow the order from the spec, skipping missing attributes"

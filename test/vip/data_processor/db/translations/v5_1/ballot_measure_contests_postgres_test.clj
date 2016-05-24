@@ -1,9 +1,9 @@
-(ns vip.data-processor.db.translations.v5-0.ballot-measure-contests-postgres-test
+(ns vip.data-processor.db.translations.v5-1.ballot-measure-contests-postgres-test
   (:require [clojure.test :refer [deftest testing is are use-fixtures]]
             [korma.core :as korma]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.db.translations.v5-0.ballot-measure-contests :as bmc]
+            [vip.data-processor.db.translations.v5-1.ballot-measure-contests :as bmc]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.test-helpers :refer :all]))
 
@@ -11,13 +11,13 @@
 
 (deftest ^:postgres an-integration-test
   (testing "we can load a CSV and transform it"
-    (let [csv-files (csv-inputs ["5-0/ballot_measure_contest.txt"])
+    (let [csv-files (csv-inputs ["5-1/ballot_measure_contest.txt"])
           ctx {:input csv-files
-               :spec-version "5.0"
+               :spec-version "5.1"
                :ltree-index 0
                :pipeline (concat
                           [postgres/start-run]
-                          (get csv/version-pipelines "5.0")
+                          (get csv/version-pipelines "5.1")
                           [bmc/transformer])}
           out-ctx (pipeline/run-pipeline ctx)]
       (assert-no-problems out-ctx [])

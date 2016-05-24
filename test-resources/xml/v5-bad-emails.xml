@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-     Sample XML file for Voting Information Project (VIP) Spec Version 5.0
+     Sample XML file for Voting Information Project (VIP) Spec Version 5.1
      Date: 2014-03-21
      File would be named: vipFeed-51-2013-11-05.xml
 
@@ -9,9 +9,9 @@
      For the sake of file size, street segments are not included.
 
     NOTE: The primary goal of the ordering of elements within this sample feed is to aid the reader
-          in understanding how the data objects within VIP 5.0 relate to each other.
+          in understanding how the data objects within VIP 5.1 relate to each other.
 -->
-<VipObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.0" xsi:noNamespaceSchemaLocation="http://votinginfoproject.github.com/vip-specification/vip_spec.xsd">
+<VipObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.1" xsi:noNamespaceSchemaLocation="http://votinginfoproject.github.com/vip-specification/vip_spec.xsd">
   <Person id="per001">
     <ContactInformation label="ci001">
       <Email>not.a.complete.email</Email>

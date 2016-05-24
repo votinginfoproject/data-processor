@@ -22,6 +22,8 @@
   That will check there is nothing
   at [:warnings :missing :ballot], [:errors :missing :ballot], etc."
   [ctx key-path]
+  (is (nil? (:stop ctx)))
+  (is (nil? (:exception ctx)))
   (doseq [problem-type problem-types]
     (is (empty? (get-in ctx (cons problem-type key-path))))))
 
@@ -83,8 +85,8 @@
       (psql/initialize)
       ;; these vars will be unbound until after psql/initialize, so
       ;; don't set psql-tables until after that's been run
-      (def psql-tables (concat (vals psql/v5-0-tables)
-                               [psql/v5-0-street-segments
+      (def psql-tables (concat (vals psql/v5-1-tables)
+                               [psql/v5-1-street-segments
                                 psql/xml-tree-validations
                                 psql/xml-tree-values
                                 psql/election_approvals

@@ -1,11 +1,11 @@
-(ns vip.data-processor.db.translations.v5-0.ballot-measure-contests
+(ns vip.data-processor.db.translations.v5-1.ballot-measure-contests
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.util :as util]
             [clojure.string :as str]))
 
 (defn ballot-measure-contests [import-id]
-  (korma/select (postgres/v5-0-tables :ballot-measure-contests)
+  (korma/select (postgres/v5-1-tables :ballot-measure-contests)
     (korma/where {:results_id import-id})))
 
 (defn base-path [index]

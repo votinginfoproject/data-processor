@@ -283,11 +283,11 @@
           v3-pipeline (get version-pipelines "3.0")]
       (is (= v3-pipeline
              (take (count v3-pipeline) (:pipeline out-ctx))))))
-  (testing "adds the 5.0 import pipeline to the front of the pipeline for 5.0 feeds"
-    (let [ctx {:spec-version "5.0"
+  (testing "adds the 5.1 import pipeline to the front of the pipeline for 5.1 feeds"
+    (let [ctx {:spec-version "5.1"
                :pipeline [branch-on-spec-version]}
           out-ctx (branch-on-spec-version ctx)
-          v5-pipeline (get version-pipelines "5.0")]
+          v5-pipeline (get version-pipelines "5.1")]
       (is (= v5-pipeline
              (take (count v5-pipeline) (:pipeline out-ctx))))))
   (testing "stops with unsupported version for other versions"
