@@ -13,7 +13,7 @@
 
 (defn bmc->ltree-entries [idx-fn bmc]
   (let [bmc-path (base-path (idx-fn))
-        index-path (util/index-path bmc-path)
+        id-path (util/id-path bmc-path)
         child-idx-fn (util/index-generator 0)]
     (conj
      (mapcat #(% child-idx-fn bmc-path bmc)
@@ -38,9 +38,9 @@
               (util/internationalized-text->ltree :summary_text)
               (util/simple-value->ltree :type)
               (util/simple-value->ltree :other_type)])
-     {:path index-path
+     {:path id-path
       :simple_path "VipObject.BallotMeasureContest.id"
-      :parent_with_id index-path
+      :parent_with_id id-path
       :value (:id bmc)})))
 
 (def transformer (util/transformer ballot-measure-contests

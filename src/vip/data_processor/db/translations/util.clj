@@ -3,7 +3,7 @@
             [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]))
 
-(defn index-path [path]
+(defn id-path [path]
   (str path ".id"))
 
 (defn index-generator
@@ -44,7 +44,7 @@
            (list
             {:path path
              :simple_path (path->simple-path path)
-             :parent_with_id (index-path base-path)
+             :parent_with_id (id-path base-path)
              :value value}))))))
   ([column-name xml-element parent-with-id]
    (fn [idx-fn base-path row]
@@ -68,11 +68,11 @@
             (list
              {:path text-path
               :simple_path (path->simple-path text-path)
-              :parent_with_id (index-path base-path)
+              :parent_with_id (id-path base-path)
               :value value}
              {:path lang-path
               :simple_path (path->simple-path lang-path)
-              :parent_with_id (index-path base-path)
+              :parent_with_id (id-path base-path)
               :value "en"})))))))
 
 (defn external-identifiers->ltree
@@ -85,7 +85,7 @@
                          ".ExternalIdentifiers."
                          index
                          ".ExternalIdentifier.0")
-          parent-with-id (index-path parent-path)
+          parent-with-id (id-path parent-path)
           sub-idx-fn (index-generator 0)]
       (mapcat #(% sub-idx-fn base-path row)
               [(simple-value->ltree :external_identifier_type "Type" parent-with-id)

@@ -21,14 +21,7 @@
                           [bmc/transformer])}
           out-ctx (pipeline/run-pipeline ctx)]
       (assert-no-problems out-ctx [])
-      (are [value path] (= value
-                           (->
-                            (korma/select postgres/xml-tree-values
-                              (korma/fields :value)
-                              (korma/where {:results_id (:import-id out-ctx)
-                                            :path (postgres/path->ltree path)}))
-                            first
-                            :value))
+      (are-xml-tree-values out-ctx
         "part duex" "VipObject.0.BallotMeasureContest.0.BallotSubTitle.2.Text.0"
         "hot shots" "VipObject.0.BallotMeasureContest.0.BallotTitle.3.Text.0"
         "en" "VipObject.0.BallotMeasureContest.0.BallotTitle.3.Text.0.language"
