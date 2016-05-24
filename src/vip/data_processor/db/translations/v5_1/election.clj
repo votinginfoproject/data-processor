@@ -1,10 +1,10 @@
-(ns vip.data-processor.db.translations.v5-0.election
+(ns vip.data-processor.db.translations.v5-1.election
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.util :as util]))
 
 (defn elections [import-id]
-  (korma/select (postgres/v5-0-tables :elections)
+  (korma/select (postgres/v5-1-tables :elections)
     (korma/where {:results_id import-id})))
 
 (defn base-path [index]

@@ -1,8 +1,8 @@
-(ns vip.data-processor.db.translations.v5-0.election-postgres-test
+(ns vip.data-processor.db.translations.v5-1.election-postgres-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [korma.core :as korma]
-            [vip.data-processor.db.translations.v5-0.election :as election]
+            [vip.data-processor.db.translations.v5-1.election :as election]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]))
@@ -11,12 +11,12 @@
 
 (deftest ^:postgres election-transforms-test
   (testing "election.txt is loaded and transformed"
-    (let [ctx {:input (csv-inputs ["5-0/election.txt"])
-               :spec-version "5.0"
+    (let [ctx {:input (csv-inputs ["5-1/election.txt"])
+               :spec-version "5.1"
                :ltree-index 1
                :pipeline (concat
                           [postgres/start-run]
-                          (get csv/version-pipelines "5.0")
+                          (get csv/version-pipelines "5.1")
                           [election/transformer])}
           out-ctx (pipeline/run-pipeline ctx)]
       (assert-no-problems out-ctx [])
