@@ -62,7 +62,7 @@
   import identified by `import-id`."
   [schema-type element-path import-id]
   (let [xml-schema-type (keyword->xml-name schema-type)
-        paths (spec/type->simple-paths xml-schema-type "5.0")
+        paths (spec/type->simple-paths xml-schema-type "5.1")
         xml-element-path (mapv keyword->xml-name element-path)]
     (for [p paths]
       (let [path-to-parent-components (-> p
@@ -156,7 +156,7 @@
 
   Primarily intended for use by `validate-elements`."
   [xml-schema-type xml-element-path valid? error-severity error-type]
-  (for [p (spec/type->simple-paths xml-schema-type "5.0")]
+  (for [p (spec/type->simple-paths xml-schema-type "5.1")]
     (fn [{:keys [import-id] :as ctx}]
       (let [simple-path (if (seq xml-element-path)
                           (str p "." (str/join "." xml-element-path))
@@ -194,5 +194,5 @@
   See `validate-elements` for more details."
   [schema-type error-severity]
   (let [xml-schema-type (keyword->xml-name schema-type)
-        valid? (spec/enumeration-values xml-schema-type "5.0")]
+        valid? (spec/enumeration-values xml-schema-type "5.1")]
     (validate-elements schema-type [] valid? error-severity :format)))

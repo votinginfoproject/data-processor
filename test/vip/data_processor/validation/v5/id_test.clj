@@ -40,7 +40,7 @@
 
 (deftest ^:postgres validate-idrefs-refer-test
   (let [ctx {:input (xml-input "v5-idrefs.xml")
-             :spec-version "5.0"
+             :spec-version "5.1"
              :pipeline [psql/start-run
                         load-xml-ltree
                         v5.id/validate-idrefs-refer]}

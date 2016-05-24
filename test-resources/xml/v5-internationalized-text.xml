@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<VipObject schemaVersion="5.0">
+<VipObject schemaVersion="5.1">
   <BallotMeasureContest id="bmc001">
     <BallotTitle>
       <Text language="en">State of the State</Text>

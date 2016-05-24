@@ -56,7 +56,7 @@
                     count)))))))
 
 (deftest xml-tree-validation-values-test
-  (testing "generates validates values for 5.0 style errors"
+  (testing "generates validates values for 5.1 style errors"
     (let [ctx {:import-id 25
                :errors {}
                :fatal {:id

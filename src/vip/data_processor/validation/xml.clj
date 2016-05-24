@@ -257,7 +257,7 @@
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           load-xml]
-   "5.0" (concat [load-xml-ltree
+   "5.1" (concat [load-xml-ltree
                   xml.v5/load-xml-street-segments]
                  v5-validations/validations
                  [load-xml-tree-validations
