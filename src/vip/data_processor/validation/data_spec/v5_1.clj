@@ -76,17 +76,18 @@
    {:filename "ballot_selection.txt"
     :table :ballot-selections
     :columns [{:name "id"}
-              {:name "ballot_measure_contest_id"}
-              {:name "ballot_measure_contest_selection_id"}
+              {:name "ballot_measure_contest_ids"}
+              {:name "ballot_measure_contest_selection_ids"}
               {:name "text"}
               {:name "candidate_id"}
               {:name "endorsement_party_id"}
-              {:name "is_write_in"}]}
+              {:name "is_write_in"}
+              {:name "sequence_order"}]}
    {:filename "ballot_style.txt"
     :table :ballot-styles
     :columns [{:name "id"}
               {:name "image_uri"}
-              {:name "ordered_contest_id"}
+              {:name "ordered_contest_ids"}
               {:name "party_id"}]}
    {:filename "candidate.txt"
     :table :candidates
@@ -110,6 +111,7 @@
               {:name "abbreviation"}
               {:name "ballot_sub_title"}
               {:name "ballot_title"}
+              ;; {:name "ballot_selection_ids" ;; this is in a join-table named 'candidate-contest-ballot-selections'
               {:name "electoral_district_id"}
               {:name "electorate_specification"}
               {:name "external_identifier_type"}
@@ -121,9 +123,9 @@
               {:name "vote_variation"}
               {:name "other_vote_variation"}
               {:name "number_elected"}
-              {:name "primary_party_id"}
+              {:name "primary_party_ids"}
               {:name "votes_allowed"}
-              {:name "office_id"}]}
+              {:name "office_ids"}]}
    {:filename "department.txt"
     :table :departments
     :columns [{:name "id"}

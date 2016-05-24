@@ -63,16 +63,12 @@
                                              :electoral-districts
                                              :hours-open
                                              :localities
-                                             :locality-polling-locations
                                              :parties
                                              :people
                                              :polling-locations
                                              :precincts
-                                             :precinct-electoral-districts
-                                             :precinct-polling-locations
                                              :sources
                                              :states
-                                             :state-polling-locations
                                              :street-segments]))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
