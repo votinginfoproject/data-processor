@@ -12,6 +12,7 @@
 (deftest ^:postgres full-good-v5-test
   (let [ctx {:input (xml-input "v5_sample_feed.xml")
              :pipeline (concat [psql/start-run
+                                xml/determine-spec-version
                                 xml/load-xml-ltree]
                                v5/validations)}
         out-ctx (pipeline/run-pipeline ctx)]
