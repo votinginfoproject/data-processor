@@ -125,6 +125,30 @@
               {:name "primary_party_ids"}
               {:name "votes_allowed"}
               {:name "office_ids"}]}
+   {:filename "candidate_selection.txt"
+    :table :candidate-selections
+    :columns [{:name "id"}
+              {:name "sequence_order"}
+              {:name "candidate_ids"}
+              {:name "endorsement_party_ids"}
+              {:name "is_write_in"}]}
+   {:filename "contest.txt"
+    :table :contests
+    :columns [{:name "id"}
+              {:name "abbreviation"}
+              {:name "ballot_selection_ids"}
+              {:name "ballot_sub_title"}
+              {:name "ballot_title"}
+              {:name "electoral_district_id"}
+              {:name "electorate_specification"}
+              {:name "external_identifier_type"}
+              {:name "external_identifier_othertype"}
+              {:name "external_identifier_value"}
+              {:name "has_rotation"}
+              {:name "name"}
+              {:name "sequence_order"}
+              {:name "vote_variation"}
+              {:name "other_vote_variation"}]}
    {:filename "department.txt"
     :table :departments
     :columns [{:name "id"}
@@ -196,6 +220,10 @@
               {:name "external_identifier_othertype"}
               {:name "external_identifier_value"}
               {:name "polling_location_ids"}]}
+   {:filename "ordered_contest.txt"
+    :table :ordered-contest
+    :columns [{:name "id"}
+              {:name "ordered_ballot_selection_ids"}]}
    {:filename "party.txt"
     :table :parties
     :columns [{:name "id"}
@@ -207,6 +235,11 @@
               {:name "external_identifier_value"}
               {:name "logo_uri"}
               {:name "name"}]}
+   {:filename "party_selection.txt"
+    :table :party-selections
+    :columns [{:name "id"}
+              {:name "sequence_order"}
+              {:name "party_ids"}]}
    {:filename "person.txt"
     :table :people
     :columns [{:name "id"}

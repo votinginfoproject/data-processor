@@ -57,13 +57,17 @@
                                              :ballot-styles
                                              :candidates
                                              :candidate-contests
+                                             :candidate-selections
+                                             :contests
                                              :departments
                                              :elections
                                              :election-administrations
                                              :electoral-districts
                                              :hours-open
                                              :localities
+                                             :ordered-contests
                                              :parties
+                                             :party-selections
                                              :people
                                              :polling-locations
                                              :precincts
