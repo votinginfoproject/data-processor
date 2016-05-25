@@ -1,3 +1,3 @@
-id,abbreviation,ballot_selection_ids,ballot_sub_title,ballot_title,electoral_district_id,electorate_specification,external_identifier_type,external_identifier_othertype,external_identifier_value,has_rotation,name,sequence_order,vote_variation,other_vote_variation
-con01,SE-1,bs01 bs02,With a Vengance,Die Hard Series,ed37,An electorate specification,fips,,23,false,Bruce Willis Movies,,,
-con02,SE-2,bs01 bs02,,Friends of Lee Van Cleef,ed37,An electorate specification,fips,,23,false,Spaghetti Westerns,,,
+abbreviation,ballot_selection_ids,ballot_sub_title,ballot_title,electoral_district_id,electorate_specification,external_identifier_type,external_identifier_othertype,external_identifier_value,has_rotation,name,sequence_order,vote_variation,other_vote_variation,id
+SE-1,"bs01 bs02",With a Vengance,Die Hard Series,ed37,An electorate specification,fips,,23,false,Bruce Willis Movies,,,,con001
+SE-2,"bs01 bs02",For a Few Dollars More,Friends of Lee Van Cleef,ed37,An electorate specification,fips,,23,false,Spaghetti Westerns,,,,con002
