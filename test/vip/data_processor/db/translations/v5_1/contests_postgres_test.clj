@@ -1,4 +1,4 @@
-(ns vip.data-processor.db.translations.v5-1.contests-test
+(ns vip.data-processor.db.translations.v5-1.contests-postgres-test
   (:require [clojure.test :refer :all]
             [korma.core :as korma]
             [vip.data-processor.validation.csv :as csv]
@@ -9,7 +9,7 @@
 
 (use-fixtures :once setup-postgres)
 
-(deftest contest->ltree-entries-test
+(deftest ^:postgres contest->ltree-entries-test
   (testing "tests run the important function"
     (let [ctx {:input (csv-inputs ["5-1/contest.txt"])
                :spec-version "5.1"
