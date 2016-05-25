@@ -53,6 +53,7 @@
     (db.util/make-entities "5.1" results-db [:offices
                                              :voter-services
                                              :ballot-measure-contests
+                                             :ballot-measure-selections
                                              :ballot-selections
                                              :ballot-styles
                                              :candidates
