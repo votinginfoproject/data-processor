@@ -1,0 +1,3 @@
+abbreviation,color,external_identifier_type,external_identifier_othertype,external_identifier_value,logo_uri,name,id
+REP,ff0000,other,something silly,dancing banannas,"http://example.com/donkey.png",Republican,par01
+DEM,0000ff,other,something silly,curtsying horses,"http://example.com/elephant.png",Democrat,par02

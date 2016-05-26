@@ -234,7 +234,6 @@
     :columns [{:name "id"}
               {:name "abbreviation"}
               {:name "color"}
-              {:name "external_identifiers"}
               {:name "external_identifier_type"}
               {:name "external_identifier_othertype"}
               {:name "external_identifier_value"}
