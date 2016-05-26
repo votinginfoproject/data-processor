@@ -226,8 +226,9 @@
               {:name "external_identifier_value"}
               {:name "polling_location_ids"}]}
    {:filename "ordered_contest.txt"
-    :table :ordered-contest
+    :table :ordered-contests
     :columns [{:name "id"}
+              {:name "contest_id"}
               {:name "ordered_ballot_selection_ids"}]}
    {:filename "party.txt"
     :table :parties
