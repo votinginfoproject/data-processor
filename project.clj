@@ -17,7 +17,9 @@
                                                               org.slf4j/slf4j-api]]
                  [net.lingala.zip4j/zip4j "1.3.2"]
                  [turbovote.resource-config "0.2.0"]
-                 [joplin.jdbc "0.3.6"]
+                 [joplin.jdbc "0.3.6"
+                  :exclusions [ragtime/ragtime.jdbc]]
+                 [ragtime/ragtime.jdbc "0.5.3"]
                  [korma "0.4.2"]
                  [org.clojure/java.jdbc "0.5.0"]
                  [org.postgresql/postgresql "9.4.1208" :exclusions [org.slf4j/slf4j-simple
