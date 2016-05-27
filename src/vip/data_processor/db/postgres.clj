@@ -68,6 +68,7 @@
                                              :localities
                                              :ordered-contests
                                              :parties
+                                             :party-contests
                                              :party-selections
                                              :people
                                              :polling-locations
