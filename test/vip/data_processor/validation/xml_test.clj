@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
+            [clojure.data.xml :as data.xml]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
@@ -276,17 +277,45 @@
       (is (= "3.0" (get out-ctx :spec-version))))))
 
 (deftest branch-on-spec-version-test
-  (testing "adds load-xml to the front of the pipeline for 3.0 feeds"
+  (testing "adds the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
     (let [ctx {:spec-version "3.0"}
-          out-ctx (branch-on-spec-version ctx)]
-      (is (= load-xml (first (:pipeline out-ctx))))))
-  (testing "stops with unsupported version for 5.0 feeds"
-    (let [ctx {:spec-version "5.0"
+          out-ctx (branch-on-spec-version ctx)
+          v3-pipeline (get version-pipelines "3.0")]
+      (is (= v3-pipeline
+             (take (count v3-pipeline) (:pipeline out-ctx))))))
+  (testing "adds the 5.1 import pipeline to the front of the pipeline for 5.1 feeds"
+    (let [ctx {:spec-version "5.1"
                :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported XML version"))))
+          out-ctx (branch-on-spec-version ctx)
+          v5-pipeline (get version-pipelines "5.1")]
+      (is (= v5-pipeline
+             (take (count v5-pipeline) (:pipeline out-ctx))))))
   (testing "stops with unsupported version for other versions"
     (let [ctx {:spec-version "2.0"  ; 2.0 is too old
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported XML version")))))
+
+(deftest path-and-values-test
+  (let [node (data.xml/element :country
+                               {:id "country1"
+                                :founded "1788"}
+                               (data.xml/element :state
+                                                 {:id "state1"}
+                                                 "Delaware")
+                               (data.xml/element :state
+                                                 {:id "state11"}
+                                                 "New York"))
+        pvs (path-and-values node)]
+    (is (= 6 (count pvs)))
+    (is (= #{"country.id" "country.founded" "country.state" "country.state.id"}
+           (set (map :simple_path pvs))))
+    (is (= #{"country.0.id" "country.0.founded"
+             "country.0.state.0" "country.0.state.0.id"
+             "country.0.state.1" "country.0.state.1.id"}
+           (set (map :path pvs))))
+    (is (some #{{:path "country.0.state.1.id"
+                 :simple_path "country.state.id"
+                 :value "state11"
+                 :parent_with_id "country.0.state.1"}}
+              pvs))))

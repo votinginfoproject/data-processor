@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <Person>
+    <FirstName>Huey</FirstName>
+  </Person>
+  <Person id="per002">
+    <FirstName>Duey</FirstName>
+  </Person>
+  <Person>
+    <FirstName>Luey</FirstName>
+  </Person>
+</VipObject>

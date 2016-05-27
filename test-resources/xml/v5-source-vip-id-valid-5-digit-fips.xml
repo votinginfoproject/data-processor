@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <State><Name>Colorado</Name></State>
+  <Source id="src001">
+    <DateTime>2016-03-08T00:00:00</DateTime>
+    <Name>the-source</Name>
+    <VipId>01001</VipId>
+  </Source>
+</VipObject>

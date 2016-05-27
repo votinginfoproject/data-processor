@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <ElectoralDistrict id="ed001">
+    <Name>Commonwealth of Virginia</Name>
+    <Type>state</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed002">
+    <Name>City and County of Denver</Name>
+    <Type>county</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed003">
+    <Name>Asgard</Name>
+    <Type>planet</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed004">
+    <Name>Lumpy Space</Name>
+    <Type>spaaaaaaace</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed005">
+    <Type>state</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed006">
+    <Name>Commonwealth of Virginia</Name>
+  </ElectoralDistrict>
+</VipObject>

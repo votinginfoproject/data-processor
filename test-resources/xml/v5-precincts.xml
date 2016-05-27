@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<VipObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.1" xsi:noNamespaceSchemaLocation="http://votinginfoproject.github.com/vip-specification/vip_spec.xsd">
+  <Precinct id="p1"></Precinct>
+  <Precinct id="p2">
+    <Name></Name>
+    <LocalityId>loc01</LocalityId>
+  </Precinct>
+  <Precinct id="p3">
+    <Name>District 2</Name>
+  </Precinct>
+  <Precinct id="p4">
+    <Name>A Fully Good Precinct</Name>
+    <LocalityId>loc02</LocalityId>
+  </Precinct>
+</VipObject>

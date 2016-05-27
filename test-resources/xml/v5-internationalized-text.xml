@@ -1,0 +1,395 @@
+<?xml version="1.0"?>
+
+<VipObject schemaVersion="5.1">
+  <BallotMeasureContest id="bmc001">
+    <BallotTitle>
+      <Text language="en">State of the State</Text>
+      <Text language="es">Estado del Estado.</Text>
+    </BallotTitle>
+    <BallotSubTitle>
+      <Text language="en">What is our State's state?</Text>
+      <Text language="es">¿Qué es el estado de nuestro Estado?</Text>
+    </BallotSubTitle>
+    <ConStatement label="bmc001con">
+      <Text language="en">This is no good.</Text>
+      <Text language="es">Esto no es bueno.</Text>
+    </ConStatement>
+    <EffectOfAbstain label="bmc001abs">
+      <Text language="en">Nothing will happen.</Text>
+      <Text language="es">Nada pasará.</Text>
+    </EffectOfAbstain>
+    <ProStatement label="bmc001pro">
+      <Text language="en">Everything will be great.</Text>
+      <Text language="es">Todo va a estar bien.</Text>
+    </ProStatement>
+    <ElectorateSpecification>
+      <Text language="en">some peeps</Text>
+      <Text language="es">una gente</Text>
+    </ElectorateSpecification>
+    <FullText>
+      <Text language="en">How much would wood a wouldchuck chuck if a wouldchuck could chuck would?</Text>
+    </FullText>
+    <PassageThreshold>
+      <Text language="en">One hundred percent</Text>
+    </PassageThreshold>
+    <SummaryText>
+      <Text language="en">It does a thing.</Text>
+    </SummaryText>
+  </BallotMeasureContest>
+  <BallotMeasureSelection id="bms001">
+    <Selection>
+      <Text language="en">Choice #1</Text>
+    </Selection>
+  </BallotMeasureSelection>
+  <Candidate id="can001">
+    <BallotName>
+      <Text language="en">Best Candidate</Text>
+    </BallotName>
+  </Candidate>
+  <CandidateContest id="cc001">
+    <BallotTitle>
+      <Text language="en">State of the State</Text>
+      <Text language="es">Estado del Estado.</Text>
+    </BallotTitle>
+    <BallotSubTitle>
+      <Text language="en">I'm a ballot subtitle.</Text>
+    </BallotSubTitle>
+    <ElectorateSpecification>
+      <Text language="en">some peeps</Text>
+      <Text language="es">una gente</Text>
+    </ElectorateSpecification>
+  </CandidateContest>
+  <Contest id="con001">
+    <BallotTitle>
+      <Text language="en">State of the State</Text>
+      <Text language="es">Estado del Estado.</Text>
+    </BallotTitle>
+    <BallotSubTitle>
+      <Text language="en">I'm a ballot subtitle.</Text>
+    </BallotSubTitle>
+    <ElectorateSpecification>
+      <Text language="en">some peeps</Text>
+      <Text language="es">una gente</Text>
+    </ElectorateSpecification>
+  </Contest>
+  <Election id="el001">
+    <AbsenteeBallotInfo>
+      <Text language="en">one</Text>
+    </AbsenteeBallotInfo>
+    <ElectionType>
+      <Text language="en">two</Text>
+    </ElectionType>
+    <Name>
+      <Text language="en">three</Text>
+    </Name>
+    <PollingHours>
+      <Text language="en">four</Text>
+    </PollingHours>
+    <RegistrationInfo>
+      <Text language="en">five</Text>
+    </RegistrationInfo>
+  </Election>
+  <ElectionAdministration id="ea001">
+    <Department>
+      <ContactInformation>
+        <Hours>
+          <Text language="en">six</Text>
+        </Hours>
+      </ContactInformation>
+      <VoterService>
+        <ContactInformation>
+          <Hours>
+            <Text language="en">seven</Text>
+          </Hours>
+        </ContactInformation>
+        <Description>
+          <Text language="en">eight</Text>
+        </Description>
+      </VoterService>
+    </Department>
+  </ElectionAdministration>
+  <Office id="off001">
+    <Name>
+      <Text language="en">nine</Text>
+    </Name>
+    <ContactInformation>
+      <Hours>
+        <Text language="en">ten</Text>
+      </Hours>
+    </ContactInformation>
+  </Office>
+  <Party id="par001">
+    <Name>
+      <Text language="en">eleven</Text>
+    </Name>
+  </Party>
+  <PartyContest id="pc001">
+    <BallotTitle>
+      <Text language="en">State of the State</Text>
+      <Text language="es">Estado del Estado.</Text>
+    </BallotTitle>
+    <BallotSubTitle>
+      <Text language="en">I'm a ballot subtitle.</Text>
+    </BallotSubTitle>
+    <ElectorateSpecification>
+      <Text language="en">some peeps</Text>
+      <Text language="es">una gente</Text>
+    </ElectorateSpecification>
+  </PartyContest>
+  <Person id="per001">
+    <ContactInformation>
+      <Hours>
+        <Text language="en">Feeling lucky?</Text>
+      </Hours>
+    </ContactInformation>
+    <FullName>
+      <Text language="en">Some One</Text>
+    </FullName>
+    <Profession>
+      <Text language="en">Politician</Text>
+    </Profession>
+    <Title>
+      <Text language="en">Big Cheese</Text>
+    </Title>
+  </Person>
+  <PollingLocation id="pol001">
+    <Directions>
+      <Text language="en">Hang a left near Albuquerque</Text>
+    </Directions>
+    <Hours>
+      <Text language="en">Open to close</Text>
+    </Hours>
+  </PollingLocation>
+  <RetentionContest id="rc001">
+    <BallotTitle>
+      <Text language="en">State of the State</Text>
+      <Text language="es">Estado del Estado.</Text>
+    </BallotTitle>
+    <BallotSubTitle>
+      <Text language="en">What is our State's state?</Text>
+      <Text language="es">¿Qué es el estado de nuestro Estado?</Text>
+    </BallotSubTitle>
+    <ConStatement label="bmc001con">
+      <Text language="en">This is no good.</Text>
+      <Text language="es">Esto no es bueno.</Text>
+    </ConStatement>
+    <EffectOfAbstain label="bmc001abs">
+      <Text language="en">Nothing will happen.</Text>
+      <Text language="es">Nada pasará.</Text>
+    </EffectOfAbstain>
+    <ProStatement label="bmc001pro">
+      <Text language="en">Everything will be great.</Text>
+      <Text language="es">Todo va a estar bien.</Text>
+    </ProStatement>
+    <ElectorateSpecification>
+      <Text language="en">some peeps</Text>
+      <Text language="es">una gente</Text>
+    </ElectorateSpecification>
+    <FullText>
+      <Text language="en">How much would wood a wouldchuck chuck if a wouldchuck could chuck would?</Text>
+    </FullText>
+    <PassageThreshold>
+      <Text language="en">One hundred percent</Text>
+    </PassageThreshold>
+    <SummaryText>
+      <Text language="en">It does a thing.</Text>
+    </SummaryText>
+  </RetentionContest>
+  <Source id="so001">
+    <Description>
+      <Text language="en">Wikipedia</Text>
+    </Description>
+    <FeedContactInformation>
+      <Hours>
+        <Text language="en">Nine to five</Text>
+      </Hours>
+    </FeedContactInformation>
+  </Source>
+
+  <BallotMeasureContest id="bmc002">
+    <BallotTitle>
+      Foo
+    </BallotTitle>
+    <BallotSubTitle>
+      Foo
+    </BallotSubTitle>
+    <ConStatement label="bmc002con">
+      Foo
+    </ConStatement>
+    <EffectOfAbstain label="bmc002abs">
+      Foo
+    </EffectOfAbstain>
+    <ProStatement label="bmc002pro">
+      Foo
+    </ProStatement>
+    <ElectorateSpecification>
+      Foo
+    </ElectorateSpecification>
+    <FullText>
+      Foo
+    </FullText>
+    <PassageThreshold>
+      Foo
+    </PassageThreshold>
+    <SummaryText>
+      Foo
+    </SummaryText>
+  </BallotMeasureContest>
+  <BallotMeasureSelection id="bms002">
+    <Selection>
+      Foo
+    </Selection>
+  </BallotMeasureSelection>
+  <Candidate id="can002">
+    <BallotName>
+      Foo
+    </BallotName>
+  </Candidate>
+  <CandidateContest id="cc002">
+    <BallotTitle>
+      Foo
+    </BallotTitle>
+    <BallotSubTitle>
+      Foo
+    </BallotSubTitle>
+    <ElectorateSpecification>
+      Foo
+    </ElectorateSpecification>
+  </CandidateContest>
+  <Contest id="con002">
+    <BallotTitle>
+      Foo
+    </BallotTitle>
+    <BallotSubTitle>
+      Foo
+    </BallotSubTitle>
+    <ElectorateSpecification>
+      Foo
+    </ElectorateSpecification>
+  </Contest>
+  <Election id="el002">
+    <AbsenteeBallotInfo>
+      Foo
+    </AbsenteeBallotInfo>
+    <ElectionType>
+      Foo
+    </ElectionType>
+    <Name>
+      Foo
+    </Name>
+    <PollingHours>
+      Foo
+    </PollingHours>
+    <RegistrationInfo>
+      Foo
+    </RegistrationInfo>
+  </Election>
+  <ElectionAdministration id="ea002">
+    <Department>
+      <ContactInformation>
+        <Hours>
+          Foo
+        </Hours>
+      </ContactInformation>
+      <VoterService>
+        <ContactInformation>
+          <Hours>
+            Foo
+          </Hours>
+        </ContactInformation>
+        <Description>
+          Foo
+        </Description>
+      </VoterService>
+    </Department>
+  </ElectionAdministration>
+  <Office id="off002">
+    <Name>
+      Foo
+    </Name>
+    <ContactInformation>
+      <Hours>
+        Foo
+      </Hours>
+    </ContactInformation>
+  </Office>
+  <Party id="par002">
+    <Name>
+      Foo
+    </Name>
+  </Party>
+  <PartyContest id="pc002">
+    <BallotTitle>
+      Foo
+    </BallotTitle>
+    <BallotSubTitle>
+      Foo
+    </BallotSubTitle>
+    <ElectorateSpecification>
+      Foo
+    </ElectorateSpecification>
+  </PartyContest>
+  <Person id="per002">
+    <ContactInformation>
+      <Hours>
+        Foo
+      </Hours>
+    </ContactInformation>
+    <FullName>
+      Foo
+    </FullName>
+    <Profession>
+      Foo
+    </Profession>
+    <Title>
+      Foo
+    </Title>
+  </Person>
+  <PollingLocation id="pol002">
+    <Directions>
+      Foo
+    </Directions>
+    <Hours>
+      Foo
+    </Hours>
+  </PollingLocation>
+  <RetentionContest id="rc002">
+    <BallotTitle>
+      Foo
+    </BallotTitle>
+    <BallotSubTitle>
+      Foo
+    </BallotSubTitle>
+    <ConStatement label="bmc002con">
+      Foo
+    </ConStatement>
+    <EffectOfAbstain label="bmc002abs">
+      Foo
+    </EffectOfAbstain>
+    <ProStatement label="bmc002pro">
+      Foo
+    </ProStatement>
+    <ElectorateSpecification>
+      Foo
+    </ElectorateSpecification>
+    <FullText>
+      Foo
+    </FullText>
+    <PassageThreshold>
+      Foo
+    </PassageThreshold>
+    <SummaryText>
+      Foo
+    </SummaryText>
+  </RetentionContest>
+  <Source id="so002">
+    <Description>
+      Foo
+    </Description>
+    <FeedContactInformation>
+      <Hours>
+        Foo
+      </Hours>
+    </FeedContactInformation>
+  </Source>
+</VipObject>

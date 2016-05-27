@@ -140,23 +140,35 @@
     (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])}
           out-ctx (determine-spec-version ctx)]
       (is (= "3.0" (get out-ctx :spec-version)))))
-  (testing "finds and assocs the version of the csv feed for 5.0 files"
-    (let [ctx {:input (csv-inputs ["5-0/spec-version/source.txt"])}
+
+  (testing "finds and assocs the version of the csv feed for 5.1 files"
+    (let [ctx {:input (csv-inputs ["5-1/spec-version/source.txt"])}
           out-ctx (determine-spec-version ctx)]
-      (is (= "5.0" (get out-ctx :spec-version))))))
+      (is (= "5.1" (get out-ctx :spec-version))))))
 
 (deftest branch-on-spec-version-test
-  (testing "adds load-csvs to the front of the pipeline for 3.0 feeds"
+  (testing "add the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
     (let [ctx {:spec-version "3.0"}
-          out-ctx (branch-on-spec-version ctx)]
-      (is (= load-csvs (first (:pipeline out-ctx))))))
-  (testing "stops with unsupported version for 5.0 feeds"
-    (let [ctx {:spec-version "5.0"
+          out-ctx (branch-on-spec-version ctx)
+          three-point-0-pipeline (get version-pipelines "3.0")]
+      (is (= three-point-0-pipeline
+             (take (count three-point-0-pipeline) (:pipeline out-ctx))))))
+
+  (testing "add the 5.1 import pipeline to the front of the pipeline for 5.1 feeds"
+    (let [ctx {:spec-version "5.1"}
+          out-ctx (branch-on-spec-version ctx)
+          five-point-0-pipeline (get version-pipelines "5.1")]
+      (is (= five-point-0-pipeline
+             (take (count five-point-0-pipeline) (:pipeline out-ctx))))))
+
+  (testing "stops with unsupported version for other versions"
+    (let [ctx {:spec-version "2.0" ; 2.0 is too old
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported CSV version"))))
+
   (testing "stops with unsupported version for other versions"
-    (let [ctx {:spec-version "2.0"  ; 2.0 is too old
+    (let [ctx {:spec-version "5.2" ; 5.1 is cool; 5.2 is vaporware
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported CSV version")))))

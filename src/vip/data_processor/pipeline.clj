@@ -47,7 +47,8 @@
              :fatal {}
              :pipeline pipeline}
         result (run-pipeline ctx)]
-    (log/info (select-keys result [:import-id :db :xml-output-file]))
+    (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
+    (log/debug (pr-str (select-keys result [:spec-version :fatal :critical])))
     (when-let [ex (:exception result)]
       (psql/fail-run (:import-id result)
                      (with-out-str (stacktrace/print-throwable ex)))

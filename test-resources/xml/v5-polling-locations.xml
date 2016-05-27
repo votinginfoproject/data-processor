@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <PollingLocation id="pl001">
+  </PollingLocation>
+  <PollingLocation id="pl002">
+    <AddressLine>I'm an address line</AddressLine>
+  </PollingLocation>
+  <PollingLocation id="pl003">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Latitude>39.750016</Latitude>
+      <Longitude>-105.000361</Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+  <PollingLocation id="pl004">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Longitude>-105.000361</Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+  <PollingLocation id="pl005">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Latitude>39.750016</Latitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+  <PollingLocation id="pl006">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Latitude>invalid latitude</Latitude>
+      <Longitude></Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+</VipObject>

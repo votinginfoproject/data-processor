@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <Office id="o001">
+  </Office>
+  <Office id="o002">
+    <Name>The Office</Name>
+  </Office>
+  <Office id="o003">
+    <Name>The Corner Office</Name>
+    <Term>
+      <Type>full-term</Type>
+    </Term>
+  </Office>
+  <Office id="o004">
+    <Name>The Window Office</Name>
+    <Term>What am I?</Term>
+  </Office>
+  <Office id="o003">
+    <Name>The Corner Office</Name>
+    <Term>
+      <Type>Not a type</Type>
+    </Term>
+  </Office>
+</VipObject>

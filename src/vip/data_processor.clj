@@ -22,10 +22,17 @@
   [t/read-edn-sqs-message
    t/assert-filename
    psql/start-run
-   t/attach-sqlite-db
    t/download-from-s3
    zip/assoc-file
    zip/extracted-contents])
+
+(def v3-validation-pipeline
+  (concat db/validations
+          db.v3-0/validations
+          xml-output/pipeline
+          [psql/insert-validations
+           psql/import-from-sqlite
+           psql/store-stats]))
 
 (def pipeline
   (concat download-pipeline
@@ -33,14 +40,12 @@
            t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id
-           psql/store-election-id]
-          db/validations
-          db.v3-0/validations ; TODO: choose extra validations based on import
-          xml-output/pipeline
-          [s3/upload-to-s3]
-          [psql/insert-validations
-           psql/import-from-sqlite
-           psql/store-stats
+           psql/store-election-id
+           (fn [{:keys [spec-version] :as ctx}]
+             (condp = spec-version
+               "3.0" (update ctx :pipeline (partial concat v3-validation-pipeline))
+               ctx))
+           s3/upload-to-s3
            cleanup/cleanup]))
 
 (defn-traced process-message [message]
@@ -62,8 +67,8 @@
         (throw exception)))))
 
 (defn consume []
-  (let [{:keys [access-key secret-key]} (config :aws :creds)
-        {:keys [region queue fail-queue]} (config :aws :sqs)
+  (let [{:keys [access-key secret-key]} (config [:aws :creds])
+        {:keys [region queue fail-queue]} (config [:aws :sqs])
         creds {:access-key access-key
                :access-secret secret-key
                :region region}]

@@ -4,6 +4,7 @@
             [turbovote.resource-config :refer [config]]
             [korma.core :as korma]
             [clojure.string :refer [join]]
+            [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.util :as util])
   (:import [java.io File]
            [java.nio.file Files CopyOption StandardCopyOption]
@@ -13,13 +14,13 @@
            [net.lingala.zip4j.util Zip4jConstants]))
 
 (defn- get-object [key]
-  (s3/get-object (config :aws :creds)
-                 (config :aws :s3 :unprocessed-bucket)
+  (s3/get-object (config [:aws :creds])
+                 (config [:aws :s3 :unprocessed-bucket])
                  key))
 
 (defn put-object [key value]
-  (s3/put-object (config :aws :creds)
-                 (config :aws :s3 :processed-bucket)
+  (s3/put-object (config [:aws :creds])
+                 (config [:aws :s3 :processed-bucket])
                  key value))
 
 (def tmp-path-prefix "vip-data-processor")
@@ -36,22 +37,43 @@
                 (into-array [StandardCopyOption/REPLACE_EXISTING]))
     tmp-path))
 
-(defn zip-filename [ctx]
-  (let [fips (->> (get-in ctx [:tables :sources])
-                  korma/select first :vip_id)
-        formatted-fips (cond
-                         (nil? fips) "XX"
-                         (< (count fips) 2) (format "%02d" (Integer/parseInt fips))
-                         (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
-                         :else fips)
-        election-date (->> (get-in ctx [:tables :elections])
-                           korma/select first :date
-                           util/format-date)]
-    (join "-" ["vipfeed" fips election-date])))
+(defn format-fips [fips]
+  (cond
+    (nil? fips) "XX"
+    (< (count fips) 3) (format "%02d" (Integer/parseInt fips))
+    (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
+    :else fips))
+
+(defn zip-filename* [fips election-date]
+  (join "-" ["vipfeed" (format-fips fips) election-date]))
+
+(defn zip-filename
+  [{:keys [spec-version tables import-id] :as ctx}]
+  (condp = spec-version
+    "3.0"
+    (let [fips (-> tables
+                   :sources
+                   korma/select
+                   first
+                   :vip_id)
+          election-date (-> tables
+                            :elections
+                            korma/select
+                            first
+                            :date
+                            util/format-date)]
+      (zip-filename* fips election-date))
+
+    "5.1"
+    (let [fips (postgres/find-value-for-simple-path
+                import-id "VipObject.Source.VipId")
+          election-date (postgres/find-value-for-simple-path
+                         import-id "VipObject.Election.Date")]
+      (zip-filename* fips election-date))))
 
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
-  [ctx]
+  [{:keys [xml-output-file] :as ctx}]
   (let [zip-name (str (zip-filename ctx) ".zip")
         zip-dir (Files/createTempDirectory tmp-path-prefix
                                            (into-array FileAttribute []))
@@ -60,7 +82,9 @@
         zip-params (doto (ZipParameters.)
                      (.setCompressionLevel
                       Zip4jConstants/DEFLATE_LEVEL_NORMAL))
-        xml-file (-> ctx :xml-output-file .toFile)]
+        xml-file (if (instance? File xml-output-file)
+                   xml-output-file
+                   (.toFile xml-output-file))]
     (.createZipFile zip xml-file zip-params)
     (put-object zip-name zip-file)
     (-> ctx

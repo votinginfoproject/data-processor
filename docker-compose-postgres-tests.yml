@@ -1,0 +1,15 @@
+processor:
+  build: .
+  links:
+    - testdb:db
+  environment:
+    VIP_DP_SQS_REGION: US_WEST_2
+  command: lein test :postgres
+testdb:
+  image: postgres:9.4.1
+  ports:
+    - "5432"
+  environment:
+    POSTGRES_USER: data_processor_test
+    POSTGRES_PASSWORD: data-processor-test
+    POSTGRES_DATABASE: data_processor_test_db

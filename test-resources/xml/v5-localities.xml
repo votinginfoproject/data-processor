@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <Locality id="l001">
+  </Locality>
+  <Locality id="l002">
+    <Name>I'm a locality!</Name>
+    <StateId>state001</StateId>
+    <Type>city</Type>
+  </Locality>
+  <Locality id="l003">
+    <Name>I'm a locality too!</Name>
+    <StateId>state001</StateId>
+    <Type>planet</Type>
+  </Locality>
+</VipObject>

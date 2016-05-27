@@ -55,6 +55,25 @@
                     (filter #(= "bad-format" (:error_type %)))
                     count)))))))
 
+(deftest xml-tree-validation-values-test
+  (testing "generates validates values for 5.1 style errors"
+    (let [ctx {:import-id 25
+               :errors {}
+               :fatal {:id
+                       {"VipObject.0.Election.1.id"
+                        {:duplicate ["ele0001"]}
+                        "VipObject.0.Election.2.id"
+                        {:duplicate ["ele0001"]}}}
+               :warnings {:import
+                          {:global
+                           {:invalid-extensions [".exemell" ".seeesvee"]}}}}
+          values (xml-tree-validation-values ctx)]
+      (is (= 4 (count values)))
+      (is (= 2
+             (->> values
+                  (filter #(= "duplicate" (:error_type %)))
+                  count))))))
+
 (deftest election-id-test
   (testing "election-id generation"
    (is (= "2015-10-10-LOUISIANA-GENERAL"

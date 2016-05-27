@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <Party id="p001">
+    <Color>not a color even though ffeedd is one</Color>
+  </Party>
+  <Party id="p002">
+    <Color>33eedd</Color>
+  </Party>
+</VipObject>

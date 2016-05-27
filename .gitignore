@@ -9,4 +9,5 @@ pom.xml.asc
 /.nrepl-port
 /dev-resources/config.edn
 data-processor@.service
+/test-resources/config.edn
 .env

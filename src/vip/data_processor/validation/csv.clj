@@ -9,7 +9,9 @@
             [vip.data-processor.util :as util]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.db.sqlite :as sqlite]))
+            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
+            [vip.data-processor.db.sqlite :as sqlite]
+            [vip.data-processor.db.postgres :as postgres]))
 
 (defn csv-filenames [data-specs]
   (set (map :filename data-specs)))
@@ -91,7 +93,12 @@
                                                               [(str "Expected " headers-count
                                                                     " values, found " row-count)]))))
                                               ctx chunk)
-                                  chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)]
+                                  chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)
+                                  chunk-values (if (= "postgresql" (get-in sql-table [:db :options :subprotocol]))
+                                                 (->> chunk-values
+                                                      (data-spec/coerce-rows columns)
+                                                      (map #(assoc % "results_id" (:import-id ctx))))
+                                                 chunk-values)]
                               (try
                                 (korma/insert sql-table (korma/values chunk-values))
                                 ctx
@@ -138,8 +145,11 @@
   (assoc ctx :stop (str "Unsupported CSV version: " spec-version)))
 
 (def version-pipelines
-  {"3.0" [load-csvs]
-   "5.0" [unsupported-version]})
+  {"3.0" [sqlite/attach-sqlite-db
+          load-csvs]
+   "5.1" [(data-spec/add-data-specs v5-1/data-specs)
+          (fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
+          load-csvs]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

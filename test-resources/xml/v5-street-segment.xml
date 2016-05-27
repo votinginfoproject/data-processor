@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <StreetSegment id="ss001">
+  </StreetSegment>
+  <StreetSegment id="ss002">
+    <OddEvenBoth>odd</OddEvenBoth>
+    <StreetName>Bath</StreetName>
+    <City>Santa Barbara</City>
+    <State>CA</State>
+    <Zip>93101</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss003">
+    <OddEvenBoth>even</OddEvenBoth>
+    <StreetName>Bath</StreetName>
+    <City>Santa Barbara</City>
+    <State>CA</State>
+    <Zip>93101</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss004">
+    <OddEvenBoth>both</OddEvenBoth>
+    <StreetName>Bath</StreetName>
+    <City>Santa Barbara</City>
+    <State>CA</State>
+    <Zip>93101</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss005">
+    <OddEvenBoth>non-prime odd numbers</OddEvenBoth>
+    <NameOfStreet>Bath</NameOfStreet>
+    <Township>Santa Barbara</Township>
+    <StateOrTerritory>CA</StateOrTerritory>
+    <ZipPlus4>93101-8816</ZipPlus4>
+  </StreetSegment>
+</VipObject>

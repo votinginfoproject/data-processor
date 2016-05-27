@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<VipObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.1" xsi:noNamespaceSchemaLocation="http://votinginfoproject.github.com/vip-specification/vip_spec.xsd">
+  <Party id="par001">
+    <Name>
+      <Text language="en">Valid ExternalIdentifiers</Text>
+    </Name>
+    <ExternalIdentifiers>
+      <ExternalIdentifier>
+        <Type>fips</Type>
+        <Value>01</Value>
+      </ExternalIdentifier>
+    </ExternalIdentifiers>
+  </Party>
+  <Party id="par002">
+    <Name>
+      <Text language="en">Without a type</Text>
+    </Name>
+    <ExternalIdentifiers>
+      <ExternalIdentifier>
+        <Value>01</Value>
+      </ExternalIdentifier>
+    </ExternalIdentifiers>
+  </Party>
+  <Party id="par003">
+    <Name>
+      <Text language="en">Without a value</Text>
+    </Name>
+    <ExternalIdentifiers>
+      <ExternalIdentifier>
+        <Type>fips</Type>
+      </ExternalIdentifier>
+    </ExternalIdentifiers>
+  </Party>
+</VipObject>

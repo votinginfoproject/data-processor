@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <BallotMeasureContest id="bmc000">
+  </BallotMeasureContest>
+  <BallotMeasureContest id="bmc001">
+    <Type>Not a real type</Type>
+  </BallotMeasureContest>
+  <BallotMeasureContest id="bmc002">
+    <Type>ballot-measure</Type>
+  </BallotMeasureContest>
+  <BallotMeasureContest id="bmc003">
+    <Type>initiative</Type>
+  </BallotMeasureContest>
+  <BallotMeasureContest id="bmc004">
+    <Type>referendum</Type>
+  </BallotMeasureContest>
+  <BallotMeasureContest id="bmc005">
+    <Type>other</Type>
+  </BallotMeasureContest>
+</VipObject>
