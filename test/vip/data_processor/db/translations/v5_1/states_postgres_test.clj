@@ -23,8 +23,8 @@
        out-ctx
        "st51" "VipObject.0.State.5.id"
        "ea40133" "VipObject.0.State.5.ElectionAdministrationId.0"
-       "poll001 poll010 poll100" "VipObject.0.State.5.PollingLocationIds.4"
+       "poll001 poll010 poll100" "VipObject.0.State.5.PollingLocationIds.3"
        "st42" "VipObject.0.State.6.id"
-       "Colorado" "VipObject.0.State.6.Name.3"
+       "Colorado" "VipObject.0.State.6.Name.2"
        "ocd-id" "VipObject.0.State.6.ExternalIdentifiers.1.ExternalIdentifier.0.Type.0"
        "ocd-division/country:us/state:co" "VipObject.0.State.6.ExternalIdentifiers.1.ExternalIdentifier.0.Value.1"))))
