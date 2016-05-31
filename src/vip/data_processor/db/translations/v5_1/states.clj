@@ -19,7 +19,6 @@
              [(util/simple-value->ltree :election_administration_id)
               util/external-identifiers->ltree
               (util/simple-value->ltree :name)
-              (util/simple-value->ltree :name)
               (util/simple-value->ltree :polling_location_ids)])
      {:path id-path
       :simple_path (util/path->simple-path id-path)
