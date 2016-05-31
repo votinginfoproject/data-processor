@@ -305,6 +305,34 @@
               {:name "ballot_style_id"}
               {:name "electoral_district_ids"}
               {:name "polling_location_ids"}]}
+   {:filename "retention_contest.txt"
+    :table :retention-contests
+    :columns [{:name "id"}
+              {:name "abbreviation"}
+              {:name "ballot_selection_ids"}
+              {:name "ballot_sub_title"}
+              {:name "ballot_title"}
+              {:name "electoral_district_id"}
+              {:name "electorate_specification"}
+              {:name "external_identifier_type"}
+              {:name "external_identifier_othertype"}
+              {:name "external_identifier_value"}
+              {:name "has_rotation"}
+              {:name "name"}
+              {:name "sequence_order"}
+              {:name "vote_variation"}
+              {:name "other_vote_variation"}
+              {:name "con_statement"}
+              {:name "effect_of_abstain"}
+              {:name "full_text"}
+              {:name "info_uri"}
+              {:name "passage_threshold"}
+              {:name "pro_statement"}
+              {:name "summary_text"}
+              {:name "type"}
+              {:name "other_type"}
+              {:name "candidate_id"}
+              {:name "office_id"}]}
    {:filename "source.txt"
     :table :sources
     :columns [{:name "id"}

@@ -73,6 +73,7 @@
                                              :people
                                              :polling-locations
                                              :precincts
+                                             :retention-contests
                                              :sources
                                              :states
                                              :street-segments]))
