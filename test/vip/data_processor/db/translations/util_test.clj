@@ -97,14 +97,30 @@
              (set (transform-fn idx-fn "VipObject.0.BallotMeasureContest.0" row)))))))
 
 (deftest latlng->ltree-test
-  (testing "when all three identifiers are missing, nothing happens"
+  (testing "when latitude and longitude are missing, nothing happens"
     (let [row {:latitude ""
                :longitude ""
-               :latlng_source ""}
+               :latlng_source "Optional source"}
           idx-fn (util/index-generator 0)]
       (is (nil? (util/latlng->ltree idx-fn "VipObject.0.PollingLocation.0" row)))))
 
-  (testing "LatLng elements have three components"
+  (testing "LatLng elements have two core components"
+    (let [row {:latitude "38.0754627"
+               :longitude "78.5014875"
+               :latlng_source ""}
+          transform-fn util/latlng->ltree
+          idx-fn (util/index-generator 0)]
+      (is (= #{{:path "VipObject.0.PollingLocation.0.LatLng.0.Latitude.0"
+                :simple_path "VipObject.PollingLocation.LatLng.Latitude"
+                :parent_with_id "VipObject.0.PollingLocation.0.id"
+                :value "38.0754627"}
+               {:path "VipObject.0.PollingLocation.0.LatLng.0.Longitude.1"
+                :simple_path "VipObject.PollingLocation.LatLng.Longitude"
+                :parent_with_id "VipObject.0.PollingLocation.0.id"
+                :value "78.5014875"}}
+             (set (transform-fn idx-fn "VipObject.0.PollingLocation.0" row))))))
+
+  (testing "Source is included when present"
     (let [row {:latitude "38.0754627"
                :longitude "78.5014875"
                :latlng_source "Google Maps"}

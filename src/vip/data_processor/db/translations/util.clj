@@ -94,8 +94,7 @@
 
 (defn latlng->ltree [idx-fn parent-path row]
   (when-not (and (str/blank? (:latitude row))
-                 (str/blank? (:longitude row))
-                 (str/blank? (:latlng_source row)))
+                 (str/blank? (:longitude row)))
     (let [index (idx-fn)
           base-path (str parent-path ".LatLng." index)
           parent-with-id (id-path parent-path)
