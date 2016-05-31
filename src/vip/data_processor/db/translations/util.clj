@@ -92,6 +92,19 @@
                (simple-value->ltree :external_identifier_othertype "OtherType" parent-with-id)
                (simple-value->ltree :external_identifier_value "Value" parent-with-id)]))))
 
+(defn latlng->ltree [idx-fn parent-path row]
+  (when-not (and (str/blank? (:latitude row))
+                 (str/blank? (:longitude row))
+                 (str/blank? (:latlng_source row)))
+    (let [index (idx-fn)
+          base-path (str parent-path ".LatLng." index)
+          parent-with-id (id-path parent-path)
+          sub-idx-fn (index-generator 0)]
+      (mapcat #(% sub-idx-fn base-path row)
+              [(simple-value->ltree :latitude "Latitude" parent-with-id)
+               (simple-value->ltree :longitude "Longitude" parent-with-id)
+               (simple-value->ltree :latlng_source "Source" parent-with-id)]))))
+
 (defn ltreeify [row]
   (-> row
       (update :path postgres/path->ltree)
