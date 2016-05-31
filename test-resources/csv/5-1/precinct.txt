@@ -1,0 +1,4 @@
+ballot_style_id,electoral_district_ids,external_identifier_type,external_identifier_othertype,external_identifier_value,is_mail_only,locality_id,name,number,polling_location_ids,precinct_split_name,ward,id
+bs00010,"ed101 ed102",ocd-id,,"ocd-division/country:us",false,loc70001,203 - GEORGETOWN,0203,"poll001 poll002",split13,5,pre90111
+bs00011,"ed103 ed104",fips,,42,false,loc70001,203 - GEORGETOWN,0203,"poll042 poll043",split26,6,pre90112
+bs00012,"ed104 ed105",,,,false,loc70001,203 - GEORGETOWN,0203,"poll043 poll045",split54,7,pre90113
