@@ -1,0 +1,2 @@
+date_of_birth,first_name,gender,last_name,middle_name,nickname,party_id,prefix,profession,suffix,title,id
+1961-08-04,Barak,male,Obama,Hussein,The Rock,par002,,President,II,Mr. President,per50001
