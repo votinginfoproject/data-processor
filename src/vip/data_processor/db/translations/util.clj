@@ -98,17 +98,26 @@
                (simple-value->ltree :external_identifier_othertype "OtherType" parent-with-id)
                (simple-value->ltree :external_identifier_value "Value" parent-with-id)]))))
 
-(defn latlng->ltree [idx-fn parent-path row]
-  (when-not (and (str/blank? (:latitude row))
-                 (str/blank? (:longitude row)))
-    (let [index (idx-fn)
-          base-path (str parent-path ".LatLng." index)
-          parent-with-id (id-path parent-path)
-          sub-idx-fn (index-generator 0)]
-      (mapcat #(% sub-idx-fn base-path row)
-              [(simple-value->ltree :latitude "Latitude" parent-with-id)
-               (simple-value->ltree :longitude "Longitude" parent-with-id)
-               (simple-value->ltree :latlng_source "Source" parent-with-id)]))))
+(defn latlng->ltree
+  ([]
+   (fn [idx-fn parent-path row]
+     (let [parent-with-id (id-path parent-path)
+           ltree-fn (latlng->ltree parent-with-id)]
+       (ltree-fn idx-fn parent-path row))))
+  ([parent-with-id]
+   (fn [idx-fn parent-path row]
+     (when-not (and (str/blank? (:latitude row))
+                    (str/blank? (:longitude row)))
+       (let [index (idx-fn)
+             base-path (str parent-path ".LatLng." index)
+             sub-idx-fn (index-generator 0)]
+         (mapcat #(% sub-idx-fn base-path row)
+                 [(simple-value->ltree :latitude "Latitude" parent-with-id)
+                  (simple-value->ltree :longitude "Longitude" parent-with-id)
+                  (simple-value->ltree :latlng_source "Source" parent-with-id)])))))
+  ([idx-fn parent-path row]
+   (let [ltree-fn (latlng->ltree)]
+     (ltree-fn idx-fn parent-path row))))
 
 (defn ltreeify [row]
   (-> row
