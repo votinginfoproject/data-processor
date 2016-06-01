@@ -65,21 +65,23 @@
        (ltree-fn idx-fn base-path row))))
   ([column-name parent-with-id]
    (let [xml-element (column->xml-elment column-name)]
-     (fn [idx-fn base-path row]
-       (let [value (get row column-name)]
-         (when-not (str/blank? value)
-           (let [index (idx-fn)
-                 text-path (str base-path "." xml-element "." index ".Text.0")
-                 lang-path (str text-path ".language")]
-             (list
-              {:path text-path
-               :simple_path (path->simple-path text-path)
-               :parent_with_id parent-with-id
-               :value value}
-              {:path lang-path
-               :simple_path (path->simple-path lang-path)
-               :parent_with_id parent-with-id
-               :value "en"}))))))))
+     (internationalized-text->ltree column-name xml-element parent-with-id)))
+  ([column-name xml-element parent-with-id]
+   (fn [idx-fn base-path row]
+     (let [value (get row column-name)]
+       (when-not (str/blank? value)
+         (let [index (idx-fn)
+               text-path (str base-path "." xml-element "." index ".Text.0")
+               lang-path (str text-path ".language")]
+           (list
+            {:path text-path
+             :simple_path (path->simple-path text-path)
+             :parent_with_id parent-with-id
+             :value value}
+            {:path lang-path
+             :simple_path (path->simple-path lang-path)
+             :parent_with_id parent-with-id
+             :value "en"})))))))
 
 (defn external-identifiers->ltree
   [idx-fn parent-path row]
@@ -118,6 +120,20 @@
   ([idx-fn parent-path row]
    (let [ltree-fn (latlng->ltree)]
      (ltree-fn idx-fn parent-path row))))
+
+(defn term->ltree
+  [idx-fn parent-path row]
+  (when-not (and (str/blank? (:term_type row))
+                 (str/blank? (:term_start_date row))
+                 (str/blank? (:term_end_date row)))
+    (let [index (idx-fn)
+          base-path (str parent-path ".Term." index)
+          parent-with-id (id-path parent-path)
+          sub-idx-fn (index-generator 0)]
+      (mapcat #(% sub-idx-fn base-path row)
+              [(simple-value->ltree :term_start_date "StartDate" parent-with-id)
+               (simple-value->ltree :term_end_date "EndDate" parent-with-id)
+               (simple-value->ltree :term_type "Type" parent-with-id)]))))
 
 (defn ltreeify [row]
   (-> row
