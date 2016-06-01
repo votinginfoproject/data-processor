@@ -1,0 +1,3 @@
+electoral_district_id,external_identifier_type,external_identifier_othertype,external_identifier_value,filing_deadline,is_partisan,name,office_holder_person_ids,term_type,term_start_date,term_end_date,id
+ed001,,,,,true,Deputy Chief of Staff,p001,appointed,2002-01-21,,off001
+ed001,,,,,true,Deputy Deputy Chief of Staff,p002,appointed,2002-01-21,,off002
