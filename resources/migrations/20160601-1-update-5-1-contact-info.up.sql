@@ -9,4 +9,6 @@ ADD COLUMN latlng_source TEXT,
 DROP COLUMN phone1,
 DROP COLUMN phone2,
 ADD COLUMN phone TEXT,
-ADD COLUMN parent_id TEXT;
+ADD COLUMN parent_id TEXT,
+DROP COLUMN lat,
+DROP COLUMN lng;

@@ -137,6 +137,24 @@
               {:name "candidate_ids"}
               {:name "endorsement_party_ids"}
               {:name "is_write_in"}]}
+   {:filename "contact_information.txt"
+    :table :contact-information
+    :columns [{:name "id"}
+              {:name "address_line_1"}
+              {:name "address_line_2"}
+              {:name "address_line_3"}
+              {:name "directions"}
+              {:name "email"}
+              {:name "fax"}
+              {:name "hours"}
+              {:name "hours_open_id"}
+              {:name "latitude"}
+              {:name "longitude"}
+              {:name "latlng_source"}
+              {:name "name"}
+              {:name "parent_id"}
+              {:name "phone"}
+              {:name "uri"}]}
    {:filename "contest.txt"
     :table :contests
     :columns [{:name "id"}

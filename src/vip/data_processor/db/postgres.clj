@@ -59,6 +59,7 @@
                                              :candidates
                                              :candidate-contests
                                              :candidate-selections
+                                             :contact-information
                                              :contests
                                              :departments
                                              :elections
