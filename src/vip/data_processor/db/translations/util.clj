@@ -57,23 +57,29 @@
              :parent_with_id parent-with-id
              :value value})))))))
 
-(defn internationalized-text->ltree [column-name]
-  (let [xml-element (column->xml-elment column-name)]
-    (fn [idx-fn base-path row]
-      (let [value (get row column-name)]
-        (when-not (str/blank? value)
-          (let [index (idx-fn)
-                text-path (str base-path "." xml-element "." index ".Text.0")
-                lang-path (str text-path ".language")]
-            (list
-             {:path text-path
-              :simple_path (path->simple-path text-path)
-              :parent_with_id (id-path base-path)
-              :value value}
-             {:path lang-path
-              :simple_path (path->simple-path lang-path)
-              :parent_with_id (id-path base-path)
-              :value "en"})))))))
+(defn internationalized-text->ltree
+  ([column-name]
+   (fn [idx-fn base-path row]
+     (let [parent-with-id (id-path base-path)
+           ltree-fn (internationalized-text->ltree column-name parent-with-id)]
+       (ltree-fn idx-fn base-path row))))
+  ([column-name parent-with-id]
+   (let [xml-element (column->xml-elment column-name)]
+     (fn [idx-fn base-path row]
+       (let [value (get row column-name)]
+         (when-not (str/blank? value)
+           (let [index (idx-fn)
+                 text-path (str base-path "." xml-element "." index ".Text.0")
+                 lang-path (str text-path ".language")]
+             (list
+              {:path text-path
+               :simple_path (path->simple-path text-path)
+               :parent_with_id parent-with-id
+               :value value}
+              {:path lang-path
+               :simple_path (path->simple-path lang-path)
+               :parent_with_id parent-with-id
+               :value "en"}))))))))
 
 (defn external-identifiers->ltree
   [idx-fn parent-path row]
