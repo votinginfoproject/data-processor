@@ -37,7 +37,7 @@
         child-idx-fn (util/index-generator 0)]
     (conj
      (mapcat #(% child-idx-fn path row)
-             [ci/contact-information->ltree
+             [(ci/contact-information->ltree)
               (util/simple-value->ltree :date_of_birth)
               (util/simple-value->ltree :first_name)
               (util/simple-value->ltree :gender)

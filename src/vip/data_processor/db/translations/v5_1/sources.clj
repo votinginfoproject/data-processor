@@ -39,7 +39,7 @@
      (mapcat #(% child-idx-fn path row)
              [(util/simple-value->ltree :date_time)
               (util/internationalized-text->ltree :description)
-              ci/contact-information->ltree
+              (ci/contact-information->ltree "FeedContactInformation")
               (util/simple-value->ltree :name)
               (util/simple-value->ltree :organization_uri)
               (util/simple-value->ltree :terms_of_use_uri)

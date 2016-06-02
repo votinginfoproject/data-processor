@@ -21,11 +21,11 @@
       (assert-no-problems out-ctx [])
       (are-xml-tree-values
        out-ctx
-       "ci1024" "VipObject.0.Source.0.ContactInformation.2.label"
-       "DemocracyWorks" "VipObject.0.Source.0.ContactInformation.2.AddressLine.0"
-       "Take the mall-ride" "VipObject.0.Source.0.ContactInformation.2.Directions.3.Text.0"
-       "en" "VipObject.0.Source.0.ContactInformation.2.Directions.3.Text.0.language"
-       "39.7500162" "VipObject.0.Source.0.ContactInformation.2.LatLng.8.Latitude.0"
+       "ci1024" "VipObject.0.Source.0.FeedContactInformation.2.label"
+       "DemocracyWorks" "VipObject.0.Source.0.FeedContactInformation.2.AddressLine.0"
+       "Take the mall-ride" "VipObject.0.Source.0.FeedContactInformation.2.Directions.3.Text.0"
+       "en" "VipObject.0.Source.0.FeedContactInformation.2.Directions.3.Text.0.language"
+       "39.7500162" "VipObject.0.Source.0.FeedContactInformation.2.LatLng.8.Latitude.0"
 
        "source01" "VipObject.0.Source.0.id"
        "2016-06-02T10:24:08" "VipObject.0.Source.0.DateTime.0"

@@ -37,7 +37,7 @@
         child-idx-fn (util/index-generator 0)]
     (conj
      (mapcat #(% child-idx-fn path row)
-             [ci/contact-information->ltree
+             [(ci/contact-information->ltree)
               (util/simple-value->ltree :electoral_district_id)
               util/external-identifiers->ltree
               (util/simple-value->ltree :filing_deadline)
