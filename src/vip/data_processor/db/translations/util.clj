@@ -38,7 +38,7 @@
    (simple-value->ltree column-name (column->xml-elment column-name)))
   ([column-name xml-element]
    (fn [idx-fn base-path row]
-     (let [value (get row column-name)]
+     (let [value (str (get row column-name))]
        (when-not (str/blank? value)
          (let [path (str base-path "." xml-element "." (idx-fn))]
            (list
