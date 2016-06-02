@@ -376,6 +376,8 @@
     :columns [{:name "id"}
               {:name "includes_all_addresses"
                :coerce coerce/postgres-boolean}
+              {:name "includes_all_streets"
+               :coerce coerce/postgres-boolean}
               {:name "address_direction"}
               {:name "city"}
               {:name "odd_even_both"}
