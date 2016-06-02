@@ -6,7 +6,7 @@
 
 (defn row-fn [import-id]
   (korma/select (postgres/v5-1-tables :offices)
-    (korma/fields :id
+    (korma/fields [:id :office_id]
                   :results_id
                   :electoral_district_id
                   :external_identifier_type
@@ -19,6 +19,7 @@
                   :term_type
                   :term_start_date
                   :term_end_date
+                  :contact_information.id
                   :contact_information.email
                   :contact_information.fax
                   :contact_information.hours
@@ -59,6 +60,6 @@
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
-      :value (:id row)})))
+      :value (:office_id row)})))
 
 (def transformer (util/transformer row-fn transform-fn))

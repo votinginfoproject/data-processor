@@ -6,7 +6,19 @@
 
 (defn row-fn [import-id]
   (korma/select (postgres/v5-1-tables :people)
-    (korma/fields :*
+    (korma/fields [:id :people_id]
+                  :date_of_birth
+                  :first_name
+                  :gender
+                  :last_name
+                  :middle_name
+                  :nickname
+                  :party_id
+                  :prefix
+                  :profession
+                  :suffix
+                  :title
+                  :contact_information.id
                   :contact_information.address_line_1
                   :contact_information.address_line_2
                   :contact_information.address_line_3
@@ -51,6 +63,6 @@
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
-      :value (:id row)})))
+      :value (:people_id row)})))
 
 (def transformer (util/transformer row-fn transform-fn))

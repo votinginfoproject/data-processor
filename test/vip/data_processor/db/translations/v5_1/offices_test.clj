@@ -24,6 +24,7 @@
       (testing "with a contact information"
         (are-xml-tree-values out-ctx
           "off001" "VipObject.0.Office.1.id"
+          "ci0827" "VipObject.0.Office.1.ContactInformation.0.label"
           "The White House" "VipObject.0.Office.1.ContactInformation.0.AddressLine.0"
           "1600 Pennsylvania Ave" "VipObject.0.Office.1.ContactInformation.0.AddressLine.1"
           "josh@example.com" "VipObject.0.Office.1.ContactInformation.0.Email.2"

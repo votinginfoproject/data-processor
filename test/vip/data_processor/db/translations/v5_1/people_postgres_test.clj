@@ -23,6 +23,7 @@
       (are-xml-tree-values
        out-ctx
        "per50001" "VipObject.0.Person.14.id"
+       "ci10861a" "VipObject.0.Person.14.ContactInformation.0.label"
        "1600 Pennsylvania Ave NW" "VipObject.0.Person.14.ContactInformation.0.AddressLine.0"
        "Washington, DC" "VipObject.0.Person.14.ContactInformation.0.AddressLine.1"
        "20006 USA" "VipObject.0.Person.14.ContactInformation.0.AddressLine.2"
