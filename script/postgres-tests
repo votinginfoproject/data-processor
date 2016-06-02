@@ -1,6 +1,11 @@
 #!/bin/sh
 
 docker-compose -f docker-compose-postgres-tests.yml build
+TEST_EXIT_STATUS=$?
+
+if [ $TEST_EXIT_STATUS -ne 0 ]; then
+    exit $TEST_EXIT_STATUS
+fi
 
 docker-compose -f docker-compose-postgres-tests.yml run processor
 TEST_EXIT_STATUS=$?
