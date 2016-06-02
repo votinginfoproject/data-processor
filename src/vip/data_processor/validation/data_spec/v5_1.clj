@@ -359,7 +359,6 @@
               {:name "date_time"}
               {:name "description"}
               {:name "organization_uri"}
-              {:name "feed_contact_information_id"}
               {:name "terms_of_use_uri"}
               {:name "version"}]}
    {:filename "state.txt"
