@@ -107,16 +107,21 @@
            ltree-fn (latlng->ltree parent-with-id)]
        (ltree-fn idx-fn parent-path row))))
   ([parent-with-id]
+   (latlng->ltree {} parent-with-id))
+  ([field-mapping parent-with-id]
    (fn [idx-fn parent-path row]
-     (when-not (and (str/blank? (:latitude row))
-                    (str/blank? (:longitude row)))
-       (let [index (idx-fn)
-             base-path (str parent-path ".LatLng." index)
-             sub-idx-fn (index-generator 0)]
-         (mapcat #(% sub-idx-fn base-path row)
-                 [(simple-value->ltree :latitude "Latitude" parent-with-id)
-                  (simple-value->ltree :longitude "Longitude" parent-with-id)
-                  (simple-value->ltree :latlng_source "Source" parent-with-id)])))))
+     (let [lat-key (get field-mapping :latitude :latitude)
+           lng-key (get field-mapping :longitude :longitude)
+           source-key (get field-mapping :latlng_source :latlng_source)]
+       (when-not (and (str/blank? (get row lat-key))
+                      (str/blank? (get row lng-key)))
+         (let [index (idx-fn)
+               base-path (str parent-path ".LatLng." index)
+               sub-idx-fn (index-generator 0)]
+           (mapcat #(% sub-idx-fn base-path row)
+                   [(simple-value->ltree lat-key "Latitude" parent-with-id)
+                    (simple-value->ltree lng-key "Longitude" parent-with-id)
+                    (simple-value->ltree source-key "Source" parent-with-id)]))))))
   ([idx-fn parent-path row]
    (let [ltree-fn (latlng->ltree)]
      (ltree-fn idx-fn parent-path row))))

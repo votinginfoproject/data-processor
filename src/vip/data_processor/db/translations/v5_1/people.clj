@@ -6,34 +6,23 @@
 
 (defn row-fn [import-id]
   (korma/select (postgres/v5-1-tables :people)
-    (korma/fields [:id :people_id]
-                  :date_of_birth
-                  :first_name
-                  :gender
-                  :last_name
-                  :middle_name
-                  :nickname
-                  :party_id
-                  :prefix
-                  :profession
-                  :suffix
-                  :title
-                  :contact_information.id
-                  :contact_information.address_line_1
-                  :contact_information.address_line_2
-                  :contact_information.address_line_3
-                  :contact_information.directions
-                  :contact_information.email
-                  :contact_information.fax
-                  :contact_information.hours
-                  :contact_information.hours_open_id
-                  :contact_information.latitude
-                  :contact_information.longitude
-                  :contact_information.latlng_source
-                  :contact_information.name
-                  :contact_information.parent_id
-                  :contact_information.phone
-                  :contact_information.uri)
+    (korma/fields :*
+                  [:contact_information.id :ci_id]
+                  [:contact_information.address_line_1 :ci_address_line_1]
+                  [:contact_information.address_line_2 :ci_address_line_2]
+                  [:contact_information.address_line_3 :ci_address_line_3]
+                  [:contact_information.directions :ci_directions]
+                  [:contact_information.email :ci_email]
+                  [:contact_information.fax :ci_fax]
+                  [:contact_information.hours :ci_hours]
+                  [:contact_information.hours_open_id :ci_hours_open_id]
+                  [:contact_information.latitude :ci_latitude]
+                  [:contact_information.longitude :ci_longitude]
+                  [:contact_information.latlng_source :ci_latlng_source]
+                  [:contact_information.name :ci_name]
+                  [:contact_information.parent_id :ci_parent_id]
+                  [:contact_information.phone :ci_phone]
+                  [:contact_information.uri :ci_uri])
     (korma/join :left (postgres/v5-1-tables :contact-information)
                 (and (= :contact_information.parent_id :id)
                      (= :contact_information.results_id :results_id)))
@@ -63,6 +52,6 @@
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
-      :value (:people_id row)})))
+      :value (:id row)})))
 
 (def transformer (util/transformer row-fn transform-fn))

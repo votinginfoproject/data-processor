@@ -5,19 +5,19 @@
 (defn contact-information->ltree [idx-fn parent-path row]
   (when-not (every? #(str/blank? (get row %))
                     [:address_line_1
-                     :address_line_2
-                     :address_line_3
-                     :directions
-                     :email
-                     :fax
-                     :hours
-                     :hours_open_id
-                     :latitude
-                     :longitude
-                     :latlng_source
-                     :name
-                     :phone
-                     :uri])
+                     :ci_address_line_2
+                     :ci_address_line_3
+                     :ci_directions
+                     :ci_email
+                     :ci_fax
+                     :ci_hours
+                     :ci_hours_open_id
+                     :ci_latitude
+                     :ci_longitude
+                     :ci_latlng_source
+                     :ci_name
+                     :ci_phone
+                     :ci_uri])
     (let [index (idx-fn)
           base-path (str parent-path ".ContactInformation." index)
           label-path (str base-path ".label")
@@ -25,19 +25,22 @@
           sub-idx-fn (util/index-generator 0)]
       (conj
        (mapcat #(% sub-idx-fn base-path row)
-               [(util/simple-value->ltree :address_line_1 "AddressLine" parent-with-id)
-                (util/simple-value->ltree :address_line_2 "AddressLine" parent-with-id)
-                (util/simple-value->ltree :address_line_3 "AddressLine" parent-with-id)
-                (util/internationalized-text->ltree :directions parent-with-id)
-                (util/simple-value->ltree :email "Email" parent-with-id)
-                (util/simple-value->ltree :fax "Fax" parent-with-id)
-                (util/internationalized-text->ltree :hours parent-with-id)
-                (util/simple-value->ltree :hours_open_id "HoursOpenId" parent-with-id)
-                (util/latlng->ltree parent-with-id)
-                (util/simple-value->ltree :name "Name" parent-with-id)
-                (util/simple-value->ltree :phone "Phone" parent-with-id)
-                (util/simple-value->ltree :uri "Uri" parent-with-id)])
+               [(util/simple-value->ltree :ci_address_line_1 "AddressLine" parent-with-id)
+                (util/simple-value->ltree :ci_address_line_2 "AddressLine" parent-with-id)
+                (util/simple-value->ltree :ci_address_line_3 "AddressLine" parent-with-id)
+                (util/internationalized-text->ltree :ci_directions "Directions" parent-with-id)
+                (util/simple-value->ltree :ci_email "Email" parent-with-id)
+                (util/simple-value->ltree :ci_fax "Fax" parent-with-id)
+                (util/internationalized-text->ltree :ci_hours "Hours" parent-with-id)
+                (util/simple-value->ltree :ci_hours_open_id "HoursOpenId" parent-with-id)
+                (util/latlng->ltree {:latitude :ci_latitude
+                                     :longitude :ci_longitude
+                                     :latlng_source :ci_latlng_source}
+                                    parent-with-id)
+                (util/simple-value->ltree :ci_name "Name" parent-with-id)
+                (util/simple-value->ltree :ci_phone "Phone" parent-with-id)
+                (util/simple-value->ltree :ci_uri "Uri" parent-with-id)])
        {:path label-path
         :simple_path (util/path->simple-path label-path)
-        :value (:id row)
+        :value (:ci_id row)
         :parent_with_id parent-with-id}))))
