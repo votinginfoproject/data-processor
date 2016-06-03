@@ -25,7 +25,7 @@
               (util/simple-value->ltree :type)
               (util/simple-value->ltree :other_type)])
      {:path id-path
-      :simple_path "VipObject.Locality.id"
+      :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
       :value (:id row)})))
 
