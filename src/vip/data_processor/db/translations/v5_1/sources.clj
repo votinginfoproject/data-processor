@@ -1,11 +1,11 @@
-(ns vip.data-processor.db.translations.v5-1.people
+(ns vip.data-processor.db.translations.v5-1.sources
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.v5-1.contact-information :as ci]
             [vip.data-processor.db.translations.util :as util]))
 
 (defn row-fn [import-id]
-  (korma/select (postgres/v5-1-tables :people)
+  (korma/select (postgres/v5-1-tables :sources)
     (korma/fields :*
                   [:contact_information.id :ci_id]
                   [:contact_information.address_line_1 :ci_address_line_1]
@@ -29,7 +29,7 @@
     (korma/where {:results_id import-id})))
 
 (defn base-path [index]
-  (str "VipObject.0.Person." index))
+  (str "VipObject.0.Source." index))
 
 (defn transform-fn [idx-fn row]
   (let [path (base-path (idx-fn))
@@ -37,18 +37,13 @@
         child-idx-fn (util/index-generator 0)]
     (conj
      (mapcat #(% child-idx-fn path row)
-             [(ci/contact-information->ltree)
-              (util/simple-value->ltree :date_of_birth)
-              (util/simple-value->ltree :first_name)
-              (util/simple-value->ltree :gender)
-              (util/simple-value->ltree :last_name)
-              (util/simple-value->ltree :middle_name)
-              (util/simple-value->ltree :nickname)
-              (util/simple-value->ltree :party_id)
-              (util/simple-value->ltree :prefix)
-              (util/simple-value->ltree :profession)
-              (util/simple-value->ltree :suffix)
-              (util/simple-value->ltree :title)])
+             [(util/simple-value->ltree :date_time)
+              (util/internationalized-text->ltree :description)
+              (ci/contact-information->ltree "FeedContactInformation")
+              (util/simple-value->ltree :name)
+              (util/simple-value->ltree :organization_uri)
+              (util/simple-value->ltree :terms_of_use_uri)
+              (util/simple-value->ltree :vip_id)])
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path

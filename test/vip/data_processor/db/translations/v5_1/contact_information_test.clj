@@ -21,7 +21,8 @@
                :ci_name "Democracy Works"
                :ci_phone "555-555-5555"
                :ci_uri "http://democracy.works"}
-          ltree-entries (set (ci/contact-information->ltree idx-fn parent-path row))]
+          transform-fn (ci/contact-information->ltree)
+          ltree-entries (set (transform-fn idx-fn parent-path row))]
       (testing "AddressLines come from address_line_{1,2,3}"
         (is (contains? ltree-entries
                        {:path "VipObject.0.Person.100.ContactInformation.27.AddressLine.0"
