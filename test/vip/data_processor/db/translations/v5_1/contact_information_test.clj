@@ -25,9 +25,9 @@
       (is (empty? (set (transform-fn idx-fn parent-path row)))))
 
     (testing "at least one field builds a ContactInformation child"
-      (let [funky-row (assoc row :ci_address_line_1 "123 Lonely Ln")]
+      (let [minimal-row (assoc row :ci_address_line_1 "123 Lonely Ln")]
         (is (contains?
-             (set (transform-fn idx-fn parent-path funky-row))
+             (set (transform-fn idx-fn parent-path minimal-row))
              {:path "VipObject.0.Person.100.ContactInformation.27.AddressLine.0"
               :value "123 Lonely Ln"
               :simple_path "VipObject.Person.ContactInformation.AddressLine"
