@@ -105,7 +105,7 @@ validation failures in `:warnings`, `:errors`, `:critical`, and
 ### The Processing Pipeline
 
 `run-pipeline` function in the `vip.data-processor.pipeline` namespace
-takes a context and will run thread that context through each function
+takes a context and will thread that context through each function
 in its `:pipeline`. Those processing functions may alter the
 `:pipeline` (for example, to alter how uploads are loaded into the
 database based on file type, or to add extra processing functions only

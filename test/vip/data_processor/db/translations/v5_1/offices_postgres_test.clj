@@ -1,4 +1,4 @@
-(ns vip.data-processor.db.translations.v5-1.offices-test
+(ns vip.data-processor.db.translations.v5-1.offices-postgres-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [korma.core :as korma]

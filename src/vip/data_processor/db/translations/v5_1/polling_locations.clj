@@ -26,7 +26,7 @@
               (util/simple-value->ltree :is_early_voting)
               util/latlng->ltree])
      {:path id-path
-      :simple_path "VipObject.PollingLocation.id"
+      :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
       :value (:id row)})))
 

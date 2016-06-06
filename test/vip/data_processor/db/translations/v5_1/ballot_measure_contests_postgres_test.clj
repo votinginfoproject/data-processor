@@ -9,8 +9,8 @@
 
 (use-fixtures :once setup-postgres)
 
-(deftest ^:postgres an-integration-test
-  (testing "we can load a CSV and transform it"
+(deftest ^:postgres transformer-test
+  (testing "ballot_measure_contest.txt is loaded and transformed"
     (let [csv-files (csv-inputs ["5-1/ballot_measure_contest.txt"])
           ctx {:input csv-files
                :spec-version "5.1"

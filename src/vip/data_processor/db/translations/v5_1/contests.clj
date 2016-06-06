@@ -37,7 +37,7 @@
               (util/simple-value->ltree :vote_variation)
               (util/simple-value->ltree :other_vote_variation)])
      {:path id-path
-      :simple_path "VipObject.Contest.id"
+      :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
       :value (:id row)})))
 

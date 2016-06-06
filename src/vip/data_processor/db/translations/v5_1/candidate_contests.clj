@@ -35,7 +35,7 @@
               (util/simple-value->ltree :primary_party_ids)
               (util/simple-value->ltree :votes_allowed)])
      {:path id-path
-      :simple_path "VipObject.CandidateContest.id"
+      :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
       :value (:id row)})))
 
