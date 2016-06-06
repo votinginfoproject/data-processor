@@ -41,11 +41,10 @@
    {:filename "voter_service.txt"
     :table :voter-services
     :columns [{:name "id"}
-              {:name "department_id"}
-              {:name "contact_information_id"}
               {:name "description"}
               {:name "election_official_person_id"}
-              {:name "voter_service_type"}
+              {:name "parent_id"}
+              {:name "type"}
               {:name "other_type"}]}
    {:filename "ballot_measure_contest.txt"
     :table :ballot-measure-contests
@@ -175,10 +174,8 @@
    {:filename "department.txt"
     :table :departments
     :columns [{:name "id"}
-              {:name "department_name"}
-              {:name "election_administration_id"}
-              {:name "contact_information_id"}
-              {:name "election_official_person_id"}]}
+              {:name "election_official_person_id"}
+              {:name "parent_id"}]}
    {:filename "election.txt"
     :table :elections
     :columns [{:name "id"}
