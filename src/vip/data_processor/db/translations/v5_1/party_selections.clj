@@ -10,17 +10,17 @@
 (defn base-path [index]
   (str "VipObject.0.PartySelection." index))
 
-(defn transform-fn [idx-fn party-selection]
-  (let [party-selection-path (base-path (idx-fn))
-        id-path (util/id-path party-selection-path)
+(defn transform-fn [idx-fn row]
+  (let [path (base-path (idx-fn))
+        id-path (util/id-path path)
         child-idx-fn (util/index-generator 0)]
     (conj
-     (mapcat #(% child-idx-fn party-selection-path party-selection)
+     (mapcat #(% child-idx-fn path row)
              [(util/simple-value->ltree :sequence_order)
               (util/simple-value->ltree :party_ids)])
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
-      :value (:id party-selection)})))
+      :value (:id row)})))
 
 (def transformer (util/transformer row-fn transform-fn))

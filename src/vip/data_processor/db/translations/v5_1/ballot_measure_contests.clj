@@ -4,19 +4,19 @@
             [vip.data-processor.db.translations.util :as util]
             [clojure.string :as str]))
 
-(defn ballot-measure-contests [import-id]
+(defn row-fn [import-id]
   (korma/select (postgres/v5-1-tables :ballot-measure-contests)
     (korma/where {:results_id import-id})))
 
 (defn base-path [index]
   (str "VipObject.0.BallotMeasureContest." index))
 
-(defn bmc->ltree-entries [idx-fn bmc]
-  (let [bmc-path (base-path (idx-fn))
-        id-path (util/id-path bmc-path)
+(defn transform-fn [idx-fn row]
+  (let [path (base-path (idx-fn))
+        id-path (util/id-path path)
         child-idx-fn (util/index-generator 0)]
     (conj
-     (mapcat #(% child-idx-fn bmc-path bmc)
+     (mapcat #(% child-idx-fn path row)
              [(util/simple-value->ltree :abbreviation)
               (util/simple-value->ltree :ballot_selection_ids)
               (util/internationalized-text->ltree :ballot_sub_title)
@@ -41,7 +41,6 @@
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
-      :value (:id bmc)})))
+      :value (:id row)})))
 
-(def transformer (util/transformer ballot-measure-contests
-                                   bmc->ltree-entries))
+(def transformer (util/transformer row-fn transform-fn))
