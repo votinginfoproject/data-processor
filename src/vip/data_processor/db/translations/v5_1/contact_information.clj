@@ -7,7 +7,7 @@
   ([xml-element]
    (fn [idx-fn parent-path row]
      (when-not (every? #(str/blank? (get row %))
-                       [:address_line_1
+                       [:ci_address_line_1
                         :ci_address_line_2
                         :ci_address_line_3
                         :ci_directions

@@ -4,6 +4,35 @@
             [clojure.test :refer :all]))
 
 (deftest contact-information->ltree-test
+  (let [idx-fn (util/index-generator 27)
+          parent-path "VipObject.0.Person.100"
+          row {:ci_address_line_1 ""
+               :ci_address_line_2 ""
+               :ci_address_line_3 ""
+               :ci_directions ""
+               :ci_email ""
+               :ci_fax ""
+               :ci_hours ""
+               :ci_hours_open_id ""
+               :ci_latitude ""
+               :ci_longitude ""
+               :ci_latlng_source ""
+               :ci_name ""
+               :ci_phone ""
+               :ci_uri ""}
+          transform-fn (ci/contact-information->ltree)]
+    (testing "omitting all optional elements renders no ContactInformation child"
+      (is (empty? (set (transform-fn idx-fn parent-path row)))))
+
+    (testing "at least one field builds a ContactInformation child"
+      (let [minimal-row (assoc row :ci_address_line_1 "123 Lonely Ln")]
+        (is (contains?
+             (set (transform-fn idx-fn parent-path minimal-row))
+             {:path "VipObject.0.Person.100.ContactInformation.27.AddressLine.0"
+              :value "123 Lonely Ln"
+              :simple_path "VipObject.Person.ContactInformation.AddressLine"
+              :parent_with_id "VipObject.0.Person.100.id"})))))
+
   (testing "can build a whole ContactInformation child"
     (let [idx-fn (util/index-generator 27)
           parent-path "VipObject.0.Person.100"
@@ -50,4 +79,5 @@
                        {:path "VipObject.0.Person.100.ContactInformation.27.LatLng.8.Latitude.0"
                         :value "40.704"
                         :simple_path "VipObject.Person.ContactInformation.LatLng.Latitude"
-                        :parent_with_id "VipObject.0.Person.100.id"}))))))
+                        :parent_with_id "VipObject.0.Person.100.id"})))))
+  )
