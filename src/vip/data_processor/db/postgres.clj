@@ -65,7 +65,6 @@
                                              :elections
                                              :election-administrations
                                              :electoral-districts
-                                             :hours-open
                                              :localities
                                              :ordered-contests
                                              :parties
@@ -75,6 +74,7 @@
                                              :polling-locations
                                              :precincts
                                              :retention-contests
+                                             :schedules
                                              :sources
                                              :states
                                              :street-segments]))

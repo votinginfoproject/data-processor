@@ -215,17 +215,12 @@
               {:name "external_identifier_othertype"}
               {:name "external_identifier_value"}
               {:name "other_type"}]}
-   {:filename "hours_open.txt"
-    :table :hours-open
-    :columns [{:name "id"}
-              {:name "schedule_id"}]}
    {:filename "schedule.txt"
     :table :schedules
     :columns [{:name "id"}
+              {:name "hours_open_id"}
               {:name "start_time"}
               {:name "end_time"}
-              {:name "start_time2"}
-              {:name "end_time2"}
               {:name "is_only_by_appointment"}
               {:name "is_or_by_appointment"}
               {:name "is_subject_to_change"}
