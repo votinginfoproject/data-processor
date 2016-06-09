@@ -9,22 +9,23 @@
 (use-fixtures :once setup-postgres)
 
 (deftest ^:postgres transformer-test
-  (testing "election_administration.txt is loaded and transformed"
-    (let [ctx {:input (csv-inputs ["5-1/contact_information.txt"
-                                   "5-1/department.txt"
-                                   "5-1/voter_service.txt"
-                                   "5-1/election_administration.txt"])
-               :spec-version "5.1"
-               :ltree-index 0
-               :pipeline (concat
-                          [postgres/start-run]
-                          (get csv/version-pipelines "5.1")
-                          [eas/transformer])}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (assert-no-problems out-ctx [])
+  (let [ctx {:input (csv-inputs ["5-1/contact_information.txt"
+                                 "5-1/department.txt"
+                                 "5-1/voter_service.txt"
+                                 "5-1/election_administration.txt"])
+             :spec-version "5.1"
+             :ltree-index 0
+             :pipeline (concat
+                        [postgres/start-run]
+                        (get csv/version-pipelines "5.1")
+                        [eas/transformer])}
+        out-ctx (pipeline/run-pipeline ctx)]
+    (assert-no-problems out-ctx [])
+
+    (testing "election_administration.txt is loaded and transformed"
       (are-xml-tree-values
        out-ctx
-       "ea40133" "VipObject.0.ElectionAdministration.0.id"
+       "ea123" "VipObject.0.ElectionAdministration.0.id"
        "https://example.com/absentee" "VipObject.0.ElectionAdministration.0.AbsenteeUri.0"
        "https://example.com/am-i-registered" "VipObject.0.ElectionAdministration.0.AmIRegisteredUri.1"
 
@@ -61,4 +62,14 @@
        "https://example.com/registration" "VipObject.0.ElectionAdministration.0.RegistrationUri.4"
        "https://example.com/rules" "VipObject.0.ElectionAdministration.0.RulesUri.5"
        "https://example.com/what-is-on-my-ballot" "VipObject.0.ElectionAdministration.0.WhatIsOnMyBallotUri.6"
-       "https://example.com/where-do-i-vote" "VipObject.0.ElectionAdministration.0.WhereDoIVoteUri.7"))))
+       "https://example.com/where-do-i-vote" "VipObject.0.ElectionAdministration.0.WhereDoIVoteUri.7"))
+
+    (testing "an election administration may have multiple departments"
+      (are-xml-tree-values
+       out-ctx
+       "ea625" "VipObject.0.ElectionAdministration.2.id"
+       "Curated Voting Consortium" "VipObject.0.ElectionAdministration.2.Department.2.ContactInformation.0.Name.3"
+       "Pencil sharpening" "VipObject.0.ElectionAdministration.2.Department.2.VoterService.2.Description.1.Text.0"
+       "Guided hike to polling place" "VipObject.0.ElectionAdministration.2.Department.2.VoterService.3.Description.1.Text.0"
+       "Bike messenger ballot delivery" "VipObject.0.ElectionAdministration.2.Department.2.VoterService.4.Description.1.Text.0"
+       "Voter Fraud Foundation" "VipObject.0.ElectionAdministration.2.Department.3.ContactInformation.0.Name.5"))))
