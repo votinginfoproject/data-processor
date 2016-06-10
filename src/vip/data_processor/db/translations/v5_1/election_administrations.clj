@@ -13,11 +13,10 @@
 (defn base-path [index]
   (str "VipObject.0.ElectionAdministration." index))
 
-(defn election-administrations->ltree [import-id ltree-index]
+(defn election-administrations->ltree [import-id idx-fn]
   (let [election-administrations (row-fn import-id)
         departments (group-by :parent_id (ds/row-fn import-id))
-        voter-services (group-by :parent_id (vs/row-fn import-id))
-        idx-fn (util/index-generator ltree-index)]
+        voter-services (group-by :parent_id (vs/row-fn import-id))]
     (mapcat (fn [ea]
               (let [ds (get departments (:id ea))
                     path (base-path (idx-fn))
@@ -40,7 +39,8 @@
             election-administrations)))
 
 (defn transformer [{:keys [import-id ltree-index] :as ctx}]
-  (let [ltree-entries (util/prep-for-insertion
+  (let [idx-fn (util/index-generator ltree-index)
+        ltree-entries (util/prep-for-insertion
                        import-id
                        (election-administrations->ltree import-id idx-fn))]
     (if (seq ltree-entries)
