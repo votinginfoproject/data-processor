@@ -35,12 +35,6 @@
             (assoc :input good-files)))
       ctx)))
 
-(defn find-input-file [ctx filename]
-  (->> ctx
-       :input
-       (filter #(= filename (clojure.string/lower-case (.getName %))))
-       first))
-
 (defn read-one-line
   "Reads one line at a time from a reader and parses it as a CSV
   string. Does not close the reader at the end, that's your job."
@@ -54,7 +48,7 @@
   "Bulk importing and CSV validation is done in one go, so that it can
   be done without holding the entire file in memory at once."
   [ctx {:keys [filename table columns] :as data-spec}]
-  (if-let [file-to-load (find-input-file ctx filename)]
+  (if-let [file-to-load (util/find-input-file ctx filename)]
     (do
       (log/info "Loading" filename)
       (try
@@ -123,7 +117,7 @@
   [{:keys [data-specs] :as ctx}]
   (let [required-files (filter :required data-specs)]
     (reduce (fn [ctx {:keys [filename required table]}]
-              (if (find-input-file ctx filename)
+              (if (util/find-input-file ctx filename)
                 ctx
                 (assoc-in ctx
                           [required table :global :missing-csv]
@@ -131,7 +125,7 @@
             ctx required-files)))
 
 (defn determine-spec-version [ctx]
-  (if-let [source-file (find-input-file ctx "source.txt")]
+  (if-let [source-file (util/find-input-file ctx "source.txt")]
     (with-open [reader (util/bom-safe-reader source-file :encoding "UTF-8")]
       (let [headers (read-one-line reader)
             line1 (read-one-line reader)

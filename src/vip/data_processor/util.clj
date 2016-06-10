@@ -15,13 +15,13 @@
   ;; the entire feed from breaking Metis while we investigate
   ;; the issue.
   (let [format-fn (fn [d] (try (->> d java.util.Date.
-                                    (.format 
-                                     (java.text.SimpleDateFormat. 
+                                    (.format
+                                     (java.text.SimpleDateFormat.
                                       "yyyy-MM-dd")))
                                (catch Throwable _
                                  nil)))]
     (if (and (seq date) (re-find #"\/" date))
-      (format-fn date) 
+      (format-fn date)
       date)))
 
 (def BOM 0xFEFF)
@@ -37,3 +37,9 @@
         (log/info x "had byte order marker")
         (.reset reader))
       reader)))
+
+(defn find-input-file [ctx filename]
+  (->> ctx
+       :input
+       (filter #(= filename (clojure.string/lower-case (.getName %))))
+       first))
