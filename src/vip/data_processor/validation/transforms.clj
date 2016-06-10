@@ -4,7 +4,6 @@
             [clojure.string :as s]
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]
-            [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.xml :as xml]))
 
 (defn read-edn-sqs-message [ctx]
@@ -27,10 +26,9 @@
    xml/branch-on-spec-version])
 
 (def csv-validations
-  [csv/remove-bad-filenames
-   csv/error-on-missing-files
+  [csv/error-on-missing-files
    csv/determine-spec-version
-   (csv-files/validate-dependencies csv-files/v3-0-file-dependencies) ; TODO: validate file depenencies based import version
+   csv/remove-bad-filenames
    csv/branch-on-spec-version])
 
 (defn remove-invalid-extensions [ctx]

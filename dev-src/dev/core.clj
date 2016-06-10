@@ -29,6 +29,7 @@
    t/xml-csv-branch
    psql/store-public-id
    psql/store-election-id
+   psql/insert-validations
    (fn [ctx]
      (if (= "3.0" (:spec-version ctx))
        (update ctx :pipeline concat v3-pipeline)

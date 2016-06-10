@@ -8,10 +8,12 @@
             [korma.db :as db]
             [vip.data-processor.util :as util]
             [vip.data-processor.db.util :as db.util]
+            [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.db.postgres :as postgres]))
+            [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.db.translations.transformer :as v5-1-transformers]))
 
 (defn csv-filenames [data-specs]
   (set (map :filename data-specs)))
@@ -142,10 +144,12 @@
 
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
+          (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
           load-csvs]
-   "5.1" [(data-spec/add-data-specs v5-1/data-specs)
-          (fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
-          load-csvs]})
+   "5.1" (concat [(fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
+                  (fn [ctx] (assoc ctx :ltree-index 0))
+                  load-csvs]
+                 v5-1-transformers/transformers)})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]
