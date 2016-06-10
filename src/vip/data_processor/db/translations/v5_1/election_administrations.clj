@@ -42,7 +42,10 @@
 (defn transformer [{:keys [import-id ltree-index] :as ctx}]
   (let [ltree-entries (util/prep-for-insertion
                        import-id
-                       (election-administrations->ltree import-id ltree-index))]
-    (korma/insert postgres/xml-tree-values
-      (korma/values ltree-entries))
-    ctx))
+                       (election-administrations->ltree import-id idx-fn))]
+    (if (seq ltree-entries)
+      (do
+        (korma/insert postgres/xml-tree-values
+          (korma/values ltree-entries))
+        (assoc ctx :ltree-index (idx-fn)))
+      ctx)))
