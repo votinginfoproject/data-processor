@@ -25,7 +25,6 @@
   [psql/start-run
    zip/assoc-file
    zip/extracted-contents
-   (data-spec/add-data-specs v3-0/data-specs) ; TODO: dont't do this for non-3.0 feeds
    t/remove-invalid-extensions
    t/xml-csv-branch
    psql/store-public-id

@@ -131,7 +131,9 @@
             line1 (read-one-line reader)
             csv-map (zipmap headers line1)
             version (get csv-map "version" "3.0")]
-        (assoc ctx :spec-version version)))
+        (-> ctx
+            (assoc :spec-version version)
+            (assoc :data-specs (get data-spec/version-specs version)))))
     (assoc-in ctx [:fatal :sources :global :missing-csv]
               ["source.txt is missing"])))
 
