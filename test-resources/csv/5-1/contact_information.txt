@@ -1,4 +1,12 @@
 address_line_1,address_line_2,address_line_3,directions,email,fax,hours,hours_open_id,latitude,longitude,latlng_source,name,phone,uri,parent_id,id
 The White House,1600 Pennsylvania Ave,,,josh@example.com,,Early to very late,,,,,Josh Lyman,555-111-2222,http://lemonlyman.example.com,off001,ci0827
+The White House,1600 Pennsylvania Ave,,,josh@example.com,,Early to very late,,,,,Josh Lyman,555-111-2222,http://lemonlyman.example.com,vs01,ci0828
 1600 Pennsylvania Ave NW,Washington,DC 20006 USA,Head Southeast of the General Rochambeau statue,president@whitehouse.gov,202-456-1131,9am-6pm,h3005,38.899,-77.036,Google Maps,"White House",202-456-1111,"http://www.whitehouse.gov",per50001,ci10861a
 DemocracyWorks,1507 Blake Street,Denver CO 80201,Take the mall-ride,democracy@example.com,555-555-1212,8am-4pm,ho123,39.7500162,-105.0025499,Google maps,Uncubed,,,source01,ci1024
+Argyle Annex,Argyle Pl,Denver CO,Alley behind Tony P's,argyle@example.com,555-555-1000,sunup to sundown,,,, ,Back porch coworking,,,dep01,ci2048
+Suite Omega,,Brooklyn,,omega@example.com,,,,,, ,Curated Voting Consortium,,,dep03,ci4096
+Suite Omega,,Brooklyn,,omega@example.com,,,,,, ,Curated Voting Consortium,,,vs02,ci4097
+Suite Omega,,Brooklyn,,omega@example.com,,,,,, ,Curated Voting Consortium,,,vs03,ci4098
+Suite Omega,,Brooklyn,,omega@example.com,,,,,, ,Curated Voting Consortium,,,vs04,ci4099
+Suite 44, 44th St,Miami,,duplicity@example.com,,sunup to sundown,,,, ,Voter Fraud Foundation,,,dep04,ci16384
+Suite 44, 44th St,Miami,,duplicity@example.com,,sunup to sundown,,,, ,Voter Fraud Foundation,,,vs05,ci16385

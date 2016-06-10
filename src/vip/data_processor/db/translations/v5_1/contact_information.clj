@@ -6,6 +6,10 @@
   ([] (contact-information->ltree "ContactInformation"))
   ([xml-element]
    (fn [idx-fn parent-path row]
+     (let [ci-fn (contact-information->ltree xml-element (util/id-path parent-path))]
+       (ci-fn idx-fn parent-path row))))
+  ([xml-element parent-with-id]
+   (fn [idx-fn parent-path row]
      (when-not (every? #(str/blank? (get row %))
                        [:ci_address_line_1
                         :ci_address_line_2
@@ -24,7 +28,6 @@
        (let [index (idx-fn)
              base-path (str parent-path "." xml-element "." index)
              label-path (str base-path ".label")
-             parent-with-id (util/id-path parent-path)
              sub-idx-fn (util/index-generator 0)]
          (conj
           (mapcat #(% sub-idx-fn base-path row)
