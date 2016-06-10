@@ -36,8 +36,7 @@
 
 (def pipeline
   (concat download-pipeline
-          [(data-spec/add-data-specs v3-0/data-specs) ; TODO: decide which specs to add based on import
-           t/remove-invalid-extensions
+          [t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id
            psql/store-election-id
