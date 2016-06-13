@@ -244,7 +244,9 @@
     (with-open [reader (util/bom-safe-reader xml-file)]
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]
-        (assoc ctx :spec-version version)))))
+        (-> ctx
+            (assoc :spec-version version)
+            (assoc :data-specs (get data-spec/version-specs version)))))))
 
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
   (assoc ctx :stop (str "Unsupported XML version: " spec-version)))
