@@ -1,10 +1,11 @@
 (ns vip.data-processor.db.translations.v5-1.election-administrations-postgres-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
-            [vip.data-processor.db.translations.v5-1.election-administrations :as eas]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.pipeline :as pipeline]
-            [vip.data-processor.validation.csv :as csv]))
+            [vip.data-processor.validation.csv :as csv]
+            [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]))
 
 (use-fixtures :once setup-postgres)
 
@@ -14,11 +15,10 @@
                                  "5-1/voter_service.txt"
                                  "5-1/election_administration.txt"])
              :spec-version "5.1"
-             :ltree-index 0
              :pipeline (concat
-                        [postgres/start-run]
-                        (get csv/version-pipelines "5.1")
-                        [eas/transformer])}
+                        [postgres/start-run
+                         (data-spec/add-data-specs v5-1/data-specs)]
+                        (get csv/version-pipelines "5.1"))}
         out-ctx (pipeline/run-pipeline ctx)]
     (assert-no-problems out-ctx [])
 

@@ -25,11 +25,11 @@
   [psql/start-run
    zip/assoc-file
    zip/extracted-contents
-   (data-spec/add-data-specs v3-0/data-specs) ; TODO: dont't do this for non-3.0 feeds
    t/remove-invalid-extensions
    t/xml-csv-branch
    psql/store-public-id
    psql/store-election-id
+   psql/insert-validations
    (fn [ctx]
      (if (= "3.0" (:spec-version ctx))
        (update ctx :pipeline concat v3-pipeline)

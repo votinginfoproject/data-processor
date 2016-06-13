@@ -8,10 +8,12 @@
             [korma.db :as db]
             [vip.data-processor.util :as util]
             [vip.data-processor.db.util :as db.util]
+            [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.db.postgres :as postgres]))
+            [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.db.translations.transformer :as v5-1-transformers]))
 
 (defn csv-filenames [data-specs]
   (set (map :filename data-specs)))
@@ -35,12 +37,6 @@
             (assoc :input good-files)))
       ctx)))
 
-(defn find-input-file [ctx filename]
-  (->> ctx
-       :input
-       (filter #(= filename (clojure.string/lower-case (.getName %))))
-       first))
-
 (defn read-one-line
   "Reads one line at a time from a reader and parses it as a CSV
   string. Does not close the reader at the end, that's your job."
@@ -54,7 +50,7 @@
   "Bulk importing and CSV validation is done in one go, so that it can
   be done without holding the entire file in memory at once."
   [ctx {:keys [filename table columns] :as data-spec}]
-  (if-let [file-to-load (find-input-file ctx filename)]
+  (if-let [file-to-load (util/find-input-file ctx filename)]
     (do
       (log/info "Loading" filename)
       (try
@@ -123,7 +119,7 @@
   [{:keys [data-specs] :as ctx}]
   (let [required-files (filter :required data-specs)]
     (reduce (fn [ctx {:keys [filename required table]}]
-              (if (find-input-file ctx filename)
+              (if (util/find-input-file ctx filename)
                 ctx
                 (assoc-in ctx
                           [required table :global :missing-csv]
@@ -131,13 +127,15 @@
             ctx required-files)))
 
 (defn determine-spec-version [ctx]
-  (if-let [source-file (find-input-file ctx "source.txt")]
+  (if-let [source-file (util/find-input-file ctx "source.txt")]
     (with-open [reader (util/bom-safe-reader source-file :encoding "UTF-8")]
       (let [headers (read-one-line reader)
             line1 (read-one-line reader)
             csv-map (zipmap headers line1)
             version (get csv-map "version" "3.0")]
-        (assoc ctx :spec-version version)))
+        (-> ctx
+            (assoc :spec-version version)
+            (assoc :data-specs (get data-spec/version-specs version)))))
     (assoc-in ctx [:fatal :sources :global :missing-csv]
               ["source.txt is missing"])))
 
@@ -146,10 +144,12 @@
 
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
+          (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
           load-csvs]
-   "5.1" [(data-spec/add-data-specs v5-1/data-specs)
-          (fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
-          load-csvs]})
+   "5.1" (concat [(fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
+                  (fn [ctx] (assoc ctx :ltree-index 0))
+                  load-csvs]
+                 v5-1-transformers/transformers)})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

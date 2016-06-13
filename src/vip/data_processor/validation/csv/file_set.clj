@@ -1,5 +1,5 @@
 (ns vip.data-processor.validation.csv.file-set
-  (:require [vip.data-processor.validation.csv :as csv]
+  (:require [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [clojure.string :as str]
             [clojure.walk :as walk]))
@@ -8,7 +8,7 @@
   (walk/postwalk
    (fn [dependencies]
      (if (string? dependencies)
-       `(csv/find-input-file ~ctx-sym ~dependencies)
+       `(util/find-input-file ~ctx-sym ~dependencies)
        dependencies))
    dependencies))
 
@@ -157,7 +157,7 @@
                             "precinct_split.txt")))
 
 (defn- validate-file-dependencies [ctx [file validator]]
-  (if (csv/find-input-file ctx file)
+  (if (util/find-input-file ctx file)
     (validator ctx)
     ctx))
 

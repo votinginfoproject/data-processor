@@ -5,7 +5,9 @@
             [vip.data-processor.db.translations.v5-1.ordered-contests :as oc]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.pipeline :as pipeline]
-            [vip.data-processor.validation.csv :as csv]))
+            [vip.data-processor.validation.csv :as csv]
+            [vip.data-processor.validation.data-spec :as data-spec]
+            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]))
 
 (use-fixtures :once setup-postgres)
 
@@ -13,14 +15,15 @@
   (testing "ordered_contest.txt is loaded and transformed"
     (let [ctx {:input (csv-inputs ["5-1/ordered_contest.txt"])
                :spec-version "5.1"
-               :ltree-index 1
                :pipeline (concat
-                          [postgres/start-run]
+                          [postgres/start-run
+                           (data-spec/add-data-specs v5-1/data-specs)]
                           (get csv/version-pipelines "5.1")
                           [oc/transformer])}
           out-ctx (pipeline/run-pipeline ctx)]
       (assert-no-problems out-ctx [])
-      (are-xml-tree-values out-ctx
-                           "oc2025" "VipObject.0.OrderedContest.1.id"
-                           "bs01 bs05 bs02" "VipObject.0.OrderedContest.1.OrderedBallotSelectionIds.1"
-                           "con02" "VipObject.0.OrderedContest.2.ContestId.0"))))
+      (are-xml-tree-values
+       out-ctx
+       "oc2025" "VipObject.0.OrderedContest.0.id"
+       "bs01 bs05 bs02" "VipObject.0.OrderedContest.0.OrderedBallotSelectionIds.1"
+       "con02" "VipObject.0.OrderedContest.1.ContestId.0"))))
