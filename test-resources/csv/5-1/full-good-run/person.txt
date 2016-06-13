@@ -1,0 +1,3 @@
+date_of_birth,first_name,gender,last_name,middle_name,nickname,party_id,prefix,profession,suffix,title,id
+1961-08-04,Barak,male,Obama,Hussein,The Rock,par02,,President,II,Mr. President,per50001
+1985-11-21,Carly,female,Jepsen,Rae,,par01,,Recording Artist,,,per50002
