@@ -46,9 +46,9 @@
               (util/simple-value->ltree :nickname)
               (util/simple-value->ltree :party_id)
               (util/simple-value->ltree :prefix)
-              (util/simple-value->ltree :profession)
+              (util/internationalized-text->ltree :profession)
               (util/simple-value->ltree :suffix)
-              (util/simple-value->ltree :title)])
+              (util/internationalized-text->ltree :title)])
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path

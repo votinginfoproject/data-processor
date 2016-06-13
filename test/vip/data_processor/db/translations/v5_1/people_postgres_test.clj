@@ -35,4 +35,5 @@
        "Obama" "VipObject.0.Person.0.LastName.4"
        "The Rock" "VipObject.0.Person.0.Nickname.6"
        "par002" "VipObject.0.Person.0.PartyId.7"
-       "Mr. President" "VipObject.0.Person.0.Title.10"))))
+       "Mr. President" "VipObject.0.Person.0.Title.10.Text.0"
+       "en" "VipObject.0.Person.0.Title.10.Text.0.language"))))
