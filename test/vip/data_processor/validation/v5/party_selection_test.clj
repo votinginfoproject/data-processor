@@ -14,10 +14,10 @@
                     psql/start-run
                     xml/load-xml-ltree
                     v5.party-selection/validate-no-missing-party-ids)]
-    (testing "party-id missing is an error"
+    (testing "party-ids missing is an error"
       (is (get-in out-ctx [:errors :party-selection
-                           "VipObject.0.PartySelection.0.PartyId" :missing])))
-    (testing "party-id present is OK"
+                           "VipObject.0.PartySelection.0.PartyIds" :missing])))
+    (testing "party-ids present is OK"
       (is (not (get-in out-ctx [:errors :party-selection
-                                "VipObject.0.PartySelection.1.PartyId"
+                                "VipObject.0.PartySelection.1.PartyIds"
                                 :missing]))))))
