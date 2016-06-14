@@ -3,6 +3,7 @@
    [vip.data-processor.db.translations.v5-1.ballot-measure-contests :as ballot-measure-contests]
    [vip.data-processor.db.translations.v5-1.ballot-measure-selections :as ballot-measure-selections]
    [vip.data-processor.db.translations.v5-1.ballot-selections :as ballot-selections]
+   [vip.data-processor.db.translations.v5-1.ballot-styles :as ballot-styles]
    [vip.data-processor.db.translations.v5-1.candidate-contests :as candidate-contests]
    [vip.data-processor.db.translations.v5-1.candidate-selections :as candidate-selections]
    [vip.data-processor.db.translations.v5-1.candidates :as candidates]
@@ -32,6 +33,7 @@
    ballot-measure-contests/transformer
    ballot-measure-selections/transformer
    ballot-selections/transformer
+   ballot-styles/transformer
    candidate-contests/transformer
    candidate-selections/transformer
    candidates/transformer
