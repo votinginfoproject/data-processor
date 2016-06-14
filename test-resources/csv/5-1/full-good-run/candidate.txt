@@ -1,0 +1,3 @@
+id,ballot_name,external_identifier_type,external_identifier_othertype,external_identifier_value,file_date,is_incumbent,is_top_ticket,party_id,person_id,post_election_status,pre_election_status
+can001,Jude Fawley,local-level,,stonemason-7,1894-12-01,false,false,par01,per50001,,filed
+can002,Arabella Donn,local-level,,barmaid-2,1894-12-01,false,false,par02,per50002,projected-winner,qualified

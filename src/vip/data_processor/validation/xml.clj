@@ -244,7 +244,9 @@
     (with-open [reader (util/bom-safe-reader xml-file)]
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]
-        (assoc ctx :spec-version version)))))
+        (-> ctx
+            (assoc :spec-version version)
+            (assoc :data-specs (get data-spec/version-specs version)))))))
 
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
   (assoc ctx :stop (str "Unsupported XML version: " spec-version)))
@@ -257,11 +259,9 @@
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           load-xml]
-   "5.1" (concat [load-xml-ltree
-                  xml.v5/load-xml-street-segments]
-                 v5-validations/validations
-                 [load-xml-tree-validations
-                  set-input-as-xml-output-file])})
+   "5.1" [load-xml-ltree
+          xml.v5/load-xml-street-segments
+          set-input-as-xml-output-file]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

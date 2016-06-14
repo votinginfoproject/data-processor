@@ -92,7 +92,7 @@
     :columns [{:name "id"}
               {:name "image_uri"}
               {:name "ordered_contest_ids"}
-              {:name "party_id"}]}
+              {:name "party_ids"}]}
    {:filename "candidate.txt"
     :table :candidates
     :columns [{:name "id"}

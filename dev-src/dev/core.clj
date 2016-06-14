@@ -1,6 +1,7 @@
 (ns dev.core
   (:require [clojure.java.io :as io]
             [clojure.pprint :as pprint]
+            [vip.data-processor :as data-processor]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.output.xml :as xml-output]
             [vip.data-processor.validation.data-spec :as data-spec]
@@ -13,13 +14,6 @@
             [vip.data-processor.s3 :refer [zip-filename]]
             [squishy.data-readers]))
 
-(def v3-pipeline
-  (concat db/validations
-          db.v3-0/validations
-          xml-output/pipeline
-          [psql/insert-validations
-           psql/import-from-sqlite
-           psql/store-stats]))
 
 (def pipeline
   [psql/start-run
@@ -29,11 +23,7 @@
    t/xml-csv-branch
    psql/store-public-id
    psql/store-election-id
-   psql/insert-validations
-   (fn [ctx]
-     (if (= "3.0" (:spec-version ctx))
-       (update ctx :pipeline concat v3-pipeline)
-       ctx))])
+   data-processor/add-validations])
 
 (defn -main [filename]
   (psql/initialize)

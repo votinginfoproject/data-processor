@@ -11,6 +11,8 @@
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.db.v3-0 :as db.v3-0]
             [vip.data-processor.validation.transforms :as t]
+            [vip.data-processor.validation.v5 :as v5-1-validations]
+            [vip.data-processor.validation.xml :as xml]
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.queue :as q]
             [vip.data-processor.db.postgres :as psql]
@@ -34,16 +36,25 @@
            psql/import-from-sqlite
            psql/store-stats]))
 
+(def v5-1-validation-pipeline
+  (concat v5-1-validations/validations
+          [xml/load-xml-tree-validations]))
+
+(defn add-validations
+  [{:keys [spec-version] :as ctx}]
+  (let [validations (condp = spec-version
+                      "3.0" v3-validation-pipeline
+                      "5.1" v5-1-validation-pipeline
+                      nil)]
+    (update ctx :pipeline (partial concat validations))))
+
 (def pipeline
   (concat download-pipeline
           [t/remove-invalid-extensions
            t/xml-csv-branch
            psql/store-public-id
            psql/store-election-id
-           (fn [{:keys [spec-version] :as ctx}]
-             (condp = spec-version
-               "3.0" (update ctx :pipeline (partial concat v3-validation-pipeline))
-               ctx))
+           add-validations
            s3/upload-to-s3
            cleanup/cleanup]))
 
