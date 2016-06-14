@@ -3,6 +3,6 @@
   <PartySelection id="ps001">
   </PartySelection>
   <PartySelection id="ps002">
-    <PartyId>54321</PartyId>
+    <PartyIds>54321</PartyIds>
   </PartySelection>
 </VipObject>
