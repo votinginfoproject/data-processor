@@ -54,6 +54,7 @@
            t/xml-csv-branch
            psql/store-public-id
            psql/store-election-id
+           add-validations
            s3/upload-to-s3
            cleanup/cleanup]))
 
