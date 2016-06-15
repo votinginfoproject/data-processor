@@ -1,3 +1,5 @@
 date_of_birth,first_name,gender,last_name,middle_name,nickname,party_id,prefix,profession,suffix,title,id
 1961-08-04,Barak,male,Obama,Hussein,The Rock,par02,,President,II,Mr. President,per50001
 1985-11-21,Carly,female,Jepsen,Rae,,par01,,Recording Artist,,,per50002
+1926-09-23,John,male,Coltrane,William,Trane,par02,,Recording Artist,Saint,,per50003
+1926-05-26,Miles,male,Davis,Dewey,,par01,,Recording Artist,III,,per50004

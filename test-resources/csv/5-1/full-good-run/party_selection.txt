@@ -1,4 +1,4 @@
 id,sequence_order,party_ids
-ps001,1,"p001 p004"
-ps002,2,"p001 p002"
-ps003,3,"p003"
+ps001,1,"par01 par04"
+ps002,2,"par02"
+ps003,3,"par03"
