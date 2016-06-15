@@ -16,10 +16,27 @@
     <FirstName>Dave</FirstName>
     <PartyId>par004</PartyId>
   </Person>
+
   <Party id="par001">
     <Name><Text language="en">Democratic</Text></Name>
   </Party>
   <Party id="par002">
     <Name><Text language="en">Republican</Text></Name>
   </Party>
+
+  <PollingLocation id="poll01">
+    <AddressLine>123 Lonely Ln</AddressLine>
+  </PollingLocation>
+
+  <Locality id="l001">
+    <Name>I'm a locality!</Name>
+    <Type>city</Type>
+    <PollingLocationIds>poll01</PollingLocationIds>
+  </Locality>
+
+  <Locality id="l002">
+    <Name>I'm a locality too!</Name>
+    <Type>planet</Type>
+    <PollingLocationIds>poll01 poll02 poll03</PollingLocationIds>
+  </Locality>
 </VipObject>

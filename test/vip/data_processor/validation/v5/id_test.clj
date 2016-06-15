@@ -43,11 +43,32 @@
              :spec-version "5.1"
              :pipeline [psql/start-run
                         load-xml-ltree
-                        v5.id/validate-idrefs-refer]}
+                        v5.id/validate-idref-references
+                        v5.id/validate-idrefs-references]}
         out-ctx (pipeline/run-pipeline ctx)]
+
     (testing "IDREF elements that don't have referents are flagged"
       (is (get-in out-ctx [:errors :id "VipObject.0.Person.1.PartyId.1" :no-referent]))
       (is (get-in out-ctx [:errors :id "VipObject.0.Person.3.PartyId.1" :no-referent])))
+
     (testing "IDREF elements that point to something are good"
       (assert-no-problems out-ctx [:errors :id "VipObject.0.Person.0.PartyId.1"])
       (assert-no-problems out-ctx [:errors :id "VipObject.0.Person.2.PartyId.1"]))))
+
+(deftest ^:postgres validate-idrefs-plural-refer-test
+  (let [ctx {:input (xml-input "v5-idrefs.xml")
+             :spec-version "5.1"
+             :pipeline [psql/start-run
+                        load-xml-ltree
+                        v5.id/validate-idrefs-references]}
+        out-ctx (pipeline/run-pipeline ctx)]
+
+    (testing "IDREFS elements that don't have any referents are flagged"
+      (is (get-in
+           out-ctx
+           [:errors :id "VipObject.0.Locality.8.PollingLocationIds.2" :no-referent])))
+
+    (testing "IDREFS elements that point to some things are good"
+      (assert-no-problems
+       out-ctx
+       [:errors :id "VipObject.0.Locality.11.PollingLocationIds.3"]))))
