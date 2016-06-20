@@ -312,7 +312,7 @@
               (bulk-import ctx
                            (ent v3-0-import-entities) ; TODO: choose import-entities based on import version
                            (->> table
-                                (db.util/select-*-lazily 5000)
+                                (db.util/lazy-select 5000)
                                 (map #(assoc % :results_id import-id))
                                 (data-spec/coerce-rows columns)))))
           ctx
