@@ -14,12 +14,6 @@
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
-(deftest create-xml-file-test
-  (testing "adds an :xml-output-file key to a context"
-    (let [ctx {:filename "create-xml-test"}
-          out-ctx (create-xml-file ctx)]
-      (is (:xml-output-file out-ctx)))))
-
 (deftest write-xml-test
   (testing "generates XML from an import"
     (let [db (sqlite/temp-db "xml-output" "3.0")
