@@ -59,14 +59,14 @@
           transform-fn (util/internationalized-text->ltree :instructions)
           idx-fn (util/index-generator 0)]
       (is (= (list
-              {:path "VipObject.0.BallotMeasureContest.0.Instructions.0.Text.0"
-               :simple_path "VipObject.BallotMeasureContest.Instructions.Text"
-               :parent_with_id "VipObject.0.BallotMeasureContest.0.id"
-               :value "Pat your head and rub your belly"}
               {:path "VipObject.0.BallotMeasureContest.0.Instructions.0.Text.0.language"
                :simple_path "VipObject.BallotMeasureContest.Instructions.Text.language"
                :parent_with_id "VipObject.0.BallotMeasureContest.0.id"
-               :value "en"})
+               :value "en"}
+              {:path "VipObject.0.BallotMeasureContest.0.Instructions.0.Text.0"
+               :simple_path "VipObject.BallotMeasureContest.Instructions.Text"
+               :parent_with_id "VipObject.0.BallotMeasureContest.0.id"
+               :value "Pat your head and rub your belly"})
              (transform-fn idx-fn "VipObject.0.BallotMeasureContest.0" row))))))
 
 (deftest external-identifiers->ltree-test
