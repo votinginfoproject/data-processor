@@ -45,7 +45,9 @@
     :else fips))
 
 (defn zip-filename* [fips election-date]
-  (join "-" ["vipfeed" (format-fips fips) election-date]))
+  (let [fips (format-fips fips)
+        date (util/format-date election-date)]
+    (str (join "-" ["vipfeed" fips date]) ".zip")))
 
 (defn zip-filename
   [{:keys [spec-version tables import-id] :as ctx}]
@@ -60,8 +62,7 @@
                             :elections
                             korma/select
                             first
-                            :date
-                            util/format-date)]
+                            :date)]
       (zip-filename* fips election-date))
 
     "5.1"
@@ -74,7 +75,7 @@
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
   [{:keys [xml-output-file] :as ctx}]
-  (let [zip-name (str (zip-filename ctx) ".zip")
+  (let [zip-name (zip-filename ctx)
         zip-dir (Files/createTempDirectory tmp-path-prefix
                                            (into-array FileAttribute []))
         zip-file (File. (.toFile zip-dir) zip-name)
