@@ -12,5 +12,5 @@
            (zip-filename* "52" "2015/03/27"))))
 
   (testing "poorly formatted dates use a workable filename"
-    (is (= "vipfeed-12345.zip"
+    (is (= "vipfeed-12345-.zip"
            (zip-filename* "12345" nil)))))
