@@ -27,3 +27,11 @@
   (testing "but if it's a partial date, no dice!"
     (is (nil? (format-date "1983/01")))))
 
+(deftest flatten-keys-test
+  (testing "a nested map collapses into a single map"
+    (is (= {[:some :path :to :a] "value"}
+           (flatten-keys {:some {:path {:to {:a "value"}}}}))))
+
+  (testing "when we run into a vector, that becomes part of the value"
+    (is (= {[:to :flatten :or] [:not {:to "flatten"}]}
+           (flatten-keys {:to {:flatten {:or [:not {:to "flatten"}]}}})))))
