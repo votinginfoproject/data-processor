@@ -74,14 +74,14 @@
                text-path (str base-path "." xml-element "." index ".Text.0")
                lang-path (str text-path ".language")]
            (list
-            {:path text-path
-             :simple_path (path->simple-path text-path)
-             :parent_with_id parent-with-id
-             :value value}
             {:path lang-path
              :simple_path (path->simple-path lang-path)
              :parent_with_id parent-with-id
-             :value "en"})))))))
+             :value "en"}
+            {:path text-path
+             :simple_path (path->simple-path text-path)
+             :parent_with_id parent-with-id
+             :value value})))))))
 
 (defn external-identifiers->ltree
   [idx-fn parent-path row]

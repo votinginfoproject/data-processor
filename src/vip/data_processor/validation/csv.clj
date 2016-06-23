@@ -11,6 +11,7 @@
             [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
+            [vip.data-processor.output.tree-xml :as tree-xml]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.transformer :as v5-1-transformers]))
@@ -149,7 +150,8 @@
    "5.1" (concat [(fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
                   (fn [ctx] (assoc ctx :ltree-index 0))
                   load-csvs]
-                 v5-1-transformers/transformers)})
+                 v5-1-transformers/transformers
+                 tree-xml/pipeline)})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines spec-version)]

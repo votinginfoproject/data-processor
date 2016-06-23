@@ -26,5 +26,5 @@
 
 (defn xml-nodes [ctx]
   (let [sql-table (get-in ctx [:tables :street-segments])
-        street-segments (util/select-*-lazily chunk-size sql-table)]
+        street-segments (util/lazy-select chunk-size sql-table)]
     (map ->xml street-segments)))

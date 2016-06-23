@@ -1,5 +1,14 @@
 (ns vip.data-processor.output.xml-helpers
-  (:require [korma.core :as korma]))
+  (:require [korma.core :as korma])
+  (:import [java.nio.file Files]
+           [java.nio.file.attribute FileAttribute]))
+
+(defn create-xml-file
+  [{:keys [filename] :as ctx}]
+  (let [xml-file (Files/createTempFile filename ".xml" (into-array FileAttribute []))]
+    (-> ctx
+        (assoc :xml-output-file xml-file)
+        (update :to-be-cleaned conj xml-file))))
 
 (defmacro xml-node [name]
   (let [tag (keyword name)]
