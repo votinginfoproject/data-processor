@@ -52,6 +52,7 @@
   (concat download-pipeline
           [t/remove-invalid-extensions
            t/xml-csv-branch
+           psql/store-spec-version
            psql/store-public-id
            psql/store-election-id
            add-validations

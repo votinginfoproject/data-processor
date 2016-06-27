@@ -209,6 +209,13 @@
       (assoc ctx :election-id election-id))
     ctx))
 
+(defn store-spec-version [{:keys [spec-version import-id] :as ctx}]
+  (when spec-version
+    (korma/update results
+      (korma/set-fields {:spec_version spec-version})
+      (korma/where {:id import-id})))
+  ctx)
+
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
         filename (:generated-xml-filename ctx)]
