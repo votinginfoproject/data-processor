@@ -94,7 +94,7 @@
           results-ctx (validate-xml-output ctx)]
       (assert-no-problems results-ctx [])))
 
-  (testing "bad XML won't validate, giving an `:error`"
+  (testing "bad XML won't validate, adding to `:errors`"
     (let [bad-xml (-> "xml/malformed.xml"
                       io/resource
                       io/file
@@ -103,4 +103,4 @@
                :vip-version "3.0"}
           results-ctx (validate-xml-output ctx)]
       (is (= '(:invalid-xml)
-             (keys (get-in results-ctx [:error :xml-generation :global])))))))
+             (keys (get-in results-ctx [:errors :xml-generation :global])))))))
