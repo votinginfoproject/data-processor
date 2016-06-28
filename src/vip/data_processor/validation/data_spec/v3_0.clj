@@ -192,7 +192,7 @@
     :stats true
     :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
               {:name "name" :required :critical}
-              {:name "type" :format format/electoral-district-type}
+              {:name "type" :format format/electoral-district-type :severity :warnings}
               {:name "number" :format format/all-digits :coerce coerce/coerce-integer}]}
    {:filename "locality.txt"
     :table :localities

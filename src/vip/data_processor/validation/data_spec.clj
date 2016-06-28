@@ -18,7 +18,7 @@
 (defn create-format-rule
   "Create a function that applies a format check for a specific
   element of an import."
-  [scope {:keys [name required format]}]
+  [scope {:keys [name required format severity] :or {severity :errors}}]
   (let [{:keys [check message]} format
         test-fn (cond
                  (sequential? check) (fn [val]
@@ -40,7 +40,7 @@
           (assoc-in ctx [:errors scope identifier name] ["Is not valid UTF-8."])
 
           (not (test-fn val))
-          (assoc-in ctx [:errors scope identifier name] [(str message ": " val)])
+          (assoc-in ctx [severity scope identifier name] [(str message ": " val)])
 
           :else ctx)))))
 

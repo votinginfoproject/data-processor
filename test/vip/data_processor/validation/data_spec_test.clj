@@ -95,6 +95,16 @@
             (is (= (ffirst (get-in (format-rule ctx {column "abcdefg" "id" id} line-number) [:errors filename id]))
                    column))
             (is (= (ffirst (get-in (format-rule ctx {column "cleveland" "id" id} line-number) [:errors filename id]))
+                   column))))
+        (testing "with a severity key, uses that severity"
+          (let [format-rule (create-format-rule filename
+                                                {:name column
+                                                 :format format/yes-no
+                                                 :severity :warnings})]
+            (is (= (-> ctx
+                       (format-rule {column "nyet" "id" id} line-number)
+                       (get-in [:warnings filename id])
+                       ffirst)
                    column)))))
       (testing "if there's no check function, everything is okay"
         (let [format-rule (create-format-rule filename {:name column})]
