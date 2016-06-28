@@ -1,2 +1,2 @@
-name,election_administration_id,id,state_bird,state_flower
+NAME,election_administration_id,id,state_bird,state_flower
 NORTH CAROLINA,8,1,Cardinal,Dogwood

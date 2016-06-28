@@ -23,7 +23,7 @@
   (.getName file))
 
 (defn good-filename? [data-specs file]
-  (let [filename (clojure.string/lower-case (file-name file))]
+  (let [filename (str/lower-case (file-name file))]
     (contains? (csv-filenames data-specs) filename)))
 
 (defn-traced remove-bad-filenames [ctx]
@@ -58,13 +58,15 @@
         (with-open [in-file (util/bom-safe-reader file-to-load :encoding "UTF-8")]
           (let [headers (->> in-file
                              read-one-line
-                             (map #(clojure.string/replace % #"\W" "")))
+                             (map #(str/replace % #"\W" ""))
+                             (map str/lower-case))
                 headers-count (count headers)
                 sql-table (get-in ctx [:tables table])
                 column-names (map :name columns)
                 required-header-names (->> columns
                                            (filter :required)
-                                           (map :name))
+                                           (map :name)
+                                           (map str/lower-case))
                 extraneous-headers (seq (set/difference (set headers) (set column-names)))
                 transforms (apply comp (data-spec/translation-fns columns))
                 format-rules (data-spec/create-format-rules (:data-specs ctx) filename columns)
