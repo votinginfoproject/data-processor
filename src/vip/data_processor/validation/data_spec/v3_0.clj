@@ -190,6 +190,7 @@
     :table :electoral-districts
     :tag-name :electoral_district
     :stats true
+    :ignore-duplicate-records true
     :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
               {:name "name" :required :critical}
               {:name "type" :format format/electoral-district-type}

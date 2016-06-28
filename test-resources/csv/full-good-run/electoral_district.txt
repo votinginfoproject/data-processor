@@ -1,4 +1,4 @@
 name,type,number,id
 DISTRICT 2,statewide,2,60000
 POWHATAN COUNTY,statewide,,60001
-PORTSMOUTH CITY,statewide,,60002
+POWHATAN COUNTY,statewide,,60002
