@@ -82,3 +82,25 @@
       (is (= "certified" (:certification (xpath/$x:attrs "/vip_object/ballot_line_result" xml-doc))))
       (is (= "unofficial_complete" (:certification (xpath/$x:attrs "/vip_object/contest_result[@id=867001]" xml-doc))))
       (is (= "certified" (:certification (xpath/$x:attrs "/vip_object/contest_result[@id=867002]" xml-doc)))))))
+
+(deftest validate-xml-test
+  (testing "good data generates validatable XML"
+    (let [good-xml (-> "xml/full-good-run.xml"
+                      io/resource
+                      io/file
+                      .toPath)
+          ctx {:xml-output-file good-xml
+               :vip-version "3.0"}
+          results-ctx (validate-xml-output ctx)]
+      (assert-no-problems results-ctx [])))
+
+  (testing "bad XML won't validate, giving an `:error`"
+    (let [bad-xml (-> "xml/malformed.xml"
+                      io/resource
+                      io/file
+                      .toPath)
+          ctx {:xml-output-file bad-xml
+               :vip-version "3.0"}
+          results-ctx (validate-xml-output ctx)]
+      (is (= '(:invalid-xml)
+             (keys (get-in results-ctx [:error :xml-generation :global])))))))
