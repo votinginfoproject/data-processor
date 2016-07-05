@@ -32,4 +32,12 @@
                                (csv/version-pipelines "5.1")
                                v5/validations)}
         out-ctx (pipeline/run-pipeline ctx)]
-    (assert-no-problems out-ctx [])))
+    (assert-no-problems out-ctx [])
+
+    (testing "the data for building a public_id is correctly fetched"
+      (is (= {:date "10/08/2016"
+              :election-type "Edible"
+              :state "Virginia"}
+             (dissoc
+              (psql/get-xml-tree-public-id-data out-ctx)
+              :import-id))))))
