@@ -163,7 +163,7 @@
               "VipObject.0.Election.*{1}.Date.*{1}")
         election-type (find-single-xml-tree-value
                        import-id
-                       "VipObject.0.Election.*{1}.ElectionType.*{1}")]
+                       "VipObject.0.Election.*{1}.ElectionType.*{1}.Text.*{1}")]
     {:date date
      :election-type election-type
      :state state
