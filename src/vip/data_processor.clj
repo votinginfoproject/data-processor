@@ -38,7 +38,8 @@
 
 (def v5-1-validation-pipeline
   (concat v5-1-validations/validations
-          [xml/load-xml-tree-validations]))
+          [xml/load-xml-tree-validations
+           psql/store-tree-stats]))
 
 (defn add-validations
   [{:keys [spec-version] :as ctx}]

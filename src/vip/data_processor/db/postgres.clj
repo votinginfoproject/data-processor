@@ -7,6 +7,7 @@
             [korma.core :as korma]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.statistics :as stats]
+            [vip.data-processor.db.tree-statistics :as tree-stats]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec])
@@ -46,6 +47,9 @@
     (korma/database results-db))
   (korma/defentity xml-tree-validations
     (korma/table "xml_tree_validations")
+    (korma/database results-db))
+  (korma/defentity v5-statistics
+    (korma/table "v5_statistics")
     (korma/database results-db))
   (korma/defentity v5-1-street-segments
     (korma/table "v5_1_street_segments"))
@@ -328,4 +332,11 @@
 (defn store-stats [{:keys [import-id] :as ctx}]
   (korma/insert statistics
                 (korma/values (assoc (stats/stats-map ctx) :results_id import-id)))
+  ctx)
+
+(defn store-tree-stats
+  [{:keys [import-id] :as ctx}]
+  (korma/insert v5-statistics
+    (korma/values
+     (assoc (tree-stats/stats ctx) :results_id import-id)))
   ctx)
