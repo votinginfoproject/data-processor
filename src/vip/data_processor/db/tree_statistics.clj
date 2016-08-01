@@ -1,10 +1,21 @@
 (ns vip.data-processor.db.tree-statistics
   (:require [clojure.string :as str]
             [korma.core :as korma]
-            [vip.data-processor.util :as util]))
+            [vip.data-processor.util :as util]
+            [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.db.translations.util :as t-util]))
 
-(def error-query
-  "WITH errors AS (SELECT subltree(errors.path, 2, 3) AS element_type,
+(defn reported-elements []
+  (->> postgres/v5-statistics
+       postgres/column-names
+       (filter #(str/ends-with? % "_count"))
+       (map #(str/replace % #"_count" ""))
+       (map t-util/column->xml-elment)))
+
+(defn error-query []
+  (let [element-paths (str/join "|" (reported-elements))]
+    (str
+     "WITH errors AS (SELECT subltree(errors.path, 2, 3) AS element_type,
                          COUNT(errors.severity) AS error_count
                   FROM results r
                   LEFT JOIN xml_tree_validations errors ON r.id = errors.results_id
@@ -16,14 +27,14 @@
                   FROM results r
                   LEFT JOIN xml_tree_values values ON r.id = values.results_id
                   WHERE r.id = ?
-                    AND values.path ~ 'VipObject.0.!schemaVersion|xmlnsxsi|xsinoNamespaceSchemaLocation.*'
+                    AND values.path ~ 'VipObject.0." element-paths ".*'
                     AND values.path IS NOT NULL
                   GROUP BY element_type)
   SELECT ltree2text(coalesce(errors.element_type, values.element_type)) AS element,
          coalesce(errors.error_count, 0) as error_count,
          coalesce(values.value_count, 0) as count
   FROM values
-  FULL OUTER JOIN errors ON errors.element_type = values.element_type;")
+  FULL OUTER JOIN errors ON errors.element_type = values.element_type;")))
 
 (def camel-case-splitter #"(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])")
 
@@ -51,6 +62,13 @@
 
 (defn stats
   [{:keys [import-id]}]
-  (->> (korma/exec-raw [error-query [import-id import-id]] :results)
+  (->> (korma/exec-raw [(error-query) [import-id import-id]] :results)
        (map stats-map)
        (reduce merge)))
+
+(defn store-tree-stats
+  [{:keys [import-id] :as ctx}]
+  (korma/insert postgres/v5-statistics
+    (korma/values
+     (assoc (stats ctx) :results_id import-id)))
+  ctx)

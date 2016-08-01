@@ -7,7 +7,6 @@
             [korma.core :as korma]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.statistics :as stats]
-            [vip.data-processor.db.tree-statistics :as tree-stats]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec])
@@ -334,9 +333,10 @@
                 (korma/values (assoc (stats/stats-map ctx) :results_id import-id)))
   ctx)
 
-(defn store-tree-stats
-  [{:keys [import-id] :as ctx}]
-  (korma/insert v5-statistics
-    (korma/values
-     (assoc (tree-stats/stats ctx) :results_id import-id)))
-  ctx)
+(defn columns [table]
+  (let [table-name (:table table)]
+    (korma/select "information_schema.columns"
+      (korma/where {:table_name table-name}))))
+
+(defn column-names [table]
+  (map :column_name (columns table)))

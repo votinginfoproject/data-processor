@@ -9,6 +9,7 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
+            [vip.data-processor.db.tree-statistics :as tree-stats]
             [vip.data-processor.validation.db.v3-0 :as db.v3-0]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.v5 :as v5-1-validations]
@@ -39,7 +40,7 @@
 (def v5-1-validation-pipeline
   (concat v5-1-validations/validations
           [xml/load-xml-tree-validations
-           psql/store-tree-stats]))
+           tree-stats/store-tree-stats]))
 
 (defn add-validations
   [{:keys [spec-version] :as ctx}]
