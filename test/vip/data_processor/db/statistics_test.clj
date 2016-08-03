@@ -11,5 +11,19 @@
                                                    {"" "Too short"}
                                                    {"Christopher" "Already taken"}]}}}
                :critical {table-name {4 {:just-some-more [1 2 3 4]}}}
-               :fatal {:this-one-doesnt-have-that-table {:global {:not-there ["So it will contribute 0 to the count"]}}}}]
+               :fatal {:this-one-doesnt-have-that-table
+                       {:global {:not-there ["So it will contribute 0 to the count"]}}}}]
       (is (= 9 (error-count table-name ctx))))))
+
+(deftest complete-test
+  (testing "rows less errors gives the success percentage"
+    (let [rows 400 errors 24]
+      (is (= 94 (complete rows errors)))))
+
+  (testing "when there are no rows and no errors, we have 100% completionn"
+    (let [rows 0 errors 0]
+      (is (= 100 (complete rows errors)))))
+
+  (testing "when there are more errors than rows, we have 0% completion"
+    (let [rows 0 errors 1]
+      (is (= 0 (complete rows errors))))))

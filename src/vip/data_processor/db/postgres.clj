@@ -47,6 +47,9 @@
   (korma/defentity xml-tree-validations
     (korma/table "xml_tree_validations")
     (korma/database results-db))
+  (korma/defentity v5-statistics
+    (korma/table "v5_statistics")
+    (korma/database results-db))
   (korma/defentity v5-1-street-segments
     (korma/table "v5_1_street_segments"))
   (def v5-1-tables
@@ -329,3 +332,11 @@
   (korma/insert statistics
                 (korma/values (assoc (stats/stats-map ctx) :results_id import-id)))
   ctx)
+
+(defn columns [table]
+  (let [table-name (:table table)]
+    (korma/select "information_schema.columns"
+      (korma/where {:table_name table-name}))))
+
+(defn column-names [table]
+  (map :column_name (columns table)))
