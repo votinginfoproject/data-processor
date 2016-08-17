@@ -38,6 +38,13 @@
             (assoc :input good-files)))
       ctx)))
 
+(defn csv-error-path [filename line-number]
+  (str "CSVError.0."
+       (-> filename
+           (str/split #"\.")
+           first)
+       "." line-number))
+
 (defn read-one-line
   "Reads one line at a time from a reader and parses it as a CSV
   string. Does not close the reader at the end, that's your job."
@@ -107,11 +114,7 @@
                                       (db.util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
                                       (let [identifier (if (= "3.0" (:spec-version ctx))
                                                          @line-number
-                                                         (str "CSVError.0."
-                                                              (-> filename
-                                                                  (str/split #"\.")
-                                                                  first)
-                                                              "." @line-number))]
+                                                         (csv-error-path filename @line-number))]
                                         (assoc-in ctx [:fatal (:name sql-table) identifier :unknown-sql-error]
                                                   [message])))))))
                             ctx))
