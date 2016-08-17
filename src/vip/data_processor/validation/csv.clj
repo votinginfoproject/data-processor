@@ -105,8 +105,15 @@
                                   (let [message (.getMessage e)]
                                     (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
                                       (db.util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
-                                      (assoc-in ctx [:fatal (:name sql-table) @line-number :unknown-sql-error]
-                                                [message]))))))
+                                      (let [identifier (if (= "3.0" (:spec-version ctx))
+                                                         @line-number
+                                                         (str "CSVError.0."
+                                                              (-> filename
+                                                                  (str/split #"\.")
+                                                                  first)
+                                                              "." @line-number))]
+                                        (assoc-in ctx [:fatal (:name sql-table) identifier :unknown-sql-error]
+                                                  [message])))))))
                             ctx))
                         ctx (db.util/chunk-rows (csv/read-csv in-file)
                                                 sqlite/statement-parameter-limit))))))
