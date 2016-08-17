@@ -34,7 +34,8 @@
          coalesce(errors.error_count, 0) as error_count,
          coalesce(values.value_count, 0) as count
   FROM values
-  FULL OUTER JOIN errors ON errors.element_type = values.element_type;")))
+  FULL OUTER JOIN errors ON errors.element_type = values.element_type
+  WHERE values.element_type IS NOT NULL;")))
 
 (def camel-case-splitter #"(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])")
 
