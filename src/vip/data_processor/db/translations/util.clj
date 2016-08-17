@@ -155,10 +155,10 @@
   (fn [{:keys [ltree-index import-id] :as ctx}]
     (let [idx-fn (index-generator ltree-index)
           ltree-rows (mapcat (partial ltree-fn idx-fn)
-                             (row-fn import-id))]
-      (if (seq ltree-rows)
-        (do
-          (korma/insert postgres/xml-tree-values
-            (korma/values (prep-for-insertion import-id ltree-rows)))
-          (assoc ctx :ltree-index (idx-fn)))
+                             (row-fn import-id))
+          rows (prep-for-insertion import-id ltree-rows)]
+      (if (seq rows)
+        (-> ctx
+            (postgres/bulk-import postgres/xml-tree-values rows)
+            (assoc :ltree-index (idx-fn)))
         ctx))))
