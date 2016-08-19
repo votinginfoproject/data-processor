@@ -95,9 +95,12 @@
                                                       ctx (data-spec/apply-format-rules format-rules ctx row-map @line-number)]
                                                   (if (= headers-count row-count)
                                                     ctx
-                                                    (assoc-in ctx [:critical table @line-number :number-of-values]
-                                                              [(str "Expected " headers-count
-                                                                    " values, found " row-count)]))))
+                                                    (let [identifier (if (= "3.0" (:spec-version ctx))
+                                                                       @line-number
+                                                                       (csv-error-path filename @line-number))]
+                                                      (assoc-in ctx [:critical table identifier :number-of-values]
+                                                                [(str "Expected " headers-count
+                                                                      " values, found " row-count)])))))
                                               ctx chunk)
                                   chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)
                                   chunk-values (if (= "postgresql" (get-in sql-table [:db :options :subprotocol]))
