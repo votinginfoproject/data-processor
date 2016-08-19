@@ -67,6 +67,7 @@
 
 (deftest report-bad-rows-test
   (let [ctx (merge {:input (csv-inputs ["bad-number-of-values/contest.txt"])
+                    :spec-version "3.0"
                     :data-specs v3-0/data-specs}
                    (sqlite/temp-db "bad-number-of-values" "3.0"))
         out-ctx (load-csvs ctx)]
