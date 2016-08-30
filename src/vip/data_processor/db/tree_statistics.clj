@@ -15,22 +15,22 @@
 (defn error-query []
   (let [element-paths (str/join "|" (reported-elements))]
     (str
-     "WITH errors AS (SELECT subltree(errors.path, 2, 3) AS element_type,
+     "WITH errors AS (SELECT element_type(errors.path) AS element_type,
                          COUNT(errors.severity) AS error_count
                   FROM results r
                   LEFT JOIN xml_tree_validations errors ON r.id = errors.results_id
                   WHERE r.id = ?
                     AND errors.path IS NOT NULL
                   GROUP BY element_type),
-       values AS (SELECT subltree(values.path, 2, 3) AS element_type,
-                         COUNT(values.path) as value_count
+       values AS (SELECT element_type(values.path) AS element_type,
+                         COUNT(DISTINCT countable_path(values.path)) as value_count
                   FROM results r
                   LEFT JOIN xml_tree_values values ON r.id = values.results_id
                   WHERE r.id = ?
                     AND values.path ~ 'VipObject.0." element-paths ".*'
                     AND values.path IS NOT NULL
                   GROUP BY element_type)
-  SELECT ltree2text(coalesce(errors.element_type, values.element_type)) AS element,
+  SELECT coalesce(errors.element_type, values.element_type) AS element,
          coalesce(errors.error_count, 0) as error_count,
          coalesce(values.value_count, 0) as count
   FROM values
