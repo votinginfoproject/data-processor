@@ -23,7 +23,7 @@
                     AND errors.path IS NOT NULL
                   GROUP BY element_type),
        values AS (SELECT element_type(values.path) AS element_type,
-                         COUNT(values.path) as value_count
+                         COUNT(DISTINCT countable_path(values.path)) as value_count
                   FROM results r
                   LEFT JOIN xml_tree_values values ON r.id = values.results_id
                   WHERE r.id = ?
