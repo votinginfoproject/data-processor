@@ -31,33 +31,18 @@
 (defn voter-service->ltree [vss parent-with-id]
   (fn [idx-fn parent-path _]
     (mapcat (fn [vs]
-              (when-not (every? #(clojure.string/blank? (get vs %))
-                                [:ci_address_line_1
-                                 :ci_address_line_2
-                                 :ci_address_line_3
-                                 :ci_directions
-                                 :ci_email
-                                 :ci_fax
-                                 :ci_hours
-                                 :ci_hours_open_id
-                                 :ci_latitude
-                                 :ci_longitude
-                                 :ci_latlng_source
-                                 :ci_name
-                                 :ci_phone
-                                 :ci_uri])
-                (let [path (str parent-path ".VoterService." (idx-fn))
-                      label-path (str path ".label")
-                      sub-idx-fn (util/index-generator 0)]
-                  (conj
-                   (mapcat #(% sub-idx-fn path vs)
-                           [(ci/contact-information->ltree)
-                            (util/internationalized-text->ltree :description)
-                            (util/simple-value->ltree :election_official_person_id)
-                            (util/simple-value->ltree :type)
-                            (util/simple-value->ltree :other_type)])
-                   {:path label-path
-                    :simple_path (util/path->simple-path label-path)
-                    :value (:id vs)
-                    :parent_with_id parent-with-id}))))
+              (let [path (str parent-path ".VoterService." (idx-fn))
+                    label-path (str path ".label")
+                    sub-idx-fn (util/index-generator 0)]
+                (conj
+                 (mapcat #(% sub-idx-fn path vs)
+                         [(ci/contact-information->ltree)
+                          (util/internationalized-text->ltree :description)
+                          (util/simple-value->ltree :election_official_person_id)
+                          (util/simple-value->ltree :type)
+                          (util/simple-value->ltree :other_type)])
+                 {:path label-path
+                  :simple_path (util/path->simple-path label-path)
+                  :value (:id vs)
+                  :parent_with_id parent-with-id})))
             vss)))
