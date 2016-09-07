@@ -127,7 +127,7 @@
    "locality_early_vote_site.txt" (and "locality.txt"
                                        "early_vote_site.txt")
    "polling_location.txt" (or "precinct_polling_location.txt"
-                              "precinct_polling_location.txt")
+                              "precinct_split_polling_location.txt")
    "precinct_early_vote_site.txt" (and "precinct.txt"
                                        "early_vote_site.txt")
    "precinct_electoral_district.txt" (and "precinct.txt"

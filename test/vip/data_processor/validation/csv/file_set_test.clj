@@ -34,3 +34,24 @@
         (assert-some-problem out-ctx [:ballots :global :missing-dependency])
         (assert-some-problem out-ctx [:precincts :global :missing-dependency])
         (assert-error-format out-ctx)))))
+
+(deftest validate-v3-dependencies-test
+  (let [validator (validate-dependencies v3-0-file-dependencies)]
+    (testing "polling_location.txt dependencies"
+      (testing "with precinct splits"
+        (let [ctx {:input [(File. "polling_location.txt")
+                           (File. "precinct.txt")
+                           (File. "precinct_split.txt")
+                           (File. "polling_location.txt")
+                           (File. "precinct_split_polling_location.txt")]
+                   :data-specs v3-0/data-specs}
+              out-ctx (validator ctx)]
+          (assert-no-problems out-ctx [])))
+      (testing "with precincts"
+        (let [ctx {:input [(File. "polling_location.txt")
+                           (File. "precinct.txt")
+                           (File. "polling_location.txt")
+                           (File. "precinct_polling_location.txt")]
+                   :data-specs v3-0/data-specs}
+              out-ctx (validator ctx)]
+          (assert-no-problems out-ctx []))))))
