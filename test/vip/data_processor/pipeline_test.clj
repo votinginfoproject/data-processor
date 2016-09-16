@@ -46,8 +46,4 @@
           pipeline [incrementor incrementor incrementor]
           result (process pipeline intial-input)]
       (is (= 3 (:input result)))
-      (is (empty? (:pipeline result)))
-      (is (empty? (:warnings result)))
-      (is (empty? (:errors result)))
-      (is (empty? (:critical result)))
-      (is (empty? (:fatal result))))))
+      (is (empty? (:pipeline result))))))

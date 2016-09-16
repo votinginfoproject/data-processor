@@ -3,42 +3,65 @@
             [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.validation.xml :as xml]))
+            [vip.data-processor.validation.xml :as xml]
+            [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
 (use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres validate-test
   (testing "Locality elements"
-    (let [ctx {:input (xml-input "v5-localities.xml")}
+    (let [errors-chan (a/chan 100)
+          ctx {:input (xml-input "v5-localities.xml")
+               :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
                       xml/load-xml-ltree
-                      v5.district-type/validate)]
+                      v5.district-type/validate)
+          errors (all-errors errors-chan)]
       (testing "type missing is OK"
-        (is (not (get-in out-ctx [:errors :locality
-                                  "VipObject.0.Locality.0.Type" :missing]))))
+        (assert-no-problems-2 errors
+                              {:severity :errors
+                               :scope :locality
+                               :identifier "VipObject.0.Locality.0.Type"
+                               :error-type :missing}))
       (testing "type present and valid is OK"
-        (is (not (get-in out-ctx [:errors :locality
-                                  "VipObject.0.Locality.1.Type.2" :format]))))
+        (assert-no-problems-2 errors
+                              {:severity :errors
+                               :scope :locality
+                               :identifier "VipObject.0.Locality.1.Type.2"
+                               :error-type :format}))
       (testing "type present and invalid is an error"
-        (is (get-in out-ctx [:errors :locality
-                             "VipObject.0.Locality.2.Type.2" :format])))))
+        (is (contains-error? errors
+                             {:severity :errors
+                              :scope :locality
+                              :identifier "VipObject.0.Locality.2.Type.2"
+                              :error-type :format})))))
   (testing "ElectoralDistrict elements"
-    (let [ctx {:input (xml-input "v5-electoral-districts.xml")}
+    (let [errors-chan (a/chan 100)
+          ctx {:input (xml-input "v5-electoral-districts.xml")
+               :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
                       xml/load-xml-ltree
-                      v5.district-type/validate)]
+                      v5.district-type/validate)
+          errors (all-errors errors-chan)]
       (testing "type valid is OK"
-        (is (not (get-in out-ctx [:errors :electoral-district
-                                  "VipObject.0.ElectoralDistrict.0.Type.1" :format])))
-        (is (not (get-in out-ctx [:errors :electoral-district
-                                  "VipObject.0.ElectoralDistrict.1.Type.1" :format])))
-        (is (not (get-in out-ctx [:errors :electoral-district
-                                  "VipObject.0.ElectoralDistrict.4.Type.0" :format]))))
+        (are [path]
+            (assert-no-problems-2 errors
+                                  {:severity :errors
+                                   :scope :electoral-district
+                                   :identifier path
+                                   :error-type :format})
+          "VipObject.0.ElectoralDistrict.0.Type.1"
+          "VipObject.0.ElectoralDistrict.1.Type.1"
+          "VipObject.0.ElectoralDistrict.4.Type.0"))
       (testing "type invalid is an error"
-        (is (get-in out-ctx [:errors :electoral-district
-                             "VipObject.0.ElectoralDistrict.2.Type.1" :format]))
-        (is (get-in out-ctx [:errors :electoral-district
-                             "VipObject.0.ElectoralDistrict.3.Type.1" :format]))))))
+        (are [path]
+            (is (contains-error? errors
+                                 {:severity :errors
+                                  :scope :electoral-district
+                                  :identifier path
+                                  :error-type :format}))
+          "VipObject.0.ElectoralDistrict.2.Type.1"
+          "VipObject.0.ElectoralDistrict.3.Type.1")))))

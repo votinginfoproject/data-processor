@@ -4,7 +4,8 @@
             [korma.core :as korma]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.db.util :as db.util])
+            [vip.data-processor.db.util :as db.util]
+            [clojure.tools.logging :as log])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [org.apache.commons.lang StringEscapeUtils]))
@@ -92,12 +93,16 @@
   (with-open [f (io/writer (.toFile file))]
     (.write f (str "<?xml version=\"1.0\"?>\n<VipObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" schemaVersion=\"" spec-version "\" xsi:noNamespaceSchemaLocation=\"http://votinginfoproject.github.com/vip-specification/vip_spec.xsd\">\n"))
     (let [last-seen-path (atom "VipObject.0")
-          inside-open-tag (atom false)]
+          inside-open-tag (atom false)
+          values-written (atom 0)]
       (doseq [{:keys [path value simple_path] :as row}
               (db.util/lazy-select 100000
                                    postgres/xml-tree-values
                                    (korma/where {:results_id import-id})
                                    (korma/order :insert_counter :ASC))]
+        (swap! values-written inc)
+        (when (= (mod @values-written 100000) 0)
+          (log/info "Wrote" @values-written "values"))
         (let [path (.getValue path)
               simple_path (.getValue simple_path)
               escaped-value (StringEscapeUtils/escapeXml value)]
@@ -138,7 +143,7 @@
         (.write f (closing-tags to-close))))))
 
 (defn generate-xml-file [{:keys [spec-version import-id xml-output-file] :as ctx}]
-  (write-xml xml-output-file spec-version import-id)
+  (write-xml xml-output-file @spec-version import-id)
   ctx)
 
 (def pipeline

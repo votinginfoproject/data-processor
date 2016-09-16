@@ -3,21 +3,30 @@
             [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.validation.xml :as xml]))
+            [vip.data-processor.validation.xml :as xml]
+            [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
 (use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres validate-no-missing-party-ids-test
-  (let [ctx {:input (xml-input "v5-party-selections.xml")}
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-party-selections.xml")
+             :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.party-selection/validate-no-missing-party-ids)]
+                    v5.party-selection/validate-no-missing-party-ids)
+        errors (all-errors errors-chan)]
     (testing "party-ids missing is an error"
-      (is (get-in out-ctx [:errors :party-selection
-                           "VipObject.0.PartySelection.0.PartyIds" :missing])))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :party-selection
+                            :identifier "VipObject.0.PartySelection.0.PartyIds"
+                            :error-type :missing})))
     (testing "party-ids present is OK"
-      (is (not (get-in out-ctx [:errors :party-selection
-                                "VipObject.0.PartySelection.1.PartyIds"
-                                :missing]))))))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :party-selection
+                             :identifier "VipObject.0.PartySelection.1.PartyIds"
+                             :error-type :missing}))))

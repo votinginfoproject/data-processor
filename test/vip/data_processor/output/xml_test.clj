@@ -10,7 +10,8 @@
             [vip.data-processor.validation.transforms :as transforms]
             [clojure.java.io :as io]
             [clojure.xml :as xml]
-            [clj-xpath.core :as xpath])
+            [clj-xpath.core :as xpath]
+            [clojure.core.async :as a])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
@@ -22,6 +23,7 @@
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
           ctx (merge {:input filenames
+                      :spec-version (atom "3.0")
                       :pipeline (concat [(data-spec/add-data-specs
                                           v3-0/data-specs)]
                                         transforms/csv-validations
@@ -95,12 +97,18 @@
       (assert-no-problems results-ctx [])))
 
   (testing "bad XML won't validate, adding to `:errors`"
-    (let [bad-xml (-> "xml/malformed.xml"
+    (let [errors-chan (a/chan 100)
+          bad-xml (-> "xml/malformed.xml"
                       io/resource
                       io/file
                       .toPath)
           ctx {:xml-output-file bad-xml
+               :errors-chan errors-chan
                :vip-version "3.0"}
-          results-ctx (validate-xml-output ctx)]
-      (is (= '(:invalid-xml)
-             (keys (get-in results-ctx [:errors :xml-generation :global])))))))
+          results-ctx (validate-xml-output ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :xml-generation
+                            :identifier :global
+                            :error-type :invalid-xml})))))

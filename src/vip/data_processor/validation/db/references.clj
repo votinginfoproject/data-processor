@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.db.references
   (:require [vip.data-processor.validation.db.util :as util]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [vip.data-processor.errors :as errors]))
 
 (defn unmatched-references [tables from via to]
   (let [from-table (tables from)
@@ -25,8 +26,8 @@
                                           (:name column)
                                           (:references column))]
                 (reduce (fn [ctx unmatched-reference]
-                          (update-in ctx [:errors table (:id unmatched-reference) :unmatched-reference]
-                                     conj {(:name column) (get unmatched-reference (keyword (:name column)))}))
+                          (errors/add-errors ctx :errors table (:id unmatched-reference) :unmatched-reference
+                                             {(:name column) (get unmatched-reference (keyword (:name column)))}))
                         ctx unmatched-references)))
             ctx
             reference-columns)))

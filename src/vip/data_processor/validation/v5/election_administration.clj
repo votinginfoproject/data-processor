@@ -2,6 +2,7 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.v5.util :as util]
+            [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]))
 
 (def validate-no-missing-departments
@@ -34,8 +35,8 @@
                                      (comp valid-voter-service-type? :value)
                                      imported-voter-service-types)]
     (reduce (fn [ctx row]
-              (update-in ctx
-                         [:errors :election-administration
-                          (-> row :path .getValue) :format]
-                         conj (:value row)))
+              (errors/add-errors ctx
+                                 :errors :election-administration
+                                 (-> row :path .getValue) :format
+                                 (:value row)))
             ctx invalid-voter-service-types)))

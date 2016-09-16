@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.db.duplicate-records
   (:require [vip.data-processor.db.sqlite :as sqlite]
             [clojure.string :as str]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [vip.data-processor.errors :as errors]))
 
 (defn columns-without-id [table]
   (remove (partial = "id") (sqlite/column-names table)))
@@ -46,6 +47,6 @@
   (let [sql-table (get-in ctx [:tables table])
         potential-dupes (find-potential-dupes sql-table)]
     (reduce (fn [ctx dupe]
-              (update-in ctx [:warnings table (:id dupe) :duplicate-rows]
-                         conj dupe))
+              (errors/add-errors ctx :warnings table (:id dupe) :duplicate-rows
+                                 dupe))
             ctx potential-dupes)))

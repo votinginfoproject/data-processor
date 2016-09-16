@@ -9,7 +9,8 @@
             [vip.data-processor.validation.transforms :refer :all]
             [vip.data-processor.db.sqlite :as sqlite]
             [clojure.java.io :as io]
-            [korma.core :as korma])
+            [korma.core :as korma]
+            [clojure.core.async :as a])
   (:import [java.io File]))
 
 (deftest csv-validations-test
@@ -19,9 +20,11 @@
                          csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
-          ctx (merge {:input filenames :pipeline (concat [(data-spec/add-data-specs v3-0/data-specs)]
-                                                         csv-validations
-                                                         db/validations)} db)
+          ctx (merge {:input filenames
+                      :spec-version (atom nil)
+                      :pipeline (concat [(data-spec/add-data-specs v3-0/data-specs)]
+                                        csv-validations
+                                        db/validations)} db)
           results-ctx (pipeline/run-pipeline ctx)]
       (is (nil? (:stop results-ctx)))
       (is (nil? (:exception results-ctx)))
@@ -29,21 +32,35 @@
 
 (deftest remove-invalid-extensions-test
   (testing "removes non-csv, txt, or xml files from :input"
-    (let [ctx {:input [(File. "good-file.xml")
+    (let [errors-chan (a/chan 100)
+          ctx {:input [(File. "good-file.xml")
                        (File. "not-so-good-file.xls")
-                       (File. "logo.ai")]}
-          results-ctx (remove-invalid-extensions ctx)]
+                       (File. "logo.ai")]
+               :errors-chan errors-chan}
+          results-ctx (remove-invalid-extensions ctx)
+          errors (all-errors errors-chan)]
       (is (= 1 (count (:input results-ctx))))
       (is (= "good-file.xml" (-> results-ctx :input first .getName)))
-      (is (= #{"not-so-good-file.xls" "logo.ai"} (set (get-in results-ctx [:warnings :import :global :invalid-extensions]))))))
+      (is (contains-error? errors
+                           {:severity :warnings
+                            :scope :import
+                            :identifier :global
+                            :error-type :invalid-extensions
+                            :error-value '("not-so-good-file.xls" "logo.ai")}))))
   (testing "allows uppercase file extensions"
-    (let [ctx {:input [(File. "this-is-okay.XML")
+    (let [errors-chan (a/chan 100)
+          ctx {:input [(File. "this-is-okay.XML")
                        (File. "so-is-this.TXT")
-                       (File. "but-not-this.NAIL")]}
-          results-ctx (remove-invalid-extensions ctx)]
+                       (File. "but-not-this.NAIL")]
+               :errors-chan errors-chan}
+          results-ctx (remove-invalid-extensions ctx)
+          errors (all-errors errors-chan)]
       (is (= [(File. "this-is-okay.XML")
               (File. "so-is-this.TXT")]
              (:input results-ctx)))
-      (is (= ["but-not-this.NAIL"]
-             (get-in results-ctx
-                     [:warnings :import :global :invalid-extensions]))))))
+      (is (contains-error? errors
+                           {:severity :warnings
+                            :scope :import
+                            :identifier :global
+                            :error-type :invalid-extensions
+                            :error-value '("but-not-this.NAIL")})))))

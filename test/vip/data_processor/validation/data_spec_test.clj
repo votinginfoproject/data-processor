@@ -6,7 +6,8 @@
             [vip.data-processor.validation.data-spec.coerce :as coerce]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.data-spec.value-format :as format]
-            [vip.data-processor.db.sqlite :as sqlite]))
+            [vip.data-processor.db.sqlite :as sqlite]
+            [clojure.core.async :as a]))
 
 (deftest coerce-rows-test
   (let [rows [{:id "1" :race "Mayor" :partisan 0 :date "2015-08-01"}
@@ -43,89 +44,182 @@
         filename "test.txt"
         id "3"
         line-number 7
-        ctx {}
         format {:check #"\A\d+\z"
                 :message "Invalid data type"}]
     (testing "with an id, uses the id"
       (testing "required column"
         (let [format-rule (create-format-rule filename {:name column :required :critical :format format})]
           (testing "if the required column is missing, adds an error of the specified severity"
-            (let [result-ctx (format-rule ctx {column "" "id" id} line-number)]
-              (is (= (ffirst (get-in result-ctx [:critical filename id]))
-                     column))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "" "id" id} line-number)
+                  errors (all-errors errors-chan)]
+              (is (contains-error? errors
+                                   {:severity :critical
+                                    :scope filename
+                                    :identifier id
+                                    :error-type column}))))
           (testing "if the column doesn't have the right format, adds an error"
-            (let [result-ctx (format-rule ctx {column "asdf" "id" id} line-number)]
-              (is (= (ffirst (get-in result-ctx [:errors filename id]))
-                     column))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "asdf" "id" id} line-number)
+                  errors (all-errors errors-chan)]
+              (is (contains-error? errors
+                                   {:severity :errors
+                                    :scope filename
+                                    :identifier id
+                                    :error-type column}))))
           (testing "if the required column is there and matches the format, is okay"
-            (let [result-ctx (format-rule ctx {column "1234" "id" id} line-number)]
-              (is (= ctx result-ctx))))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "1234" "id" id} line-number)
+                  errors (all-errors errors-chan)]
+              (is (assert-no-problems-2 errors {}))))))
       (testing "optional column"
         (let [format-rule (create-format-rule filename {:name column :format format})]
           (testing "if it's not there, it's okay"
-            (let [result-ctx (format-rule ctx {} line-number)]
-              (is (= ctx result-ctx))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {} line-number)
+                  errors (all-errors errors-chan)]
+              (is (assert-no-problems-2 errors {}))))
           (testing "if it is there"
             (testing "it matches the format, everything's okay"
-              (let [result-ctx (format-rule ctx {column "1234" "id" id} line-number)]
-                (is (= ctx result-ctx))))
+              (let [errors-chan (a/chan 100)
+                    ctx {:errors-chan errors-chan}
+                    result-ctx (format-rule ctx {column "1234" "id" id} line-number)
+                    errors (all-errors errors-chan)]
+                (is (assert-no-problems-2 errors {}))))
             (testing "it doesn't match the format, you get an error"
-              (let [result-ctx (format-rule ctx {column "asdf" "id" id} line-number)]
-                (is (= (ffirst (get-in result-ctx [:errors filename id]))
-                       column)))))))
+              (let [errors-chan (a/chan 100)
+                    ctx {:errors-chan errors-chan}
+                    result-ctx (format-rule ctx {column "asdf" "id" id} line-number)
+                    errors (all-errors errors-chan)]
+                (is (contains-error? errors
+                                     {:severity :errors
+                                      :scope filename
+                                      :identifier id
+                                      :error-type column})))))))
       (testing "a check that is a list of options"
         (let [format-rule (create-format-rule filename {:name column :format format/yes-no})]
           (testing "matches"
-            (is (= ctx (format-rule ctx {column "yes" "id" id} line-number)))
-            (is (= ctx (format-rule ctx {column "no" "id" id} line-number))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "yes" "id" id} line-number)
+                  errors (all-errors errors-chan)]
+              (is (assert-no-problems-2 errors {})))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "no" "id" id} line-number)
+                  errors (all-errors errors-chan)]
+              (is (assert-no-problems-2 errors {}))))
           (testing "non-matches"
-            (is (= (ffirst (get-in (format-rule ctx {column "YEP!" "id" id} line-number) [:errors filename id]))
-                   column))
-            (is (= (ffirst (get-in (format-rule ctx {column "no way" "id" id} line-number) [:errors filename id]))
-                   column)))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "YEP!" "id" id} line-number)
+                  errors (all-errors errors-chan)]
+              (is (contains-error? errors
+                                   {:severity :errors
+                                    :scope filename
+                                    :identifier id
+                                    :error-type column})))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "no way" "id" id} line-number)
+                  errors (all-errors errors-chan)]
+              (is (contains-error? errors
+                                   {:severity :errors
+                                    :scope filename
+                                    :identifier id
+                                    :error-type column}))))
           (testing "matches of all kinds of cases"
-            (is (= ctx (format-rule ctx {column "YES" "id" id} line-number)))
-            (is (= ctx (format-rule ctx {column "NO" "id" id} line-number)))
-            (is (= ctx (format-rule ctx {column "Yes" "id" id} line-number))))))
+            (are [value]
+                (let [errors-chan (a/chan 100)
+                      ctx {:errors-chan errors-chan}
+                      result-ctx (format-rule ctx {column value "id" id} line-number)
+                      errors (all-errors errors-chan)]
+                  (is (assert-no-problems-2 errors {})))
+              "YES"
+              "NO"
+              "Yes"))))
       (testing "a check that is a function"
         (let [palindrome? (fn [v] (= v (clojure.string/reverse v)))
               format-rule (create-format-rule filename {:name column :format {:check palindrome? :message "Not a palindrome"}})]
           (testing "matches"
-            (is (= ctx (format-rule ctx {column "able was I ere I saw elba" "id" id} line-number)))
-            (is (= ctx (format-rule ctx {column "racecar" "id" id} line-number))))
+            (are [value]
+                (let [errors-chan (a/chan 100)
+                      ctx {:errors-chan errors-chan}
+                      result-ctx (format-rule ctx {column value "id" id} line-number)
+                      errors (all-errors errors-chan)]
+                  (is (assert-no-problems-2 errors {})))
+              "able was I ere I saw elba"
+              "racecar"))
           (testing "non-matches"
-            (is (= (ffirst (get-in (format-rule ctx {column "abcdefg" "id" id} line-number) [:errors filename id]))
-                   column))
-            (is (= (ffirst (get-in (format-rule ctx {column "cleveland" "id" id} line-number) [:errors filename id]))
-                   column))))
+            (are [value]
+                (let [errors-chan (a/chan 100)
+                      ctx {:errors-chan errors-chan}
+                      result-ctx (format-rule ctx {column value "id" id} line-number)
+                      errors (all-errors errors-chan)]
+                  (is (contains-error? errors
+                                       {:severity :errors
+                                        :scope filename
+                                        :identifier id
+                                        :error-type column})))
+              "abcdefg"
+              "cleveland")))
         (testing "with a severity key, uses that severity"
           (let [format-rule (create-format-rule filename
                                                 {:name column
                                                  :format format/yes-no
-                                                 :severity :warnings})]
-            (is (= (-> ctx
-                       (format-rule {column "nyet" "id" id} line-number)
-                       (get-in [:warnings filename id])
-                       ffirst)
-                   column)))))
+                                                 :severity :warnings})
+                errors-chan (a/chan 100)
+                ctx {:errors-chan errors-chan}
+                results-ctx (format-rule ctx {column "nyet" "id" id} line-number)
+                errors (all-errors errors-chan)]
+            (is (contains-error? errors
+                                 {:severity :warnings
+                                  :scope filename
+                                  :identifier id
+                                  :error-type column})))))
       (testing "if there's no check function, everything is okay"
         (let [format-rule (create-format-rule filename {:name column})]
-          (is (= ctx (format-rule ctx {column "hi" "id" id} line-number)))
-          (is (= ctx (format-rule ctx {"id" id} line-number))))))
+          (are [value]
+              (let [errors-chan (a/chan 100)
+                    ctx {:errors-chan errors-chan}
+                    result-ctx (format-rule ctx {column value "id" id} line-number)
+                    errors (all-errors errors-chan)]
+                (is (assert-no-problems-2 errors {})))
+            "hi"
+            nil))))
     (testing "without an id, uses the line number"
       (testing "required column"
         (let [format-rule (create-format-rule filename {:name column :required :fatal :format format})]
           (testing "if the required column is missing, adds an error of the specified severity"
-            (let [result-ctx (format-rule ctx {column ""} line-number)]
-              (is (= (ffirst (get-in result-ctx [:fatal filename line-number]))
-                     column))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column ""} line-number)
+                  errors (all-errors errors-chan)]
+              (is (contains-error? errors
+                                   {:severity :fatal
+                                    :scope filename
+                                    :identifier line-number
+                                    :error-type column}))))
           (testing "if the column doesn't have the right format, adds an error"
-            (let [result-ctx (format-rule ctx {column "asdf"} line-number)]
-              (is (= (ffirst (get-in result-ctx [:errors filename line-number]))
-                     column))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "asdf"} line-number)
+                  errors (all-errors errors-chan)]
+              (is (contains-error? errors
+                                   {:severity :errors
+                                    :scope filename
+                                    :identifier line-number
+                                    :error-type column}))))
           (testing "if the required column is there and matches the format, is okay"
-            (let [result-ctx (format-rule ctx {column "1234"} line-number)]
-              (is (= ctx result-ctx)))))))
+            (let [errors-chan (a/chan 100)
+                  ctx {:errors-chan errors-chan}
+                  result-ctx (format-rule ctx {column "1234"} line-number)
+                  errors (all-errors errors-chan)]
+              (assert-no-problems-2 errors {}))))))
     (testing "with a severity set on the format"
       (let [format {:check #"\A\d+\z"
                     :message "Invalid data type"
@@ -134,24 +228,43 @@
                                                       :required :fatal
                                                       :format format})]
         (testing "not overridden creates errors at the format's severity"
-          (let [result-ctx (format-rule ctx {column "asdf"} line-number)]
-            (is (= (ffirst (get-in result-ctx [:fatal filename line-number]))
-                   column))))
+          (let [errors-chan (a/chan 100)
+                ctx {:errors-chan errors-chan}
+                result-ctx (format-rule ctx {column "asdf"} line-number)
+                errors (all-errors errors-chan)]
+            (is (contains-error? errors
+                                 {:severity :fatal
+                                  :scope filename
+                                  :identifier line-number
+                                  :error-type column}))))
         (testing "overridden creates errors at the override severity"
           (let [format-rule (create-format-rule filename {:name column
                                                           :required :fatal
                                                           :format format
                                                           :severity :warnings})
-                result-ctx (format-rule ctx {column "asdf"} line-number)]
-            (is (= (ffirst (get-in result-ctx [:warnings filename line-number]))
-                   column))))))))
+                errors-chan (a/chan 100)
+                ctx {:errors-chan errors-chan}
+                result-ctx (format-rule ctx {column "asdf"} line-number)
+                errors (all-errors errors-chan)]
+            (is (contains-error? errors
+                                 {:severity :warnings
+                                  :scope filename
+                                  :identifier line-number
+                                  :error-type column}))))))))
 
 (deftest invalid-utf-8-test
   (testing "marks any value with a Unicode replacement character as invalid UTF-8 because that's what we assume we get"
-    (let [ctx (merge {:input (csv-inputs ["invalid-utf8/source.txt"])
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["invalid-utf8/source.txt"])
+                      :errors-chan errors-chan
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "invalid-utf-8" "3.0"))
-          out-ctx (csv/load-csvs ctx)]
+          out-ctx (csv/load-csvs ctx)
+          errors (all-errors errors-chan)]
       (testing "reports errors for values with the Unicode replacement character"
-        (is (= (get-in out-ctx [:errors :sources "1" "name"])
-               ["Is not valid UTF-8."]))))))
+        (is (contains-error? errors
+                             {:severity :errors
+                              :scope :sources
+                              :identifier "1"
+                              :error-type "name"
+                              :error-value "Is not valid UTF-8."}))))))

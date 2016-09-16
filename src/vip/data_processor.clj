@@ -1,10 +1,13 @@
 (ns vip.data-processor
   (:require [clojure.tools.logging :as log]
+            [clojure.core.async :as a]
             [com.climate.newrelic.trace :refer [defn-traced]]
             [squishy.core :as sqs]
             [turbovote.resource-config :refer [config]]
+            [utility-works.async :as util-async]
             [korma.core :as korma]
             [vip.data-processor.cleanup :as cleanup]
+            [vip.data-processor.errors :as errors]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
@@ -33,18 +36,16 @@
   (concat db/validations
           db.v3-0/validations
           xml-output/pipeline
-          [psql/insert-validations
-           psql/import-from-sqlite
+          [psql/import-from-sqlite
            psql/store-stats]))
 
 (def v5-1-validation-pipeline
   (concat v5-1-validations/validations
-          [xml/load-xml-tree-validations
-           tree-stats/store-tree-stats]))
+          [tree-stats/store-tree-stats]))
 
 (defn add-validations
   [{:keys [spec-version] :as ctx}]
-  (let [validations (condp = spec-version
+  (let [validations (condp = @spec-version
                       "3.0" v3-validation-pipeline
                       "5.1" v5-1-validation-pipeline
                       nil)]
@@ -93,6 +94,26 @@
     (q/initialize)
     (psql/initialize)
     (q/publish {:id id :event "starting"} "qa-engine.status")
+    (util-async/batch-process
+     errors/v3-errors-chan
+     (fn [all-errors]
+       (doseq [[_ errors] (group-by #(get-in % [:ctx :import-id])
+                                    all-errors)]
+         (psql/bulk-import
+          (:ctx (first errors))
+          psql/validations
+          (map psql/validation-value errors))))
+     500 5000)
+    (util-async/batch-process
+     errors/v5-errors-chan
+     (fn [all-errors]
+       (doseq [[_ errors] (group-by #(get-in % [:ctx :import-id])
+                                    all-errors)]
+         (psql/bulk-import
+          (:ctx (first errors))
+          psql/xml-tree-validations
+          (map psql/xml-tree-validation-value errors))))
+     500 5000)
     (let [consumer (consume)]
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn []

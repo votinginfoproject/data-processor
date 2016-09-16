@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.db.record-limit
-  (:require [korma.core :as korma]))
+  (:require [korma.core :as korma]
+            [vip.data-processor.errors :as errors]))
 
 (defn count-rows [table]
   "Takes a single table and counts the number of rows in it."
@@ -15,8 +16,8 @@
 (defn error-if-not-one-row [ctx count]
   "If the count of the rows is not equal to 1, add an error."
   (if-not (= 1 (:count count))
-    (assoc-in ctx [:errors (:name count) :global :row-constraint]
-              ["File needs to contain exactly one row."])
+    (errors/add-errors ctx :errors (:name count) :global :row-constraint
+                       "File needs to contain exactly one row.")
     ctx))
 
 (defn tables-allow-only-one-record

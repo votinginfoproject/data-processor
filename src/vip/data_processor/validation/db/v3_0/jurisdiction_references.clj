@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.db.v3-0.jurisdiction-references
   (:require [vip.data-processor.validation.db.util :as util]
             [korma.core :as korma]
-            [com.climate.newrelic.trace :refer [defn-traced]]))
+            [com.climate.newrelic.trace :refer [defn-traced]]
+            [vip.data-processor.errors :as errors]))
 
 (defn unmatched-jurisdiction-references [tables from-table]
   (let [table (tables from-table)
@@ -34,8 +35,8 @@
   (let [unmatched-references (unmatched-jurisdiction-references
                               (:tables ctx) table)]
     (reduce (fn [ctx unmatched-reference]
-              (update-in ctx [:errors table (:id unmatched-reference) :unmatched-reference]
-                         conj (select-keys unmatched-reference [:jurisdiction_id])))
+              (errors/add-errors ctx :errors table (:id unmatched-reference) :unmatched-reference
+                                 (select-keys unmatched-reference [:jurisdiction_id])))
             ctx unmatched-references)))
 
 (defn-traced validate-jurisdiction-references [{:keys [data-specs] :as ctx}]

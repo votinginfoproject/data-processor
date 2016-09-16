@@ -20,7 +20,8 @@
             [clojure.walk :as walk]
             [com.climate.newrelic.trace :refer [defn-traced]]
             [vip.data-processor.output.v3-0.xml :as v3-0]
-            [vip.data-processor.output.xml-helpers :refer [create-xml-file]])
+            [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
+            [vip.data-processor.errors :as errors])
   (:import [javax.xml XMLConstants]
            [javax.xml.transform.stream StreamSource]
            [javax.xml.validation SchemaFactory]
@@ -88,7 +89,7 @@
       (.validate validator (StreamSource. (.toFile xml-output-file)))
       ctx
       (catch SAXParseException e
-        (assoc-in ctx [:errors :xml-generation :global :invalid-xml] [(.getMessage e)])))))
+        (errors/add-errors ctx :errors :xml-generation :global :invalid-xml (.getMessage e))))))
 
 (def pipeline
   [create-xml-file

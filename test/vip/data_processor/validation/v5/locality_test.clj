@@ -3,33 +3,52 @@
             [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.validation.xml :as xml]))
+            [vip.data-processor.validation.xml :as xml]
+            [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
 (use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres validate-no-missing-names-test
-  (let [ctx {:input (xml-input "v5-localities.xml")}
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-localities.xml")
+             :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.locality/validate-no-missing-names)]
+                    v5.locality/validate-no-missing-names)
+        errors (all-errors errors-chan)]
     (testing "name missing is an error"
-      (is (get-in out-ctx [:errors :locality "VipObject.0.Locality.0.Name"
-                           :missing])))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :locality
+                            :identifier "VipObject.0.Locality.0.Name"
+                            :error-type :missing})))
     (testing "name present is OK"
-      (is (not (get-in out-ctx [:errors :locality "VipObject.0.Locality.1.Name"
-                                :missing]))))))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :locality
+                             :identifier "VipObject.0.Locality.1.Name"
+                             :error-type :missing}))))
 
 (deftest ^:postgres validate-no-missing-state-ids-test
-  (let [ctx {:input (xml-input "v5-localities.xml")}
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-localities.xml")
+             :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.locality/validate-no-missing-state-ids)]
+                    v5.locality/validate-no-missing-state-ids)
+        errors (all-errors errors-chan)]
     (testing "state-id missing is an error"
-      (is (get-in out-ctx [:errors :locality
-                           "VipObject.0.Locality.0.StateId" :missing])))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :locality
+                            :identifier "VipObject.0.Locality.0.StateId"
+                            :error-type :missing})))
     (testing "state-id present is OK"
-      (is (not (get-in out-ctx [:errors :locality
-                                "VipObject.0.Locality.1.StateId" :missing]))))))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :locality
+                             :identifier "VipObject.0.Locality.1.StateId"
+                             :error-type :missing}))))

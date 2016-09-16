@@ -9,7 +9,8 @@
             [vip.data-processor.db.statistics :as stats]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec])
+            [vip.data-processor.validation.data-spec :as data-spec]
+            [clojure.set :as set])
   (:import [org.postgresql.util PGobject]))
 
 (defn url []
@@ -175,7 +176,7 @@
      :import-id import-id}))
 
 (defn get-public-id-data [{:keys [spec-version] :as ctx}]
-  (condp = spec-version
+  (condp = @spec-version
     "3.0" (get-v3-public-id-data ctx)
     "5.1" (get-xml-tree-public-id-data ctx)
     {}))
@@ -215,9 +216,9 @@
     ctx))
 
 (defn store-spec-version [{:keys [spec-version import-id] :as ctx}]
-  (when spec-version
+  (when @spec-version
     (korma/update results
-      (korma/set-fields {:spec_version spec-version})
+      (korma/set-fields {:spec_version @spec-version})
       (korma/where {:id import-id})))
   ctx)
 
@@ -259,60 +260,26 @@
                              invalid-identifier))
     :else identifier))
 
-(defn validation-value [results-id severity scope identifier error-type error-data]
-  {:results_id results-id
+(defn validation-value
+  [{:keys [ctx severity scope identifier error-type error-value]}]
+  {:results_id (:import-id ctx)
    :severity (name severity)
    :scope (name scope)
    :identifier (coerce-identifier identifier)
    :error_type (name error-type)
-   :error_data (pr-str error-data)})
+   :error_data (pr-str error-value)})
 
 (defn xml-tree-validation-value
-  [results-id severity scope path error-type error-data]
-  {:results_id results-id
+  [{:keys [ctx severity scope identifier error-type error-value]}]
+  {:results_id (:import-id ctx)
    :severity (name severity)
    :scope (name scope)
    :error_type (name error-type)
-   :error_data (pr-str error-data)
-   :path (when-not (= :global path) (path->ltree path))})
-
-(defn validation-values-from [values-fn]
-  (fn [{:keys [import-id] :as ctx}]
-    (mapcat
-     (fn [severity]
-       (let [errors (get ctx severity)]
-         (when-not (empty? errors)
-           (let [errors (util/flatten-keys errors)]
-             (mapcat (fn [[[scope identifier error-type] error-data]]
-                       (map (fn [error-data]
-                              (values-fn import-id severity scope identifier error-type error-data))
-                            error-data))
-                     errors)))))
-     [:warnings :errors :critical :fatal])))
-
-(def validation-values
-  "Create insertable validations from the processing context map. Suitable for the 3.0 schema.
-
-    (validation-values {:import-id 493
-                        :errors {:candidates {3 {:missing-values [name\" \"email\"]}}}
-                        :critical {:candidates {:global {:missing-columns [\"party\"]}}}})
-    ;; =>
-       ({:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"name\\\"\"}
-        {:results_id 493 :severity \"errors\" :scope \"candidates\" :identifier 3 :error_type \"missing-values\" :error_data \"\\\"email\\\"\"}
-        {:results_id 493 :severity \"critical\" :scope \"candidates\" :identifier -1 :error_type \"missing-columns\" :error_data \"\\\"party\\\"\"})"
-  (validation-values-from validation-value))
-
-(def xml-tree-validation-values
-  "Create insertable validations from the processing context map. Suitable for the 5.1 schema."
-  (validation-values-from xml-tree-validation-value))
+   :error_data (pr-str error-value)
+   :path (when-not (= :global identifier) (path->ltree identifier))})
 
 (def statement-parameter-limit 10000)
 (def bulk-import (partial db.util/bulk-import statement-parameter-limit))
-
-(defn insert-validations [ctx]
-  (log/info "Inserting validations")
-  (let [validation-values (validation-values ctx)]
-    (bulk-import ctx validations validation-values)))
 
 (defn import-from-sqlite [{:keys [import-id db data-specs] :as ctx}]
   (reduce (fn [ctx ent]

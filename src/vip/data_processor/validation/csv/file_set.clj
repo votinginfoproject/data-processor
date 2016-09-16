@@ -2,7 +2,8 @@
   (:require [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [clojure.string :as str]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [vip.data-processor.errors :as errors]))
 
 (defn- build-dependency-pred [ctx-sym dependencies]
   (walk/postwalk
@@ -41,8 +42,8 @@
                               (if ~pred
                                 ~ctx
                                 (let [error-scope# (data-spec/filename->table (:data-specs ~ctx) ~filename)]
-                                  (assoc-in ~ctx [:errors error-scope# :global :missing-dependency]
-                                            [(error-message-for '~dependencies)]))))]
+                                  (errors/add-errors ~ctx :errors error-scope# :global :missing-dependency
+                                            (error-message-for '~dependencies)))))]
              (merge {~filename validator#} (build-dependencies ~@next-mappings))))
         (throw (IllegalArgumentException.
                 "build-dependencies requires an even number of forms"))))))

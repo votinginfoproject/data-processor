@@ -2,7 +2,8 @@
   (:require [clojure.string :as str]
             [clojure.tools.logging :as log]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
-            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]))
+            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
+            [vip.data-processor.errors :as errors]))
 
 (def version-specs
   {"3.0" v3-0/data-specs
@@ -36,14 +37,14 @@
         (cond
           (empty? val)
           (if required
-            (assoc-in ctx [required scope identifier name] [(str "Missing " name)])
+            (errors/add-errors ctx required scope identifier name (str "Missing " name))
             ctx)
 
           (invalid-utf-8? val)
-          (assoc-in ctx [:errors scope identifier name] ["Is not valid UTF-8."])
+          (errors/add-errors ctx :errors scope identifier name "Is not valid UTF-8.")
 
           (not (test-fn val))
-          (assoc-in ctx [severity scope identifier name] [(str message ": " val)])
+          (errors/add-errors ctx severity scope identifier name (str message ": " val))
 
           :else ctx)))))
 

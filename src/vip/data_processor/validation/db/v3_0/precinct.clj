@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.db.v3-0.precinct
-  (:require [korma.core :as korma]))
+  (:require [korma.core :as korma]
+            [vip.data-processor.errors :as errors]))
 
 (defn validate-no-missing-polling-locations
   "Precincts are missing a polling location if they are not mail only
@@ -17,7 +18,7 @@
                                            (korma/modifier "DISTINCT")
                                            (korma/fields :precinct_id))]}))]
     (reduce (fn [ctx bad-precinct-row]
-              (assoc-in ctx [:warnings :precincts
-                             (:id bad-precinct-row) :missing-polling-location]
-                        ["Missing polling location"]))
+              (errors/add-errors ctx :warnings :precincts
+                                 (:id bad-precinct-row) :missing-polling-location
+                                 "Missing polling location"))
             ctx bad-precincts)))

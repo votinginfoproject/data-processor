@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.xml :refer :all]
+            [clojure.core.async :as a]
             [clojure.data.xml :as data.xml]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
@@ -11,7 +12,8 @@
             [vip.data-processor.validation.db.v3-0.street-segment :as street-segment]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
-            [korma.core :as korma]))
+            [korma.core :as korma]
+            [vip.data-processor.errors :as errors]))
 
 (deftest load-xml-test
   (testing "loads data into the db from an XML file"
@@ -108,38 +110,54 @@
           (is (= [{:locality_id 101 :early_vote_site_id 30203}]
                  locality-early-vote-sites))))))
   (testing "adds errors for non-UTF-8 data"
-    (let [ctx (merge {:input (xml-input "non-utf-8.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "non-utf-8.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml]}
                      (sqlite/temp-db "non-utf-8" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= (get-in out-ctx [:errors :candidates "90001" "name"])
-             ["Is not valid UTF-8."]))
-      (assert-error-format out-ctx)))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :candidates
+                            :identifier "90001"
+                            :error-type "name"
+                            :error-value "Is not valid UTF-8."}))))
   (testing "can continue after reaching malformed XML"
-    (let [ctx (merge {:input (xml-input "malformed.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "malformed.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml]}
                      (sqlite/temp-db "malformed-xml" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:critical :import :global :malformed-xml]))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :critical
+                            :scope :import
+                            :identifier :global
+                            :error-type :malformed-xml}))
       (testing "but still loads data before the malformation!"
         (is (= [{:id 39 :name "Ohio" :election_administration_id 3456}]
-               (korma/select (get-in out-ctx [:tables :states])))))
-      (assert-error-format out-ctx))))
+               (korma/select (get-in out-ctx [:tables :states]))))))))
 
 (deftest full-good-run-test
   (testing "a good XML file produces no erorrs or warnings"
-    (let [ctx (merge {:input (xml-input "full-good-run.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "full-good-run.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
+                      :spec-version (atom nil)
                       :pipeline (concat [determine-spec-version
                                          branch-on-spec-version]
                                         db/validations)}
                      (sqlite/temp-db "full-good-xml" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
       (is (nil? (:stop out-ctx)))
       (is (nil? (:exception out-ctx)))
-      (assert-no-problems out-ctx [])
+      (assert-no-problems-2 errors {})
       (testing "inserts values for columns not in the first element of a type"
         (let [mail-only-precinct (first
                                   (korma/select (get-in out-ctx [:tables :precincts])
@@ -148,122 +166,210 @@
 
 (deftest validate-no-duplicated-ids-test
   (testing "returns an error when there is a duplicated id"
-    (let [ctx (merge {:input (xml-input "duplicated-ids.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "duplicated-ids.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml db/validate-no-duplicated-ids]}
                      (sqlite/temp-db "duplicated-ids" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)
+          duplicate-id-errors (matching-errors errors
+                                               {:severity :errors
+                                                :scope :import
+                                                :identifier 101
+                                                :error-type :duplicate-ids})]
       (is (= #{"precincts" "localities"}
-             (set (get-in out-ctx [:errors :import 101 :duplicate-ids]))))
-      (assert-error-format out-ctx))))
+             (apply set (map :error-value duplicate-id-errors)))))))
 
 (deftest validate-no-duplicated-rows-test
   (testing "returns a warning if two nodes have the same data"
-    (let [ctx (merge {:input (xml-input "duplicated-rows.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "duplicated-rows.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml db/validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicated-rows" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
       (doseq [id [900101 900102 900103]]
-        (is (get-in out-ctx [:warnings :candidates id :duplicate-rows])))
+        (is (contains-error? errors {:severity :warnings
+                                     :scope :candidates
+                                     :identifier id
+                                     :error-type :duplicate-rows})))
       (testing "except for ballots"
         (doseq [id [80000 80001]]
-          (is (nil? (get-in out-ctx [:warnings :ballots id :duplicate-rows])))))
+          (is (nil? (contains-error? errors {:severity :warnings
+                                             :scope :ballots
+                                             :identifier id
+                                             :error-type :duplicate-rows})))))
       (assert-error-format out-ctx))))
 
 (deftest validate-references-test
   (testing "returns an error if there are unreferenced objects"
-    (let [ctx (merge {:input (xml-input "unreferenced-ids.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "unreferenced-ids.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml db/validate-references]}
                      (sqlite/temp-db "unreferenced-ids" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= '({"state_id" 99}) (get-in out-ctx [:errors :localities 101 :unmatched-reference])))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors {:severity :errors
+                                   :scope :localities
+                                   :identifier 101
+                                   :error-type :unmatched-reference
+                                   :error-value {"state_id" 99}})))))
 
 (deftest validate-jurisdiction-references-test
   (testing "returns an error if there are unreferenced jurisdiction references"
-    (let [ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml jurisdiction-references/validate-jurisdiction-references]}
                      (sqlite/temp-db "unreferenced-jurisdictions" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= '({:jurisdiction_id 99999}) (get-in out-ctx [:errors :ballot-line-results 91008 :unmatched-reference])))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors {:severity :errors
+                                   :scope :ballot-line-results
+                                   :identifier 91008
+                                   :error-type :unmatched-reference
+                                   :error-value {:jurisdiction_id 99999}})))))
 
 (deftest validate-one-record-limit-test
   (testing "returns an error if particular nodes are duplicated more than once"
-    (let [ctx (merge {:input (xml-input "one-record-limit.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "one-record-limit.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml db/validate-one-record-limit]}
                      (sqlite/temp-db "one-record-limit" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= ["File needs to contain exactly one row."]
-             (get-in out-ctx [:errors :elections :global :row-constraint])))
-      (is (= ["File needs to contain exactly one row."]
-             (get-in out-ctx [:errors :sources :global :row-constraint])))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors {:severity :errors
+                                   :scope :elections
+                                   :identifier :global
+                                   :error-type :row-constraint
+                                   :error-value "File needs to contain exactly one row."}))
+      (is (contains-error? errors {:severity :errors
+                                   :scope :sources
+                                   :identifier :global
+                                   :error-type :row-constraint
+                                   :error-value "File needs to contain exactly one row."})))))
 
 (deftest validate-no-unreferenced-rows
   (testing "returns a warning if it finds rows that are unreferenced"
-    (let [ctx (merge {:input (xml-input "unreferenced-rows.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "unreferenced-rows.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml db/validate-no-unreferenced-rows]}
                      (sqlite/temp-db "unreferenced-rows" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:warnings :candidates 90000 :unreferenced-row]))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors {:severity :warnings
+                                   :scope :candidates
+                                   :identifier 90000
+                                   :error-type :unreferenced-row})))))
 
 (deftest validate-no-overlapping-street-segments
   (testing "returns an error if street segments overlap"
-    (let [ctx (merge {:input (xml-input "overlapping-street-segments.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "overlapping-street-segments.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml street-segment/validate-no-overlapping-street-segments]}
                      (sqlite/temp-db "overlapping-street-segments" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= '(1210003) (get-in out-ctx [:errors :street-segments 1210002 :overlaps])))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :street-segments
+                            :identifier 1210002
+                            :error-type :overlaps
+                            :error-value 1210003})))))
 
 (deftest validate-election-administration-addresses
   (testing "returns an error if either the physical or mailing address is incomplete"
-    (let [ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml
                                  admin-addresses/validate-addresses]}
                      (sqlite/temp-db "incomplete-election-administrations" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :election-administrations 3456
-                           :incomplete-physical-address]))
-      (is (get-in out-ctx [:errors :election-administrations 3456
-                           :incomplete-mailing-address]))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :election-administrations
+                            :identifier 3456
+                            :error-type :incomplete-physical-address}))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :election-administrations
+                            :identifier 3456
+                            :error-type :incomplete-mailing-address}))
       (assert-error-format out-ctx))))
 
 (deftest validate-data-formats
-  (let [ctx (merge {:input (xml-input "bad-data-values.xml")
+  (let [errors-chan (a/chan 100)
+        ctx (merge {:input (xml-input "bad-data-values.xml")
                     :data-specs v3-0/data-specs
+                    :errors-chan errors-chan
                     :pipeline [load-xml]}
                    (sqlite/temp-db "bad-data-values" "3.0"))
-        out-ctx (pipeline/run-pipeline ctx)]
+        out-ctx (pipeline/run-pipeline ctx)
+        errors (all-errors errors-chan)]
     (testing "adds critical errors for missing required fields in candidates"
-      (is (get-in out-ctx [:critical :candidates "90001" "name"])))
+      (is (contains-error? errors {:severity :critical
+                                   :scope :candidates
+                                   :identifier "90001"
+                                   :error-type "name"})))
     (testing "adds errors for values that fail format validation"
-      (is (get-in out-ctx [:errors :candidates "90001" "candidate_url"]))
-      (is (get-in out-ctx [:errors :candidates "90001" "phone"]))
-      (is (get-in out-ctx [:errors :candidates "90001" "email"]))
-      (is (get-in out-ctx [:fatal :candidates "90001" "sort_order"])))
-    (testing "puts errors in the right format"
-      (assert-error-format out-ctx))))
+      (is (contains-error? errors {:severity :errors
+                                   :scope :candidates
+                                   :identifier "90001"
+                                   :error-type "candidate_url"}))
+      (is (contains-error? errors {:severity :errors
+                                   :scope :candidates
+                                   :identifier "90001"
+                                   :error-type "phone"}))
+      (is (contains-error? errors {:severity :errors
+                                   :scope :candidates
+                                   :identifier "90001"
+                                   :error-type "email"}))
+      (is (contains-error? errors {:severity :fatal
+                                   :scope :candidates
+                                   :identifier "90001"
+                                   :error-type "sort_order"})))))
 
 (deftest same-element-duplicate-ids-test
   (testing "doesn't die when elements share ids"
-    (let [ctx (merge {:input (xml-input "same-element-duplicated-ids.xml")
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (xml-input "same-element-duplicated-ids.xml")
                       :data-specs v3-0/data-specs
+                      :errors-chan errors-chan
                       :pipeline [load-xml]}
                      (sqlite/temp-db "same-element-duplicated-ids" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:fatal :localities "101" :duplicate-ids]))
-      (is (get-in out-ctx [:fatal :precincts "10101" :duplicate-ids]))
-      (is (get-in out-ctx [:fatal :precincts "10103" :duplicate-ids]))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :fatal
+                            :scope :localities
+                            :identifier "101"
+                            :error-type :duplicate-ids}))
+      (is (contains-error? errors
+                           {:severity :fatal
+                            :scope :precincts
+                            :identifier "10101"
+                            :error-type :duplicate-ids}))
+      (is (contains-error? errors
+                           {:severity :fatal
+                            :scope :precincts
+                            :identifier "10103"
+                            :error-type :duplicate-ids}))
       (testing "but still loads some data"
         (is (= [{:id 103}]
                (korma/select (get-in out-ctx [:tables :localities])
@@ -272,26 +378,27 @@
 
 (deftest determine-spec-version-test
   (testing "finds and assocs the schemaVersion of the xml feed"
-    (let [ctx {:input (xml-input "full-good-run.xml")}
+    (let [ctx {:input (xml-input "full-good-run.xml")
+               :spec-version (atom nil)}
           out-ctx (determine-spec-version ctx)]
-      (is (= "3.0" (get out-ctx :spec-version))))))
+      (is (= "3.0" @(get out-ctx :spec-version))))))
 
 (deftest branch-on-spec-version-test
   (testing "adds the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
-    (let [ctx {:spec-version "3.0"}
+    (let [ctx {:spec-version (atom "3.0")}
           out-ctx (branch-on-spec-version ctx)
           v3-pipeline (get version-pipelines "3.0")]
       (is (= v3-pipeline
              (take (count v3-pipeline) (:pipeline out-ctx))))))
   (testing "adds the 5.1 import pipeline to the front of the pipeline for 5.1 feeds"
-    (let [ctx {:spec-version "5.1"
+    (let [ctx {:spec-version (atom "5.1")
                :pipeline [branch-on-spec-version]}
           out-ctx (branch-on-spec-version ctx)
           v5-pipeline (get version-pipelines "5.1")]
       (is (= v5-pipeline
              (take (count v5-pipeline) (:pipeline out-ctx))))))
   (testing "stops with unsupported version for other versions"
-    (let [ctx {:spec-version "2.0"  ; 2.0 is too old
+    (let [ctx {:spec-version (atom "2.0")   ; 2.0 is too old
                :pipeline [branch-on-spec-version]}
           out-ctx (pipeline/run-pipeline ctx)]
       (is (.startsWith (:stop out-ctx) "Unsupported XML version")))))

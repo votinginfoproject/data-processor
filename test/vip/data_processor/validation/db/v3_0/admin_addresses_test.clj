@@ -6,18 +6,27 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.pipeline :as pipeline]))
+            [vip.data-processor.pipeline :as pipeline]
+            [clojure.core.async :as a]))
 
 (deftest validate-election-administration-addresses-test
   (testing "errors are returned if either the physical or mailing address is incomplete"
-    (let [ctx (merge {:input (csv-inputs ["bad-election-administration-addresses/election_administration.txt"])
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["bad-election-administration-addresses/election_administration.txt"])
+                      :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-addresses]}
                      (sqlite/temp-db "incomplete-addresses" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:errors :election-administrations 99990
-                           :incomplete-physical-address]))
-      (is (get-in out-ctx [:errors :election-administrations 99991
-                           :incomplete-mailing-address]))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :election-administrations
+                            :identifier 99990
+                            :error-type :incomplete-physical-address}))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :election-administrations
+                            :identifier 99991
+                            :error-type :incomplete-mailing-address})))))

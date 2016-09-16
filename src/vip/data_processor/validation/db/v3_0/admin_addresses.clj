@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.db.v3-0.admin-addresses
   (:require [korma.core :as korma]
-            [com.climate.newrelic.trace :refer [defn-traced]]))
+            [com.climate.newrelic.trace :refer [defn-traced]]
+            [vip.data-processor.errors :as errors]))
 
 (defn transform-field [address-type field-name]
   (keyword (str (name address-type)
@@ -24,8 +25,8 @@
         error-name (keyword (str "incomplete-" (name address-type) "-address"))]
     (if (seq bad-addresses)
       (reduce (fn [ctx bad-address-id]
-                (assoc-in ctx [:errors :election-administrations bad-address-id error-name]
-                          ["Incomplete address"]))
+                (errors/add-errors ctx :errors :election-administrations bad-address-id error-name
+                                   "Incomplete address"))
               ctx bad-addresses)
       ctx)))
 

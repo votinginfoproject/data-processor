@@ -5,20 +5,24 @@
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]))
+            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
+            [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
 
 (deftest ^:postgres contest->ltree-entries-test
   (testing "tests run the important function"
-    (let [ctx {:input (csv-inputs ["5-1/candidate_contest.txt"])
-               :spec-version "5.1"
+    (let [errors-chan (a/chan 100)
+          ctx {:input (csv-inputs ["5-1/candidate_contest.txt"])
+               :errors-chan errors-chan
+               :spec-version (atom "5.1")
                :pipeline (concat
                           [postgres/start-run
                            (data-spec/add-data-specs v5-1/data-specs)]
                           (get csv/version-pipelines "5.1"))}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (assert-no-problems out-ctx [])
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (assert-no-problems-2 errors {})
       (are-xml-tree-values
        out-ctx
        "cancon001" "VipObject.0.CandidateContest.0.id"

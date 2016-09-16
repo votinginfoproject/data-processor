@@ -3,51 +3,85 @@
             [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.validation.xml :as xml]))
+            [vip.data-processor.validation.xml :as xml]
+            [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
 (use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres validate-no-missing-names-test
-  (let [ctx {:input (xml-input "v5-offices.xml")}
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-offices.xml")
+             :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.office/validate-no-missing-names)]
+                    v5.office/validate-no-missing-names)
+        errors (all-errors errors-chan)]
     (testing "name missing is an error"
-      (is (get-in out-ctx [:errors :office "VipObject.0.Office.0.Name"
-                           :missing])))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :office
+                            :identifier "VipObject.0.Office.0.Name"
+                            :error-type :missing})))
     (testing "name present is OK"
-      (is (not (get-in out-ctx [:errors :office "VipObject.0.Office.1.Name"
-                                :missing]))))))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :office
+                             :identifier "VipObject.0.Office.1.Name"
+                             :error-type :missing}))))
 
 (deftest ^:postgres validate-no-missing-term-types-test
-  (let [ctx {:input (xml-input "v5-offices.xml")}
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-offices.xml")
+             :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.office/validate-no-missing-term-types)]
+                    v5.office/validate-no-missing-term-types)
+        errors (all-errors errors-chan)]
     (testing "term missing is OK"
-      (is (not (get-in out-ctx [:errors :office "VipObject.0.Office.0.Term"
-                                :missing])))
-      (is (not (get-in out-ctx [:errors :office "VipObject.0.Office.1.Term"
-                                :missing]))))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :office
+                             :identifier "VipObject.0.Office.0.Term"
+                             :error-type :missing})
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :office
+                             :identifier "VipObject.0.Office.1.Term"
+                             :error-type :missing}))
     (testing "term present w/ type is OK"
-      (is (not (get-in out-ctx [:errors :office "VipObject.0.Office.2.Term.0.Type"
-                                :missing]))))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :office
+                             :identifier "VipObject.0.Office.2.Term.0.Type"
+                             :error-type :missing}))
     (testing "term present w/o type is an error"
-      (is (get-in out-ctx [:errors :office "VipObject.0.Office.3.Term.1.Type"
-                           :missing])))))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :office
+                            :identifier "VipObject.0.Office.3.Term.1.Type"
+                            :error-type :missing})))))
 
 (deftest ^:postgres validate-term-types-test
-  (let [ctx {:input (xml-input "v5-offices.xml")}
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-offices.xml")
+             :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.office/validate-term-types)]
+                    v5.office/validate-term-types)
+        errors (all-errors errors-chan)]
     (testing "valid term type is OK"
-      (is (not (get-in out-ctx [:errors :term "VipObject.0.Office.2.Term.1.Type.0"
-                                :format]))))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :term
+                             :identifier "VipObject.0.Office.2.Term.1.Type.0"
+                             :error-type :format}))
     (testing "invalid term type is an error"
-      (is (get-in out-ctx [:errors :term "VipObject.0.Office.4.Term.1.Type.0"
-                           :format])))))
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :term
+                            :identifier "VipObject.0.Office.4.Term.1.Type.0"
+                            :error-type :format})))))

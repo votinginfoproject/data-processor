@@ -14,7 +14,8 @@
             [vip.data-processor.output.tree-xml :as tree-xml]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.db.translations.transformer :as v5-1-transformers]))
+            [vip.data-processor.db.translations.transformer :as v5-1-transformers]
+            [vip.data-processor.errors :as errors]))
 
 (defn csv-filenames [data-specs]
   (set (map :filename data-specs)))
@@ -33,8 +34,9 @@
       (let [bad-filenames (->> bad-files (map file-name) sort)
             bad-file-list (apply str (interpose ", " bad-filenames))]
         (-> ctx
-            (update-in [:warnings :import :global :bad-filenames]
-                       conj bad-file-list)
+            (errors/add-errors
+             :warnings :import :global :bad-filenames
+             bad-file-list)
             (assoc :input good-files)))
       ctx)))
 
@@ -78,14 +80,17 @@
                 transforms (apply comp (data-spec/translation-fns columns))
                 format-rules (data-spec/create-format-rules (:data-specs ctx) filename columns)
                 ctx (if extraneous-headers
-                      (assoc-in ctx [:warnings table :global :extraneous-headers]
-                                extraneous-headers)
+                      (apply errors/add-errors
+                             ctx :warnings table :global :extraneous-headers
+                             extraneous-headers)
                       ctx)
                 line-number (atom 1)]
             (if (empty? (set/intersection (set headers) (set column-names)))
-              (assoc-in ctx [:critical table :global :no-header] ["No header row"])
+              (errors/add-errors ctx :critical table :global :no-header "No header row")
               (if-let [missing-headers (seq (set/difference (set required-header-names) (set headers)))]
-                (assoc-in ctx [:critical table :global :missing-headers] missing-headers)
+                (apply errors/add-errors
+                       ctx :critical table :global :missing-headers
+                       missing-headers)
                 (reduce (fn [ctx chunk]
                           (if (seq chunk)
                             (let [ctx (reduce (fn [ctx row]
@@ -95,12 +100,17 @@
                                                       ctx (data-spec/apply-format-rules format-rules ctx row-map @line-number)]
                                                   (if (= headers-count row-count)
                                                     ctx
-                                                    (let [identifier (if (= "3.0" (:spec-version ctx))
+                                                    (let [identifier (if (= "3.0" @(:spec-version ctx))
                                                                        @line-number
                                                                        (csv-error-path filename @line-number))]
-                                                      (assoc-in ctx [:critical table identifier :number-of-values]
-                                                                [(str "Expected " headers-count
-                                                                      " values, found " row-count)])))))
+                                                      (errors/add-errors
+                                                       ctx
+                                                       :critical
+                                                       table
+                                                       identifier
+                                                       :number-of-values
+                                                       (str "Expected " headers-count
+                                                            " values, found " row-count))))))
                                               ctx chunk)
                                   chunk-values (map (comp transforms #(select-keys % column-names) (partial zipmap headers)) chunk)
                                   chunk-values (if (= "postgresql" (get-in sql-table [:db :options :subprotocol]))
@@ -115,16 +125,17 @@
                                   (let [message (.getMessage e)]
                                     (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
                                       (db.util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
-                                      (let [identifier (if (= "3.0" (:spec-version ctx))
+                                      (let [identifier (if (= "3.0" @(:spec-version ctx))
                                                          @line-number
                                                          (csv-error-path filename @line-number))]
-                                        (assoc-in ctx [:fatal (:name sql-table) identifier :unknown-sql-error]
-                                                  [message])))))))
+                                        (errors/add-errors
+                                         ctx :fatal (:name sql-table) identifier
+                                         :unknown-sql-error message)))))))
                             ctx))
                         ctx (db.util/chunk-rows (csv/read-csv in-file)
                                                 sqlite/statement-parameter-limit))))))
         (catch java.lang.Exception e
-          (update-in ctx [:fatal filename :global :csv-error] conj (.getMessage e)))))
+          (errors/add-errors ctx :fatal filename :global :csv-error (.getMessage e)))))
     ctx))
 
 (defn-traced load-csvs [ctx]
@@ -137,9 +148,9 @@
     (reduce (fn [ctx {:keys [filename required table]}]
               (if (util/find-input-file ctx filename)
                 ctx
-                (assoc-in ctx
-                          [required table :global :missing-csv]
-                          [(str filename " is missing")])))
+                (errors/add-errors ctx
+                                   required table :global :missing-csv
+                                   (str filename " is missing"))))
             ctx required-files)))
 
 (defn determine-spec-version [ctx]
@@ -150,13 +161,15 @@
             csv-map (zipmap headers line1)
             version (get csv-map "version" "3.0")]
         (-> ctx
-            (assoc :spec-version version)
+            (update :spec-version (fn [spec-version]
+                                    (reset! spec-version version)
+                                    spec-version))
             (assoc :data-specs (get data-spec/version-specs version)))))
-    (assoc-in ctx [:fatal :sources :global :missing-csv]
-              ["source.txt is missing"])))
+    (errors/add-errors ctx :fatal :sources :global :missing-csv
+                       "source.txt is missing")))
 
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported CSV version: " spec-version)))
+  (assoc ctx :stop (str "Unsupported CSV version: " @spec-version)))
 
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
@@ -169,6 +182,6 @@
                  tree-xml/pipeline)})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines spec-version)]
+  (if-let [pipeline (get version-pipelines @spec-version)]
     (update ctx :pipeline (partial concat pipeline))
     (unsupported-version ctx)))

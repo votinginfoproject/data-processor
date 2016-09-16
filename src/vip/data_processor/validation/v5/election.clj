@@ -2,6 +2,7 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.v5.util :as util]
+            [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]))
 
 (defn validate-one-election [{:keys [import-id] :as ctx}]
@@ -17,8 +18,8 @@
                            first
                            :election_count)]
     (if (> election-count 1)
-      (update-in ctx [:fatal :election "VipObject.0.Election" :count]
-                 conj :more-than-one)
+      (errors/add-errors ctx :fatal :election "VipObject.0.Election" :count
+                         :more-than-one)
       ctx)))
 
 (def validate-date

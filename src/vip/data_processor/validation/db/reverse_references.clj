@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.db.reverse-references
   (:require [vip.data-processor.validation.db.util :as util]
             [korma.core :as korma]
-            [korma.sql.engine :as eng]))
+            [korma.sql.engine :as eng]
+            [vip.data-processor.errors :as errors]))
 
 (defn find-referencing-column [table-name data-spec]
   (->> data-spec
@@ -71,6 +72,6 @@
   (let [tables (:tables ctx)
         unreferenced-rows (find-unreferenced-rows tables table-id references-map)]
     (reduce (fn [ctx unreferenced-row]
-              (update-in ctx [:warnings table-id (:id unreferenced-row) :unreferenced-row]
-                         conj unreferenced-row))
+              (errors/add-errors ctx :warnings table-id (:id unreferenced-row) :unreferenced-row
+                                 unreferenced-row))
             ctx unreferenced-rows)))

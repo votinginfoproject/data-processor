@@ -3,6 +3,7 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.v5.util :as util]
             [vip.data-processor.validation.xml.spec :as spec]
+            [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]))
 
 (defn duplicate-ids [import-id]
@@ -23,7 +24,7 @@
     (reduce (fn [ctx row]
               (let [id (:value row)
                     path (-> row :path .getValue)]
-                (update-in ctx [:fatal :id path :duplicates] conj id)))
+                (errors/add-errors ctx :fatal :id path :duplicates id)))
             ctx duplicate-ids)))
 
 (def validate-no-missing-ids
@@ -45,8 +46,10 @@
                  query
                  :results)]
     (reduce (fn [ctx bad-id]
-              (update-in ctx [:errors :id (.getValue (:path bad-id)) :no-referent]
-                         conj (str (:value bad-id))))
+              (errors/add-errors ctx
+                                 :errors :id (.getValue (:path bad-id))
+                                 :no-referent
+                                 (str (:value bad-id))))
             ctx bad-ids)))
 
 (defn validate-idref-type-refers
@@ -86,7 +89,7 @@
 (defn validate-idref-references
   [{:keys [import-id spec-version] :as ctx}]
   (log/info "Validating idref references")
-  (let [idref-simple-paths (->> (spec/type->simple-paths "xs:IDREF" spec-version)
+  (let [idref-simple-paths (->> (spec/type->simple-paths "xs:IDREF" @spec-version)
                                 (map postgres/path->ltree))]
     (reduce validate-idref-type-refers
             ctx idref-simple-paths)))
@@ -94,7 +97,7 @@
 (defn validate-idrefs-references
   [{:keys [import-id spec-version] :as ctx}]
   (log/info "Validating idrefs references")
-  (let [idrefs-simple-paths (->> (spec/type->simple-paths "xs:IDREFS" spec-version)
+  (let [idrefs-simple-paths (->> (spec/type->simple-paths "xs:IDREFS" @spec-version)
                                  (map postgres/path->ltree))]
     (reduce validate-idrefs-type-refers
             ctx idrefs-simple-paths)))

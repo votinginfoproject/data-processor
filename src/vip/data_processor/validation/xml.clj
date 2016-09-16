@@ -8,7 +8,8 @@
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.v5 :as v5-validations]
-            [vip.data-processor.validation.xml.v5 :as xml.v5]))
+            [vip.data-processor.validation.xml.v5 :as xml.v5]
+            [vip.data-processor.errors :as errors]))
 
 (def address-elements
   #{"address"
@@ -91,7 +92,7 @@
             transformed-contents (map transforms contents)]
         (import-joins ctx data-spec elements)
         (sqlite/bulk-import ctx sql-table transformed-contents))
-      (update-in ctx [:critical :import :global :unknown-tags] conj tag))))
+      (errors/add-errors ctx :critical :import :global :unknown-tags tag))))
 
 (defn partition-by-n
   "Applies f to each value in coll, splitting it each time f returns a
@@ -130,8 +131,8 @@
 
           ;; If we get a XMLStreamException, add error and finish
           (instance? javax.xml.stream.XMLStreamException partition-or-error)
-          (assoc-in ctx [:critical :import :global :malformed-xml]
-                    [(.getMessage partition-or-error)])
+          (errors/add-errors ctx :critical :import :global :malformed-xml
+                             (.getMessage partition-or-error))
 
           ;; otherwise, load and continue
           :else (recur (load-elements ctx partition-or-error) (rest xml-elements)))))))
@@ -231,25 +232,19 @@
           (korma/values pvs))))
     ctx))
 
-(defn load-xml-tree-validations
-  [ctx]
-  (let [results-id (:import-id ctx)
-        errors (postgres/xml-tree-validation-values ctx)]
-    (postgres/bulk-import ctx
-                          postgres/xml-tree-validations
-                          errors)))
-
 (defn determine-spec-version [ctx]
   (let [xml-file (first (:input ctx))]
     (with-open [reader (util/bom-safe-reader xml-file)]
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]
         (-> ctx
-            (assoc :spec-version version)
+            (update :spec-version (fn [spec-version]
+                                    (reset! spec-version version)
+                                    spec-version))
             (assoc :data-specs (get data-spec/version-specs version)))))))
 
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported XML version: " spec-version)))
+  (assoc ctx :stop (str "Unsupported XML version: " @spec-version)))
 
 (defn set-input-as-xml-output-file
   [{:keys [input] :as ctx}]
@@ -264,6 +259,6 @@
           set-input-as-xml-output-file]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines spec-version)]
+  (if-let [pipeline (get version-pipelines @spec-version)]
     (update ctx :pipeline (partial concat pipeline))
     (unsupported-version ctx)))

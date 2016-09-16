@@ -3,6 +3,7 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.v5.util :as util]
             [clojure.string :as str]
+            [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]))
 
 (util/validate-no-missing-values :street-segment
@@ -49,9 +50,10 @@
                   [overlap-query [import-id]]
                   :results)]
     (reduce (fn [ctx overlap]
-              (update-in ctx [:errors
-                              :street-segment
-                              (.getValue (:path overlap))
-                              :overlaps]
-                         conj (:ss2_id overlap)))
+              (errors/add-errors ctx
+                                 :errors
+                                 :street-segment
+                                 (.getValue (:path overlap))
+                                 :overlaps
+                                 (:ss2_id overlap)))
             ctx overlaps)))

@@ -7,7 +7,8 @@
             [korma.db :as db]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.util :as util]))
+            [vip.data-processor.util :as util]
+            [clojure.core.async :as a]))
 
 (set! *print-length* 10)
 
@@ -114,3 +115,21 @@
                            first
                            :value))
      ~@args))
+
+(defn all-errors [errors-chan]
+  (a/<!! (a/timeout 100)) ;; give a moment
+  (a/close! errors-chan)
+  (a/<!!
+   (a/into [] errors-chan)))
+
+(defn matching-errors [errors error]
+  (let [ks (keys error)]
+    (filter #(= error
+                (select-keys % ks))
+            errors)))
+
+(defn contains-error? [errors error]
+  (seq (matching-errors errors error)))
+
+(defn assert-no-problems-2 [errors error]
+  (is (not (contains-error? errors error))))

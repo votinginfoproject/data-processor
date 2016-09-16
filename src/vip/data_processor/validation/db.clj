@@ -4,12 +4,13 @@
             [vip.data-processor.validation.db.references :as refs]
             [vip.data-processor.validation.db.record-limit :as record-limit]
             [vip.data-processor.validation.db.reverse-references :as rev-refs]
-            [com.climate.newrelic.trace :refer [defn-traced]]))
+            [com.climate.newrelic.trace :refer [defn-traced]]
+            [vip.data-processor.errors :as errors]))
 
 (defn-traced validate-no-duplicated-ids [ctx]
   (let [dupes (dupe-ids/duplicated-ids ctx)]
     (reduce (fn [ctx [id tables]]
-              (assoc-in ctx [:errors :import id :duplicate-ids] tables))
+              (errors/add-errors ctx :errors :import id :duplicate-ids tables))
             ctx dupes)))
 
 (defn-traced validate-no-duplicated-rows [{:keys [data-specs] :as ctx}]

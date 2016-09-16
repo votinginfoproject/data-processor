@@ -36,44 +36,6 @@
     (is (= invalid-identifier (coerce-identifier '(a list))))
     (is (= invalid-identifier (coerce-identifier "ABC")))))
 
-(deftest validation-values-test
-  (testing "generates validation values for all kinds of errors"
-    (let [ctx {:import-id 34
-               :warnings {:ballots {:global {:missing-headers ["name" "id"]}
-                                    3 {:bad-format ["school must match /\\w+/"]
-                                       :too-long ["less than 140 characters"]}}
-                          :election-results {nil {:unreferenced-ids [12 45]}}}
-               :errors {:sources {:global {:number-of-rows ["sources.txt must have one row"]}}}}
-          values (validation-values ctx)]
-      (is (= 7 (count values)))
-      (is (every? #(= 34 (:results_id %)) values))
-      (testing "creates a validation value for each error-data"
-        (let [missing-header-values (filter #(= "missing-headers" (:error_type %)) values)]
-          (is (= 2 (count missing-header-values)))
-          (is (apply = (map #(dissoc % :error_data) missing-header-values))))
-        (is (= 1 (->> values
-                    (filter #(= "bad-format" (:error_type %)))
-                    count)))))))
-
-(deftest xml-tree-validation-values-test
-  (testing "generates validates values for 5.1 style errors"
-    (let [ctx {:import-id 25
-               :errors {}
-               :fatal {:id
-                       {"VipObject.0.Election.1.id"
-                        {:duplicate ["ele0001"]}
-                        "VipObject.0.Election.2.id"
-                        {:duplicate ["ele0001"]}}}
-               :warnings {:import
-                          {:global
-                           {:invalid-extensions [".exemell" ".seeesvee"]}}}}
-          values (xml-tree-validation-values ctx)]
-      (is (= 4 (count values)))
-      (is (= 2
-             (->> values
-                  (filter #(= "duplicate" (:error_type %)))
-                  count))))))
-
 (deftest election-id-test
   (testing "election-id generation"
    (is (= "2015-10-10-LOUISIANA-GENERAL"

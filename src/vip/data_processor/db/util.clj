@@ -3,7 +3,8 @@
             [clojure.set :as set]
             [clojure.string :as str]
             [korma.core :as korma]
-            [korma.db :as db]))
+            [korma.db :as db]
+            [vip.data-processor.errors :as errors]))
 
 (defn sqlize-str [s]
   (-> s
@@ -111,8 +112,8 @@
        (when (seq chunk-without-dupe-ids)
          (korma/insert sql-table (korma/values chunk-without-dupe-ids)))
        (reduce (fn [ctx dupe-id]
-                 (assoc-in ctx [:fatal entity dupe-id :duplicate-ids]
-                           ["Duplicate id"]))
+                 (errors/add-errors ctx :fatal entity dupe-id :duplicate-ids
+                                    "Duplicate id"))
                ctx (set/union existing-ids local-dupe-ids))))))
 
 (defn hydrate-row [ks row]
@@ -139,8 +140,9 @@
                     (let [message (.getMessage e)]
                       (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
                         (retry-chunk-without-dupe-ids ctx table hydrated-rows)
-                        (assoc-in ctx [:fatal (:name table) :global :unknown-sql-error]
-                                  [message]))))))))
+                        (errors/add-errors
+                         ctx :fatal (:name table) :global :unknown-sql-error
+                         message))))))))
           ctx (chunk-rows rows statement-parameter-limit)))
 
 (defmacro lazy-select

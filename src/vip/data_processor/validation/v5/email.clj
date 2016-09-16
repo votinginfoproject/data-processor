@@ -2,6 +2,7 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.data-spec.value-format :as value-format]
+            [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]))
 
 (defn validate-emails [{:keys [import-id] :as ctx}]
@@ -16,7 +17,7 @@
               (if (re-find (:check value-format/email)
                            (:value row))
                 ctx
-                (update-in ctx
-                          [:errors :email (-> row :path .getValue) :format]
-                          conj (:value row))))
+                (errors/add-errors ctx
+                                   :errors :email (-> row :path .getValue) :format
+                                   (:value row))))
             ctx emails)))

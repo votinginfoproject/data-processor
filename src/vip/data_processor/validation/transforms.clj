@@ -4,7 +4,8 @@
             [clojure.string :as s]
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.csv :as csv]
-            [vip.data-processor.validation.xml :as xml]))
+            [vip.data-processor.validation.xml :as xml]
+            [vip.data-processor.errors :as errors]))
 
 (defn read-edn-sqs-message [ctx]
   (assoc ctx :input (edn/read-string (get-in ctx [:input :body]))))
@@ -41,11 +42,12 @@
                                    (s/split #"\.")
                                    last
                                    s/lower-case))))
-        {valid-files false invalid-files true} (group-by invalid-fn files)]
-    (-> ctx
-        (assoc :input valid-files)
-        (assoc-in [:warnings :import :global :invalid-extensions]
-                  (map #(.getName %) invalid-files)))))
+        {valid-files false invalid-files true} (group-by invalid-fn files)
+        ctx (assoc ctx :input valid-files)]
+    (if (seq invalid-files)
+      (errors/add-errors ctx :warnings :import :global :invalid-extensions
+                         (map #(.getName %) invalid-files))
+      ctx)))
 
 (defn xml-csv-branch [ctx]
   (let [file-extensions (->> ctx

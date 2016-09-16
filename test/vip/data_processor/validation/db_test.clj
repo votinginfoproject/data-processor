@@ -6,84 +6,138 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.pipeline :as pipeline]))
+            [vip.data-processor.pipeline :as pipeline]
+            [clojure.core.async :as a]))
 
 (deftest validate-no-duplicated-ids-test
   (testing "finds duplicated ids across CSVs and errors"
-    (let [ctx (merge {:input (csv-inputs ["duplicate-ids/contest.txt"
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["duplicate-ids/contest.txt"
                                           "duplicate-ids/candidate.txt"])
+                      :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-duplicated-ids]}
                      (sqlite/temp-db "duplicate-ids" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= #{"contests" "candidates"}
-             (set (get-in out-ctx [:errors :import 5882300 :duplicate-ids]))
-             (set (get-in out-ctx [:errors :import 8675309 :duplicate-ids]))))
-      (is (not (get-in out-ctx [:errors :import 7 :duplicated-ids])))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :import
+                            :identifier 5882300
+                            :error-type :duplicate-ids
+                            :error-value '("contests" "candidates")}))
+      (assert-no-problems-2 errors
+                            {:severity :errors
+                             :scope :import
+                             :identifier 7
+                             :error-type :duplicate-ids}))))
 
 (deftest validate-no-duplicated-rows-test
   (testing "finds possibly duplicated rows in a table and warns"
-    (let [ctx (merge {:input (csv-inputs ["duplicate-rows/candidate.txt"
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["duplicate-rows/candidate.txt"
                                           "duplicate-rows/ballot_candidate.txt"
                                           "duplicate-rows/ballot.txt"])
+                      :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-duplicated-rows]}
                      (sqlite/temp-db "duplicate-ids" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
       (doseq [id [3100047456984 3100047456989 3100047466988 3100047466990]]
-        (is (get-in out-ctx [:warnings :candidates id :duplicate-rows])))
-      (is (= #{{:candidate_id 3100047456987, :ballot_id 410004745} {:candidate_id 3100047466988, :ballot_id 410004746}}
-             (set (get-in out-ctx [:warnings :ballot-candidates nil :duplicate-rows]))))
+        (is (contains-error? errors
+                             {:severity :warnings
+                              :scope :candidates
+                              :identifier id
+                              :error-type :duplicate-rows})))
+      (is (contains-error? errors
+                           {:severity :warnings
+                            :scope :ballot-candidates
+                            :identifier nil
+                            :error-type :duplicate-rows
+                            :error-value {:candidate_id 3100047456987
+                                          :ballot_id 410004745}}))
+      (is (contains-error? errors
+                           {:severity :warnings
+                            :scope :ballot-candidates
+                            :identifier nil
+                            :error-type :duplicate-rows
+                            :error-value {:candidate_id 3100047466988
+                                          :ballot_id 410004746}}))
       (testing "does not add errors for ballots"
         (doseq [id [1 2 3]]
-          (is (nil? (get-in out-ctx [:warnings :ballots id :duplicate-rows])))))
-      (assert-error-format out-ctx))))
+          (assert-no-problems-2 errors
+                                {:severity :warnings
+                                 :scope :ballots
+                                 :identifier id
+                                 :error-type :duplicate-rows}))))))
 
 (deftest validate-one-record-limit-test
   (testing "validates that only one row exists in certain files"
-    (let [ctx (merge {:input (csv-inputs ["bad-number-of-rows/election.txt"])
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["bad-number-of-rows/election.txt"])
+                      :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-one-record-limit]}
                      (sqlite/temp-db "too-many-records" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= (get-in out-ctx [:errors :elections :global :row-constraint])
-             ["File needs to contain exactly one row."]))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :elections
+                            :identifier :global
+                            :error-type :row-constraint
+                            :error-value "File needs to contain exactly one row."})))))
 
 (deftest validate-references-test
   (testing "finds bad references"
-    (let [ctx (merge {:input (csv-inputs ["bad-references/ballot.txt"
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["bad-references/ballot.txt"
                                           "bad-references/referendum.txt"])
+                      :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-references]}
                      (sqlite/temp-db "bad-references" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (= 123456789 (-> out-ctx
-                           (get-in [:errors :ballots 41100369 :unmatched-reference])
-                           first
-                           (get "referendum_id"))))
-      (assert-error-format out-ctx))))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :ballots
+                            :identifier 41100369
+                            :error-type :unmatched-reference
+                            :error-value {"referendum_id" 123456789}})))))
 
 (deftest validate-no-unreferenced-rows-test
   (testing "finds rows not referenced"
-    (let [ctx (merge {:input (csv-inputs ["unreferenced-rows/ballot.txt"
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["unreferenced-rows/ballot.txt"
                                           "unreferenced-rows/candidate.txt"
                                           "unreferenced-rows/contest.txt"
                                           "unreferenced-rows/ballot_candidate.txt"])
+                      :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
                                  validate-no-unreferenced-rows]}
                      (sqlite/temp-db "unreferenced-rows" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (get-in out-ctx [:warnings :ballots 2 :unreferenced-row]))
-      (is (get-in out-ctx [:warnings :ballots 3 :unreferenced-row]))
-      (is (get-in out-ctx [:warnings :candidates 13 :unreferenced-row]))
-      (is (get-in out-ctx [:warnings :candidates 14 :unreferenced-row]))
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (are [scope id]
+          (is (contains-error? errors
+                               {:severity :warnings
+                                :scope scope
+                                :identifier id
+                                :error-type :unreferenced-row}))
+        :ballots 2
+        :ballots 3
+        :candidates 13
+        :candidates 14)
       (testing "except for contests"
-        (is (nil? (get-in out-ctx [:warnings :contests 100 :unreferenced-row]))))
-      (assert-error-format out-ctx))))
+        (assert-no-problems-2 errors
+                              {:severity :warnings
+                               :scope :contests
+                               :identifier 100
+                               :error-type :unreferenced-row})))))

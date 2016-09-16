@@ -15,6 +15,8 @@
                  [democracyworks/squishy "2.0.0" :exclusions [joda-time
                                                               org.slf4j/slf4j-simple
                                                               org.slf4j/slf4j-api]]
+                 [org.clojure/core.async "0.2.391"]
+                 [democracyworks/utility-works "0.1.0-SNAPSHOT"]
                  [net.lingala.zip4j/zip4j "1.3.2"]
                  [turbovote.resource-config "0.2.0"]
                  [joplin.jdbc "0.3.6"

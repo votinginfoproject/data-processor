@@ -51,7 +51,7 @@
 
 (defn zip-filename
   [{:keys [spec-version tables import-id] :as ctx}]
-  (condp = spec-version
+  (condp = @spec-version
     "3.0"
     (let [fips (-> tables
                    :sources

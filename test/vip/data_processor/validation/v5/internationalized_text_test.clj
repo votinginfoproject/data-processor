@@ -3,21 +3,28 @@
             [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.validation.xml :as xml]))
+            [vip.data-processor.validation.xml :as xml]
+            [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
 (use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres validate-no-missing-texts-test
-  (let [ctx {:input (xml-input "v5-internationalized-text.xml")}
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-internationalized-text.xml")
+             :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.intl-text/validate-no-missing-texts)]
+                    v5.intl-text/validate-no-missing-texts)
+        errors (all-errors errors-chan)]
     (testing "Text present is OK"
-      (are [element-path] (is (not (get-in out-ctx
-                                           [:errors :internationalized-text
-                                            element-path :missing])))
+      (are [element-path]
+          (assert-no-problems-2 errors
+                                {:severity :errors
+                                 :scope :internationalized-text
+                                 :identifier element-path
+                                 :error-type :missing})
         "VipObject.0.BallotMeasureContest.0.BallotTitle.0.Text"
         "VipObject.0.BallotMeasureContest.0.BallotSubTitle.1.Text"
         "VipObject.0.BallotMeasureContest.0.ConStatement.2.Text"
@@ -67,9 +74,12 @@
         "VipObject.0.Source.13.Description.0.Text"
         "VipObject.0.Source.13.FeedContactInformation.1.Hours.0.Text"))
     (testing "Text missing is an error"
-      (are [element-path] (is (get-in out-ctx
-                                      [:errors :internationalized-text
-                                       element-path :missing]))
+      (are [element-path]
+          (is (contains-error? errors
+                               {:severity :errors
+                                :scope :internationalized-text
+                                :identifier element-path
+                                :error-type :missing}))
         "VipObject.0.BallotMeasureContest.14.BallotTitle.0.Text"
         "VipObject.0.BallotMeasureContest.14.BallotSubTitle.1.Text"
         "VipObject.0.BallotMeasureContest.14.ConStatement.2.Text"

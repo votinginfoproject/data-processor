@@ -4,7 +4,8 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.output.tree-xml :refer :all]
             [vip.data-processor.pipeline :as pipeline]
-            [vip.data-processor.test-helpers :refer :all]))
+            [vip.data-processor.test-helpers :refer :all]
+            [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
 
@@ -60,11 +61,14 @@
                :simple_path (postgres/path->ltree "VipObject.Contest.id")
                :parent_with_id (postgres/path->ltree "VipObject.0.Contest.1.id")
                :value "con001"}]))
-        ctx {:spec-version "5.1.2"
+        errors-chan (a/chan 100)
+        ctx {:spec-version (atom "5.1.2")
+             :errors-chan errors-chan
              :import-id import-id
              :pipeline pipeline}
-        out-ctx (pipeline/run-pipeline ctx)]
-    (assert-no-problems out-ctx [])
+        out-ctx (pipeline/run-pipeline ctx)
+        errors (all-errors errors-chan)]
+    (assert-no-problems-2 errors {})
     (is (= (-> out-ctx
                :xml-output-file
                .toFile
