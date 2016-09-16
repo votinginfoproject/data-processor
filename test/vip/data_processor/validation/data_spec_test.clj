@@ -43,10 +43,12 @@
         filename "test.txt"
         id "3"
         line-number 7
-        ctx {}]
+        ctx {}
+        format {:check #"\A\d+\z"
+                :message "Invalid data type"}]
     (testing "with an id, uses the id"
       (testing "required column"
-        (let [format-rule (create-format-rule filename {:name column :required :critical :format format/all-digits})]
+        (let [format-rule (create-format-rule filename {:name column :required :critical :format format})]
           (testing "if the required column is missing, adds an error of the specified severity"
             (let [result-ctx (format-rule ctx {column "" "id" id} line-number)]
               (is (= (ffirst (get-in result-ctx [:critical filename id]))
@@ -59,7 +61,7 @@
             (let [result-ctx (format-rule ctx {column "1234" "id" id} line-number)]
               (is (= ctx result-ctx))))))
       (testing "optional column"
-        (let [format-rule (create-format-rule filename {:name column :format format/all-digits})]
+        (let [format-rule (create-format-rule filename {:name column :format format})]
           (testing "if it's not there, it's okay"
             (let [result-ctx (format-rule ctx {} line-number)]
               (is (= ctx result-ctx))))
@@ -112,7 +114,7 @@
           (is (= ctx (format-rule ctx {"id" id} line-number))))))
     (testing "without an id, uses the line number"
       (testing "required column"
-        (let [format-rule (create-format-rule filename {:name column :required :fatal :format format/all-digits})]
+        (let [format-rule (create-format-rule filename {:name column :required :fatal :format format})]
           (testing "if the required column is missing, adds an error of the specified severity"
             (let [result-ctx (format-rule ctx {column ""} line-number)]
               (is (= (ffirst (get-in result-ctx [:fatal filename line-number]))
@@ -123,7 +125,26 @@
                      column))))
           (testing "if the required column is there and matches the format, is okay"
             (let [result-ctx (format-rule ctx {column "1234"} line-number)]
-              (is (= ctx result-ctx)))))))))
+              (is (= ctx result-ctx)))))))
+    (testing "with a severity set on the format"
+      (let [format {:check #"\A\d+\z"
+                    :message "Invalid data type"
+                    :severity :fatal}
+            format-rule (create-format-rule filename {:name column
+                                                      :required :fatal
+                                                      :format format})]
+        (testing "not overridden creates errors at the format's severity"
+          (let [result-ctx (format-rule ctx {column "asdf"} line-number)]
+            (is (= (ffirst (get-in result-ctx [:fatal filename line-number]))
+                   column))))
+        (testing "overridden creates errors at the override severity"
+          (let [format-rule (create-format-rule filename {:name column
+                                                          :required :fatal
+                                                          :format format
+                                                          :severity :warnings})
+                result-ctx (format-rule ctx {column "asdf"} line-number)]
+            (is (= (ffirst (get-in result-ctx [:warnings filename line-number]))
+                   column))))))))
 
 (deftest invalid-utf-8-test
   (testing "marks any value with a Unicode replacement character as invalid UTF-8 because that's what we assume we get"

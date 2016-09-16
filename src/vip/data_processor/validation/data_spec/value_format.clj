@@ -2,7 +2,8 @@
 
 (def all-digits
   {:check #"\A\d+\z"
-   :message "Invalid data type"})
+   :message "Invalid data type"
+   :severity :fatal})
 
 (def date
   {:check #"\A\d{4}-\d{2}-\d{2}\z"

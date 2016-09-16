@@ -18,15 +18,18 @@
 (defn create-format-rule
   "Create a function that applies a format check for a specific
   element of an import."
-  [scope {:keys [name required format severity] :or {severity :errors}}]
-  (let [{:keys [check message]} format
+  [scope {name :name
+          required :required
+          {:keys [check message severity]} :format
+          severity-override :severity}]
+  (let [severity (or severity-override severity :errors)
         test-fn (cond
-                 (sequential? check) (fn [val]
-                                       (let [lower-case-val (str/lower-case val)]
-                                         (some #{lower-case-val} check)))
-                 (instance? clojure.lang.IFn check) check
-                 (instance? java.util.regex.Pattern check) (fn [val] (re-find check val))
-                 :else (constantly true))]
+                  (sequential? check) (fn [val]
+                                        (let [lower-case-val (str/lower-case val)]
+                                          (some #{lower-case-val} check)))
+                  (instance? clojure.lang.IFn check) check
+                  (instance? java.util.regex.Pattern check) (fn [val] (re-find check val))
+                  :else (constantly true))]
     (fn [ctx element id-or-line-number]
       (let [identifier (or (get element "id") id-or-line-number)
             val (element name)]

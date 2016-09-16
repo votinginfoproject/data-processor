@@ -250,7 +250,7 @@
       (is (get-in out-ctx [:errors :candidates "90001" "candidate_url"]))
       (is (get-in out-ctx [:errors :candidates "90001" "phone"]))
       (is (get-in out-ctx [:errors :candidates "90001" "email"]))
-      (is (get-in out-ctx [:errors :candidates "90001" "sort_order"])))
+      (is (get-in out-ctx [:fatal :candidates "90001" "sort_order"])))
     (testing "puts errors in the right format"
       (assert-error-format out-ctx))))
 
