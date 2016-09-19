@@ -1,4 +1,4 @@
-drop index if exists street_segments_results_precinct_idx;
-drop index if exists precinct_polling_locations_results_precinct_idx;
-drop index if exists precinct_polling_locations_results_polling_location_idx;
+drop index if exists v3_0_street_segments_results_precinct_idx;
+drop index if exists v3_0_precinct_polling_locations_results_precinct_idx;
+drop index if exists v3_0_precinct_polling_locations_results_polling_location_idx;
 drop index if exists v3_0_precincts_results_locality_idx;
