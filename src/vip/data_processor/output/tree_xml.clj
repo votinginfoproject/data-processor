@@ -94,7 +94,7 @@
     (let [last-seen-path (atom "VipObject.0")
           inside-open-tag (atom false)]
       (doseq [{:keys [path value simple_path] :as row}
-              (db.util/lazy-select 1000
+              (db.util/lazy-select 100000
                                    postgres/xml-tree-values
                                    (korma/where {:results_id import-id})
                                    (korma/order :insert_counter :ASC))]
