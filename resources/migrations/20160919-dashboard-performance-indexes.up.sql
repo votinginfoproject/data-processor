@@ -10,5 +10,5 @@ create index v3_0_precinct_polling_locations_results_polling_location_idx on v3_
 drop index if exists v3_0_precincts_results_locality_idx;
 create index v3_0_precincts_results_locality_idx on v3_0_precincts (results_id, locality_id);
 
-drop index if exists xml_tree_output_sanity;
-create index xml_tree_output_sanity on xml_tree_values (results_id, insert_counter);
+drop index if exists xml_tree_values_results_insert_counter_idx;
+create index xml_tree_values_results_insert_counter_idx on xml_tree_values (results_id, insert_counter);
