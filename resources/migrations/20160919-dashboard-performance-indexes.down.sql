@@ -1,0 +1,5 @@
+drop index if exists v3_0_street_segments_results_precinct_idx;
+drop index if exists v3_0_precinct_polling_locations_results_precinct_idx;
+drop index if exists v3_0_precinct_polling_locations_results_polling_location_idx;
+drop index if exists v3_0_precincts_results_locality_idx;
+drop index if exists xml_tree_values_results_insert_counter_idx;

@@ -1,0 +1,4 @@
+drop index if exists xml_tree_values_results_state_path_idx;
+drop index if exists xml_tree_values_results_date_path_idx;
+drop index if exists xml_tree_values_results_election_type_path_idx;
+drop index if exists validations_results_scoped_severity_idx;

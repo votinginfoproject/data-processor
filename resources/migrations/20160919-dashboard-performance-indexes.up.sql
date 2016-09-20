@@ -1,0 +1,14 @@
+drop index if exists v3_0_street_segments_results_precinct_idx;
+create index v3_0_street_segments_results_precinct_idx on v3_0_street_segments(results_id, precinct_id);
+
+drop index if exists v3_0_precinct_polling_locations_results_precinct_idx;
+create index v3_0_precinct_polling_locations_results_precinct_idx on v3_0_precinct_polling_locations(results_id, precinct_id);
+
+drop index if exists v3_0_precinct_polling_locations_results_polling_location_idx;
+create index v3_0_precinct_polling_locations_results_polling_location_idx on v3_0_precinct_polling_locations(results_id, polling_location_id);
+
+drop index if exists v3_0_precincts_results_locality_idx;
+create index v3_0_precincts_results_locality_idx on v3_0_precincts (results_id, locality_id);
+
+drop index if exists xml_tree_values_results_insert_counter_idx;
+create index xml_tree_values_results_insert_counter_idx on xml_tree_values (results_id, insert_counter);
