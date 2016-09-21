@@ -1,0 +1,1 @@
+drop index if exists xml_tree_values_idref_validation_idx;
