@@ -45,6 +45,7 @@
   (let [spec-version (atom nil)
         errors-chan (a/chan 1024)
         ctx {:input initial-input
+             :skip-validations? false
              :warnings {}
              :errors {}
              :critical {}

@@ -44,12 +44,14 @@
           [tree-stats/store-tree-stats]))
 
 (defn add-validations
-  [{:keys [spec-version] :as ctx}]
-  (let [validations (condp = @spec-version
-                      "3.0" v3-validation-pipeline
-                      "5.1" v5-1-validation-pipeline
-                      nil)]
-    (update ctx :pipeline (partial concat validations))))
+  [{:keys [spec-version skip-validations?] :as ctx}]
+  (if skip-validations?
+    ctx
+    (let [validations (condp = spec-version
+                        "3.0" v3-validation-pipeline
+                        "5.1" v5-1-validation-pipeline
+                        nil)]
+      (update ctx :pipeline (partial concat validations)))))
 
 (def pipeline
   (concat download-pipeline

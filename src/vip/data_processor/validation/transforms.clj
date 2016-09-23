@@ -8,7 +8,8 @@
             [vip.data-processor.errors :as errors]))
 
 (defn read-edn-sqs-message [ctx]
-  (assoc ctx :input (edn/read-string (get-in ctx [:input :body]))))
+  (let [message (edn/read-string (get-in ctx [:input :body]))]
+    (assoc ctx :input message :skip-validations? (get message :skip-validations false))))
 
 (defn assert-filename [ctx]
   (if-let [filename (get-in ctx [:input :filename])]
