@@ -41,6 +41,7 @@
   context will result in logging the exception."
   [pipeline initial-input]
   (let [ctx {:input initial-input
+             :skip-validations? false
              :warnings {}
              :errors {}
              :critical {}
