@@ -1,9 +1,11 @@
 (ns vip.data-processor.validation.v5.email
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.validation.data-spec.value-format :as value-format]))
+            [vip.data-processor.validation.data-spec.value-format :as value-format]
+            [clojure.tools.logging :as log]))
 
 (defn validate-emails [{:keys [import-id] :as ctx}]
+  (log/info "Validating emails")
   (let [emails (korma/select postgres/xml-tree-values
                  (korma/where {:results_id import-id})
                  (korma/where

@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.v5.hours-open
-  (:require [vip.data-processor.validation.v5.util :as util]))
+  (:require [vip.data-processor.validation.v5.util :as util]
+            [clojure.tools.logging :as log]))
 
 (defn valid-time-with-zone? [time]
   (re-matches
@@ -7,6 +8,7 @@
    time))
 
 (defn validate-times [{:keys [import-id] :as ctx}]
+  (log/info "Validating times")
   (let [hours-open-path "VipObject.0.HoursOpen.*{1}.Schedule.*{1}.Hours.*{1}"
         times (util/select-lquery
                import-id

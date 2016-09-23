@@ -2,7 +2,8 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.v5.util :as util]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.tools.logging :as log]))
 
 (util/validate-no-missing-values :street-segment
                                  [:odd-even-both]
@@ -42,6 +43,7 @@
 
 (defn validate-no-street-segment-overlaps
   [{:keys [import-id] :as ctx}]
+  (log/info "Validating street segment overlaps")
   (let [overlaps (korma/exec-raw
                   (:conn postgres/v5-1-street-segments)
                   [overlap-query [import-id]]

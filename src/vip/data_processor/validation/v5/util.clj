@@ -2,7 +2,8 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.xml.spec :as spec]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.tools.logging :as log]))
 
 (defn two-import-ids
   "A common params-fn for build-xml-tree-value-query-validator that
@@ -16,6 +17,7 @@
   context) which returns a vector of params for the query."
   [severity scope error-type error-data query params-fn]
   (fn [{:keys [import-id] :as ctx}]
+    (log/info "Validating" severity scope error-type)
     (let [missing-paths (korma/exec-raw
                          (:conn postgres/xml-tree-values)
                          [query (params-fn ctx)]
