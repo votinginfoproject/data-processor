@@ -1,4 +1,5 @@
 (ns vip.data-processor.validation.zip
+  (:require [clojure.tools.logging :as log])
   (:import [net.lingala.zip4j.core ZipFile]
            [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
@@ -22,6 +23,7 @@
 
 (defn assoc-file [ctx]
   (let [path (:input ctx)]
+    (log/info "Starting to process from path:" (str path))
     (cond
       (zip-file? path) (assoc ctx :input (unzip-file path))
       (xml-file? path) (assoc ctx :input path)
