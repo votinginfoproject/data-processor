@@ -2,7 +2,8 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.v5.util :as util]
-            [vip.data-processor.validation.xml.spec :as spec]))
+            [vip.data-processor.validation.xml.spec :as spec]
+            [clojure.tools.logging :as log]))
 
 (defn duplicate-ids [import-id]
   (korma/select [postgres/xml-tree-values :first]
@@ -17,6 +18,7 @@
 
 (defn validate-unique-ids
   [{:keys [import-id] :as ctx}]
+  (log/info "Validating unique ids")
   (let [duplicate-ids (duplicate-ids import-id)]
     (reduce (fn [ctx row]
               (let [id (:value row)
@@ -83,6 +85,7 @@
 
 (defn validate-idref-references
   [{:keys [import-id spec-version] :as ctx}]
+  (log/info "Validating idref references")
   (let [idref-simple-paths (->> (spec/type->simple-paths "xs:IDREF" spec-version)
                                 (map postgres/path->ltree))]
     (reduce validate-idref-type-refers
@@ -90,6 +93,7 @@
 
 (defn validate-idrefs-references
   [{:keys [import-id spec-version] :as ctx}]
+  (log/info "Validating idrefs references")
   (let [idrefs-simple-paths (->> (spec/type->simple-paths "xs:IDREFS" spec-version)
                                  (map postgres/path->ltree))]
     (reduce validate-idrefs-type-refers

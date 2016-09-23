@@ -112,8 +112,10 @@
 (defn start-run [ctx]
   (let [results (korma/insert results
                               (korma/values {:start_time (korma/sqlfn now)
-                                             :complete false}))]
-    (assoc ctx :import-id (:id results))))
+                                             :complete false}))
+        import-id (:id results)]
+    (log/info "Starting run with import_id:" import-id)
+    (assoc ctx :import-id import-id)))
 
 (defn build-public-id [date election-type state import-id]
   (let [nil-or-empty? (some-fn nil? empty?)

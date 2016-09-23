@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.v5.candidate
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.validation.v5.util :as util]))
+            [vip.data-processor.validation.v5.util :as util]
+            [clojure.tools.logging :as log]))
 
 (defn valid-pre-election-status? [status]
   (#{"filed" "qualified" "withdrawn" "write-in"} (:value status)))
@@ -11,6 +12,7 @@
    (:value status)))
 
 (defn validate-pre-election-statuses [{:keys [import-id] :as ctx}]
+  (log/info "Validating PreElectionStatus elements")
   (let [statuses (korma/select postgres/xml-tree-values
                    (korma/where {:results_id import-id
                                  :simple_path (postgres/path->ltree "VipObject.Candidate.PreElectionStatus")}))
@@ -22,6 +24,7 @@
             ctx invalid-statuses)))
 
 (defn validate-post-election-statuses [{:keys [import-id] :as ctx}]
+  (log/info "Validating PostElectionStatus elements")
   (let [statuses (korma/select postgres/xml-tree-values
                    (korma/where {:results_id import-id
                                  :simple_path (postgres/path->ltree "VipObject.Candidate.PostElectionStatus")}))

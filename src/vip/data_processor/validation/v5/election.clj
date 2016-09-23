@@ -1,9 +1,11 @@
 (ns vip.data-processor.validation.v5.election
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.validation.v5.util :as util]))
+            [vip.data-processor.validation.v5.util :as util]
+            [clojure.tools.logging :as log]))
 
 (defn validate-one-election [{:keys [import-id] :as ctx}]
+  (log/info "Validating one election")
   (let [result (korma/exec-raw
                 (:conn postgres/xml-tree-values)
                 ["SELECT COUNT(DISTINCT subltree(path, 0, 4)) AS election_count

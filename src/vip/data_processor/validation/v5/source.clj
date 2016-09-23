@@ -2,9 +2,11 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.fips :as fips]
-            [vip.data-processor.validation.v5.util :as util]))
+            [vip.data-processor.validation.v5.util :as util]
+            [clojure.tools.logging :as log]))
 
 (defn validate-one-source [{:keys [import-id] :as ctx}]
+  (log/info "Validating one source")
   (let [result (korma/exec-raw
                 (:conn postgres/xml-tree-values)
                 ["SELECT COUNT(DISTINCT subltree(path, 0, 4)) AS source_count
@@ -57,6 +59,7 @@
    util/two-import-ids))
 
 (defn validate-vip-id-valid-fips [{:keys [import-id] :as ctx}]
+  (log/info "Validating VipId")
   (let [simple-path (postgres/path->ltree "VipObject.Source.VipId")
         vip-ids (korma/select postgres/xml-tree-values
                   (korma/where {:results_id import-id
