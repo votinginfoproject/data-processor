@@ -29,14 +29,12 @@
 (def validate-no-missing-ids
   (util/build-xml-tree-value-query-validator
    :fatal :id :missing :missing-id
-   "SELECT xtv.path
-    FROM (SELECT DISTINCT subltree(path, 0, 4) || 'id' AS path
-          FROM xml_tree_values WHERE results_id = ?
-          AND nlevel(subltree(path, 0, 4)) = 4) xtv
-    LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
-    ON xtv.path = xtv2.path
-    WHERE xtv2.path IS NULL"
-   util/two-import-ids))
+   "select distinct subltree(path, 0, 4) || 'id' as path
+    from xml_tree_values
+    where results_id = ?
+      and nlevel(path) > 3
+      and parent_with_id is null"
+   (fn [{:keys [import-id]}] [import-id])))
 
 (defn validate-ids-with
   [{:keys [import-id] :as ctx} simple-path query]
