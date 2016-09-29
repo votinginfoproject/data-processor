@@ -157,7 +157,7 @@
           errors (all-errors errors-chan)]
       (is (nil? (:stop out-ctx)))
       (is (nil? (:exception out-ctx)))
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (testing "inserts values for columns not in the first element of a type"
         (let [mail-only-precinct (first
                                   (korma/select (get-in out-ctx [:tables :precincts])

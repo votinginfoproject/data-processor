@@ -26,12 +26,12 @@
                             :identifier "VipObject.0.Party.1.ExternalIdentifiers.1.ExternalIdentifier.0.Type"
                             :error-type :missing})))
     (testing "existing Types are not flagged"
-      (assert-no-problems-2 errors
-                            {:scope :external-identifiers
-                             :identifier "VipObject.0.Party.0.ExternalIdentifiers.1.ExternalIdentifier.0.Type"})
-      (assert-no-problems-2 errors
-                            {:scope :external-identifiers
-                             :identifier "VipObject.0.Party.2.ExternalIdentifiers.1.ExternalIdentifier.0.Type"}))))
+      (assert-no-problems errors
+                          {:scope :external-identifiers
+                           :identifier "VipObject.0.Party.0.ExternalIdentifiers.1.ExternalIdentifier.0.Type"})
+      (assert-no-problems errors
+                          {:scope :external-identifiers
+                           :identifier "VipObject.0.Party.2.ExternalIdentifiers.1.ExternalIdentifier.0.Type"}))))
 
 (deftest ^:postgres validate-no-missing-values-test
   (let [errors-chan (a/chan 100)
@@ -49,9 +49,9 @@
                             :identifier "VipObject.0.Party.2.ExternalIdentifiers.1.ExternalIdentifier.0.Value"
                             :error-type :missing})))
     (testing "existing Values are not flagged"
-      (assert-no-problems-2 errors
-                            {:scope :external-identifiers
-                             :identifier "VipObject.0.Party.0.ExternalIdentifiers.1.ExternalIdentifier.0.Value"})
-      (assert-no-problems-2 errors
-                            {:scope :external-identifiers
-                             :identifier "VipObject.0.Party.1.ExternalIdentifiers.1.ExternalIdentifier.0.Value"}))))
+      (assert-no-problems errors
+                          {:scope :external-identifiers
+                           :identifier "VipObject.0.Party.0.ExternalIdentifiers.1.ExternalIdentifier.0.Value"})
+      (assert-no-problems errors
+                          {:scope :external-identifiers
+                           :identifier "VipObject.0.Party.1.ExternalIdentifiers.1.ExternalIdentifier.0.Value"}))))

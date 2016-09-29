@@ -25,11 +25,11 @@
                             :identifier "VipObject.0.Locality.0.Name"
                             :error-type :missing})))
     (testing "name present is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :locality
-                             :identifier "VipObject.0.Locality.1.Name"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :locality
+                           :identifier "VipObject.0.Locality.1.Name"
+                           :error-type :missing}))))
 
 (deftest ^:postgres validate-no-missing-state-ids-test
   (let [errors-chan (a/chan 100)
@@ -47,8 +47,8 @@
                             :identifier "VipObject.0.Locality.0.StateId"
                             :error-type :missing})))
     (testing "state-id present is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :locality
-                             :identifier "VipObject.0.Locality.1.StateId"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :locality
+                           :identifier "VipObject.0.Locality.1.StateId"
+                           :error-type :missing}))))

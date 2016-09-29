@@ -25,11 +25,11 @@
                             :identifier "VipObject.0.PollingLocation.0.AddressLine"
                             :error-type :missing})))
     (testing "address-line present is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :polling-location
-                             :identifier "VipObject.0.PollingLocation.1.AddressLine"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :polling-location
+                           :identifier "VipObject.0.PollingLocation.1.AddressLine"
+                           :error-type :missing}))))
 
 (deftest ^:postgres validate-latitude-longitude-test
   (let [errors-chan (a/chan 100)
@@ -44,27 +44,27 @@
                     v5.polling-location/validate-longitude)
         errors (all-errors errors-chan)]
     (testing "lat-lng missing is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :lat-lng
-                             :identifier "VipObject.0.PollingLocation.0.LatLng"
-                             :error-type :missing})
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :lat-lng
-                             :identifier "VipObject.0.PollingLocation.1.LatLng"
-                             :error-type :missing}))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :lat-lng
+                           :identifier "VipObject.0.PollingLocation.0.LatLng"
+                           :error-type :missing})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :lat-lng
+                           :identifier "VipObject.0.PollingLocation.1.LatLng"
+                           :error-type :missing}))
     (testing "valid lat-lng is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :lat-lng
-                             :identifier "VipObject.0.PollingLocation.2.LatLng.1.Latitude.0"
-                             :error-type :format})
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :lat-lng
-                             :identifier "VipObject.0.PollingLocation.2.LatLng.1.Latitude.1"
-                             :error-type :format}))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :lat-lng
+                           :identifier "VipObject.0.PollingLocation.2.LatLng.1.Latitude.0"
+                           :error-type :format})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :lat-lng
+                           :identifier "VipObject.0.PollingLocation.2.LatLng.1.Latitude.1"
+                           :error-type :format}))
     (testing "missing latitude is an error"
       (is (contains-error? errors
                            {:severity :errors

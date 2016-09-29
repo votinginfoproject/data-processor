@@ -25,8 +25,8 @@
                             :identifier "VipObject.0.Party.0.Color.0"
                             :error-type :format})))
     (testing "color valid is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :party
-                             :identifier "VipObject.0.Party.1.Color.0"
-                             :error-type :format}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :party
+                           :identifier "VipObject.0.Party.1.Color.0"
+                           :error-type :format}))))

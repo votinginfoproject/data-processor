@@ -31,16 +31,16 @@
                             :identifier "VipObject.0.Precinct.1.Name"
                             :error-type :missing})))
     (testing "doesn't for those that aren't"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :precincts
-                             :identifier "VipObject.0.Precinct.2.Name"
-                             :error-type :missing})
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :precincts
-                             :identifier "VipObject.0.Precinct.3.Name"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :precincts
+                           :identifier "VipObject.0.Precinct.2.Name"
+                           :error-type :missing})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :precincts
+                           :identifier "VipObject.0.Precinct.3.Name"
+                           :error-type :missing}))))
 
 (deftest ^:postgres validate-no-missing-locality-ids-test
   (let [errors-chan (a/chan 100)
@@ -63,13 +63,13 @@
                             :identifier "VipObject.0.Precinct.2.LocalityId"
                             :error-type :missing})))
     (testing "doesn't for those that aren't"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :precincts
-                             :identifier "VipObject.0.Precinct.1.LocalityId"
-                             :error-type :missing})
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :precincts
-                             :identifier "VipObject.0.Precinct.3.LocalityId"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :precincts
+                           :identifier "VipObject.0.Precinct.1.LocalityId"
+                           :error-type :missing})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :precincts
+                           :identifier "VipObject.0.Precinct.3.LocalityId"
+                           :error-type :missing}))))

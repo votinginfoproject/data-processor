@@ -25,8 +25,8 @@
                             :identifier "VipObject.0.OrderedContest.0.ContestId"
                             :error-type :missing})))
     (testing "contest-id present is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :ordered-contest
-                             :identifier "VipObject.0.OrderedContest.1.ContestId"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :ordered-contest
+                           :identifier "VipObject.0.OrderedContest.1.ContestId"
+                           :error-type :missing}))))

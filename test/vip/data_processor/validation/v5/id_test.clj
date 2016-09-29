@@ -35,16 +35,16 @@
                             :error-value "super-duper"})))
 
     (testing "unique IDs are not flagged"
-      (assert-no-problems-2 errors
-                            {:severity :fatal
-                             :scope :id
-                             :identifier "VipObject.0.ElectionAuthority.2.id"
-                             :error-type :duplicates})
-      (assert-no-problems-2 errors
-                            {:severity :fatal
-                             :scope :id
-                             :identifier "VipObject.0.ElectionAuthority.3.id"
-                             :error-type :duplicates}))))
+      (assert-no-problems errors
+                          {:severity :fatal
+                           :scope :id
+                           :identifier "VipObject.0.ElectionAuthority.2.id"
+                           :error-type :duplicates})
+      (assert-no-problems errors
+                          {:severity :fatal
+                           :scope :id
+                           :identifier "VipObject.0.ElectionAuthority.3.id"
+                           :error-type :duplicates}))))
 
 (deftest ^:postgres validate-no-missing-ids-test
   (let [errors-chan (a/chan 100)
@@ -67,11 +67,11 @@
                             :identifier "VipObject.0.Person.2.id"
                             :error-type :missing})))
     (testing "doesn't for those that aren't"
-      (assert-no-problems-2 errors
-                            {:severity :fatal
-                             :scope :id
-                             :identifier "VipObject.0.Person.1.id"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :fatal
+                           :scope :id
+                           :identifier "VipObject.0.Person.1.id"
+                           :error-type :missing}))))
 
 (deftest ^:postgres validate-idrefs-refer-test
   (let [errors-chan (a/chan 100)
@@ -98,14 +98,14 @@
                             :error-type :no-referent})))
 
     (testing "IDREF elements that point to something are good"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :id
-                             :identifier "VipObject.0.Person.0.PartyId.1"})
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :id
-                             :identifier "VipObject.0.Person.2.PartyId.1"}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :id
+                           :identifier "VipObject.0.Person.0.PartyId.1"})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :id
+                           :identifier "VipObject.0.Person.2.PartyId.1"}))))
 
 (deftest ^:postgres validate-idrefs-plural-refer-test
   (let [errors-chan (a/chan 100)
@@ -126,7 +126,7 @@
             :error-type :no-referent})))
 
     (testing "IDREFS elements that point to some things are good"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :id
-                             :identifier "VipObject.0.Locality.11.PollingLocationIds.3"}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :id
+                           :identifier "VipObject.0.Locality.11.PollingLocationIds.3"}))))

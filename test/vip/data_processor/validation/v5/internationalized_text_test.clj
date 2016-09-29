@@ -20,11 +20,11 @@
         errors (all-errors errors-chan)]
     (testing "Text present is OK"
       (are [element-path]
-          (assert-no-problems-2 errors
-                                {:severity :errors
-                                 :scope :internationalized-text
-                                 :identifier element-path
-                                 :error-type :missing})
+          (assert-no-problems errors
+                              {:severity :errors
+                               :scope :internationalized-text
+                               :identifier element-path
+                               :error-type :missing})
         "VipObject.0.BallotMeasureContest.0.BallotTitle.0.Text"
         "VipObject.0.BallotMeasureContest.0.BallotSubTitle.1.Text"
         "VipObject.0.BallotMeasureContest.0.ConStatement.2.Text"

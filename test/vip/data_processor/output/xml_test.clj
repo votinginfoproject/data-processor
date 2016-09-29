@@ -37,7 +37,7 @@
                       slurp
                       xpath/xml->doc)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (are [path text] (= text (xpath/$x:text path xml-doc))
            "/vip_object/ballot[@id=200000]/image_url" "http://i.imgur.com/PMgfJSm.jpg"
            "/vip_object/ballot[@id=200000]/candidate_id[@sort_order=3]" "10000"
@@ -100,7 +100,7 @@
                :vip-version "3.0"}
           results-ctx (validate-xml-output ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})))
+      (assert-no-problems errors {})))
 
   (testing "bad XML won't validate, adding to `:errors`"
     (let [errors-chan (a/chan 100)

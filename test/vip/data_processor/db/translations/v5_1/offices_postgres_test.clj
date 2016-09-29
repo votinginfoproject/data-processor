@@ -23,7 +23,7 @@
                           (get csv/version-pipelines "5.1"))}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (testing "with a contact information"
         (are-xml-tree-values out-ctx
           "off001" "VipObject.0.Office.0.id"

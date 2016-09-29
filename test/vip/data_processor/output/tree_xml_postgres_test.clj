@@ -68,7 +68,7 @@
              :pipeline pipeline}
         out-ctx (pipeline/run-pipeline ctx)
         errors (all-errors errors-chan)]
-    (assert-no-problems-2 errors {})
+    (assert-no-problems errors {})
     (is (= (-> out-ctx
                :xml-output-file
                .toFile

@@ -21,7 +21,7 @@
                  :data-specs v3-0/data-specs}
             out-ctx (validator ctx)
             errors (all-errors errors-chan)]
-        (assert-no-problems-2 errors {}))
+        (assert-no-problems errors {}))
       (testing "with sub-dependencies"
         (let [errors-chan (a/chan 100)
               ctx {:input [(File. "ballot.txt")
@@ -32,7 +32,7 @@
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
               errors (all-errors errors-chan)]
-          (assert-no-problems-2 errors {}))))
+          (assert-no-problems errors {}))))
     (testing "adds errors when dependencies are not met"
       (let [errors-chan (a/chan 100)
             ctx {:input [(File. "ballot.txt")
@@ -64,7 +64,7 @@
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
               errors (all-errors errors-chan)]
-          (assert-no-problems-2 errors {})))
+          (assert-no-problems errors {})))
       (testing "with precincts"
         (let [errors-chan (a/chan 100)
               ctx {:input [(File. "polling_location.txt")
@@ -75,4 +75,4 @@
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
               errors (all-errors errors-chan)]
-          (assert-no-problems-2 errors {}))))))
+          (assert-no-problems errors {}))))))

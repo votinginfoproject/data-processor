@@ -25,10 +25,10 @@
                             :identifier "VipObject.0.ElectoralDistrict.4.Name"
                             :error-type :missing}))
       (are [path]
-          (assert-no-problems-2 errors
-                                {:severity :errors
-                                 :scope :electoral-district
-                                 :identifier path})
+          (assert-no-problems errors
+                              {:severity :errors
+                               :scope :electoral-district
+                               :identifier path})
         "VipObject.0.ElectoralDistrict.0.Name"
         "VipObject.0.ElectoralDistrict.1.Name"
         "VipObject.0.ElectoralDistrict.2.Name"
@@ -51,10 +51,10 @@
                             :identifier "VipObject.0.ElectoralDistrict.5.Type"
                             :error-type :missing}))
       (are [path]
-          (assert-no-problems-2 errors
-                                {:severity :errors
-                                 :scope :electoral-district
-                                 :identifier path})
+          (assert-no-problems errors
+                              {:severity :errors
+                               :scope :electoral-district
+                               :identifier path})
         "VipObject.0.ElectoralDistrict.0.Type"
         "VipObject.0.ElectoralDistrict.1.Type"
         "VipObject.0.ElectoralDistrict.2.Type"

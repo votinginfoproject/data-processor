@@ -26,8 +26,8 @@
                             :identifier "VipObject.0.RetentionContest.0.CandidateId"
                             :error-type :missing})))
     (testing "doesn't for those that aren't"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :retention-contests
-                             :identifier "VipObject.0.RetentionContest.1.CandidateId"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :retention-contests
+                           :identifier "VipObject.0.RetentionContest.1.CandidateId"
+                           :error-type :missing}))))

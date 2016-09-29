@@ -34,7 +34,7 @@
                       xml/load-xml-ltree
                       v5.election/validate-one-election)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))
 
 (deftest ^:postgres validate-date-test
   (testing "Date element missing is a fatal error"
@@ -60,7 +60,7 @@
                       xml/load-xml-ltree
                       v5.election/validate-date)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))
 
 (deftest ^:postgres validate-state-id-test
   (testing "StateId element missing is a fatal error"
@@ -86,4 +86,4 @@
                       xml/load-xml-ltree
                       v5.election/validate-state-id)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))

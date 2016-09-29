@@ -25,8 +25,8 @@
                             :identifier "VipObject.0.PartySelection.0.PartyIds"
                             :error-type :missing})))
     (testing "party-ids present is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :party-selection
-                             :identifier "VipObject.0.PartySelection.1.PartyIds"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :party-selection
+                           :identifier "VipObject.0.PartySelection.1.PartyIds"
+                           :error-type :missing}))))

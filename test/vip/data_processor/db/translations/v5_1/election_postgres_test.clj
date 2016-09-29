@@ -22,7 +22,7 @@
                           (get csv/version-pipelines "5.1"))}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (are-xml-tree-values out-ctx
         "e001" "VipObject.0.Election.0.id"
         "Best Hot Dog" "VipObject.0.Election.0.Name.6.Text.0"

@@ -34,7 +34,7 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))
 
 (deftest ^:postgres validate-name-test
   (testing "missing Name is a fatal error"
@@ -60,7 +60,7 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})))
+      (assert-no-problems errors {})))
   (testing "Name present is OK even if it's not first"
     (let [errors-chan (a/chan 100)
           ctx {:input (xml-input "v5-source-second-with-name-second.xml")
@@ -70,7 +70,7 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))
 
 (deftest ^:postgres validate-date-time-test
   (testing "missing DateTime is a fatal error"
@@ -96,7 +96,7 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})))
+      (assert-no-problems errors {})))
   (testing "DateTime present is OK even if it's not first"
     (let [errors-chan (a/chan 100)
           ctx {:input (xml-input "v5-source-second-with-date-time-second.xml")
@@ -106,7 +106,7 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))
 
 (deftest ^:postgres validate-vip-id-test
   (testing "missing VipId is a fatal error"
@@ -132,7 +132,7 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))
 
 (deftest ^:postgres validate-vip-id-valid-fips-test
   (testing "invalid 2-digit FIPS in VipId is a critical error"
@@ -158,7 +158,7 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})))
+      (assert-no-problems errors {})))
   (testing "invalid 5-digit FIPS in VipId is a critical error"
     (let [errors-chan (a/chan 100)
           ctx {:input (xml-input "v5-source-vip-id-invalid-5-digit-fips.xml")
@@ -182,4 +182,4 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))

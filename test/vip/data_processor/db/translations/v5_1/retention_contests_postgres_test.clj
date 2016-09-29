@@ -23,7 +23,7 @@ errors-chan (a/chan 100)
                           (get csv/version-pipelines "5.1"))}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (are-xml-tree-values out-ctx
         "rc001" "VipObject.0.RetentionContest.0.id"
         "Judge Dredd" "VipObject.0.RetentionContest.0.Abbreviation.0"

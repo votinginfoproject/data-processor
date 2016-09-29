@@ -31,7 +31,7 @@
           errors (all-errors errors-chan)]
       (is (nil? (:stop results-ctx)))
       (is (nil? (:exception results-ctx)))
-      (assert-no-problems-2 errors {}))))
+      (assert-no-problems errors {}))))
 
 (deftest remove-invalid-extensions-test
   (testing "removes non-csv, txt, or xml files from :input"
