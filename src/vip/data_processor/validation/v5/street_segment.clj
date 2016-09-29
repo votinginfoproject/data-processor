@@ -38,7 +38,7 @@
                ss.odd_even_both = 'both' OR
                ss2.odd_even_both = 'both')
    INNER JOIN xml_tree_values xtv
-           ON xtv.value = ss.id
+           ON xtv.value = ss.id AND xtv.results_id = ss.results_id
    WHERE ss.results_id = ? AND xtv.simple_path = 'VipObject.StreetSegment.id';")
 
 (defn validate-no-street-segment-overlaps
