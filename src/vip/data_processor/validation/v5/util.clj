@@ -79,35 +79,31 @@
                                  (->> (str/join ".")))]
         (fn [ctx]
           (log/info "Validating" :errors schema-type :missing)
-          (let [parents (map (comp #(.getValue %) :path)
-                             (korma/exec-raw
-                              (:conn postgres/xml-tree-values)
-                              ["SELECT DISTINCT subltree(path, 0, CAST(? AS INT)) AS path
-                                FROM xml_tree_values
-                                WHERE results_id = ?
-                                AND simple_path <@ text2ltree(?)"
-                               [path-to-parent-nlevel import-id
-                                path-to-parent]]
-                              :results))
-                children (map (fn [r]
-                                {:parent (-> r :parent_path .getValue)
-                                 :child (-> r :child_path .getValue)})
-                              (korma/exec-raw
+          (let [expected (->> (korma/exec-raw
                                (:conn postgres/xml-tree-values)
-                               ["SELECT path AS child_path,
-                                        subltree(path, 0, CAST(? AS INT)) AS parent_path
+                               ["SELECT DISTINCT subltree(path, 0, CAST(? AS INT)) AS path
                                  FROM xml_tree_values
                                  WHERE results_id = ?
                                  AND simple_path <@ text2ltree(?)"
                                 [path-to-parent-nlevel import-id
-                                 path-to-children]]
-                               :results))
-                expected-parent-set (set parents)
-                found-parent-set (->> children (map :parent) set)]
-            (if (= expected-parent-set found-parent-set)
+                                 path-to-parent]]
+                               :results)
+                              (map (comp #(.getValue %) :path))
+                              set)
+                found (->> (korma/exec-raw
+                            (:conn postgres/xml-tree-values)
+                            ["SELECT subltree(path, 0, CAST(? AS INT)) AS path
+                              FROM xml_tree_values
+                              WHERE results_id = ?
+                              AND simple_path <@ text2ltree(?)"
+                             [path-to-parent-nlevel import-id
+                              path-to-children]]
+                            :results)
+                           (map (comp #(.getValue %) :path))
+                           set)]
+            (if (= expected found)
               ctx
-              (let [missing (set/difference expected-parent-set
-                                            found-parent-set)]
+              (let [missing (set/difference expected found)]
                 (reduce (fn [ctx path]
                           (let [missing-path (str path "."
                                                   (last xml-element-path))]
