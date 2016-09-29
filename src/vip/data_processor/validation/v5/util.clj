@@ -3,7 +3,8 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.xml.spec :as spec]
             [clojure.string :as str]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [clojure.set :as set]))
 
 (defn two-import-ids
   "A common params-fn for build-xml-tree-value-query-validator that
@@ -69,27 +70,55 @@
     (for [p paths]
       (let [path-to-parent-components (-> p
                                           (str/split #"\.")
-                                          (concat (butlast xml-element-path)))
+                                          (concat (butlast xml-element-path))
+                                          vec)
             path-to-parent (str/join "." path-to-parent-components)
-            simple-path-nlevel (count path-to-parent-components)
-            path-nlevel (* 2 simple-path-nlevel)
-            path2-nlevel (inc path-nlevel)]
-        (build-xml-tree-value-query-validator
-         :errors schema-type :missing (->> element-path
-                                           (map name)
-                                           (str/join "-")
-                                           (str "missing-")
-                                           keyword)
-         "SELECT xtv.path
-          FROM (SELECT DISTINCT subltree(path, 0, CAST(? AS INT)) || ? AS path
-                FROM xml_tree_values WHERE results_id = ?
-                AND subltree(simple_path, 0, CAST(? AS INT)) = text2ltree(?)) xtv
-          LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
-          ON xtv.path = subltree(xtv2.path, 0, CAST(? AS INT))
-          WHERE xtv2.path IS NULL"
-         (constantly [path-nlevel (last xml-element-path) import-id
-                      simple-path-nlevel path-to-parent import-id
-                      path2-nlevel]))))))
+            path-to-parent-nlevel (* 2 (count path-to-parent-components))
+            path-to-children (-> path-to-parent-components
+                                 (conj (last xml-element-path))
+                                 (->> (str/join ".")))]
+        (fn [ctx]
+          (log/info "Validating" :errors schema-type :missing)
+          (let [parents (->> (korma/exec-raw
+                              (:conn postgres/xml-tree-values)
+                              ["SELECT DISTINCT subltree(path, 0, CAST(? AS INT)) AS path
+                                FROM xml_tree_values
+                                WHERE results_id = ?
+                                AND simple_path <@ text2ltree(?)"
+                               [path-to-parent-nlevel import-id
+                                path-to-parent]]
+                              :results)
+                             (map (comp #(.getValue %) :path)))
+                children (->> (korma/exec-raw
+                               (:conn postgres/xml-tree-values)
+                               ["SELECT path AS child_path,
+                                        subltree(path, 0, CAST(? AS INT)) AS parent_path
+                                 FROM xml_tree_values
+                                 WHERE results_id = ?
+                                 AND simple_path <@ text2ltree(?)"
+                                [path-to-parent-nlevel import-id
+                                 path-to-children]]
+                               :results)
+                              (map (fn [r]
+                                     {:parent (-> r :parent_path .getValue)
+                                      :child (-> r :child_path .getValue)})))
+                expected-parent-set (set parents)
+                found-parent-set (->> children (map :parent) set)]
+            (if (= expected-parent-set found-parent-set)
+              ctx
+              (let [missing (set/difference expected-parent-set
+                                            found-parent-set)]
+                (reduce (fn [ctx path]
+                          (let [missing-path (str path "."
+                                                  (last xml-element-path))]
+                            (update-in ctx [:errors schema-type missing-path
+                                            :missing]
+                                       conj (->> element-path
+                                                 (map name)
+                                                 (str/join "-")
+                                                 (str "missing-")
+                                                 keyword))))
+                        ctx missing)))))))))
 
 (defn validate-no-missing-elements
   "Returns a fn that takes a validation `ctx` and runs 'no-missing' validators
