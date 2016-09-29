@@ -35,16 +35,16 @@
                             :error-value "super-duper"})))
 
     (testing "unique IDs are not flagged"
-      (assert-no-problems errors
-                          {:severity :fatal
-                           :scope :id
-                           :identifier "VipObject.0.ElectionAuthority.2.id"
-                           :error-type :duplicates})
-      (assert-no-problems errors
-                          {:severity :fatal
-                           :scope :id
-                           :identifier "VipObject.0.ElectionAuthority.3.id"
-                           :error-type :duplicates}))))
+      (assert-no-problems-2 errors
+                            {:severity :fatal
+                             :scope :id
+                             :identifier "VipObject.0.ElectionAuthority.2.id"
+                             :error-type :duplicates})
+      (assert-no-problems-2 errors
+                            {:severity :fatal
+                             :scope :id
+                             :identifier "VipObject.0.ElectionAuthority.3.id"
+                             :error-type :duplicates}))))
 
 (deftest ^:postgres validate-no-missing-ids-test
   (let [errors-chan (a/chan 100)
@@ -67,11 +67,11 @@
                             :identifier "VipObject.0.Person.2.id"
                             :error-type :missing})))
     (testing "doesn't for those that aren't"
-      (assert-no-problems errors
-                          {:severity :fatal
-                           :scope :id
-                           :identifier "VipObject.0.Person.1.id"
-                           :error-type :missing}))))
+      (assert-no-problems-2 errors
+                            {:severity :fatal
+                             :scope :id
+                             :identifier "VipObject.0.Person.1.id"
+                             :error-type :missing}))))
 
 (deftest ^:postgres validate-idrefs-refer-test
   (let [errors-chan (a/chan 100)
