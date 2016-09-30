@@ -108,13 +108,13 @@
                 (reduce (fn [ctx path]
                           (let [missing-path (str path "."
                                                   (last xml-element-path))]
-                            (update-in ctx [:errors schema-type missing-path
-                                            :missing]
-                                       conj (->> element-path
-                                                 (map name)
-                                                 (str/join "-")
-                                                 (str "missing-")
-                                                 keyword))))
+                            (errors/add-errors ctx :errors schema-type
+                                               missing-path :missing
+                                               (->> element-path
+                                                    (map name)
+                                                    (str/join "-")
+                                                    (str "missing-")
+                                                    keyword))))
                         ctx missing)))))))))
 
 (defn validate-no-missing-elements
