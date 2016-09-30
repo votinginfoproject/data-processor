@@ -26,11 +26,11 @@
                             :identifier "VipObject.0.StreetSegment.0.OddEvenBoth"
                             :error-type :missing})))
     (testing "odd-even-both present is OK"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                            :scope :street-segment
-                            :identifier "VipObject.0.StreetSegment.1.OddEvenBoth"
-                            :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :street-segment
+                           :identifier "VipObject.0.StreetSegment.1.OddEvenBoth"
+                           :error-type :missing}))))
 
 (deftest ^:postgres validate-odd-even-both-value
   (let [errors-chan (a/chan 100)
@@ -45,10 +45,10 @@
       (doseq [path ["VipObject.0.StreetSegment.1.OddEvenBoth.0"
                     "VipObject.0.StreetSegment.2.OddEvenBoth.0"
                     "VipObject.0.StreetSegment.3.OddEvenBoth.0"]]
-        (assert-no-problems-2 errors
-                              {:scope :street-segment
-                               :identifier path
-                               :error-type :format})))
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :format})))
     (testing "anything else is not"
       (is (contains-error? errors
                            {:severity :errors
@@ -80,7 +80,7 @@
       (doseq [path ["VipObject.0.StreetSegment.1.City"
                     "VipObject.0.StreetSegment.2.City"
                     "VipObject.0.StreetSegment.3.City"]]
-        (assert-no-problems-2 errors
+        (assert-no-problems errors
                             {:scope :street-segment
                              :identifier path
                              :error-type :missing})))))
@@ -109,10 +109,10 @@
       (doseq [path ["VipObject.0.StreetSegment.1.State"
                     "VipObject.0.StreetSegment.2.State"
                     "VipObject.0.StreetSegment.3.State"]]
-        (assert-no-problems-2 errors
-                              {:scope :street-segment
-                               :identifier path
-                               :error-type :missing})))))
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :missing})))))
 
 (deftest ^:postgres validate-no-missing-zip
   (let [errors-chan (a/chan 100)
@@ -138,10 +138,10 @@
       (doseq [path ["VipObject.0.StreetSegment.1.Zip"
                     "VipObject.0.StreetSegment.2.Zip"
                     "VipObject.0.StreetSegment.3.Zip"]]
-        (assert-no-problems-2 errors
-                              {:scope :street-segment
-                               :identifier path
-                               :error-type :missing})))))
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :missing})))))
 
 (deftest ^:postgres validate-no-missing-street-name
   (let [errors-chan (a/chan 100)
@@ -167,10 +167,10 @@
       (doseq [path ["VipObject.0.StreetSegment.1.StreetName"
                     "VipObject.0.StreetSegment.2.StreetName"
                     "VipObject.0.StreetSegment.3.StreetName"]]
-        (assert-no-problems-2 errors
-                              {:scope :street-segment
-                               :identifier path
-                               :error-type :missing})))))
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :missing})))))
 
 (deftest ^:postgres validate-no-street-segment-overlaps-test
   (let [errors-chan (a/chan 100)
@@ -190,11 +190,11 @@
                                 :identifier path
                                 :error-type :overlaps
                                 :error-value overlap}))
-          (assert-no-problems-2 errors
-                                {:severity :errors
-                                :scope :street-segment
-                                :identifier path
-                                :error-type :overlaps}))
+          (assert-no-problems errors
+                              {:severity :errors
+                               :scope :street-segment
+                               :identifier path
+                               :error-type :overlaps}))
       "simple, complete overlap"    "VipObject.0.StreetSegment.0" "ss002"
       "partial overlap"             "VipObject.0.StreetSegment.2" "ss004"
       "single address overlap"      "VipObject.0.StreetSegment.4" "ss006"

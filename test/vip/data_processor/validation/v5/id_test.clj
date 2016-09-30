@@ -98,14 +98,14 @@
                             :error-type :no-referent})))
 
     (testing "IDREF elements that point to something are good"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :id
-                             :identifier "VipObject.0.Person.0.PartyId.1"})
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :id
-                             :identifier "VipObject.0.Person.2.PartyId.1"}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :id
+                           :identifier "VipObject.0.Person.0.PartyId.1"})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :id
+                           :identifier "VipObject.0.Person.2.PartyId.1"}))))
 
 (deftest ^:postgres validate-idrefs-plural-refer-test
   (let [errors-chan (a/chan 100)
@@ -126,7 +126,7 @@
             :error-type :no-referent})))
 
     (testing "IDREFS elements that point to some things are good"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :id
-                             :identifier "VipObject.0.Locality.11.PollingLocationIds.3"}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :id
+                           :identifier "VipObject.0.Locality.11.PollingLocationIds.3"}))))

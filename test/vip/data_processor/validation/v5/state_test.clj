@@ -31,6 +31,6 @@
                             :identifier "VipObject.0.State.1.Name"
                             :error-type :missing})))
     (testing "doesn't for those that aren't"
-      (assert-no-problems-2 errors
-                            {:scope :states
-                             :identifier "VipObject.0.State.2.Name"}))))
+      (assert-no-problems errors
+                          {:scope :states
+                           :identifier "VipObject.0.State.2.Name"}))))

@@ -23,7 +23,7 @@
                           (get csv/version-pipelines "5.1"))}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (are-xml-tree-values
        out-ctx
        "st51" "VipObject.0.State.0.id"

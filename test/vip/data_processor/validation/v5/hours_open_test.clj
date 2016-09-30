@@ -19,39 +19,39 @@
                     v5.hours-open/validate-times)
         errors (all-errors errors-chan)]
     (testing "StartTime and EndTime valid produces no errors"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :hours-open
-                             :identifier "VipObject.0.HoursOpen.0.Schedule.0.Hours.0.StartTime.0"})
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :hours-open
-                             :identifier "VipObject.0.HoursOpen.0.Schedule.0.Hours.0.EndTime.1"}))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :hours-open
+                           :identifier "VipObject.0.HoursOpen.0.Schedule.0.Hours.0.StartTime.0"})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :hours-open
+                           :identifier "VipObject.0.HoursOpen.0.Schedule.0.Hours.0.EndTime.1"}))
     (testing "StartTime hours out of range produces one error"
       (is (contains-error? errors
                            {:severity :errors
                             :scope :hours-open
                             :identifier "VipObject.0.HoursOpen.1.Schedule.0.Hours.0.StartTime.0"
                             :error-type :format}))
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :hours-open
-                             :identifier "VipObject.0.HoursOpen.1.Schedule.0.Hours.0.EndTime.1"}))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :hours-open
+                           :identifier "VipObject.0.HoursOpen.1.Schedule.0.Hours.0.EndTime.1"}))
     (testing "StartTime missing time zone produces one error"
       (is (contains-error? errors
                            {:severity :errors
                             :scope :hours-open
                             :identifier "VipObject.0.HoursOpen.2.Schedule.0.Hours.0.StartTime.0"
                             :error-type :format}))
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :hours-open
-                             :identifier "VipObject.0.HoursOpen.2.Schedule.0.Hours.0.EndTime.1"}))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :hours-open
+                           :identifier "VipObject.0.HoursOpen.2.Schedule.0.Hours.0.EndTime.1"}))
     (testing "EndTime invalid produces one error"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :hours-open
-                             :identifier "VipObject.0.HoursOpen.3.Schedule.0.Hours.0.StartTime.0"})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :hours-open
+                           :identifier "VipObject.0.HoursOpen.3.Schedule.0.Hours.0.StartTime.0"})
       (is (contains-error? errors
                            {:severity :errors
                             :scope :hours-open

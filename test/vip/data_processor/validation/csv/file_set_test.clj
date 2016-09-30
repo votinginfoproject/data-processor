@@ -13,20 +13,26 @@
                       "precinct.txt" "source.txt")
         validator (validate-dependencies dependencies)]
     (testing "does not add errors when dependencies are met"
-      (let [ctx {:input [(File. "ballot.txt")
+      (let [errors-chan (a/chan 100)
+            ctx {:input [(File. "ballot.txt")
                          (File. "candidate.txt")
                          (File. "election.txt")]
+                 :errors-chan errors-chan
                  :data-specs v3-0/data-specs}
-            out-ctx (validator ctx)]
-        (assert-no-problems out-ctx []))
+            out-ctx (validator ctx)
+            errors (all-errors errors-chan)]
+        (assert-no-problems errors {}))
       (testing "with sub-dependencies"
-        (let [ctx {:input [(File. "ballot.txt")
+        (let [errors-chan (a/chan 100)
+              ctx {:input [(File. "ballot.txt")
                            (File. "candidate.txt")
                            (File. "precinct.txt")
                            (File. "source.txt")]
+                   :errors-chan errors-chan
                    :data-specs v3-0/data-specs}
-              out-ctx (validator ctx)]
-          (assert-no-problems out-ctx []))))
+              out-ctx (validator ctx)
+              errors (all-errors errors-chan)]
+          (assert-no-problems errors {}))))
     (testing "adds errors when dependencies are not met"
       (let [errors-chan (a/chan 100)
             ctx {:input [(File. "ballot.txt")
@@ -58,7 +64,7 @@
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
               errors (all-errors errors-chan)]
-          (assert-no-problems-2 errors {})))
+          (assert-no-problems errors {})))
       (testing "with precincts"
         (let [errors-chan (a/chan 100)
               ctx {:input [(File. "polling_location.txt")
@@ -69,4 +75,4 @@
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
               errors (all-errors errors-chan)]
-          (assert-no-problems-2 errors {}))))))
+          (assert-no-problems errors {}))))))

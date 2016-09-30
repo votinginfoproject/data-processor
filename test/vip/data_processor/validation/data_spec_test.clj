@@ -74,7 +74,7 @@
                   ctx {:errors-chan errors-chan}
                   result-ctx (format-rule ctx {column "1234" "id" id} line-number)
                   errors (all-errors errors-chan)]
-              (is (assert-no-problems-2 errors {}))))))
+              (is (assert-no-problems errors {}))))))
       (testing "optional column"
         (let [format-rule (create-format-rule filename {:name column :format format})]
           (testing "if it's not there, it's okay"
@@ -82,14 +82,14 @@
                   ctx {:errors-chan errors-chan}
                   result-ctx (format-rule ctx {} line-number)
                   errors (all-errors errors-chan)]
-              (is (assert-no-problems-2 errors {}))))
+              (is (assert-no-problems errors {}))))
           (testing "if it is there"
             (testing "it matches the format, everything's okay"
               (let [errors-chan (a/chan 100)
                     ctx {:errors-chan errors-chan}
                     result-ctx (format-rule ctx {column "1234" "id" id} line-number)
                     errors (all-errors errors-chan)]
-                (is (assert-no-problems-2 errors {}))))
+                (is (assert-no-problems errors {}))))
             (testing "it doesn't match the format, you get an error"
               (let [errors-chan (a/chan 100)
                     ctx {:errors-chan errors-chan}
@@ -107,12 +107,12 @@
                   ctx {:errors-chan errors-chan}
                   result-ctx (format-rule ctx {column "yes" "id" id} line-number)
                   errors (all-errors errors-chan)]
-              (is (assert-no-problems-2 errors {})))
+              (is (assert-no-problems errors {})))
             (let [errors-chan (a/chan 100)
                   ctx {:errors-chan errors-chan}
                   result-ctx (format-rule ctx {column "no" "id" id} line-number)
                   errors (all-errors errors-chan)]
-              (is (assert-no-problems-2 errors {}))))
+              (is (assert-no-problems errors {}))))
           (testing "non-matches"
             (let [errors-chan (a/chan 100)
                   ctx {:errors-chan errors-chan}
@@ -138,7 +138,7 @@
                       ctx {:errors-chan errors-chan}
                       result-ctx (format-rule ctx {column value "id" id} line-number)
                       errors (all-errors errors-chan)]
-                  (is (assert-no-problems-2 errors {})))
+                  (is (assert-no-problems errors {})))
               "YES"
               "NO"
               "Yes"))))
@@ -151,7 +151,7 @@
                       ctx {:errors-chan errors-chan}
                       result-ctx (format-rule ctx {column value "id" id} line-number)
                       errors (all-errors errors-chan)]
-                  (is (assert-no-problems-2 errors {})))
+                  (is (assert-no-problems errors {})))
               "able was I ere I saw elba"
               "racecar"))
           (testing "non-matches"
@@ -188,7 +188,7 @@
                     ctx {:errors-chan errors-chan}
                     result-ctx (format-rule ctx {column value "id" id} line-number)
                     errors (all-errors errors-chan)]
-                (is (assert-no-problems-2 errors {})))
+                (is (assert-no-problems errors {})))
             "hi"
             nil))))
     (testing "without an id, uses the line number"
@@ -219,7 +219,7 @@
                   ctx {:errors-chan errors-chan}
                   result-ctx (format-rule ctx {column "1234"} line-number)
                   errors (all-errors errors-chan)]
-              (assert-no-problems-2 errors {}))))))
+              (assert-no-problems errors {}))))))
     (testing "with a severity set on the format"
       (let [format {:check #"\A\d+\z"
                     :message "Invalid data type"

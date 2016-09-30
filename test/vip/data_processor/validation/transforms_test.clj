@@ -20,15 +20,18 @@
                          csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
+          errors-chan (a/chan 100)
           ctx (merge {:input filenames
+                      :errors-chan errors-chan
                       :spec-version (atom nil)
                       :pipeline (concat [(data-spec/add-data-specs v3-0/data-specs)]
                                         csv-validations
                                         db/validations)} db)
-          results-ctx (pipeline/run-pipeline ctx)]
+          results-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
       (is (nil? (:stop results-ctx)))
       (is (nil? (:exception results-ctx)))
-      (assert-no-problems results-ctx []))))
+      (assert-no-problems errors {}))))
 
 (deftest remove-invalid-extensions-test
   (testing "removes non-csv, txt, or xml files from :input"

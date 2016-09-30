@@ -20,10 +20,10 @@
         out-ctx (pipeline/run-pipeline ctx)
         errors (all-errors errors-chan)]
     (are [path]
-        (assert-no-problems-2 errors
-                              {:severity :errors
-                               :scope :candidates
-                               :identifier path})
+        (assert-no-problems errors
+                            {:severity :errors
+                             :scope :candidates
+                             :identifier path})
       "VipObject.0.Candidate.0.PreElectionStatus.0"
       "VipObject.0.Candidate.1.PreElectionStatus.0"
       "VipObject.0.Candidate.2.PreElectionStatus.0"
@@ -48,10 +48,10 @@
         out-ctx (pipeline/run-pipeline ctx)
         errors (all-errors errors-chan)]
     (are [path]
-        (assert-no-problems-2 errors
-                              {:severity :errors
-                               :scope :candidates
-                               :identifier path})
+        (assert-no-problems errors
+                            {:severity :errors
+                             :scope :candidates
+                             :identifier path})
       "VipObject.0.Candidate.0.PostElectionStatus.1"
       "VipObject.0.Candidate.1.PostElectionStatus.1"
       "VipObject.0.Candidate.2.PostElectionStatus.1"
@@ -87,14 +87,14 @@
                             :identifier "VipObject.0.Candidate.1.BallotName"
                             :error-type :missing})))
     (testing "doesn't for those that aren't"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :candidates
-                             :identifier "VipObject.0.Candidate.2.BallotName"
-                             :error-type :missing}))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :candidates
+                           :identifier "VipObject.0.Candidate.2.BallotName"
+                           :error-type :missing}))
     (testing "doesn't care if BallotName isn't first"
-      (assert-no-problems-2 errors
-                            {:severity :errors
-                             :scope :candidates
-                             :identifier "VipObject.0.Candidate.3.BallotName"
-                             :error-type :missing}))))
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :candidates
+                           :identifier "VipObject.0.Candidate.3.BallotName"
+                           :error-type :missing}))))

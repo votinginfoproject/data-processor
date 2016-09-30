@@ -30,7 +30,7 @@
                     "VipObject.0.BallotMeasureContest.3.Type"
                     "VipObject.0.BallotMeasureContest.4.Type"
                     "VipObject.0.BallotMeasureContest.5.Type"]]
-        (assert-no-problems-2 errors {:scope :ballot-measure-contest
+        (assert-no-problems errors {:scope :ballot-measure-contest
                                       :identifier path
                                       :error-type :missing})))))
 
@@ -54,7 +54,7 @@
                     "VipObject.0.BallotMeasureContest.3.Type.0"
                     "VipObject.0.BallotMeasureContest.4.Type.0"
                     "VipObject.0.BallotMeasureContest.5.Type.0"]]
-        (assert-no-problems-2 errors
+        (assert-no-problems errors
                               {:scope :ballot-measure-contest
                                :identifier path
                                :error-type :format})))))

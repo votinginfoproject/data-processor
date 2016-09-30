@@ -27,7 +27,7 @@
                             :identifier 5882300
                             :error-type :duplicate-ids
                             :error-value '("contests" "candidates")}))
-      (assert-no-problems-2 errors
+      (assert-no-problems errors
                             {:severity :errors
                              :scope :import
                              :identifier 7
@@ -68,7 +68,7 @@
                                           :ballot_id 410004746}}))
       (testing "does not add errors for ballots"
         (doseq [id [1 2 3]]
-          (assert-no-problems-2 errors
+          (assert-no-problems errors
                                 {:severity :warnings
                                  :scope :ballots
                                  :identifier id
@@ -136,7 +136,7 @@
         :candidates 13
         :candidates 14)
       (testing "except for contests"
-        (assert-no-problems-2 errors
+        (assert-no-problems errors
                               {:severity :warnings
                                :scope :contests
                                :identifier 100

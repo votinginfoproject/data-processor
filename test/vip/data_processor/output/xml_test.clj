@@ -22,8 +22,10 @@
                          csv/csv-filenames
                          (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
                          (remove nil?))
+          errors-chan (a/chan 100)
           ctx (merge {:input filenames
                       :spec-version (atom "3.0")
+                      :errors-chan errors-chan
                       :pipeline (concat [(data-spec/add-data-specs
                                           v3-0/data-specs)]
                                         transforms/csv-validations
@@ -33,8 +35,9 @@
                       :xml-output-file
                       .toString
                       slurp
-                      xpath/xml->doc)]
-      (assert-no-problems results-ctx [])
+                      xpath/xml->doc)
+          errors (all-errors errors-chan)]
+      (assert-no-problems errors {})
       (are [path text] (= text (xpath/$x:text path xml-doc))
            "/vip_object/ballot[@id=200000]/image_url" "http://i.imgur.com/PMgfJSm.jpg"
            "/vip_object/ballot[@id=200000]/candidate_id[@sort_order=3]" "10000"
@@ -91,10 +94,13 @@
                       io/resource
                       io/file
                       .toPath)
+          errors-chan (a/chan 100)
           ctx {:xml-output-file good-xml
+               :errors-chan errors-chan
                :vip-version "3.0"}
-          results-ctx (validate-xml-output ctx)]
-      (assert-no-problems results-ctx [])))
+          results-ctx (validate-xml-output ctx)
+          errors (all-errors errors-chan)]
+      (assert-no-problems errors {})))
 
   (testing "bad XML won't validate, adding to `:errors`"
     (let [errors-chan (a/chan 100)

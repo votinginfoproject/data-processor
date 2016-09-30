@@ -170,8 +170,7 @@
              (map :name
                   (korma/select
                    (get-in out-ctx [:tables :sources])
-                   (korma/fields :name)))))
-      (assert-error-format out-ctx))))
+                   (korma/fields :name))))))))
 
 (deftest low-number-vip-id-test
   (let [db (sqlite/temp-db "low-number-vip-id-test" "3.0")
@@ -184,8 +183,7 @@
              (map :vip_id
                   (korma/select
                    (get-in out-ctx [:tables :sources])
-                   (korma/fields :vip_id)))))
-      (assert-error-format out-ctx))))
+                   (korma/fields :vip_id))))))))
 
 (deftest determine-spec-version-test
   (testing "finds and assocs the version of the csv feed for 3.0 files"

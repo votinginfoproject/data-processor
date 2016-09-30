@@ -48,8 +48,8 @@
                             :identifier "VipObject.0.Person.1.ContactInformation.0.Email.0"
                             :error-type :format}))
       (testing "but not for good emails"
-        (assert-no-problems-2 errors
-                              {:severity :errors
-                               :scope :email
-                               :identifier "VipObject.0.Person.2.ContactInformation.0.Email.0"
-                               :error-type :format})))))
+        (assert-no-problems errors
+                            {:severity :errors
+                             :scope :email
+                             :identifier "VipObject.0.Person.2.ContactInformation.0.Email.0"
+                             :error-type :format})))))

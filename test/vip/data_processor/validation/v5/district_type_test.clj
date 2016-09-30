@@ -20,17 +20,17 @@
                       v5.district-type/validate)
           errors (all-errors errors-chan)]
       (testing "type missing is OK"
-        (assert-no-problems-2 errors
-                              {:severity :errors
-                               :scope :locality
-                               :identifier "VipObject.0.Locality.0.Type"
-                               :error-type :missing}))
+        (assert-no-problems errors
+                            {:severity :errors
+                             :scope :locality
+                             :identifier "VipObject.0.Locality.0.Type"
+                             :error-type :missing}))
       (testing "type present and valid is OK"
-        (assert-no-problems-2 errors
-                              {:severity :errors
-                               :scope :locality
-                               :identifier "VipObject.0.Locality.1.Type.2"
-                               :error-type :format}))
+        (assert-no-problems errors
+                            {:severity :errors
+                             :scope :locality
+                             :identifier "VipObject.0.Locality.1.Type.2"
+                             :error-type :format}))
       (testing "type present and invalid is an error"
         (is (contains-error? errors
                              {:severity :errors
@@ -48,11 +48,11 @@
           errors (all-errors errors-chan)]
       (testing "type valid is OK"
         (are [path]
-            (assert-no-problems-2 errors
-                                  {:severity :errors
-                                   :scope :electoral-district
-                                   :identifier path
-                                   :error-type :format})
+            (assert-no-problems errors
+                                {:severity :errors
+                                 :scope :electoral-district
+                                 :identifier path
+                                 :error-type :format})
           "VipObject.0.ElectoralDistrict.0.Type.1"
           "VipObject.0.ElectoralDistrict.1.Type.1"
           "VipObject.0.ElectoralDistrict.4.Type.0"))

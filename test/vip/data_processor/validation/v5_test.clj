@@ -23,7 +23,7 @@
                                v5/validations)}
         out-ctx (pipeline/run-pipeline ctx)
         errors (all-errors errors-chan)]
-    (assert-no-problems-2 errors {})))
+    (assert-no-problems errors {})))
 
 (deftest ^:postgres full-good-v51-csv-test
   (let [csvs (-> "csv/5-1/full-good-run"
@@ -41,7 +41,7 @@
                                v5/validations)}
         out-ctx (pipeline/run-pipeline ctx)
         errors (all-errors errors-chan)]
-    (assert-no-problems-2 errors {})
+    (assert-no-problems errors {})
 
     (testing "the data for building a public_id is correctly fetched"
       (is (= {:date "10/08/2016"

@@ -22,7 +22,7 @@
                           (get csv/version-pipelines "5.1"))}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (testing "multiple Schedules for one HoursOpen"
         (are-xml-tree-values out-ctx
          "ho001" "VipObject.0.HoursOpen.0.id"

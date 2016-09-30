@@ -157,7 +157,7 @@
           errors (all-errors errors-chan)]
       (is (nil? (:stop out-ctx)))
       (is (nil? (:exception out-ctx)))
-      (assert-no-problems-2 errors {})
+      (assert-no-problems errors {})
       (testing "inserts values for columns not in the first element of a type"
         (let [mail-only-precinct (first
                                   (korma/select (get-in out-ctx [:tables :precincts])
@@ -202,8 +202,7 @@
           (is (nil? (contains-error? errors {:severity :warnings
                                              :scope :ballots
                                              :identifier id
-                                             :error-type :duplicate-rows})))))
-      (assert-error-format out-ctx))))
+                                             :error-type :duplicate-rows}))))))))
 
 (deftest validate-references-test
   (testing "returns an error if there are unreferenced objects"
@@ -310,8 +309,7 @@
                            {:severity :errors
                             :scope :election-administrations
                             :identifier 3456
-                            :error-type :incomplete-mailing-address}))
-      (assert-error-format out-ctx))))
+                            :error-type :incomplete-mailing-address})))))
 
 (deftest validate-data-formats
   (let [errors-chan (a/chan 100)
@@ -373,8 +371,7 @@
       (testing "but still loads some data"
         (is (= [{:id 103}]
                (korma/select (get-in out-ctx [:tables :localities])
-                             (korma/fields :id)))))
-      (assert-error-format out-ctx))))
+                             (korma/fields :id))))))))
 
 (deftest determine-spec-version-test
   (testing "finds and assocs the schemaVersion of the xml feed"
