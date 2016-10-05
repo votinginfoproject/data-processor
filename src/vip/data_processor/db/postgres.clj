@@ -6,7 +6,6 @@
             [korma.db :as db]
             [korma.core :as korma]
             [turbovote.resource-config :refer [config]]
-            [vip.data-processor.db.statistics :as stats]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
@@ -296,11 +295,6 @@
                                 (data-spec/coerce-rows columns)))))
           ctx
           db.util/import-entity-names))
-
-(defn store-stats [{:keys [import-id] :as ctx}]
-  (korma/insert statistics
-                (korma/values (assoc (stats/stats-map ctx) :results_id import-id)))
-  ctx)
 
 (defn columns [table]
   (let [table-name (:table table)]
