@@ -46,11 +46,14 @@
 (defn add-validations
   [{:keys [spec-version skip-validations?] :as ctx}]
   (if skip-validations?
-    ctx
-    (let [validations (condp = spec-version
+    (do
+      (log/info "Skipping validations")
+      ctx)
+    (let [validations (condp = @spec-version
                         "3.0" v3-validation-pipeline
                         "5.1" v5-1-validation-pipeline
                         nil)]
+      (log/info "Adding validations for" (pr-str @spec-version))
       (update ctx :pipeline (partial concat validations)))))
 
 (def pipeline
