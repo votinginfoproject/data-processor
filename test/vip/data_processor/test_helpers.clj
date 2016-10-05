@@ -62,6 +62,7 @@
                                 psql/xml-tree-values
                                 psql/election_approvals
                                 psql/statistics
+                                psql/v5-statistics
                                 psql/validations
                                 psql/results]))
       (reset! setup-postgres-has-run true)))
