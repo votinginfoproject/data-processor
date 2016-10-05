@@ -55,11 +55,16 @@
              :pipeline pipeline}
         _ (add-watch spec-version :route-errors
                      (errors/add-watch-fn errors-chan))
-        result (run-pipeline ctx)]
+        result (run-pipeline ctx)
+        import-id (:import-id result)]
     (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
-    (log/debug (pr-str (select-keys result [:spec-version :fatal :critical])))
+    (log/debug (pr-str (select-keys result [:spec-version :fatal :critical :stop])))
+
     (when-let [ex (:exception result)]
-      (psql/fail-run (:import-id result)
-                     (with-out-str (stacktrace/print-throwable ex)))
+      (psql/fail-run import-id (with-out-str (stacktrace/print-throwable ex)))
       (log/error (with-out-str (stacktrace/print-stack-trace ex))))
+
+    (when-let [stop (:stop result)]
+      (psql/fail-run import-id stop)
+      (log/error "Stopping run of" import-id "due to:" stop))
     result))
