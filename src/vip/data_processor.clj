@@ -12,7 +12,6 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
-            [vip.data-processor.db.tree-statistics :as tree-stats]
             [vip.data-processor.validation.db.v3-0 :as db.v3-0]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.v5 :as v5-1-validations]
@@ -36,12 +35,10 @@
   (concat db/validations
           db.v3-0/validations
           xml-output/pipeline
-          [psql/import-from-sqlite
-           psql/store-stats]))
+          [psql/import-from-sqlite]))
 
 (def v5-1-validation-pipeline
-  (concat v5-1-validations/validations
-          [tree-stats/store-tree-stats]))
+  v5-1-validations/validations)
 
 (defn add-validations
   [{:keys [spec-version skip-validations?] :as ctx}]
@@ -64,6 +61,8 @@
            psql/store-public-id
            psql/store-election-id
            add-validations
+           errors/close-errors-chan
+           errors/await-statistics
            s3/upload-to-s3
            cleanup/cleanup]))
 
@@ -99,26 +98,6 @@
     (q/initialize)
     (psql/initialize)
     (q/publish {:id id :event "starting"} "qa-engine.status")
-    (util-async/batch-process
-     errors/v3-errors-chan
-     (fn [all-errors]
-       (doseq [[_ errors] (group-by #(get-in % [:ctx :import-id])
-                                    all-errors)]
-         (psql/bulk-import
-          (:ctx (first errors))
-          psql/validations
-          (map psql/validation-value errors))))
-     500 5000)
-    (util-async/batch-process
-     errors/v5-errors-chan
-     (fn [all-errors]
-       (doseq [[_ errors] (group-by #(get-in % [:ctx :import-id])
-                                    all-errors)]
-         (psql/bulk-import
-          (:ctx (first errors))
-          psql/xml-tree-validations
-          (map psql/xml-tree-validation-value errors))))
-     500 5000)
     (let [consumer (consume)]
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn []

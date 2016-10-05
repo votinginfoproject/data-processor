@@ -2,8 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [clojure.stacktrace :as stacktrace]
             [vip.data-processor.db.postgres :as psql]
-            [clojure.core.async :as a]
-            [vip.data-processor.errors :as errors]))
+            [clojure.core.async :as a]))
 
 (defn try-processing-fn
   "Attempt to run the processing function on the context. If the
@@ -42,19 +41,15 @@
   Runs the pipeline, returning the final context. An exception on the
   context will result in logging the exception."
   [pipeline initial-input]
-  (let [spec-version (atom nil)
-        errors-chan (a/chan 1024)
-        ctx {:input initial-input
+  (let [ctx {:input initial-input
              :skip-validations? false
              :warnings {}
              :errors {}
              :critical {}
              :fatal {}
-             :spec-version spec-version
-             :errors-chan errors-chan
+             :spec-version (atom nil)
+             :errors-chan (a/chan 1024)
              :pipeline pipeline}
-        _ (add-watch spec-version :route-errors
-                     (errors/add-watch-fn errors-chan))
         result (run-pipeline ctx)]
     (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
     (log/debug (pr-str (select-keys result [:spec-version :fatal :critical])))

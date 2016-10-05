@@ -15,7 +15,8 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.transformer :as v5-1-transformers]
-            [vip.data-processor.errors :as errors]))
+            [vip.data-processor.errors :as errors]
+            [vip.data-processor.errors.process :as process]))
 
 (defn csv-filenames [data-specs]
   (set (map :filename data-specs)))
@@ -173,10 +174,12 @@
 
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
+          process/process-v3-validations
           (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
           load-csvs]
    "5.1" (concat [(fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
                   (fn [ctx] (assoc ctx :ltree-index 0))
+                  process/process-v5-validations
                   load-csvs]
                  v5-1-transformers/transformers
                  tree-xml/pipeline)})
