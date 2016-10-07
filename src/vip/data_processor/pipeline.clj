@@ -58,7 +58,6 @@
         result (run-pipeline ctx)
         import-id (:import-id result)]
     (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
-    (log/debug (pr-str (select-keys result [:spec-version :fatal :critical :stop])))
 
     (when-let [stop (:stop result)]
       (psql/fail-run import-id nil)
