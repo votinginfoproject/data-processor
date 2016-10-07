@@ -71,7 +71,8 @@
                   UNNEST(string_to_array(value, ' ')) AS value,
                   parent_with_id, simple_path
              FROM xml_tree_values
-            WHERE simple_path = ?)
+            WHERE simple_path = ?
+              and results_id = ?)
      SELECT referer.path, referer.value
        FROM referer
        LEFT JOIN (SELECT value
@@ -79,10 +80,8 @@
                    WHERE results_id = ?
                      AND simple_path ~ '*{2}.id') referent
               ON referer.value = referent.value
-           WHERE referer.results_id = ?
-             AND referer.simple_path = ?
-             AND referent.value IS NULL;"
-    [simple-path import-id import-id simple-path]]))
+           WHERE referent.value IS NULL;"
+    [simple-path import-id import-id]]))
 
 (defn validate-idref-references
   [{:keys [import-id spec-version] :as ctx}]
