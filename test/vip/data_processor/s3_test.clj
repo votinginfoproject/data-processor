@@ -4,13 +4,19 @@
 
 (deftest zip-filename*-test
   (testing "nicely formatted dates make nice filenames"
-    (is (= "vipfeed-51-2015-03-24.zip"
-           (zip-filename* "51" "2015-03-24"))))
+    (is (= "vipfeed-51-VA-2015-03-24.zip"
+           (zip-filename* "51" "VA" "2015-03-24"))))
 
   (testing "workably formatted dates make nice filenames"
-    (is (= "vipfeed-52-2015-03-27.zip"
-           (zip-filename* "52" "2015/03/27"))))
+    (is (= "vipfeed-52-FL-2015-03-27.zip"
+           (zip-filename* "52" "FL" "2015/03/27"))))
 
   (testing "poorly formatted dates use a workable filename"
-    (is (= "vipfeed-12345-.zip"
-           (zip-filename* "12345" nil)))))
+    (is (= "vipfeed-12345-North-Carolina-.zip"
+           (zip-filename* "12345" "North Carolina" nil))))
+
+  (testing "missing the fips and/or state doesn't break the world"
+    (is (= "vipfeed-12-YY-2016-11-08.zip"
+           (zip-filename* "12" nil  "2016-11-08")))
+    (is (= "vipfeed-XX-North-Carolina-2016-11-08.zip"
+           (zip-filename* nil " North Carolina " "2016-11-08")))))

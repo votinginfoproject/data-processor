@@ -44,10 +44,17 @@
     (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
     :else fips))
 
-(defn zip-filename* [fips election-date]
+(defn format-state
+  [state]
+  (if (nil? state)
+    "YY"
+    (clojure.string/replace (clojure.string/trim state) #"\s" "-")))
+
+(defn zip-filename* [fips state election-date]
   (let [fips (format-fips fips)
+        state (format-state state)
         date (util/format-date election-date)]
-    (str (join "-" ["vipfeed" fips date]) ".zip")))
+    (str (join "-" ["vipfeed" fips state date]) ".zip")))
 
 (defn zip-filename
   [{:keys [spec-version tables import-id] :as ctx}]
@@ -58,19 +65,26 @@
                    korma/select
                    first
                    :vip_id)
+          state (-> tables
+                    :state
+                    korma/select
+                    first
+                    :name)
           election-date (-> tables
                             :elections
                             korma/select
                             first
                             :date)]
-      (zip-filename* fips election-date))
+      (zip-filename* fips state election-date))
 
     "5.1"
     (let [fips (postgres/find-value-for-simple-path
                 import-id "VipObject.Source.VipId")
+          state (postgres/find-value-for-simple-path
+                 import-id "VipObject.State.Name")
           election-date (postgres/find-value-for-simple-path
                          import-id "VipObject.Election.Date")]
-      (zip-filename* fips election-date))))
+      (zip-filename* fips state election-date))))
 
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
