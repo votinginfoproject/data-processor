@@ -5,7 +5,8 @@
             [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.util :as db.util]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [vip.data-processor.db.postgres :as psql])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [org.apache.commons.lang StringEscapeUtils]))
@@ -96,10 +97,7 @@
           inside-open-tag (atom false)
           values-written (atom 0)]
       (doseq [{:keys [path value simple_path] :as row}
-              (db.util/lazy-select 100000
-                                   postgres/xml-tree-values
-                                   (korma/where {:results_id import-id})
-                                   (korma/order :insert_counter :ASC))]
+              (psql/lazy-select-xml-tree-values 100000 import-id)]
         (swap! values-written inc)
         (when (= (mod @values-written 100000) 0)
           (log/info "Wrote" @values-written "values"))
