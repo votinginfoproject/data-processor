@@ -1,6 +1,7 @@
 (ns vip.data-processor.db.statistics
   (:require [clojure.string :as str]
             [korma.core :as korma]
+            [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.util :as util]))
 
 (defn data-specs-with-stats [data-specs]
@@ -13,14 +14,14 @@
       first
       :cnt))
 
-(defn error-count [table-name {:keys [warnings errors critical fatal]}]
-  (transduce (comp (map table-name)
-                   (remove nil?)
-                   (map util/flatten-keys)
-                   (mapcat vals)
-                   (map count))
-             + 0
-             [warnings errors critical fatal]))
+(defn error-count [table-name {:keys [import-id]}]
+  (-> psql/validations
+   (korma/select
+    (korma/aggregate (count "*") :cnt)
+    (korma/where {:results_id import-id
+                  :scope (name table-name)}))
+   first
+   :cnt))
 
 (defn complete [row-count error-count]
   (cond
@@ -55,3 +56,8 @@
                    (keyword (str table-prefix "_error_count")) error-count
                    (keyword (str table-prefix "_completion")) complete})))
          (reduce merge))))
+
+(defn store-stats [{:keys [import-id] :as ctx}]
+  (korma/insert psql/statistics
+    (korma/values (assoc (stats-map ctx) :results_id import-id)))
+  ctx)

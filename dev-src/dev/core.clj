@@ -3,7 +3,6 @@
             [clojure.core.async :as a]
             [clojure.tools.logging :as log]
             [clojure.pprint :as pprint]
-            [utility-works.async :as util-async]
             [vip.data-processor :as data-processor]
             [vip.data-processor.errors :as errors]
             [vip.data-processor.pipeline :as pipeline]
@@ -29,30 +28,11 @@
    psql/store-public-id
    psql/store-election-id
    data-processor/add-validations
-   errors/detach-errors-chan])
+   errors/close-errors-chan
+   errors/await-statistics])
 
 (defn -main [filename]
   (psql/initialize)
-  (util-async/batch-process
-   errors/v3-errors-chan
-   (fn [all-errors]
-     (doseq [[_ errors] (group-by #(get-in % [:ctx :import-id])
-                                  all-errors)]
-       (psql/bulk-import
-        (:ctx (first errors))
-        psql/validations
-        (map psql/validation-value errors))))
-   1000 100)
-  (util-async/batch-process
-   errors/v5-errors-chan
-   (fn [all-errors]
-     (doseq [[_ errors] (group-by #(get-in % [:ctx :import-id])
-                                  all-errors)]
-       (psql/bulk-import
-        (:ctx (first errors))
-        psql/xml-tree-validations
-        (map psql/xml-tree-validation-value errors))))
-   1000 100)
   (let [file (if (zip/xml-file? filename)
                (java.nio.file.Paths/get filename (into-array [""]))
                (java.io.File. filename))
