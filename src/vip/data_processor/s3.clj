@@ -66,7 +66,7 @@
                    first
                    :vip_id)
           state (-> tables
-                    :state
+                    :states
                     korma/select
                     first
                     :name)
