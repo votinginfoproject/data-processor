@@ -68,5 +68,4 @@
       (psql/fail-run import-id (with-out-str (stacktrace/print-throwable ex)))
       (log/error (with-out-str (stacktrace/print-stack-trace ex))))
 
-
     result))
