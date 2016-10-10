@@ -9,6 +9,7 @@
             [vip.data-processor.cleanup :as cleanup]
             [vip.data-processor.errors :as errors]
             [vip.data-processor.pipeline :as pipeline]
+            [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
@@ -46,7 +47,7 @@
     (do
       (log/info "Skipping validations")
       ctx)
-    (let [validations (condp = @spec-version
+    (let [validations (condp = (util/version-without-patch @spec-version)
                         "3.0" v3-validation-pipeline
                         "5.1" v5-1-validation-pipeline
                         nil)]

@@ -393,7 +393,21 @@
           out-ctx (branch-on-spec-version ctx)
           v5-pipeline (get version-pipelines "5.1")]
       (is (= v5-pipeline
-             (take (count v5-pipeline) (:pipeline out-ctx))))))
+             (take (count v5-pipeline) (:pipeline out-ctx)))))
+    (testing "for 5.1.1 feeds"
+      (let [ctx {:spec-version (atom "5.1.1")
+                 :pipeline [branch-on-spec-version]}
+            out-ctx (branch-on-spec-version ctx)
+            v5-pipeline (get version-pipelines "5.1")]
+        (is (= v5-pipeline
+               (take (count v5-pipeline) (:pipeline out-ctx))))))
+    (testing "and 5.1.2 feeds"
+      (let [ctx {:spec-version (atom "5.1.2")
+                 :pipeline [branch-on-spec-version]}
+            out-ctx (branch-on-spec-version ctx)
+            v5-pipeline (get version-pipelines "5.1")]
+        (is (= v5-pipeline
+               (take (count v5-pipeline) (:pipeline out-ctx)))))))
   (testing "stops with unsupported version for other versions"
     (let [ctx {:spec-version (atom "2.0")   ; 2.0 is too old
                :pipeline [branch-on-spec-version]}

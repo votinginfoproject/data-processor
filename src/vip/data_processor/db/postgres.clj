@@ -175,7 +175,7 @@
      :import-id import-id}))
 
 (defn get-public-id-data [{:keys [spec-version] :as ctx}]
-  (condp = @spec-version
+  (condp = (util/version-without-patch @spec-version)
     "3.0" (get-v3-public-id-data ctx)
     "5.1" (get-xml-tree-public-id-data ctx)
     {}))

@@ -242,7 +242,8 @@
             (update :spec-version (fn [spec-version]
                                     (reset! spec-version version)
                                     spec-version))
-            (assoc :data-specs (get data-spec/version-specs version)))))))
+            (assoc :data-specs (get data-spec/version-specs
+                                    (util/version-without-patch version))))))))
 
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
   (assoc ctx :stop (str "Unsupported XML version: " @spec-version)))
@@ -262,6 +263,7 @@
           set-input-as-xml-output-file]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines @spec-version)]
+  (if-let [pipeline (get version-pipelines
+                         (util/version-without-patch @spec-version))]
     (update ctx :pipeline (partial concat pipeline))
     (unsupported-version ctx)))

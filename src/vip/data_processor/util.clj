@@ -43,3 +43,6 @@
        :input
        (filter #(= filename (clojure.string/lower-case (.getName %))))
        first))
+
+(defn version-without-patch [version]
+  (clojure.string/replace version #"^(\d+\.\d+)\.\d+$" "$1"))

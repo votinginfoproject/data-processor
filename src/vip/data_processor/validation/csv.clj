@@ -165,7 +165,8 @@
             (update :spec-version (fn [spec-version]
                                     (reset! spec-version version)
                                     spec-version))
-            (assoc :data-specs (get data-spec/version-specs version)))))
+            (assoc :data-specs (get data-spec/version-specs
+                                    (util/version-without-patch version))))))
     (errors/add-errors ctx :fatal :sources :global :missing-csv
                        "source.txt is missing")))
 
@@ -185,6 +186,7 @@
                  tree-xml/pipeline)})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines @spec-version)]
+  (if-let [pipeline (get version-pipelines
+                         (util/version-without-patch @spec-version))]
     (update ctx :pipeline (partial concat pipeline))
     (unsupported-version ctx)))
