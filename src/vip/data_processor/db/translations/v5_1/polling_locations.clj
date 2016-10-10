@@ -20,11 +20,12 @@
              [(util/simple-value->ltree :address_line)
               (util/internationalized-text->ltree :directions)
               (util/internationalized-text->ltree :hours)
-              (util/simple-value->ltree :photo_uri)
               (util/simple-value->ltree :hours_open_id)
               (util/simple-value->ltree :is_drop_box)
               (util/simple-value->ltree :is_early_voting)
-              util/latlng->ltree])
+              util/latlng->ltree
+              (util/simple-value->ltree :name)
+              (util/simple-value->ltree :photo_uri)])
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path
