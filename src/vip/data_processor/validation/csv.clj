@@ -171,7 +171,7 @@
                        "source.txt is missing")))
 
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported CSV version: " @spec-version)))
+  (assoc ctx :stop (str "Unsupported CSV version: " (pr-str @spec-version))))
 
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
