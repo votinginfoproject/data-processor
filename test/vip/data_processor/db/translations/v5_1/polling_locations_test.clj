@@ -26,15 +26,16 @@
       (are-xml-tree-values
        out-ctx
        "pl81274" "VipObject.0.PollingLocation.0.id"
-       "ALBERMARLE HIGH SCHOOL 2775 Hydraulic Rd Charlottesville, VA 22901" "VipObject.0.PollingLocation.0.AddressLine.0"
+       "2775 Hydraulic Rd Charlottesville, VA 22901" "VipObject.0.PollingLocation.0.AddressLine.0"
        "Use back door" "VipObject.0.PollingLocation.0.Directions.1.Text.0"
        "en" "VipObject.0.PollingLocation.0.Directions.1.Text.0.language"
        "7am-8pm" "VipObject.0.PollingLocation.0.Hours.2.Text.0"
        "en" "VipObject.0.PollingLocation.0.Hours.2.Text.0.language"
-       "www.picture.com" "VipObject.0.PollingLocation.0.PhotoUri.3"
-       "hours0001" "VipObject.0.PollingLocation.0.HoursOpenId.4"
-       "false" "VipObject.0.PollingLocation.0.IsDropBox.5"
-       "true" "VipObject.0.PollingLocation.0.IsEarlyVoting.6"
-       "38.0754627" "VipObject.0.PollingLocation.0.LatLng.7.Latitude.0"
-       "78.5014875" "VipObject.0.PollingLocation.0.LatLng.7.Longitude.1"
-       "Google Maps" "VipObject.0.PollingLocation.0.LatLng.7.Source.2"))))
+       "hours0001" "VipObject.0.PollingLocation.0.HoursOpenId.3"
+       "false" "VipObject.0.PollingLocation.0.IsDropBox.4"
+       "true" "VipObject.0.PollingLocation.0.IsEarlyVoting.5"
+       "38.0754627" "VipObject.0.PollingLocation.0.LatLng.6.Latitude.0"
+       "78.5014875" "VipObject.0.PollingLocation.0.LatLng.6.Longitude.1"
+       "Google Maps" "VipObject.0.PollingLocation.0.LatLng.6.Source.2"
+       "ALBERMARLE HIGH SCHOOL" "VipObject.0.PollingLocation.0.Name.7"
+       "www.picture.com" "VipObject.0.PollingLocation.0.PhotoUri.8"))))

@@ -290,6 +290,7 @@
    {:filename "polling_location.txt"
     :table :polling-locations
     :columns [{:name "id"}
+              {:name "name"}
               {:name "address_line"}
               {:name "directions"}
               {:name "hours"}
