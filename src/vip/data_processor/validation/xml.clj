@@ -246,7 +246,7 @@
                                     (util/version-without-patch version))))))))
 
 (defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported XML version: " @spec-version)))
+  (assoc ctx :stop (str "Unsupported XML version: " (pr-str @spec-version))))
 
 (defn set-input-as-xml-output-file
   [{:keys [input] :as ctx}]
