@@ -35,3 +35,17 @@
   (testing "when we run into a vector, that becomes part of the value"
     (is (= {[:to :flatten :or] [:not {:to "flatten"}]}
            (flatten-keys {:to {:flatten {:or [:not {:to "flatten"}]}}})))))
+
+(deftest version-without-patch-test
+  (testing "when there is no version, there is no patch level to remove"
+    (is (nil? (version-without-patch nil)))
+    (is (nil? (version-without-patch ""))))
+
+  (testing "with a two-part version number, we get our input back"
+    (is (= "5.1" (version-without-patch "5.1"))))
+
+  (testing "with a three-part version number, we strip the patch level"
+    (is (= "5.1" (version-without-patch "5.1.1"))))
+
+  (testing "going past three levels might surprise you"
+    (is (= "5.1.2.3" (version-without-patch "5.1.2.3")))))

@@ -45,4 +45,5 @@
        first))
 
 (defn version-without-patch [version]
-  (clojure.string/replace version #"^(\d+\.\d+)\.\d+$" "$1"))
+  (when-not (empty? version)
+    (clojure.string/replace version #"^(\d+\.\d+)\.\d+$" "$1")))
