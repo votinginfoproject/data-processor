@@ -45,7 +45,4 @@
     (is (= "5.1" (version-without-patch "5.1"))))
 
   (testing "with a three-part version number, we strip the patch level"
-    (is (= "5.1" (version-without-patch "5.1.1"))))
-
-  (testing "going past three levels might surprise you"
-    (is (= "5.1.2.3" (version-without-patch "5.1.2.3")))))
+    (is (= "5.1" (version-without-patch "5.1.1")))))

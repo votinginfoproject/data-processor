@@ -44,6 +44,9 @@
        (filter #(= filename (clojure.string/lower-case (.getName %))))
        first))
 
-(defn version-without-patch [version]
+(defn version-without-patch
+  "Strip the patch-level from `spec-version`. Assumes three or fewer version
+  numbers, e.g., \"5.1.2\" becomes \"5.1\"."
+  [version]
   (when-not (empty? version)
     (clojure.string/replace version #"^(\d+\.\d+)\.\d+$" "$1")))
