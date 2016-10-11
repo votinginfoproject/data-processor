@@ -17,6 +17,6 @@
 
   (testing "missing the fips and/or state doesn't break the world"
     (is (= "vipfeed-12-YY-2016-11-08.zip"
-           (zip-filename* "12" nil  "2016-11-08")))
+           (zip-filename* "12" nil "2016-11-08")))
     (is (= "vipfeed-XX-North-Carolina-2016-11-08.zip"
-           (zip-filename* nil " North Carolina " "2016-11-08")))))
+           (zip-filename* "" " North Carolina " "2016-11-08")))))

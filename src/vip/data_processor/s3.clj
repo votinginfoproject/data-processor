@@ -39,14 +39,14 @@
 
 (defn format-fips [fips]
   (cond
-    (nil? fips) "XX"
+    (empty? fips) "XX"
     (< (count fips) 3) (format "%02d" (Integer/parseInt fips))
     (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
     :else fips))
 
 (defn format-state
   [state]
-  (if (nil? state)
+  (if (empty? state)
     "YY"
     (clojure.string/replace (clojure.string/trim state) #"\s" "-")))
 
