@@ -40,12 +40,12 @@
 
 (defn transformer [{:keys [import-id ltree-index] :as ctx}]
   (let [idx-fn (util/index-generator ltree-index)
-        ltree-entries (util/prep-for-insertion
-                       import-id
-                       (election-administrations->ltree import-id idx-fn))]
-    (if (seq ltree-entries)
+        rows (util/prep-for-insertion
+              import-id
+              (election-administrations->ltree import-id idx-fn))]
+    (if (seq rows)
       (do
-        (korma/insert postgres/xml-tree-values
-          (korma/values ltree-entries))
-        (assoc ctx :ltree-index (idx-fn)))
-      ctx)))
+        (-> ctx
+            (postgres/bulk-import postgres/xml-tree-values rows)
+            (assoc :ltree-index (idx-fn)))
+        ctx))))
