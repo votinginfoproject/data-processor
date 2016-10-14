@@ -44,8 +44,7 @@
               import-id
               (election-administrations->ltree import-id idx-fn))]
     (if (seq rows)
-      (do
-        (-> ctx
+      (-> ctx
             (postgres/bulk-import postgres/xml-tree-values rows)
             (assoc :ltree-index (idx-fn)))
-        ctx))))
+      ctx)))
