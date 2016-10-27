@@ -8,7 +8,6 @@
             [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
-(use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres validate-no-missing-odd-even-both
   (let [errors-chan (a/chan 100)

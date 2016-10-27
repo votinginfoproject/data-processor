@@ -8,7 +8,6 @@
             [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
-(use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres pipeline-test
   (let [import-id (-> postgres/results
