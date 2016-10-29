@@ -4,7 +4,6 @@
             [com.climate.newrelic.trace :refer [defn-traced]]
             [squishy.core :as sqs]
             [turbovote.resource-config :refer [config]]
-            [utility-works.async :as util-async]
             [korma.core :as korma]
             [vip.data-processor.cleanup :as cleanup]
             [vip.data-processor.errors :as errors]

@@ -43,10 +43,6 @@
   [pipeline initial-input]
   (let [ctx {:input initial-input
              :skip-validations? false
-             :warnings {}
-             :errors {}
-             :critical {}
-             :fatal {}
              :spec-version (atom nil)
              :errors-chan (a/chan 1024)
              :pipeline pipeline}
