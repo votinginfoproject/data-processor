@@ -341,3 +341,40 @@
                         nil)
                       chunked-rows))))]
         (trampoline chunked-rows)))))
+
+(defn lazy-select-fn [chunk-size query-fn]
+  (fn [& args]
+    (let [cursor-name (str (gensym "lazy_select_cursor"))
+          done? (atom false)
+          close-attempts (atom 0)
+          query (apply query-fn args)]
+      (korma/exec-raw
+       [(str "DECLARE " cursor-name " NO SCROLL CURSOR "
+             "WITH HOLD FOR "
+             query)])
+      (letfn [(chunked-rows []
+                (when @done?
+                  (swap! close-attempts inc))
+                (try
+                  (do
+                    (let [this-chunk (korma/exec-raw
+                                      [(str "FETCH " chunk-size
+                                            " FROM " cursor-name)]
+                                      :results)]
+                      (if (seq this-chunk)
+                        (do
+                          (lazy-cat
+                           this-chunk
+                           (trampoline chunked-rows)))
+                        (do
+                          (reset! done? true)
+                          (korma/exec-raw
+                           [(str "CLOSE " cursor-name)])
+                          nil))))
+                  (catch java.sql.SQLException e
+                    (if (> @close-attempts 30)
+                      (do
+                        (log/error "Tried to close cursor" cursor-name "too many times")
+                        nil)
+                      chunked-rows))))]
+        (trampoline chunked-rows)))))

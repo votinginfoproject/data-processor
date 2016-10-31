@@ -1,11 +1,14 @@
 (ns vip.data-processor.db.translations.v5-1.street-segments
-  (:require [korma.core :as korma]
-            [vip.data-processor.db.postgres :as postgres]
+  (:require [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.util :as util]))
 
-(defn row-fn [import-id]
-  (korma/select (postgres/v5-1-tables :street-segments)
-    (korma/where {:results_id import-id})))
+(def row-fn
+  (postgres/lazy-select-fn
+   10000
+   (fn [import-id]
+     (str "SELECT * FROM v5_1_street_segments"
+          " WHERE results_id = "
+          import-id))))
 
 (defn base-path [index]
   (str "VipObject.0.StreetSegment." index))
