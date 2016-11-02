@@ -221,6 +221,13 @@
       (korma/where {:id import-id})))
   ctx)
 
+(defn analyze-xtv [ctx]
+  (log/info "Analyzing xml_tree_values")
+  (korma/exec-raw
+   (:conn xml-tree-values)
+   ["analyze xml_tree_values"])
+  ctx)
+
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
         filename (:generated-xml-filename ctx)]
