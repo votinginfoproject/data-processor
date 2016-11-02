@@ -7,15 +7,20 @@
             [clojure.tools.logging :as log]))
 
 (defn duplicate-ids [import-id]
-  (korma/select [postgres/xml-tree-values :first]
-    (korma/fields :first.value :first.path)
-    (korma/where {:first.results_id import-id :second.results_id import-id})
-    (korma/where (postgres/ltree-match :first :path "VipObject.0.*.id"))
-    (korma/where (postgres/ltree-match :second :path "VipObject.0.*.id"))
-    (korma/join :inner [postgres/xml-tree-values :second]
-                (and
-                 (= :first.value :second.value)
-                 (not= :first.path :second.path)))))
+  (korma/exec-raw
+   (:conn postgres/xml-tree-values)
+   ["with ids as (select value, path
+                  from xml_tree_values
+                  where results_id = ?
+                    and path ~ 'VipObject.0.*.id'
+                  order by value)
+     select set1.path, set1.value
+     from ids set1
+     inner join ids set2
+             on set1.value = set2.value
+            and set1.path <> set2.path"
+    [import-id]]
+   :results))
 
 (defn validate-unique-ids
   [{:keys [import-id] :as ctx}]
