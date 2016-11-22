@@ -68,13 +68,6 @@
       (reset! setup-postgres-has-run true)))
   (f))
 
-(defn with-clean-postgres
-  "An :each test fixture to clear out tables in the test database. "
-  [f]
-  (doseq [table psql-tables]
-    (korma/delete table))
-  (f))
-
 (defmacro are-xml-tree-values
   [out-ctx & args]
   `(are [value# path#] (= value#

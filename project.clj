@@ -16,7 +16,7 @@
                                                               org.slf4j/slf4j-simple
                                                               org.slf4j/slf4j-api]]
                  [org.clojure/core.async "0.2.391"]
-                 [democracyworks/utility-works "0.1.2"]
+                 [democracyworks/utility-fns "0.2.0"]
                  [net.lingala.zip4j/zip4j "1.3.2"]
                  [turbovote.resource-config "0.2.0"]
                  [joplin.jdbc "0.3.6"

@@ -7,7 +7,6 @@
             [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
-(use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres validate-one-election-test
   (testing "more than one Election element is a fatal error"

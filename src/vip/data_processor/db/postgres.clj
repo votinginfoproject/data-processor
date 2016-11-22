@@ -101,11 +101,20 @@
                     " ~ '" path "'"))))
 
 (defn find-value-for-simple-path [import-id simple-path]
-  (-> xml-tree-values
-      (korma/select
+  (-> (korma/select xml-tree-values
         (korma/fields :value)
         (korma/where {:results_id import-id
                       :simple_path (path->ltree simple-path)}))
+      first
+      :value))
+
+(defn find-single-xml-tree-value [results-id path]
+  (-> (korma/select xml-tree-values
+        (korma/fields :value)
+        (korma/where {:results_id results-id})
+        (korma/where (ltree-match xml-tree-values
+                                  :path
+                                  path)))
       first
       :value))
 
@@ -149,26 +158,16 @@
      :state state
      :import-id import-id}))
 
-(defn find-single-xml-tree-value [results-id path]
-  (-> (korma/select xml-tree-values
-        (korma/fields :value)
-        (korma/where {:results_id results-id})
-        (korma/where (ltree-match xml-tree-values
-                                  :path
-                                  path)))
-      first
-      :value))
-
 (defn get-xml-tree-public-id-data [{:keys [import-id] :as ctx}]
-  (let [state (find-single-xml-tree-value
+  (let [state (find-value-for-simple-path
                import-id
-               "VipObject.0.State.*{1}.Name.*{1}")
-        date (find-single-xml-tree-value
+               "VipObject.State.Name")
+        date (find-value-for-simple-path
               import-id
-              "VipObject.0.Election.*{1}.Date.*{1}")
-        election-type (find-single-xml-tree-value
+              "VipObject.Election.Date")
+        election-type (find-value-for-simple-path
                        import-id
-                       "VipObject.0.Election.*{1}.ElectionType.*{1}.Text.*{1}")]
+                       "VipObject.Election.ElectionType.Text")]
     {:date date
      :election-type election-type
      :state state
@@ -182,15 +181,18 @@
 
 (defn generate-public-id [ctx]
   (let [{:keys [date election-type state import-id]} (get-public-id-data ctx)]
+    (log/info "Building public id")
     (build-public-id date election-type state import-id)))
 
 (defn generate-election-id [ctx]
+  (log/info "Building election id")
   (let [{:keys [date election-type state]} (get-public-id-data ctx)]
     (build-election-id date election-type state)))
 
 (defn store-public-id [ctx]
   (let [id (:import-id ctx)
         public-id (generate-public-id ctx)]
+    (log/info "Storing public id")
     (korma/update results
                   (korma/set-fields {:public_id public-id})
                   (korma/where {:id id}))
@@ -207,6 +209,7 @@
 (defn store-election-id [ctx]
   (if-let [election-id (generate-election-id ctx)]
     (let [id (:import-id ctx)]
+      (log/info "Storing election id")
       (save-election-id! election-id)
       (korma/update results
                     (korma/set-fields {:election_id election-id})
@@ -216,9 +219,17 @@
 
 (defn store-spec-version [{:keys [spec-version import-id] :as ctx}]
   (when @spec-version
+    (log/info "Storing spec-verion," @spec-version)
     (korma/update results
       (korma/set-fields {:spec_version @spec-version})
       (korma/where {:id import-id})))
+  ctx)
+
+(defn analyze-xtv [ctx]
+  (log/info "Analyzing xml_tree_values")
+  (korma/exec-raw
+   (:conn xml-tree-values)
+   ["analyze xml_tree_values"])
   ctx)
 
 (defn complete-run [ctx]
@@ -303,3 +314,78 @@
 
 (defn column-names [table]
   (map :column_name (columns table)))
+
+(defn lazy-select-xml-tree-values [chunk-size import-id]
+  (binding [db/*current-conn* (db/get-connection (:db xml-tree-values))]
+    (let [cursor-name (str (gensym "xtv_cursor"))
+          done? (atom false)
+          close-attempts (atom 0)]
+      (korma/exec-raw
+                      [(str "DECLARE " cursor-name " NO SCROLL CURSOR "
+                            "WITH HOLD FOR "
+                            "SELECT * FROM xml_tree_values "
+                            "WHERE results_id=" import-id " "
+                            "ORDER BY insert_counter ASC;")])
+      (letfn [(chunked-rows []
+                (when @done?
+                  (swap! close-attempts inc))
+                (try
+                  (do
+                    (let [this-chunk (korma/exec-raw
+                                      [(str "FETCH " chunk-size
+                                            " FROM " cursor-name)]
+                                      :results)]
+                      (if (seq this-chunk)
+                        (do
+                          (lazy-cat
+                           this-chunk
+                           (trampoline chunked-rows)))
+                        (do
+                          (reset! done? true)
+                          (korma/exec-raw
+                           [(str "CLOSE " cursor-name)])
+                          nil))))
+                  (catch java.sql.SQLException e
+                    (if (> @close-attempts 30)
+                      (do
+                        (log/error "Tried to close cursor" cursor-name "too many times")
+                        nil)
+                      chunked-rows))))]
+        (trampoline chunked-rows)))))
+
+(defn lazy-select-fn [chunk-size query-fn]
+  (fn [& args]
+    (let [cursor-name (str (gensym "lazy_select_cursor"))
+          done? (atom false)
+          close-attempts (atom 0)
+          query (apply query-fn args)]
+      (korma/exec-raw
+       [(str "DECLARE " cursor-name " NO SCROLL CURSOR "
+             "WITH HOLD FOR "
+             query)])
+      (letfn [(chunked-rows []
+                (when @done?
+                  (swap! close-attempts inc))
+                (try
+                  (do
+                    (let [this-chunk (korma/exec-raw
+                                      [(str "FETCH " chunk-size
+                                            " FROM " cursor-name)]
+                                      :results)]
+                      (if (seq this-chunk)
+                        (do
+                          (lazy-cat
+                           this-chunk
+                           (trampoline chunked-rows)))
+                        (do
+                          (reset! done? true)
+                          (korma/exec-raw
+                           [(str "CLOSE " cursor-name)])
+                          nil))))
+                  (catch java.sql.SQLException e
+                    (if (> @close-attempts 30)
+                      (do
+                        (log/error "Tried to close cursor" cursor-name "too many times")
+                        nil)
+                      chunked-rows))))]
+        (trampoline chunked-rows)))))

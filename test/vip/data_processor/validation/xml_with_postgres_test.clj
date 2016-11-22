@@ -10,7 +10,6 @@
             [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
-(use-fixtures :each with-clean-postgres)
 
 (deftest ^:postgres load-xml-ltree-test
   (testing "imports xml values into postgres"

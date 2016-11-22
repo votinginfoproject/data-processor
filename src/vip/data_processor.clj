@@ -4,7 +4,6 @@
             [com.climate.newrelic.trace :refer [defn-traced]]
             [squishy.core :as sqs]
             [turbovote.resource-config :refer [config]]
-            [utility-works.async :as util-async]
             [korma.core :as korma]
             [vip.data-processor.cleanup :as cleanup]
             [vip.data-processor.errors :as errors]
@@ -58,6 +57,7 @@
   (concat download-pipeline
           [t/remove-invalid-extensions
            t/xml-csv-branch
+           psql/analyze-xtv
            psql/store-spec-version
            psql/store-public-id
            psql/store-election-id
