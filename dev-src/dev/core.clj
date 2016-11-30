@@ -30,7 +30,8 @@
    psql/store-election-id
    data-processor/add-validations
    errors/close-errors-chan
-   errors/await-statistics])
+   errors/await-statistics
+   psql/refresh-materialized-views])
 
 (defn -main [filename]
   (psql/initialize)

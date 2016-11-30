@@ -64,6 +64,7 @@
            add-validations
            errors/close-errors-chan
            errors/await-statistics
+           psql/refresh-materialized-views
            s3/upload-to-s3
            cleanup/cleanup]))
 
