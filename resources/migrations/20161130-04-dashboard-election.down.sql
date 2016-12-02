@@ -1,1 +1,1 @@
-drop materialized view dashboard.elections;
+drop materialized view v5_dashboard.elections;

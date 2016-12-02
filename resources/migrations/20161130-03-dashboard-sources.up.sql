@@ -1,4 +1,4 @@
-create materialized view dashboard.sources
+create materialized view v5_dashboard.sources
 (results_id, id, vip_id, name, datetime,
  description, organization_uri, terms_of_use_uri)
 as

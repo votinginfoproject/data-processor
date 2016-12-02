@@ -1,1 +1,1 @@
-drop schema dashboard;
+drop schema v5_dashboard;

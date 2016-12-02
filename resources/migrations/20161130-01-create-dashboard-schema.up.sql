@@ -1,1 +1,1 @@
-create schema dashboard;
+create schema v5_dashboard;

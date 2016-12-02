@@ -1,1 +1,1 @@
-drop materialized view dashboard.sources;
+drop materialized view v5_dashboard.sources;

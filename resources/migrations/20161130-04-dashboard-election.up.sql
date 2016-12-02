@@ -1,4 +1,4 @@
-create materialized view dashboard.elections
+create materialized view v5_dashboard.elections
   (results_id, id, date, election_type, is_statewide, name, registration_info,
    absentee_ballot_info, results_uri, polling_hours, hours_open_id,
    has_election_day_registration, registration_deadline, absentee_request_deadline)

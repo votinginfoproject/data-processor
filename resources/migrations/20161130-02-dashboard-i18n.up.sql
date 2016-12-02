@@ -7,7 +7,7 @@ create index xtv_i18n_text_idx
 on xml_tree_values (results_id, path, value)
 where simple_path ~ 'VipObject.*.Text';
 
-create materialized view dashboard.i18n (results_id, simple_path, value) as
+create materialized view v5_dashboard.i18n (results_id, simple_path, value) as
 with i18n as
   (select results_id, subpath(path, 0, nlevel(path) - 1) as path
    from xml_tree_values
