@@ -6,7 +6,7 @@ with
   texts as (
     select *
     from crosstab('select results_id, element_type(simple_path) as element, value
-                  from i18n_text t
+                  from v5_dashboard.i18n t
                   where t.simple_path ~
                       ''VipObject.Source.Description.Text''
                   order by 1',
