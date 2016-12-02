@@ -235,7 +235,7 @@
 (defn refresh-materialized-views
   [ctx]
   (log/info "Refreshing materialized views")
-  (doseq [view ["dashboard.sources" "dashboard.elections"]]
+  (doseq [view ["v5_dashboard.sources" "v5_dashboard.elections"]]
     (korma/exec-raw
      (:conn xml-tree-values)
      [(str "refresh materialized view " view)]))
