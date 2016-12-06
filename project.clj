@@ -10,6 +10,7 @@
                  [org.apache.directory.studio/org.apache.commons.lang "2.6"]
                  [com.novemberain/langohr "3.5.1"]
                  [joda-time "2.9.3"]
+                 [clj-time "0.12.2"]
                  [clj-aws-s3 "0.3.10" :exclusions [joda-time]]
                  [com.climate/clj-newrelic "0.2.1"]
                  [democracyworks/squishy "2.0.0" :exclusions [joda-time

@@ -1,7 +1,8 @@
 (ns vip.data-processor.validation.v5.hours-open
   (:require [vip.data-processor.validation.v5.util :as util]
             [vip.data-processor.errors :as errors]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [clj-time.format :as f]))
 
 (defn valid-time-with-zone? [time]
   (re-matches
@@ -9,9 +10,9 @@
    time))
 
 (defn valid-date? [date]
-  (re-matches
-   #"\A(?:(?:[0-9]{4})-(?:[0][1-9]|[1][0-2])-(?:[0][1-9]|[1-2][0-9]|[3][0-1]))\z"
-   date))
+  (try
+    (f/parse (f/formatter "yyyy-MM-dd") date)
+    (catch Exception e false)))
 
 (defn validate-times [{:keys [import-id] :as ctx}]
   (log/info "Validating times")

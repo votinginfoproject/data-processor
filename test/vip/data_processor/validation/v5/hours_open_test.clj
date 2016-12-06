@@ -29,13 +29,14 @@
                            :scope :hours-open
                            :identifier "VipObject.0.HoursOpen.0.Schedule.0.EndDate.2"}))
 
-    (testing "a start date or end date that looks like a timestamp is invalid"
+    (testing "a date that looks like a timestamp is invalid"
       (is (contains-error? errors
                            {:severity :errors
                             :scope :hours-open
                             :identifier "VipObject.0.HoursOpen.1.Schedule.0.StartDate.1"
-                            :error-type :format}))
+                            :error-type :format})))
 
+    (testing "a leap day in the wrong year is invalid"
       (is (contains-error? errors
                            {:severity :errors
                             :scope :hours-open
