@@ -232,6 +232,15 @@
    ["analyze xml_tree_values"])
   ctx)
 
+(defn refresh-materialized-views
+  [ctx]
+  (log/info "Refreshing materialized views")
+  (doseq [view ["v5_dashboard.sources" "v5_dashboard.elections"]]
+    (korma/exec-raw
+     (:conn xml-tree-values)
+     [(str "refresh materialized view " view)]))
+  ctx)
+
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
         filename (:generated-xml-filename ctx)]
