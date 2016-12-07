@@ -30,15 +30,15 @@
          "07:00:00-06:00" "VipObject.0.HoursOpen.0.Schedule.0.Hours.0.StartTime.0"
          "22:00:00-06:00" "VipObject.0.HoursOpen.0.Schedule.0.Hours.0.EndTime.1"
          "true" "VipObject.0.HoursOpen.0.Schedule.0.IsOrByAppointment.1"
-         "2016-10-10-06:00" "VipObject.0.HoursOpen.0.Schedule.0.StartDate.2"
-         "2016-10-12-06:00" "VipObject.0.HoursOpen.0.Schedule.0.EndDate.3"
+         "2016-10-10" "VipObject.0.HoursOpen.0.Schedule.0.StartDate.2"
+         "2016-10-12" "VipObject.0.HoursOpen.0.Schedule.0.EndDate.3"
 
          "sch002" "VipObject.0.HoursOpen.0.Schedule.1.label"
          "09:00:00-06:00" "VipObject.0.HoursOpen.0.Schedule.1.Hours.0.StartTime.0"
          "20:00:00-06:00" "VipObject.0.HoursOpen.0.Schedule.1.Hours.0.EndTime.1"
          "true" "VipObject.0.HoursOpen.0.Schedule.1.IsOnlyByAppointment.1"
-         "2016-10-13-06:00" "VipObject.0.HoursOpen.0.Schedule.1.StartDate.2"
-         "2016-10-15-06:00" "VipObject.0.HoursOpen.0.Schedule.1.EndDate.3"))
+         "2016-10-13" "VipObject.0.HoursOpen.0.Schedule.1.StartDate.2"
+         "2016-10-15" "VipObject.0.HoursOpen.0.Schedule.1.EndDate.3"))
       (testing "another HoursOpen from a third row"
         (are-xml-tree-values out-ctx
          "ho002" "VipObject.0.HoursOpen.1.id"
@@ -46,5 +46,5 @@
          "08:00:00-06:00" "VipObject.0.HoursOpen.1.Schedule.0.Hours.0.StartTime.0"
          "14:00:00-06:00" "VipObject.0.HoursOpen.1.Schedule.0.Hours.0.EndTime.1"
          "true" "VipObject.0.HoursOpen.1.Schedule.0.IsSubjectToChange.1"
-         "2016-10-10-06:00" "VipObject.0.HoursOpen.1.Schedule.0.StartDate.2"
-         "2016-10-15-06:00" "VipObject.0.HoursOpen.1.Schedule.0.EndDate.3")))))
+         "2016-10-10" "VipObject.0.HoursOpen.1.Schedule.0.StartDate.2"
+         "2016-10-15" "VipObject.0.HoursOpen.1.Schedule.0.EndDate.3")))))

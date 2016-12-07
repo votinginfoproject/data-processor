@@ -6,14 +6,19 @@
         <StartTime>09:00:00-06:00</StartTime>
         <EndTime>19:00:00-06:00</EndTime>
       </Hours>
+      <StartDate>2016-11-08</StartDate>
+      <EndDate>2016-11-08</EndDate>
     </Schedule>
   </HoursOpen>
+
   <HoursOpen id="ho002">
     <Schedule>
       <Hours>
         <StartTime>37:00:00-06:00</StartTime>
         <EndTime>19:00:00-06:00</EndTime>
       </Hours>
+      <StartDate>2016-11-08T08:00:00.000-06:00</StartDate>
+      <EndDate>2017-02-29</EndDate>
     </Schedule>
   </HoursOpen>
   <HoursOpen id="ho003">

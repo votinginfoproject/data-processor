@@ -45,6 +45,7 @@
    retention-contest/validate-no-missing-candidate-ids
    state/validate-no-missing-names
    hours-open/validate-times
+   hours-open/validate-dates
    electoral-district/validate-no-missing-names
    electoral-district/validate-no-missing-types
    election-admin/validate-no-missing-departments
