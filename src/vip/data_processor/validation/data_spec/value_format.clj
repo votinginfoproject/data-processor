@@ -61,3 +61,7 @@
 (def yes-no
   {:check ["yes" "no"]
    :message "Must be yes or no"})
+
+(def boolean
+  {:check ["true" "false"]
+   :message "Booleans should be \"true\" or \"false\""})
