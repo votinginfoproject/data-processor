@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <Office id="off9999">
+    <ElectoralDistrictId>ed60129</ElectoralDistrictId>
+    <FilingDeadline>2013-01-01</FilingDeadline>
+    <IsPartisan>False</IsPartisan>
+    <Name>
+      <Text language="en">President and Vice-President</Text>
+    </Name>
+    <Term>
+      <Type>full-term</Type>
+    </Term>
+  </Office>
+</VipObject>
