@@ -1,6 +1,6 @@
 (ns vip.data-processor.validation.v5.boolean
   (:require [korma.core :as korma]
-            [vip-data-processor.db.postgres :as postgres]
+            [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.data-spec.value-format :as value-format]
             [vip.data-processor.errors :as errors]
             [vip.data-processor.validation.xml.spec :as spec]
@@ -13,8 +13,8 @@
                           (korma/where {:results_id import-id
                                         :simple_path [in (map postgres/path->ltree boolean-paths)]}))]
       (reduce (fn [ctx row]
-                (if (re-find (:check value-format/boolean)
-                             (:value row))
+                (if (contains? (:check value-format/boolean-valid)
+                               (:value row))
                   ctx
                   (errors/add-errors ctx
                                      :errors :boolean (-> row :path .getValue) :format

@@ -62,6 +62,6 @@
   {:check ["yes" "no"]
    :message "Must be yes or no"})
 
-(def boolean
-  {:check ["true" "false"]
+(def boolean-valid
+  {:check #{"true" "false"}
    :message "Booleans should be \"true\" or \"false\""})
