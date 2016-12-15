@@ -1,0 +1,1 @@
+drop index if exists xml_tree_values_results_element_type_idx;

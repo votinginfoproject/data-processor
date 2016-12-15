@@ -1,5 +1,6 @@
 (ns vip.data-processor.db.tree-statistics
   (:require [clojure.string :as str]
+            [clojure.tools.logging :as log]
             [korma.core :as korma]
             [vip.data-processor.util :as util]
             [vip.data-processor.db.postgres :as postgres]
@@ -69,7 +70,11 @@
 
 (defn store-tree-stats
   [{:keys [import-id] :as ctx}]
+  (log/info "Building basic feed stats")
   (korma/insert postgres/v5-statistics
     (korma/values
      (assoc (stats ctx) :results_id import-id)))
+  (log/info "Building locality stats")
+  (korma/exec-raw
+   ["select * from v5_dashboard.feed_localities(?)" [import-id]])
   ctx)
