@@ -9,7 +9,9 @@
 
 (use-fixtures :once setup-postgres)
 
-(deftest ^:postgres boolean-isstatewide-incorrect-test
+(set! *print-length* 100)
+
+(deftest ^:postgres boolean-incorrect-test
   (let [errors-chan (a/chan 100)
         ctx {:input (xml-input "v5-incorrect-booleans.xml")
              :pipeline [psql/start-run
@@ -22,33 +24,27 @@
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.Election.6.IsStatewide.5",
+                            :identifier "VipObject.0.Election.7.IsStatewide.5",
                             :error-type :format
                             :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.Office.7.IsPartisan.2",
+                            :identifier "VipObject.0.Office.8.IsPartisan.2",
                             :error-type :format
                             :error-value "False"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.Precinct.8.IsMailOnly.4",
+                            :identifier "VipObject.0.Precinct.9.IsMailOnly.4",
                             :error-type :format
                             :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.Election.6.HasElectionDayRegistration.3",
+                            :identifier "VipObject.0.Election.7.HasElectionDayRegistration.3",
                             :error-type :format
                             :error-value "False"}))
-      (is (contains-error? errors
-                           {:severity :errors
-                            :scope :boolean
-                            :identifier "VipObject.0.Election.6.IsStatewide.5",
-                            :error-type :format
-                            :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
@@ -64,68 +60,57 @@
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.BallotMeasureContest.5.HasRotation.8",
+                            :identifier "VipObject.0.BallotMeasureContest.6.HasRotation.8",
                             :error-type :format
                             :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.RetentionContest.4.HasRotation.6",
+                            :identifier "VipObject.0.RetentionContest.5.HasRotation.6",
                             :error-type :format
                             :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.CandidateSelection.3.IsWriteIn.2",
+                            :identifier "VipObject.0.CandidateSelection.4.IsWriteIn.2",
                             :error-type :format
                             :error-value "False"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.HoursOpen.2.Schedule.0.IsOnlyByAppointment.4",
+                            :identifier "VipObject.0.HoursOpen.3.Schedule.0.IsOnlyByAppointment.4",
                             :error-type :format
                             :error-value "False"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.HoursOpen.2.Schedule.0.IsOrByAppointment.5",
+                            :identifier "VipObject.0.HoursOpen.3.Schedule.0.IsOrByAppointment.5",
                             :error-type :format
                             :error-value "False"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.HoursOpen.2.Schedule.0.IsSubjectToChange.6",
+                            :identifier "VipObject.0.HoursOpen.3.Schedule.0.IsSubjectToChange.6",
                             :error-type :format
                             :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.StreetSegment.1.IncludesAllAddresses.1",
+                            :identifier "VipObject.0.StreetSegment.2.IncludesAllAddresses.1",
                             :error-type :format
                             :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.StreetSegment.1.IncludesAllStreets.2",
+                            :identifier "VipObject.0.StreetSegment.2.IncludesAllStreets.2",
                             :error-type :format
                             :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean
-                            :identifier "VipObject.0.CandidateContest.0.HasRotation.7",
+                            :identifier "VipObject.0.CandidateContest.1.HasRotation.7",
                             :error-type :format
-                            :error-value "True"})))))
-
-(deftest ^:postgres boolean-pollinglocation-incorrect-test
-  (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-pollinglocation-incorrect-boolean.xml")
-             :pipeline [psql/start-run
-                        load-xml-ltree
-                        v5.boolean/validate-booleans]
-              :errors-chan errors-chan}
-        out-ctx (pipeline/run-pipeline ctx)
-        errors (all-errors errors-chan)]
-    (testing "catch True instead of true"
+                            :error-value "True"}))
       (is (contains-error? errors
                            {:severity :errors
                             :scope :boolean

@@ -1,5 +1,17 @@
 <?xml version="1.0"?>
 <VipObject schemaVersion="5.1">
+  <PollingLocation id="pl00000">
+    <AddressLine>DEPARTMENT OF VOTER REGISTRATION AND ELECTIONS</AddressLine>
+    <AddressLine>1600 5TH STREET</AddressLine>
+    <AddressLine>CHARLOTTESVILLE, VA 22902</AddressLine>
+    <HoursOpenId>hours0002</HoursOpenId>
+    <IsDropBox>True</IsDropBox>
+    <IsEarlyVoting>True</IsEarlyVoting>
+    <LatLng>
+      <Latitude>38.009939</Latitude>
+      <Longitude>-78.506204</Longitude>
+    </LatLng>
+  </PollingLocation>
   <CandidateContest id="cc20003">
     <BallotSelectionIds>cs10961 cs10962 cs10963</BallotSelectionIds>
     <BallotTitle>
@@ -135,18 +147,6 @@
     <ResultsUri>http://www.sbe.virginia.gov/ElectionResults.html</ResultsUri>
     <StateId>st51</StateId>
   </Election>
-  <PollingLocation id="pl00000">
-    <AddressLine>DEPARTMENT OF VOTER REGISTRATION AND ELECTIONS</AddressLine>
-    <AddressLine>1600 5TH STREET</AddressLine>
-    <AddressLine>CHARLOTTESVILLE, VA 22902</AddressLine>
-    <HoursOpenId>hours0002</HoursOpenId>
-    <IsDropBox>True</IsDropBox>
-    <IsEarlyVoting>True</IsEarlyVoting>
-    <LatLng>
-      <Latitude>38.009939</Latitude>
-      <Longitude>-78.506204</Longitude>
-    </LatLng>
-  </PollingLocation>
   <Candidate id="can10961">
      <BallotName>
        <Text language="en">Ken T. Cuccinelli II</Text>
