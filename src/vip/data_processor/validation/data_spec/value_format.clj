@@ -1,5 +1,4 @@
-(ns vip.data-processor.validation.data-spec.value-format
-  (:require [vip.data-processor.validation.data-spec.coerce :as coerce]))
+(ns vip.data-processor.validation.data-spec.value-format)
 
 (def all-digits
   {:check #"\A\d+\z"
