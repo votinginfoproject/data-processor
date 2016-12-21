@@ -6,17 +6,6 @@
    :message "Invalid data type"
    :severity :fatal})
 
-(defn check-not-negative [val]
-  (let [house-number (coerce/coerce-integer val)]
-      (and
-       (re-find (:check all-digits) val)
-       (>= house-number 0))))
-
-(def not-negative-integer
-  {:check check-not-negative
-   :message "House numbers must consist of postive integers only"
-   :severity :fatal})
-
 (def date
   {:check #"\A\d{4}-\d{2}-\d{2}\z"
    :message "Invalid date format"})

@@ -311,7 +311,7 @@
     :stats true
     :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
               {:name "start_house_number" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
-              {:name "end_house_number" :required :critical :format format/not-negative-integer :coerce coerce/coerce-integer}
+              {:name "end_house_number" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
               {:name "odd_even_both" :format format/odd-even-both}
               {:name "start_apartment_number" :format format/all-digits :coerce coerce/coerce-integer}
               {:name "end_apartment_number" :format format/all-digits :coerce coerce/coerce-integer}
