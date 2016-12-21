@@ -2,6 +2,23 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.validation.data-spec.value-format :refer :all]))
 
+(deftest no-negative-house-numbers
+  (let [not-negative-house-number (:check not-negative-integer)]
+    (testing "validates false on negative numbers"
+      (is (not-negative-house-number "1"))
+      (is (not-negative-house-number "2"))
+      (is (not (not-negative-house-number "-1")))
+      (is (not (not-negative-house-number "-2")))
+      (is (not (not-negative-house-number "abc"))))))
+
+(deftest test-all-digits
+  (let [all-digits-regex (:check all-digits)]
+    (testing "matches digit values"
+      (are [s] (re-matches all-digits-regex s)
+           "123"
+           "456"))))
+
+
 (deftest electoral-district-type-regex-test
   (let [electoral-district-type-regex (:check electoral-district-type)]
     (testing "matches a lot of expected values"

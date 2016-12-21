@@ -1,8 +1,20 @@
-(ns vip.data-processor.validation.data-spec.value-format)
+(ns vip.data-processor.validation.data-spec.value-format
+  (:require [vip.data-processor.validation.data-spec.coerce :as coerce]))
 
 (def all-digits
   {:check #"\A\d+\z"
    :message "Invalid data type"
+   :severity :fatal})
+
+(defn check-not-negative [val]
+  (let [house-number (coerce/coerce-integer val)]
+      (and
+       (re-find (:check all-digits) val)
+       (>= house-number 0))))
+
+(def not-negative-integer
+  {:check check-not-negative
+   :message "House numbers must consist of postive integers only"
    :severity :fatal})
 
 (def date
