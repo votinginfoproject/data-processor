@@ -9,7 +9,7 @@ begin
     when row_count = 0 then
       completion := 100;
     else
-      completion := (((row_count - error_count) / row_count::float) * 100);
+      completion := floor(((row_count - error_count) / row_count::float) * 100);
   end case;
   return completion;
 end;
