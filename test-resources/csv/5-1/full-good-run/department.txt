@@ -1,4 +1,4 @@
-election_official_person_id,parent_id,id
+election_official_person_id,election_administration_id,id
 per50002,ea123,dep01
 per50002,ea345,dep02
 per50002,ea625,dep03

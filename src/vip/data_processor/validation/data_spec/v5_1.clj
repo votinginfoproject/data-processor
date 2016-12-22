@@ -43,7 +43,7 @@
     :columns [{:name "id"}
               {:name "description"}
               {:name "election_official_person_id"}
-              {:name "parent_id"}
+              {:name "department_id"}
               {:name "type"}
               {:name "other_type"}]}
    {:filename "ballot_measure_contest.txt"
@@ -175,7 +175,7 @@
     :table :departments
     :columns [{:name "id"}
               {:name "election_official_person_id"}
-              {:name "parent_id"}]}
+              {:name "election_administration_id"}]}
    {:filename "election.txt"
     :table :elections
     :columns [{:name "id"}
