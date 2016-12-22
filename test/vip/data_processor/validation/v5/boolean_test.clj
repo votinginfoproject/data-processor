@@ -4,7 +4,7 @@
              [vip.data-processor.db.postgres :as psql]
              [vip.data-processor.validation.xml :refer :all]
              [vip.data-processor.test-helpers :refer :all]
-             [vip.data-processor.validation.v5.boolean :as v5.boolean]
+             [vip.data-processor.validation.v5.booleans :as v5.booleans]
              [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
@@ -16,7 +16,7 @@
         ctx {:input (xml-input "v5-incorrect-booleans.xml")
              :pipeline [psql/start-run
                         load-xml-ltree
-                        v5.boolean/validate-booleans]
+                        v5.booleans/validate-format]
               :errors-chan errors-chan}
         out-ctx (pipeline/run-pipeline ctx)
         errors (all-errors errors-chan)]
