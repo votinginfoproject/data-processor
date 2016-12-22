@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VipObject xmlnsxsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.1.2" xsinoNamespaceSchemaLocation="http://votinginfoproject.github.com/vip-specification/vip_spec.xsd">
+  <Source>
+    <Description>
+      <Text language="en">Colorado Secretary of the State</Text>
+    </Description>
+    <Name>Colorado Secretary of the State</Name>
+    <OrganizationUri>https://example.com</OrganizationUri>
+    <VipId>8</VipId>
+  </Source>
+
+  <Election id="ele2020">
+    <AbsenteeRequestDeadline>2020-11-10</AbsenteeRequestDeadline>
+    <Date>2020-11-10</Date>
+    <ElectionType>
+      <Text language="en">General Election</Text>
+    </ElectionType>
+    <HasElectionDayRegistration>True</HasElectionDayRegistration>
+    <IsStatewide>True</IsStatewide>
+    <Name>
+      <Text language="en">2020 Duel of the Fates</Text>
+    </Name>
+    <RegistrationDeadline></RegistrationDeadline>
+    <ResultsUri>https://example.com/results</ResultsUri>
+    <StateId>st08</StateId>
+  </Election>
+
+  <State id="st08"></State>
+
+  <!-- Buena Vista -->
+  <Locality id="loc1">
+    <ElectionAdministrationId>ea1</ElectionAdministrationId>
+    <ExternalIdentifiers>
+      <ExternalIdentifiers>
+        <Type>ocd-id</Type>
+        <Value>ocd-division/country:us/state:co/county:chaffee/town:buena_vista</Value>
+      </ExternalIdentifiers>
+    </ExternalIdentifiers>
+    <Name>Buena Vista</Name>
+    <StateId>st08</StateId>
+    <Type>town</Type>
+  </Locality>
+
+  <Precinct id="pre10">
+    <IsMailOnly>true</IsMailOnly>
+    <LocalityId>loc1</LocalityId>
+    <Name>BV Precinct 1</Name>
+    <Number>1</Number>
+    <PollingLocationIds>pl10 pl11</PollingLocationIds>
+  </Precinct>
+
+  <Precinct id="pre11">
+    <IsMailOnly>true</IsMailOnly>
+    <LocalityId>loc1</LocalityId>
+    <Name>BV Precinct 2</Name>
+    <Number>2</Number>
+    <PollingLocationIds>pl12 pl13</PollingLocationIds>
+  </Precinct>
+
+  <PollingLocation id="pl10">
+    <Name>Chaffee County Annex</Name>
+    <AddressLine>112 Linderman Avenue</AddressLine>
+    <AddressLine>Buena Vista, CO 81211</AddressLine>
+    <HoursOpenId>hours1</HoursOpenId>
+    <IsDropBox>true</IsDropBox>
+    <IsEarlyVoting>true</IsEarlyVoting>
+  </PollingLocation>
+
+  <PollingLocation id="pl11">
+    <Name>Deerhammer Distilling Compnay</Name>
+    <AddressLine>321 E Main St</AddressLine>
+    <AddressLine>Buena Vista, CO 81211</AddressLine>
+    <HoursOpenId>hours1</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>true</IsEarlyVoting>
+  </PollingLocation>
+
+  <PollingLocation id="pl12">
+    <Name>Commanche Drive-In Theatre</Name>
+    <AddressLine>27784 Co Rd 339</AddressLine>
+    <AddressLine>Buena Vista, CO 81211</AddressLine>
+    <HoursOpenId>hours1</HoursOpenId>
+    <IsDropBox></IsDropBox>
+    <IsEarlyVoting></IsEarlyVoting>
+  </PollingLocation>
+
+  <PollingLocation id="pl13">
+    <Name>Merrifield Greenhouse Inc</Name>
+    <AddressLine>19256 Co Rd 343</AddressLine>
+    <AddressLine>Buena Vista, CO 81211</AddressLine>
+    <HoursOpenId>hours1</HoursOpenId>
+    <IsDropBox></IsDropBox>
+    <IsEarlyVoting></IsEarlyVoting>
+  </PollingLocation>
+
+  <StreetSegment id="ss10">
+    <City>Buena Vista</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre10</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>Main</StreetName>
+    <StreetSuffix></StreetSuffix>
+    <Zip>81211</Zip>
+  </StreetSegment>
+
+  <StreetSegment id="ss11">
+    <City>Buena Vista</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre10</PrecinctId>
+    <StartHouseNumber>101</StartHouseNumber>
+    <EndHouseNumber>200</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>Main</StreetName>
+    <StreetSuffix></StreetSuffix>
+    <Zip>81211</Zip>
+  </StreetSegment>
+
+    <StreetSegment id="ss12">
+    <City>Buena Vista</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre11</PrecinctId>
+    <StartHouseNumber>15000</StartHouseNumber>
+    <EndHouseNumber>17999</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>County Road 343</StreetName>
+    <StreetSuffix></StreetSuffix>
+    <Zip>81211</Zip>
+  </StreetSegment>
+
+  <StreetSegment id="ss13">
+    <City>Buena Vista</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre11</PrecinctId>
+    <StartHouseNumber>18000</StartHouseNumber>
+    <EndHouseNumber>20000</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>County Road 343</StreetName>
+    <StreetSuffix></StreetSuffix>
+    <Zip>81211</Zip>
+  </StreetSegment>
+
+  <!-- Nathrop -->
+  <Locality id="loc2">
+    <ElectionAdministrationId>ea1</ElectionAdministrationId>
+    <ExternalIdentifiers>
+      <ExternalIdentifiers>
+        <Type>ocd-id</Type>
+        <Value>ocd-division/country:us/state:co/town:nathrop</Value>
+      </ExternalIdentifiers>
+    </ExternalIdentifiers>
+    <Name>Nathrop</Name>
+    <StateId>st08</StateId>
+    <Type>ghost town</Type>
+  </Locality>
+
+  <Precinct id="pre2">
+    <IsMailOnly>true</IsMailOnly>
+    <LocalityId>loc2</LocalityId>
+    <Name>Nathrop Area</Name>
+    <Number>2</Number>
+    <PollingLocationIds>pl2</PollingLocationIds>
+  </Precinct>
+
+  <PollingLocation id="pl2">
+    <Name>St. Elmo General Store</Name>
+    <AddressLine>25865 County Road 162</AddressLine>
+    <AddressLine>Nathrop, CO 81236</AddressLine>
+    <HoursOpenId>hours1</HoursOpenId>
+    <IsDropBox></IsDropBox>
+    <IsEarlyVoting></IsEarlyVoting>
+  </PollingLocation>
+
+  <StreetSegment id="ss21">
+    <City>Nathrop</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre2</PrecinctId>
+    <StartHouseNumber>25800</StartHouseNumber>
+    <EndHouseNumber>25900</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>County Road 162</StreetName>
+    <Zip>81236</Zip>
+  </StreetSegment>
+
+
+  <StreetSegment id="ss22">
+    <City>Nathrop</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre2</PrecinctId>
+    <StartHouseNumber>23000</StartHouseNumber>
+    <EndHouseNumber>24000</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>North</StreetName>
+    <Zip>81236</Zip>
+  </StreetSegment>
+
+  <!-- Salida -->
+  <Locality id="loc3">
+    <ElectionAdministrationId>ea1</ElectionAdministrationId>
+    <ExternalIdentifiers>
+      <ExternalIdentifiers>
+        <Type>ocd-id</Type>
+        <Value>ocd-division/country:us/state:co/county:chaffee/city:salida</Value>
+      </ExternalIdentifiers>
+    </ExternalIdentifiers>
+    <Name>Salida</Name>
+    <StateId>st08</StateId>
+    <Type>city</Type>
+  </Locality>
+
+  <Precinct id="pre3">
+    <IsMailOnly>true</IsMailOnly>
+    <LocalityId>loc3</LocalityId>
+    <Name>Salida Precinct 1</Name>
+    <Number>3</Number>
+    <PollingLocationIds>pl31 pl32</PollingLocationIds>
+  </Precinct>
+
+  <PollingLocation id="pl31">
+    <Name>Chaffee County Courthouse</Name>
+    <AddressLine>104 Crestone</AddressLine>
+    <AddressLine>Salida, CO 81201</AddressLine>
+    <HoursOpenId>hours1</HoursOpenId>
+    <IsDropBox></IsDropBox>
+    <IsEarlyVoting></IsEarlyVoting>
+  </PollingLocation>
+
+  <PollingLocation id="pl32">
+    <Name>Cafe Dawn</Name>
+    <AddressLine>203 W 1st St</AddressLine>
+    <AddressLine>Salida, CO 81201</AddressLine>
+    <HoursOpenId>hours1</HoursOpenId>
+    <IsDropBox></IsDropBox>
+    <IsEarlyVoting></IsEarlyVoting>
+  </PollingLocation>
+
+  <StreetSegment id="ss31">
+    <City>Salida</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre3</PrecinctId>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>10</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>F</StreetName>
+    <StreetSuffix>ST</StreetSuffix>
+    <Zip>81201</Zip>
+  </StreetSegment>
+
+  <StreetSegment id="ss32">
+    <City>Salida</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre3</PrecinctId>
+    <StartHouseNumber>11</StartHouseNumber>
+    <EndHouseNumber>20</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>F</StreetName>
+    <StreetSuffix>ST</StreetSuffix>
+    <Zip>81201</Zip>
+  </StreetSegment>
+
+  <StreetSegment id="ss33">
+    <City>Salida</City>
+    <OddEvenBoth>both</OddEvenBoth>
+    <PrecinctId>pre3</PrecinctId>
+    <StartHouseNumber>21</StartHouseNumber>
+    <EndHouseNumber>30</EndHouseNumber>
+    <State>CO</State>
+    <StreetName>F</StreetName>
+    <StreetSuffix>ST</StreetSuffix>
+    <Zip></Zip>
+  </StreetSegment>
+
+  <!-- ancillary stuff -->
+  <ElectionAdministration id="ea1">
+    <AbsenteeUri></AbsenteeUri>
+    <AmIRegisteredUri></AmIRegisteredUri>
+    <Department>
+      <ContactInformation label="ci1">
+        <AddressLine>104 Crestone Ave</AddressLine>
+        <AddressLine>Salida, CO 81201</AddressLine>
+        <Name></Name>
+      </ContactInformation>
+      <ElectionOfficialPersonId>per1</ElectionOfficialPersonId>
+      <VoterService>
+        <Description>The election official referenced is missing</Description>
+      </VoterService>
+    </Department>
+  </ElectionAdministration>
+
+  <HoursOpen id="hours1">
+    <Schedule>
+      <Hours>
+        <StartTime>07:00:00-7:00</StartTime>
+        <EndTime>12:00:00-7:00</EndTime>
+      </Hours>
+      <StartDate>2020-11-10</StartDate>
+      <EndDate>2020-11-10</EndDate>
+    </Schedule>
+  </HoursOpen>
+</VipObject>
