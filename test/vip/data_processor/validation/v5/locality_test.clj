@@ -82,14 +82,49 @@
                            first)]
         (is (= 3 (:count localities)))))
 
-    (testing "a locality element can have a number of errors"
+    (testing "a locality has some basic info"
+      (let [localities (-> (korma/select psql/v5-dashboard-localities
+                             (korma/fields :name :type :id)
+                             (korma/where {:results_id results-id})))]
+        (is (= #{{:name "Salida"
+                  :type "city"
+                  :id "loc3"}
+                 {:name "Nathrop"
+                  :type "ghost town"
+                  :id "loc2"}
+                 {:name "Buena Vista"
+                  :type "town"
+                  :id "loc1"}}
+               (set localities)))))
+
+    (testing "in a locality, we count elements, their errors, and success rates"
       (let [salida (-> (korma/select psql/v5-dashboard-localities
                          (korma/where {:id "loc3" :results_id results-id}))
                        first)]
-        (is (= (:type salida) "city"))
-        (is (= (:street_segment_errors salida) 1))
-        (is (= (:voter_service_errors salida) 1))
-        (is (= (:hours_open_errors salida) 2))
-        (is (= (:department_errors salida) 0))
-        (is (= (:election_administration_errors salida) 0))
-        (is (= (:polling_location_errors salida) 0))))))
+        (is (= {:id "loc3"
+                :name "Salida"
+                :type "city"
+                :error_count 4
+                :precinct_errors 0
+                :precinct_count 1
+                :precinct_completion 100
+                :polling_location_errors 0
+                :polling_location_count 2
+                :polling_location_completion 100
+                :street_segment_errors 1
+                :street_segment_count 3
+                :street_segment_completion 66
+                :hours_open_errors 2
+                :hours_open_count 1
+                :hours_open_completion 0
+                :election_administration_errors 0
+                :election_administration_count 1
+                :election_administration_completion 100
+                :department_errors 0
+                :department_count 4
+                :department_completion 100
+                :voter_service_errors 1
+                :voter_service_count 1
+                :voter_service_completion 0
+                :results_id results-id}
+               salida))))))
