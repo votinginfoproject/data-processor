@@ -7,6 +7,7 @@
              [vip.data-processor.test-helpers :refer :all]
              [vip.data-processor.validation.v5 :as v5]
              [clojure.java.io :as io]
+             [korma.core :as korma]
              [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
@@ -37,10 +38,21 @@
              :pipeline (concat [psql/start-run
                                 csv/determine-spec-version]
                                (csv/version-pipelines "5.1")
-                               v5/validations)}
+                               v5/validations
+                               [psql/store-spec-version
+                                psql/store-public-id])}
         out-ctx (pipeline/run-pipeline ctx)
         errors (all-errors errors-chan)]
     (assert-no-problems errors {})
+
+    (testing "the election state, type, and date are saved to the results table"
+      (let [results_values (-> (korma/select psql/results
+                                (korma/fields :id :start_time :public_id :state :election_type :election_date)
+                                (korma/where {:id (:import-id out-ctx)}))
+                            first)]
+        (is (= (:election_date results_values) "10/08/2016"))
+        (is (= (:election_type results_values) "Edible"))
+        (is (= (:state results_values) "Virginia"))))
 
     (testing "the data for building a public_id is correctly fetched"
       (is (= {:date "10/08/2016"

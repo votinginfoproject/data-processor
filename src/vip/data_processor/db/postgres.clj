@@ -191,10 +191,14 @@
 
 (defn store-public-id [ctx]
   (let [id (:import-id ctx)
-        public-id (generate-public-id ctx)]
+        public-id (generate-public-id ctx)
+        public-id-data (get-public-id-data ctx)]
     (log/info "Storing public id")
     (korma/update results
-                  (korma/set-fields {:public_id public-id})
+                  (korma/set-fields {:public_id public-id
+                                     :state (:state public-id-data)
+                                     :election_type (:election-type public-id-data)
+                                     :election_date (:date public-id-data)})
                   (korma/where {:id id}))
     (assoc ctx :public-id public-id)))
 
