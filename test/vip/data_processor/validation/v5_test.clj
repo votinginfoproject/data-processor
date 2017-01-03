@@ -46,18 +46,20 @@
     (assert-no-problems errors {})
 
     (testing "the election state, type, and date are saved to the results table"
-      (let [results_values (-> (korma/select psql/results
-                                (korma/fields :id :start_time :public_id :state :election_type :election_date)
+      (let [results-values (-> (korma/select psql/results
+                                (korma/fields :id :start_time :public_id :state :election_type :election_date :vip_id)
                                 (korma/where {:id (:import-id out-ctx)}))
                             first)]
-        (is (= (:election_date results_values) "10/08/2016"))
-        (is (= (:election_type results_values) "Edible"))
-        (is (= (:state results_values) "Virginia"))))
+        (is (= (:election_date results-values) "10/08/2016"))
+        (is (= (:election_type results-values) "Edible"))
+        (is (= (:state results-values) "Virginia"))
+        (is (= (:vip_id results-values) "51"))))
 
     (testing "the data for building a public_id is correctly fetched"
       (is (= {:date "10/08/2016"
               :election-type "Edible"
-              :state "Virginia"}
+              :state "Virginia"
+              :vip-id "51"}
              (dissoc
               (psql/get-xml-tree-public-id-data out-ctx)
               :import-id))))))
