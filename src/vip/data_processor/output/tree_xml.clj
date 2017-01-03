@@ -92,7 +92,7 @@
 
 (defn write-xml [file spec-version import-id]
   (with-open [f (io/writer (.toFile file))]
-    (.write f (str "<?xml version=\"1.0\"?>\n<VipObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" schemaVersion=\"" spec-version "\" xsi:noNamespaceSchemaLocation=\"http://votinginfoproject.github.com/vip-specification/vip_spec.xsd\">\n"))
+    (.write f (str "<?xml version=\"1.0\"?>\n<VipObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" schemaVersion=\"" spec-version "\" xsi:noNamespaceSchemaLocation=\"https://raw.githubusercontent.com/votinginfoproject/vip-specification/master/vip_spec.xsd\">\n"))
     (let [last-seen-path (atom "VipObject.0")
           inside-open-tag (atom false)
           values-written (atom 0)]
