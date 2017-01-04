@@ -73,4 +73,4 @@
                :xml-output-file
                .toFile
                slurp)
-           "<?xml version=\"1.0\"?>\n<VipObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" schemaVersion=\"5.1.2\" xsi:noNamespaceSchemaLocation=\"https://raw.githubusercontent.com/votinginfoproject/vip-specification/master/vip_spec.xsd\">\n<Candidate id=\"can001\"><Name>Frank</Name><Party>Every day</Party><Title><Text language=\"en\">President</Text><Text language=\"es\">&quot;El&quot; Presidente</Text></Title><Nickname>&gt; Ezra</Nickname></Candidate><Contest id=\"con001\"></Contest></VipObject>"))))
+           "<?xml version=\"1.0\"?>\n<VipObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" schemaVersion=\"5.1.2\" xsi:noNamespaceSchemaLocation=\"https://raw.githubusercontent.com/votinginfoproject/vip-specification/v5.1.2-release/vip_spec.xsd\">\n<Candidate id=\"can001\"><Name>Frank</Name><Party>Every day</Party><Title><Text language=\"en\">President</Text><Text language=\"es\">&quot;El&quot; Presidente</Text></Title><Nickname>&gt; Ezra</Nickname></Candidate><Contest id=\"con001\"></Contest></VipObject>"))))
