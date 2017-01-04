@@ -15,8 +15,8 @@
 
 (defn election-administrations->ltree [import-id idx-fn]
   (let [election-administrations (row-fn import-id)
-        departments (group-by :parent_id (ds/row-fn import-id))
-        voter-services (group-by :parent_id (vs/row-fn import-id))]
+        departments (group-by :election_administration_id (ds/row-fn import-id))
+        voter-services (group-by :department_id (vs/row-fn import-id))]
     (mapcat (fn [ea]
               (let [ds (get departments (:id ea))
                     path (base-path (idx-fn))

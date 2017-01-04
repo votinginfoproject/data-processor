@@ -1,4 +1,4 @@
-description,election_official_person_id,type,other_type,parent_id,id
+description,election_official_person_id,type,other_type,department_id,id
 A service we provide,eloff02,overseas-voting,,dep01,vs01
 Abstainance-only voting,eloff01,voter-registration,,dep02,vs00
 Pencil sharpening,eloff03,other,office-help,dep03,vs02
