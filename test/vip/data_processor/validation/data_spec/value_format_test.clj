@@ -2,6 +2,15 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.validation.data-spec.value-format :refer :all]))
 
+(deftest test-all-digits
+  (let [all-digits-regex (:check all-digits)]
+    (testing "matches digit values"
+      (are [s] (re-matches all-digits-regex s)
+           "123"
+           "456")
+      (is (nil? (re-matches all-digits-regex "-1")))
+      (is (nil? (re-matches all-digits-regex "abc"))))))
+
 (deftest electoral-district-type-regex-test
   (let [electoral-district-type-regex (:check electoral-district-type)]
     (testing "matches a lot of expected values"
