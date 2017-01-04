@@ -50,6 +50,9 @@
   (korma/defentity v5-statistics
     (korma/table "v5_statistics")
     (korma/database results-db))
+  (korma/defentity v5-dashboard-localities
+    (korma/table "v5_dashboard.localities")
+    (korma/database results-db))
   (korma/defentity v5-1-street-segments
     (korma/table "v5_1_street_segments"))
   (def v5-1-tables
