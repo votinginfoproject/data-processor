@@ -20,6 +20,7 @@
             [vip.data-processor.validation.v5.party-selection :as party-selection]
             [vip.data-processor.validation.v5.ordered-contest :as ordered-contest]
             [vip.data-processor.validation.v5.street-segment :as street-segment]
+            [vip.data-processor.validation.v5.boolean :as boolean-validation]
             [vip.data-processor.validation.v5.polling-location :as polling-location]))
 
 (def validations
@@ -73,4 +74,5 @@
    polling-location/validate-no-missing-latitudes
    polling-location/validate-no-missing-longitudes
    polling-location/validate-latitude
-   polling-location/validate-longitude])
+   polling-location/validate-longitude
+   boolean-validation/validate-booleans])
