@@ -1,4 +1,4 @@
-(ns vip.data-processor.validation.v5.boolean
+(ns vip.data-processor.validation.v5.booleans
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.data-spec.value-format :as value-format]
@@ -6,7 +6,7 @@
             [vip.data-processor.validation.xml.spec :as spec]
             [clojure.tools.logging :as log]))
 
-(defn validate-booleans [{:keys [import-id] :as ctx}]
+(defn validate-format [{:keys [import-id] :as ctx}]
   (log/info "Validating booleans")
   (let [boolean-paths (spec/type->simple-paths "xs:boolean" "5.1")
         boolean-values (korma/select postgres/xml-tree-values
