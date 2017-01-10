@@ -21,9 +21,14 @@
     (is (= "2015-06-18-federal-Ohio-4" (build-public-id "6/18/2015" "federal" "Ohio" 4)))
     (is (= "federal-Ohio-4" (build-public-id "//////" "federal" "Ohio" 4)))
     (is (= "federal-Ohio-4" (build-public-id "" "federal " "Ohio " 4))))
+
   (testing "gives an 'invalid' named id if all of date, election-type and state are nil"
     (is (= "invalid-4" (build-public-id nil nil nil 4)))
-    (is (= "invalid-4" (build-public-id "" nil "" 4)))))
+    (is (= "invalid-4" (build-public-id "" nil "" 4))))
+
+  (testing "most punctuation and any non-ascii characters are stripped"
+    (is (= "1969-06-20-a-space-race-pal-11" (build-public-id "6/20/1969" "a space" "race, pal!" 11)))
+    (is (= "2017-01-05-jalapenos-42" (build-public-id "1/5/2017" "jalapeños" nil 42)))))
 
 (deftest coerce-identifier-test
   (testing "coerces valid identifiers"

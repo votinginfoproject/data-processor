@@ -10,7 +10,8 @@
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
             [clojure.set :as set])
-  (:import [org.postgresql.util PGobject]))
+  (:import [org.postgresql.util PGobject]
+           [java.text Normalizer]))
 
 (defn url []
   (let [{:keys [host port user password database]} (config [:postgres])]
@@ -134,7 +135,11 @@
         formatted-date (util/format-date date)
         good-parts (->> [formatted-date election-type state]
                         (remove nil-or-empty?)
-                        (map #(str/trim %)))]
+                        (map #(str/trim %))
+                        (map #(Normalizer/normalize % java.text.Normalizer$Form/NFKD))
+                        (map #(str/replace % #"\p{Space}" "-"))
+                        (map #(str/replace % #"[\p{Punct}&&[^-]]" "%"))
+                        (map #(str/replace % #"[\P{ASCII}%]" "")))]
     (if (empty? good-parts)
       (str "invalid-" import-id)
       (str/join "-" (concat good-parts [import-id])))))
