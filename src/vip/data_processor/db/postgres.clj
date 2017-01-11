@@ -138,8 +138,7 @@
                         (map #(str/trim %))
                         (map #(Normalizer/normalize % java.text.Normalizer$Form/NFKD))
                         (map #(str/replace % #"\p{Space}" "-"))
-                        (map #(str/replace % #"[\p{Punct}&&[^-]]" "%"))
-                        (map #(str/replace % #"[\P{ASCII}%]" "")))]
+                        (map #(str/replace % #"[\p{Punct}\P{ASCII}&&[^-]]" "")))]
     (if (empty? good-parts)
       (str "invalid-" import-id)
       (str/join "-" (concat good-parts [import-id])))))
