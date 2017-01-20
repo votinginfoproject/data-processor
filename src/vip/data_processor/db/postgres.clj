@@ -155,10 +155,18 @@
         {:keys [date election_type]} (-> ctx
                                          (get-in [:tables :elections])
                                          (korma/select (korma/fields :date :election_type))
-                                         first)]
+                                         first)
+        vip-id (-> ctx
+                   (get-in [:tables :sources])
+                   (korma/select (korma/fields :vip_id))
+                   first
+                   :vip_id)]
+
+
     {:date date
      :election-type election_type
      :state state
+     :vip-id vip-id
      :import-id import-id}))
 
 (defn get-xml-tree-public-id-data [{:keys [import-id] :as ctx}]
@@ -170,11 +178,15 @@
               "VipObject.Election.Date")
         election-type (find-value-for-simple-path
                        import-id
-                       "VipObject.Election.ElectionType.Text")]
+                       "VipObject.Election.ElectionType.Text")
+        vip-id (find-value-for-simple-path
+                import-id
+                "VipObject.Source.VipId")]
     {:date date
      :election-type election-type
      :state state
-     :import-id import-id}))
+     :import-id import-id
+     :vip-id vip-id}))
 
 (defn get-public-id-data [{:keys [spec-version] :as ctx}]
   (condp = (util/version-without-patch @spec-version)
@@ -194,10 +206,15 @@
 
 (defn store-public-id [ctx]
   (let [id (:import-id ctx)
-        public-id (generate-public-id ctx)]
+        public-id (generate-public-id ctx)
+        public-id-data (get-public-id-data ctx)]
     (log/info "Storing public id")
     (korma/update results
-                  (korma/set-fields {:public_id public-id})
+                  (korma/set-fields {:public_id public-id
+                                     :state (:state public-id-data)
+                                     :election_type (:election-type public-id-data)
+                                     :election_date (:date public-id-data)
+                                     :vip_id (:vip-id public-id-data)})
                   (korma/where {:id id}))
     (assoc ctx :public-id public-id)))
 
