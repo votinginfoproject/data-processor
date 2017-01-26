@@ -55,6 +55,8 @@
     (korma/database results-db))
   (korma/defentity v5-1-street-segments
     (korma/table "v5_1_street_segments"))
+  (korma/defentity v5-dashboard-paths-by-locality
+    (korma/table "v5_dashboard.paths_by_locality"))
   (def v5-1-tables
     (db.util/make-entities "5.1" results-db [:offices
                                              :voter-services
@@ -233,6 +235,14 @@
   (korma/exec-raw
    (:conn xml-tree-values)
    ["analyze xml_tree_values"])
+  ctx)
+
+(defn populate-locality-table
+  [ctx]
+  (let [id (:import-id ctx)]
+    (korma/exec-raw
+     (:conn xml-tree-values)
+     ["select v5_dashboard.populate_locality_table(?)" [id]]))
   ctx)
 
 (defn refresh-materialized-views
