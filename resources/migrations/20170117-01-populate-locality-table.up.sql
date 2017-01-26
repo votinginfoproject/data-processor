@@ -128,3 +128,11 @@ begin
   end loop;
 end;
 $$ language plpgsql;
+
+do $$declare r record;
+begin
+  for r in select id from results where spec_version like '5.1%'
+  loop
+    perform v5_dashboard.populate_locality_table(r.id);
+  end loop;
+end$$
