@@ -59,13 +59,78 @@
                            :identifier "VipObject.0.Locality.1.StateId"
                            :error-type :missing}))))
 
+(deftest ^:postgres populating-paths-by-locality
+  (let [errors-chan (a/chan 100)
+        pipeline [psql/start-run
+                  t/xml-csv-branch
+                  data-processor/add-validations
+                  errors/close-errors-chan
+                  errors/await-statistics
+                  psql/populate-locality-table]
+        ctx {:input (xml-input "v5-locality-summaries.xml")
+             :spec-version (atom "5.1.2")
+             :errors-chan errors-chan
+             :pipeline pipeline}
+
+        out-ctx (pipeline/run-pipeline ctx)
+        results-id (:import-id out-ctx)]
+    (testing "we have three localities on the paths_by_locality table"
+      (let [localities (-> (korma/select psql/v5-dashboard-paths-by-locality
+                             (korma/aggregate (count :*) :count)
+                             (korma/where {:results_id results-id}))
+                           first)]
+        (is (= 3 (:count localities)))))
+    (testing "we have 13 paths for loc3 on paths_by_locality"
+      (let [pathstring (-> (korma/select psql/v5-dashboard-paths-by-locality
+                             (korma/fields :paths)
+                             (korma/where {:locality_id "loc3" :results_id results-id}))
+                           first :paths)
+            paths (-> pathstring (clojure.string/replace #"[\{\}]" " ") (clojure.string/split #",") set)]
+        (is (= 13 (count paths)))))))
+
+(deftest ^:postgres locality-error-report
+  (let [errors-chan (a/chan 100)
+        pipeline [psql/start-run
+                  t/xml-csv-branch
+                  data-processor/add-validations
+                  errors/close-errors-chan
+                  errors/await-statistics
+                  psql/store-public-id
+                  psql/populate-locality-table]
+        ctx {:input (xml-input "v5-locality-summaries.xml")
+             :spec-version (atom "5.1.2")
+             :errors-chan errors-chan
+             :pipeline pipeline}
+        out-ctx (pipeline/run-pipeline ctx)
+        results-id (:import-id out-ctx)]
+    (testing "we get the correct number of errors in a locality error report"
+      (let
+        [public-id (-> (korma/select psql/results
+                         (korma/fields :public_id)
+                         (korma/where {:id results-id}))
+                      first
+                      :public_id)
+         report (-> (korma/exec-raw
+                     [(str "select * from v5_dashboard.locality_error_report('" public-id "', 'loc3')")]
+                     :results)
+                   first)]
+        (is (= {:results_id results-id
+                :path "VipObject.0.StreetSegment.31.Zip"
+                :severity "errors"
+                :scope "street-segment"
+                :identifier "ss33"
+                :error_type "missing"
+                :error_data ":missing-zip"}
+               report))))))
+
+
 (deftest ^:postgres locality-summary-test
   (let [errors-chan (a/chan 100)
         pipeline [psql/start-run
-                        t/xml-csv-branch
-                        data-processor/add-validations
-                        errors/close-errors-chan
-                        errors/await-statistics]
+                  t/xml-csv-branch
+                  data-processor/add-validations
+                  errors/close-errors-chan
+                  errors/await-statistics]
         ctx {:input (xml-input "v5-locality-summaries.xml")
              :spec-version (atom "5.1.2")
              :errors-chan errors-chan

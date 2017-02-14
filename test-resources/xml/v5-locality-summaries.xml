@@ -25,6 +25,50 @@
     <StateId>st08</StateId>
   </Election>
 
+  <ElectoralDistrict id="ed01">
+    <Name>Chaffee</Name>
+    <Number>1</Number>
+    <Type>county</Type>
+  </ElectoralDistrict>
+
+  <ElectoralDistrict id="ed02">
+    <Name>Colorado Fifth Congressional District</Name>
+    <Number>5</Number>
+    <Type>congressional</Type>
+  </ElectoralDistrict>
+
+  <ElectoralDistrict id="ed03">
+    <Name>Buena Vista</Name>
+    <Type>township</Type>
+  </ElectoralDistrict>
+
+  <Contest id="con01">
+    <BallotTitle>
+      <Text lang="en">Best Tacos in the County</Text>
+    </BallotTitle>
+    <ElectoralDistrictId>ed01</ElectoralDistrictId>
+    <Name>Taco Contest</Name>
+  </Contest>
+
+  <Contest id="con02">
+    <BallotTitle>
+      <Text lang="en">US Senate Stuff</Text>
+    </BallotTitle>
+    <ElectoralDistrictId>ed02</ElectoralDistrictId>
+    <Name>A Quality Congressperson</Name>
+  </Contest>
+
+  <Contest id="con03">
+    <BallotSubTitle>
+      For those dogs that chase too many trucks
+    </BallotSubTitle>
+    <BallotTitle>
+      <Text lang="en">Finding Fussy Fidos</Text>
+    </BallotTitle>
+    <ElectoralDistrictId>ed03</ElectoralDistrictId>
+    <Name>Town Dogcatcher</Name>
+  </Contest>
+
   <State id="st08"></State>
 
   <!-- Buena Vista -->
@@ -47,6 +91,7 @@
     <Name>BV Precinct 1</Name>
     <Number>1</Number>
     <PollingLocationIds>pl10 pl11</PollingLocationIds>
+    <ElectoralDistrictIds>ed01 ed02 ed03</ElectoralDistrictIds>
   </Precinct>
 
   <Precinct id="pre11">
@@ -161,6 +206,7 @@
     <Name>Nathrop Area</Name>
     <Number>2</Number>
     <PollingLocationIds>pl2</PollingLocationIds>
+    <ElectoralDistrictIds>ed01 ed02 ed03</ElectoralDistrictIds>
   </Precinct>
 
   <PollingLocation id="pl2">
