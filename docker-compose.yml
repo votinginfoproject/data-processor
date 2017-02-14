@@ -5,12 +5,12 @@ processor:
     - db
   env_file: .env
 rabbitmq:
-  image: rabbitmq:3.5.3-management
+  image: rabbitmq:3.6.5-management
   ports:
     - "15672"
   hostname: qa-engine-rabbit
 db:
-  image: postgres:9.4.1
+  image: postgres:9.4.7
   ports:
     - "5432"
   environment:

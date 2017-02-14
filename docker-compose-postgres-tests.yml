@@ -5,8 +5,9 @@ processor:
   environment:
     VIP_DP_SQS_REGION: US_WEST_2
   command: lein test :postgres
+
 testdb:
-  image: postgres:9.4.1
+  image: postgres:9.4.7
   ports:
     - "5432"
   environment:
