@@ -7,12 +7,13 @@ processor:
 rabbitmq:
   image: rabbitmq:3.6.5-management
   ports:
-    - "15672"
+    - 55672:15672
   hostname: qa-engine-rabbit
 db:
   image: postgres:9.4.7
   ports:
-    - "5432"
+    - 55432:5432
   environment:
     POSTGRES_USER: dataprocessor
+    POSTGRES_DB: dataprocessor
     POSTGRES_PASSWORD: vip2016

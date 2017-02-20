@@ -53,9 +53,15 @@ production, you will need Docker.
 
 Configuration in Docker is set via the `.env` file in the root of the
 project. Create that file, copy the following into it and provide
-values for each environemnt variable.
+values for each environment variable.
 
 ```
+DB_PORT_5432_TCP_ADDR=
+DB_ENV_POSTGRES_USER=
+DB_ENV_POSTGRES_PASSWORD=
+DB_ENV_POSTGRES_DATABASE=
+POSTGRES_USER=
+POSTGRES_PASSWORD=
 VIP_DP_AWS_ACCESS_KEY=
 VIP_DP_AWS_SECRET_KEY=
 VIP_DP_S3_UNPROCESSED_BUCKET=
@@ -78,12 +84,14 @@ $ docker-compose build
 $ docker-compose up
 ```
 
-While it's running, you can place messages on the SQS queue specified
-by `VIP_DP_SQS_QUEUE` and it will be picked up by the processor,
-downloading the file in the message, the file will be processed, the
-database populated, the XML output zipped up and placed in the bucket
-specified by `VIP_DP_S3_PROCESSED_BUCKET`, and a message sent on
-RabbitMQ.
+While it's running, you can place messages on the SQS queue specified by
+`VIP_DP_SQS_QUEUE` and it will be picked up by the processor, downloading the
+file in the message, the file will be processed, the database populated, the XML
+output zipped up and placed in the bucket specified by
+`VIP_DP_S3_PROCESSED_BUCKET`, and a message sent on RabbitMQ to
+`VIP_DP_RABBITMQ_EXCHANGE`. While it's running, you can access the PostgreSQL
+server running within Docker on port `55432` and RabbitMQ console on port
+`55672` (so they don't clash with services that may already be running).
 
 The message you send on the SQS queue must look like the following:
 
