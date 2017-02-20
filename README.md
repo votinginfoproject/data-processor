@@ -180,3 +180,74 @@ To add a validation to all processing, it should be added to the
 required for XML or CSV processing, it should be added to the
 `xml-validations` or `csv-validations` lists respectively in the
 `vip.data-processor.validation.transforms` namespace.
+
+
+## Deploying
+
+`data-processor` is currently deployed as a [CoreOS cluster][CoreOS] running
+atop [AWS EC2][EC2] instances. There are two ways code can be deployed.
+
+### Automatic Deploys
+
+The most common way of deploying new code is by merging an approved PR into the
+`master` branch. [Buildkite][buildkite], a continuous integration services,
+monitors this repository and triggers a build when code is pushed. For most
+branches, the build consists of running a test suite. Code pushed to the
+`master` branch - usually by merging an approved pull request - runs the test
+suite, and if that is successful, builds a Docker image and deploys it to the
+production CoreOS cluster.
+
+### Manual Deploys
+
+In order to manually deploy something other than the `master` branch's `HEAD`,
+e.g, to test new features in a staging environment, you'll need to have a few
+things:
+
+- `fleetctl` installed (available in Homebrew)
+- The public IP address of an EC2 instance in your chosen cluster (aka
+  `$FLEETCTL_TUNNEL`),
+- The ssh key for that cluster (aka `$PEM_FILE`)
+- A [Quay] account to use with Docker (run `docker login quay.io` if you haven't
+  already)
+
+Begin by checking out the code you want to deploy at a given commit, then run
+`script/build`. If the test suite passes, a Docker image is built. Push this
+image to Quay as directed by the output of the build script.
+
+Setup your environment for fleet and run `script/deploy`. A successful
+deployment should look something like this.
+
+```
+$ export FLEETCTL_TUNNEL=an-ip-in-your-cluster
+$ PEM_FILE=/path/to/key.pem ./script/deploy
+Agent pid 88741
+Identity added: /path/to/key.pem (/path/to/key.pem)
+Destroyed data-processor@.service
+Unit data-processor@.service inactive
+--- (re-)starting fleet service instances
+Destroyed data-processor@1.service
+Unit data-processor@1.service inactive
+Unit data-processor@1.service launched on 94554086.../10.0.103.12
+Destroyed data-processor@2.service
+Unit data-processor@2.service inactive
+Unit data-processor@2.service launched on 6f2818e4.../10.0.101.122
+Destroyed data-processor@3.service
+Unit data-processor@3.service inactive
+Unit data-processor@3.service launched on cea44c01.../10.0.104.31
+```
+
+You can verify that a node is running properly by checking its logs.
+
+```sh
+$ fleetctl journal -f data-processor@1
+Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.339 [main] INFO  vip.data-processor - VIP Data Processor starting up. ID: #uuid "9cc1b957-eb61-4e1d-883d-39fffda98967"
+Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.415 [main] INFO  vip.data-processor.queue - RabbitMQ connected.
+Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.422 [main] INFO  vip.data-processor.queue - RabbitMQ topic set.
+Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.422 [main] INFO  vip.data-processor.db.postgres - Initializing Postgres
+Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: Migrating #ragtime.jdbc.SqlDatabase{:db-spec {:connection-uri jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret}, :migrations-table ragtime_migrations, :url jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret, :connection-uri jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret, :db {:type :sql, :url jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret}, :migrator resources/migrations}
+Feb 20 19:04:09 ip-10-0-103-12 bash[25140]: 19:04:09.296 [clojure-agent-send-off-pool-0] INFO  squishy.core - Consuming SQS messages from https://sqs.us-east-1.amazonaws.com/1234/your-sqs-queue
+```
+
+[CoreOS]: https://coreos.com/
+[EC2]: https://aws.amazon.com/ec2/
+[buildkite]: https://buildkite.com/the-voting-information-project
