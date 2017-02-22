@@ -215,7 +215,7 @@ things:
 - The public IP address of an EC2 instance in your chosen cluster (aka
   `$FLEETCTL_TUNNEL`),
 - The ssh key for that cluster (aka `$PEM_FILE`)
-- A [Quay] account to use with Docker (run `docker login quay.io` if you haven't
+- A [quay.io account][quay] to use with Docker (run `docker login quay.io` if you haven't
   already)
 
 Begin by checking out the code you want to deploy at a given commit, then run
@@ -259,3 +259,4 @@ Feb 20 19:04:09 ip-10-0-103-12 bash[25140]: 19:04:09.296 [clojure-agent-send-off
 [CoreOS]: https://coreos.com/
 [EC2]: https://aws.amazon.com/ec2/
 [buildkite]: https://buildkite.com/the-voting-information-project
+[quay]: http://quay.io/
