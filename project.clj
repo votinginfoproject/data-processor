@@ -28,7 +28,7 @@
                  [org.postgresql/postgresql "9.4.1208" :exclusions [org.slf4j/slf4j-simple
                                                                     org.slf4j/slf4j-api]]
                  [org.xerial/sqlite-jdbc "3.8.11.2"]]
-  :plugins [[com.carouselapps/jar-copier "0.3.0"]]
+  :plugins [[com.pupeno/jar-copier "0.4.0"]]
   :profiles {:test {:resource-paths ["test-resources"]
                     :dependencies [[com.github.kyleburton/clj-xpath "1.4.5"]]}
              :dev {:source-paths ["dev-src"]
@@ -37,7 +37,7 @@
   :test-selectors {:default (complement :postgres)
                    :postgres :postgres
                    :all (constantly true)}
-  :java-agents [[com.newrelic.agent.java/newrelic-agent "3.20.0"]]
+  :java-agents [[com.newrelic.agent.java/newrelic-agent "3.25.0"]]
   :jar-copier {:java-agents true
                :destination "resources/jars"}
   :prep-tasks ["javac" "compile" "jar-copier"]
