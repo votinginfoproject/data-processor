@@ -5,6 +5,7 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
+            [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.transforms :as transforms]
@@ -27,8 +28,14 @@
                       :spec-version (atom "3.0")
                       :errors-chan errors-chan
                       :pipeline (concat [(data-spec/add-data-specs
-                                          v3-0/data-specs)]
-                                        transforms/csv-validations
+                                          v3-0/data-specs)
+                                         csv/error-on-missing-files
+                                         csv/determine-spec-version
+                                         csv/remove-bad-filenames
+                                         sqlite/attach-sqlite-db
+                                         (csv-files/validate-dependencies
+                                          csv-files/v3-0-file-dependencies)
+                                         csv/load-csvs]
                                         pipeline)} db)
           results-ctx (pipeline/run-pipeline ctx)
           xml-doc (-> results-ctx
