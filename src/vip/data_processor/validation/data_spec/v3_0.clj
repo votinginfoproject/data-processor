@@ -313,8 +313,8 @@
               {:name "start_house_number" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
               {:name "end_house_number" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
               {:name "odd_even_both" :format format/odd-even-both}
-              {:name "start_apartment_number" :format format/all-digits :coerce coerce/coerce-integer}
-              {:name "end_apartment_number" :format format/all-digits :coerce coerce/coerce-integer}
+              {:name "start_apartment_number"}
+              {:name "end_apartment_number"}
               {:name "non_house_address_house_number" :format format/all-digits :coerce coerce/coerce-integer}
               {:name "non_house_address_house_number_prefix"}
               {:name "non_house_address_house_number_suffix"}

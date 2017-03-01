@@ -1,7 +1,7 @@
 start_house_number,end_house_number,odd_even_both,start_apartment_number,end_apartment_number,non_house_address_house_number,non_house_address_house_number_prefix,non_house_address_house_number_suffix,non_house_address_street_direction,non_house_address_street_name,non_house_address_street_suffix,non_house_address_address_direction,non_house_address_apartment,non_house_address_city,non_house_address_state,non_house_address_zip,precinct_id,precinct_split_id,id
 1,1,odd,,,,,,,BON SECOURS,WAY,,,PORTSMOUTH,VA,23703,90000,100041,2000000
 1,1,odd,,,,,,,CRAWFORD,CT,,,PORTSMOUTH,VA,23704,90013,100019,2000001
-1,10,both,,,,,,,BRENT,CRES,,,PORTSMOUTH,VA,23703,90028,100034,2000002
+1,10,both,1a,2b,,,,,BRENT,CRES,,,PORTSMOUTH,VA,23703,90028,100034,2000002
 1,10,both,,,,,,,CRABTREE,CT,,,PORTSMOUTH,VA,23703,90040,100001,2000003
 1,10,both,,,,,,,Keswick,CT,,,Portsmouth,VA,23703,90015,100025,2000004
 1,10,both,,,,,,,Neptune,CT,,,Portsmouth,VA,23703,90015,100025,2000005

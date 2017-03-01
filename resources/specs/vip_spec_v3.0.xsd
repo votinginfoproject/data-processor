@@ -268,8 +268,8 @@
               <xs:element name="start_house_number" type="xs:integer" />
               <xs:element name="end_house_number" type="xs:integer" />
               <xs:element name="odd_even_both" type="oebEnum" />
-              <xs:element minOccurs="0" name="start_apartment_number" type="xs:integer" />
-              <xs:element minOccurs="0" name="end_apartment_number" type="xs:integer" />
+              <xs:element minOccurs="0" name="start_apartment_number" type="xs:string" />
+              <xs:element minOccurs="0" name="end_apartment_number" type="xs:string" />
               <xs:element name="non_house_address" type="detailAddressType" />
               <xs:element name="precinct_id" type="xs:integer" />
               <xs:element minOccurs="0" name="precinct_split_id" type="xs:integer" />
@@ -314,36 +314,36 @@
     </xs:complexType>
   </xs:element>
 
-  
+
 
 
 <xs:complexType name="detailAddressType">
     <xs:all>
-        <xs:element minOccurs="0" name="house_number" type="xs:integer"/> 
-        <xs:element minOccurs="0" name="house_number_prefix" type="xs:string"/> 
-        <xs:element minOccurs="0" name="house_number_suffix" type="xs:string"/> 
-        <xs:element minOccurs="0" name="street_direction" type="xs:string"/> 
-        <xs:element name="street_name" type="xs:string"/> 
-        <xs:element minOccurs="0" name="street_suffix" type="xs:string"/> 
-        <xs:element minOccurs="0" name="address_direction" type="xs:string"/> 
+        <xs:element minOccurs="0" name="house_number" type="xs:integer"/>
+        <xs:element minOccurs="0" name="house_number_prefix" type="xs:string"/>
+        <xs:element minOccurs="0" name="house_number_suffix" type="xs:string"/>
+        <xs:element minOccurs="0" name="street_direction" type="xs:string"/>
+        <xs:element name="street_name" type="xs:string"/>
+        <xs:element minOccurs="0" name="street_suffix" type="xs:string"/>
+        <xs:element minOccurs="0" name="address_direction" type="xs:string"/>
         <xs:element minOccurs="0" name="apartment" type="xs:string"/>
         <xs:element name="city" type="xs:string"/>
         <xs:element name="state" type="xs:string"/>
         <xs:element name="zip" type="xs:string"/>
-    </xs:all> 
-</xs:complexType> 
-  
+    </xs:all>
+</xs:complexType>
+
 <xs:complexType name="simpleAddressType">
     <xs:all>
-        <xs:element minOccurs="0" name="location_name" type="xs:string"/> 
+        <xs:element minOccurs="0" name="location_name" type="xs:string"/>
         <xs:element name="line1" type="xs:string"/>
         <xs:element minOccurs="0" name="line2" type="xs:string"/>
         <xs:element minOccurs="0" name="line3" type="xs:string"/>
         <xs:element name="city" type="xs:string"/>
         <xs:element name="state" type="xs:string"/>
         <xs:element name="zip" type="xs:string"/>
-    </xs:all> 
-</xs:complexType> 
+    </xs:all>
+</xs:complexType>
 
 <xs:complexType name="votesWithCertification">
   <xs:simpleContent>
@@ -364,7 +364,7 @@
       <xs:enumeration value="Unofficial_Complete"/>
       <xs:enumeration value="Certified"/>
     </xs:restriction>
-  </xs:simpleType> 
+  </xs:simpleType>
 
   <xs:simpleType name="yesNoEnum">
     <xs:restriction base="xs:string">
@@ -375,7 +375,7 @@
       <xs:enumeration value="YES"/>
       <xs:enumeration value="NO"/>
     </xs:restriction>
-  </xs:simpleType> 
+  </xs:simpleType>
 
   <xs:simpleType name="oebEnum">
     <xs:restriction base="xs:string">
@@ -389,6 +389,6 @@
       <xs:enumeration value="EVEN"/>
       <xs:enumeration value="BOTH"/>
     </xs:restriction>
-  </xs:simpleType> 
+  </xs:simpleType>
 
 </xs:schema>
