@@ -23,6 +23,7 @@ select distinct on (v.identifier)
       on l.id = p.locality_id
       and l.results_id = r.id
     where r.public_id = pid
-    and v.scope = 'polling-locations';
+    and v.scope = 'polling-locations'
+    and v.error_type like 'address%';
 end
 $$ language plpgsql;
