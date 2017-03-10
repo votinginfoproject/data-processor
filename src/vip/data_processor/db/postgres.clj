@@ -275,6 +275,13 @@
      [(str "refresh materialized view " view)]))
   ctx)
 
+
+(defn v5-summary-branch
+  [{:keys [spec-version] :as ctx}]
+  (if (= @spec-version "5.1")
+    (update ctx :pipeline (partial concat [populate-locality-table refresh-materialized-views]))
+    ctx))
+
 (defn complete-run [ctx]
   (let [id (:import-id ctx)
         filename (:generated-xml-filename ctx)]

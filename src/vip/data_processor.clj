@@ -64,8 +64,7 @@
            add-validations
            errors/close-errors-chan
            errors/await-statistics
-           psql/refresh-materialized-views
-           psql/populate-locality-table
+           psql/v5-summary-branch
            s3/upload-to-s3
            cleanup/cleanup]))
 
