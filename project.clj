@@ -20,13 +20,13 @@
                  [democracyworks/utility-fns "0.2.0"]
                  [net.lingala.zip4j/zip4j "1.3.2"]
                  [turbovote.resource-config "0.2.0"]
-                 [joplin.jdbc "0.3.6"
+                 [joplin.jdbc "0.3.10"
                   :exclusions [ragtime/ragtime.jdbc]]
-                 [ragtime/ragtime.jdbc "0.5.3"]
-                 [korma "0.4.2"]
-                 [org.clojure/java.jdbc "0.5.0"]
-                 [org.postgresql/postgresql "9.4.1208" :exclusions [org.slf4j/slf4j-simple
-                                                                    org.slf4j/slf4j-api]]
+                 [ragtime/ragtime.jdbc "0.6.4"]
+                 [korma "0.4.3"]
+                 [org.clojure/java.jdbc "0.6.1"]
+                 [org.postgresql/postgresql "42.0.0" :exclusions [org.slf4j/slf4j-simple
+                                                                  org.slf4j/slf4j-api]]
                  [org.xerial/sqlite-jdbc "3.8.11.2"]]
   :plugins [[com.pupeno/jar-copier "0.4.0"]]
   :profiles {:test {:resource-paths ["test-resources"]

@@ -50,8 +50,8 @@
                        :user (config [:postgres :user])
                        :password (config [:postgres :password])}]
 
-      (jdbc/execute! jdbc-config [(str "DROP DATABASE IF EXISTS " database-name)] :transaction? false)
-      (jdbc/execute! jdbc-config [(str "CREATE DATABASE " database-name)] :transaction? false)
+      (jdbc/execute! jdbc-config [(str "DROP DATABASE IF EXISTS " database-name)] {:transaction? false})
+      (jdbc/execute! jdbc-config [(str "CREATE DATABASE " database-name)] {:transaction? false})
 
       (psql/initialize)
       ;; these vars will be unbound until after psql/initialize, so
