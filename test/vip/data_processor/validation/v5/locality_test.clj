@@ -113,16 +113,17 @@
          report (-> (korma/exec-raw
                      [(str "select * from v5_dashboard.locality_error_report('" public-id "', 'loc3')")]
                      :results)
-                   first)]
-        (is (= {:results_id results-id
-                :path "VipObject.0.StreetSegment.31.Zip"
-                :severity "errors"
-                :scope "street-segment"
-                :identifier "ss33"
-                :error_type "missing"
-                :error_data ":missing-zip"}
-               report))))))
-
+                    set)]
+        (is (= 3 (count report)))
+        (is (contains?
+             report
+             {:results_id results-id
+              :path "VipObject.0.StreetSegment.31.Zip"
+              :severity "errors"
+              :scope "street-segment"
+              :identifier "ss33"
+              :error_type "missing"
+              :error_data ":missing-zip"}))))))
 
 (deftest ^:postgres locality-summary-test
   (let [errors-chan (a/chan 100)
