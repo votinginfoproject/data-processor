@@ -31,8 +31,7 @@
    data-processor/add-validations
    errors/close-errors-chan
    errors/await-statistics
-   psql/refresh-materialized-views
-   psql/populate-locality-table])
+   psql/v5-summary-branch])
 
 (defn -main [filename]
   (psql/initialize)

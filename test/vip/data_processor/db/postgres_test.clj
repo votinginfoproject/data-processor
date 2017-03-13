@@ -49,3 +49,13 @@
           (build-election-id "2015-10-10" "LOUISIANA   " "GENERAL")))
    (is (nil? (build-election-id "2015-10-10" "LOUISIANA" nil)))
    (is (nil? (build-election-id "2015-10-10" "" "GENERAL")))))
+
+(deftest v5-summary-branch-test
+  (let [v3-ctx {:pipeline []
+                 :spec-version (atom "3.0")}
+        v5-ctx {:pipeline []
+                :spec-version (atom "5.1")}
+        v3-out-ctx (v5-summary-branch v3-ctx)
+        v5-out-ctx (v5-summary-branch v5-ctx)]
+    (is (= (count (v3-out-ctx :pipeline)) 0))
+    (is (= (count (v5-out-ctx :pipeline)) 2))))
