@@ -37,6 +37,7 @@
   :test-selectors {:default (complement :postgres)
                    :postgres :postgres
                    :all (constantly true)}
+  :repl-options {:init (set! *print-length* 50)}
   :java-agents [[com.newrelic.agent.java/newrelic-agent "3.25.0"]]
   :jar-copier {:java-agents true
                :destination "resources/jars"}

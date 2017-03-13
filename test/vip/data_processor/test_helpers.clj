@@ -10,8 +10,6 @@
             [vip.data-processor.util :as util]
             [clojure.core.async :as a]))
 
-(set! *print-length* 10)
-
 (def problem-types [:warnings :errors :critical :fatal])
 
 (defn csv-inputs [file-names]

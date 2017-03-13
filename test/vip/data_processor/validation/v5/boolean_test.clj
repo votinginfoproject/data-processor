@@ -9,8 +9,6 @@
 
 (use-fixtures :once setup-postgres)
 
-(set! *print-length* 100)
-
 (deftest ^:postgres boolean-incorrect-test
   (let [errors-chan (a/chan 100)
         ctx {:input (xml-input "v5-incorrect-booleans.xml")
