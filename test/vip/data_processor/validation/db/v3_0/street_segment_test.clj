@@ -32,7 +32,7 @@
       18 19
       20 21
       27 28)
-    (doseq [id [22 23 24 25 26]]
+    (doseq [id [22 23 24 25 26 29 30]]
       (is (nil? (contains-error?  errors
                                   {:severity :errors
                                    :scope :street-segments

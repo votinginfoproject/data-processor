@@ -21,6 +21,7 @@
                                            (korma/sqlfn ifnull :street_segments2.precinct_id "NULL_VALUE"))
                                      (not= (korma/sqlfn ifnull :street_segments.precinct_split_id "NULL_VALUE")
                                            (korma/sqlfn ifnull :street_segments2.precinct_split_id "NULL_VALUE")))
+                                 (= :street_segments.non_house_address_city :street_segments2.non_house_address_city)
                                  (= :street_segments.non_house_address_zip :street_segments2.non_house_address_zip)
                                  (or (= :street_segments.odd_even_both :street_segments2.odd_even_both)
                                      (= :street_segments.odd_even_both "both")
