@@ -1,6 +1,3 @@
-/*update v3_0_street_segments set start_apartment_number = null where start_apartment_number = '';*/
-/*update v3_0_street_segments set end_apartment_number = null where end_apartment_number = '';*/
-
 create or replace function convert_to_integer(apt_number_txt text)
 returns integer as $$
 declare apt_number_int integer default null;
