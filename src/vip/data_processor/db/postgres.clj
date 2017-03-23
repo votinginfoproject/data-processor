@@ -275,11 +275,41 @@
      [(str "refresh materialized view " view)]))
   ctx)
 
+(defn populate-i18n-table
+  [ctx]
+  (let [id (:import-id ctx)]
+    (log/info "Populating v5_dashboard.i18n table"
+      (korma/exec-raw
+       (:conn xml-tree-values)
+       ["select v5_dashboard.populate_i18n_table(?)" [id]])))
+  ctx)
+
+(defn populate-sources-table
+  [ctx]
+  (let [id (:import-id ctx)]
+    (log/info "Populating v5_dashboard.sources table"
+      (korma/exec-raw
+       (:conn xml-tree-values)
+       ["select v5_dashboard.populate_sources_table(?)" [id]])))
+  ctx)
+
+(defn populate-elections-table
+  [ctx]
+  (let [id (:import-id ctx)]
+    (log/info "Populating v5_dashboard.elections table"
+      (korma/exec-raw
+       (:conn xml-tree-values)
+       ["select v5_dashboard.populate_elections_table(?)" [id]])))
+  ctx)
+
 
 (defn v5-summary-branch
   [{:keys [spec-version] :as ctx}]
   (if (= @spec-version "5.1")
-    (update ctx :pipeline (partial concat [populate-locality-table refresh-materialized-views]))
+    (update ctx :pipeline (partial concat [populate-locality-table
+                                           populate-i18n-table
+                                           populate-sources-table
+                                           populate-elections-table]))
     ctx))
 
 (defn complete-run [ctx]
