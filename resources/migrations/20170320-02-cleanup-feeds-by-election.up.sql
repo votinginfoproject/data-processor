@@ -1,6 +1,6 @@
-create schema cleanup;
+create schema if not exists cleanup;
 
-create view cleanup.feeds_by_election(state, vip_id, current_run, old_runs) as
+create or replace view cleanup.feeds_by_election(state, vip_id, current_run, old_runs) as
   with feeds as
       (select xtv_state.value as state,
                         xtv_source.value as vip_id,
