@@ -15,7 +15,7 @@ insert into v5_dashboard.i18n
   from i18n
   left join xml_tree_values xtv
          on i18n.results_id = xtv.results_id
-        and xtv.simple_path ~ '*.Text'
+        and xtv.simple_path ~ 'VipObject.*.Text'
         and  i18n.path <@ xtv.path;
 $$ language sql;
 
