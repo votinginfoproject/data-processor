@@ -260,3 +260,14 @@ Feb 20 19:04:09 ip-10-0-103-12 bash[25140]: 19:04:09.296 [clojure-agent-send-off
 [EC2]: https://aws.amazon.com/ec2/
 [buildkite]: https://buildkite.com/the-voting-information-project
 [quay]: http://quay.io/
+
+## Database Maintenance
+
+`cleanup.feeds_by_election` looks at any election that has more than 5 copies in the database and returns a list of `old_runs` and a list of `new_runs`.
+
+To delete any but the most recent 5 versions of a feed (where two feeds are considered the "same" if they have the same
+`state`, `vip_id`, `election_date`, and `election_type`) run
+
+```sql
+delete from results where id in (select unnest(old_runs) from cleanup.feeds_by_election);
+```
