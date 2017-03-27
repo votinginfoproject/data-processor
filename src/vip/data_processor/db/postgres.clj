@@ -266,40 +266,28 @@
      ["select v5_dashboard.populate_locality_table(?)" [id]]))
   ctx)
 
-(defn refresh-materialized-views
-  [ctx]
-  (log/info "Refreshing materialized views")
-  (doseq [view ["v5_dashboard.sources" "v5_dashboard.elections"]]
-    (korma/exec-raw
-     (:conn xml-tree-values)
-     [(str "refresh materialized view " view)]))
-  ctx)
-
 (defn populate-i18n-table
-  [ctx]
-  (let [id (:import-id ctx)]
-    (log/info "Populating v5_dashboard.i18n table"
-      (korma/exec-raw
-       (:conn xml-tree-values)
-       ["select v5_dashboard.populate_i18n_table(?)" [id]])))
+  [{:keys [import-id] :as ctx}]
+  (log/info "Populating v5_dashboard.i18n table")
+  (korma/exec-raw
+   (:conn xml-tree-values)
+   ["select v5_dashboard.populate_i18n_table(?)" [import-id]])
   ctx)
 
 (defn populate-sources-table
-  [ctx]
-  (let [id (:import-id ctx)]
-    (log/info "Populating v5_dashboard.sources table"
-      (korma/exec-raw
-       (:conn xml-tree-values)
-       ["select v5_dashboard.populate_sources_table(?)" [id]])))
+  [{:keys [import-id] :as ctx}]
+  (log/info "Populating v5_dashboard.sources table")
+  (korma/exec-raw
+   (:conn xml-tree-values)
+   ["select v5_dashboard.populate_sources_table(?)" [import-id]])
   ctx)
 
 (defn populate-elections-table
-  [ctx]
-  (let [id (:import-id ctx)]
-    (log/info "Populating v5_dashboard.elections table"
-      (korma/exec-raw
-       (:conn xml-tree-values)
-       ["select v5_dashboard.populate_elections_table(?)" [id]])))
+  [{:keys [import-id] :as ctx}]
+  (log/info "Populating v5_dashboard.elections table")
+  (korma/exec-raw
+   (:conn xml-tree-values)
+   ["select v5_dashboard.populate_elections_table(?)" [import-id]])
   ctx)
 
 
