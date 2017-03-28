@@ -1,5 +1,6 @@
 (ns vip.data-processor.db.translations.util
   (:require [clojure.string :as str]
+            [clojure.java.jdbc :as jdbc]
             [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]))
 
@@ -162,3 +163,21 @@
             (postgres/bulk-import postgres/xml-tree-values rows)
             (assoc :ltree-index (idx-fn)))
         ctx))))
+
+(defn transformer-with-conn
+  "Generates a transformation function that operates on a single
+  database connection? If `row-fn` is the sort of thing that requires a
+  connection, we'll need to setup a binding context and thread this
+  value to subsequent calls. "
+  [row-fn ltree-fn]
+  (fn [{:keys [ltree-index import-id] :as ctx}]
+    (jdbc/with-db-connection [conn (postgres/db-spec)]
+      (let [idx-fn (index-generator ltree-index)
+            ltree-rows (mapcat (partial ltree-fn idx-fn)
+                               (row-fn conn import-id))
+            rows (prep-for-insertion import-id ltree-rows)]
+        (if (seq rows)
+          (-> ctx
+              (postgres/bulk-import postgres/xml-tree-values rows)
+              (assoc :ltree-index (idx-fn)))
+          ctx)))))

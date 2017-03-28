@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [joplin.core :as j]
             [joplin.jdbc.database]
+            [clojure.java.jdbc :as jdbc]
             [korma.db :as db]
             [korma.core :as korma]
             [turbovote.resource-config :refer [config]]
@@ -16,6 +17,15 @@
 (defn url []
   (let [{:keys [host port user password database]} (config [:postgres])]
     (str "jdbc:postgresql://" host ":" port "/" database "?user=" user "&password=" password)))
+
+(defn db-spec []
+  (let [{:keys [host port user password database]} (config [:postgres])]
+    {:dbtype "postgresql"
+     :dbname database
+     :host host
+     :port port
+     :username user
+     :password password}))
 
 (defn migrate []
   (j/migrate-db {:db {:type :sql
@@ -358,42 +368,89 @@
 (defn column-names [table]
   (map :column_name (columns table)))
 
-(defn lazy-select-xml-tree-values [chunk-size import-id]
-  (binding [db/*current-conn* (db/get-connection (:db xml-tree-values))]
-    (let [cursor-name (str (gensym "xtv_cursor"))
-          done? (atom false)
-          close-attempts (atom 0)]
-      (korma/exec-raw
-                      [(str "DECLARE " cursor-name " NO SCROLL CURSOR "
-                            "WITH HOLD FOR "
-                            "SELECT * FROM xml_tree_values "
-                            "WHERE results_id=" import-id " "
-                            "ORDER BY insert_counter ASC;")])
+(defn from-cursor
+  "Given a database connection, `conn`, and a cursor named `cursor`,
+  fetch chunks of `n` rows until the cursor is exhausted. Returns a
+  lazy-seq of results and closes the cursor when it is finished. Throws
+  a `java.sql.SQLException` if anything goes awry (e.g., the cursor
+  doesn't exist in the given `conn`)"
+  [conn cursor n]
+  (try
+    (jdbc/query conn [(str "FETCH " n " FROM " cursor)])
+    (catch java.sql.SQLException e
+      (log/error (str "Can't fetch from " cursor " on " conn))
+      (throw e))))
+
+(defn setup-cursor
+  "Given a database connection `conn` and a query `q`, setup a uniquely
+  named cursor, returning its name. The caller is responsible for
+  closing the cursor appropriately. Throws a `java.sql.SQLException` if
+  anything goes awry."
+  [conn q]
+  (let [cursor (str (gensym "cursor"))]
+    (try
+      (jdbc/execute! conn [(str "DECLARE " cursor " NO SCROLL CURSOR "
+                                "WITH HOLD FOR " q)])
+      (catch java.sql.SQLException e
+        (log/error "Failed to create cursor" cursor " on " (pr-str conn))
+        (throw e)))
+    cursor))
+
+(defn close
+  "Closes `cursor` on `conn`, throwing a java.sql.SQLException on
+  failure."
+  [conn cursor]
+  (try
+    (jdbc/execute! conn [(str "close " cursor)])
+    (catch java.sql.SQLException e
+      (log/error (str "Can't close " cursor " on " (pr-str conn)))
+      (throw e))))
+
+(defn lazy-select-xml-tree-values
+  "Given a database connection `conn`, a chunk-size `n`, and an
+  `import-id`, return a lazy-seq containing the subset of
+  xml_tree_values in insertion order. Must be used - the lazy-seq fully
+  consumed - within a `jdbc/with-db-connection` context."
+  [conn n import-id]
+  (let [q (str "select path, simple_path, value "
+               "from xml_tree_values "
+               "where results_id = " import-id
+               "order by insert_counter asc;")
+        cursor (setup-cursor conn q)]
+    (letfn [(chunked-rows []
+              (try
+                (let [this-chunk (from-cursor conn cursor n)]
+                  (if (seq this-chunk)
+                    (lazy-cat this-chunk (trampoline chunked-rows))
+                    (do
+                      (close conn cursor)
+                      nil)))
+                (catch java.sql.SQLException e
+                  (log/error "Lazy failure case: " (.getMessage e))
+                  chunked-rows)))]
+      (trampoline chunked-rows))))
+
+(defn lazy-cursor-fetch
+  "Returns a function that gives you a lazy-seq from apply the query-fn
+  `q` to a cursor, in chunks of `n`, on a single database connection
+  `conn`. Must be used within a `jdbc/with-database-connection` form.
+
+  Example: (apply (lazy-cursor-fetch 10000 query-fn) conn import-id)"
+  [n query-fn]
+  (fn [conn & args]
+    (let [query (apply query-fn args)
+          cursor (setup-cursor conn query)]
       (letfn [(chunked-rows []
-                (when @done?
-                  (swap! close-attempts inc))
-                (try
-                  (do
-                    (let [this-chunk (korma/exec-raw
-                                      [(str "FETCH " chunk-size
-                                            " FROM " cursor-name)]
-                                      :results)]
-                      (if (seq this-chunk)
-                        (do
-                          (lazy-cat
-                           this-chunk
-                           (trampoline chunked-rows)))
-                        (do
-                          (reset! done? true)
-                          (korma/exec-raw
-                           [(str "CLOSE " cursor-name)])
-                          nil))))
-                  (catch java.sql.SQLException e
-                    (if (> @close-attempts 30)
-                      (do
-                        (log/error "Tried to close cursor" cursor-name "too many times")
-                        nil)
-                      chunked-rows))))]
+              (try
+                (let [this-chunk (from-cursor conn cursor n)]
+                  (if (seq this-chunk)
+                    (lazy-cat this-chunk (trampoline chunked-rows))
+                    (do
+                      (close conn cursor)
+                      nil)))
+                (catch java.sql.SQLException e
+                  (log/error "Lazy failure case: " (.getMessage e))
+                  chunked-rows)))]
         (trampoline chunked-rows)))))
 
 (defn lazy-select-fn [chunk-size query-fn]
