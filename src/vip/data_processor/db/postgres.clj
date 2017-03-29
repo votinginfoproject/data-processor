@@ -24,7 +24,7 @@
      :dbname database
      :host host
      :port port
-     :username user
+     :user user
      :password password}))
 
 (defn migrate []
