@@ -58,4 +58,4 @@
         v3-out-ctx (v5-summary-branch v3-ctx)
         v5-out-ctx (v5-summary-branch v5-ctx)]
     (is (= (count (v3-out-ctx :pipeline)) 0))
-    (is (= (count (v5-out-ctx :pipeline)) 2))))
+    (is (= (count (v5-out-ctx :pipeline)) 4))))
