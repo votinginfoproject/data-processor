@@ -4,7 +4,7 @@ as $$
 begin
 return query
 select distinct on (v.identifier)
-       l1.name, p1.name, pl.address_location_name, pl.address_line1,
+       coalesce(l.name, l0.name), coalesce(p.name, p0.name), pl.address_location_name, pl.address_line1,
        pl.address_line2, pl.address_line3, pl.address_city,
        pl.address_state, pl.address_zip, v.identifier
     from results r
@@ -24,15 +24,15 @@ select distinct on (v.identifier)
     left join v3_0_precinct_splits ps
       on pspl.precinct_split_id = ps.id
       and ps.results_id = r.id
-    left join v3_0_precincts p1
-      on ps.precinct_id = p1.id
-      and p1.results_id = r.id
+    left join v3_0_precincts p0
+      on ps.precinct_id = p0.id
+      and p0.results_id = r.id
     left join v3_0_localities l
       on l.id = p.locality_id
       and l.results_id = r.id
-    left join v3_0_localities l1
-      on l1.id = p1.locality_id
-      and l1.results_id = r.id
+    left join v3_0_localities l0
+      on l0.id = p0.locality_id
+      and l0.results_id = r.id
     where r.public_id = pid
     and v.scope = 'polling-locations'
     and v.error_type like 'address%';
