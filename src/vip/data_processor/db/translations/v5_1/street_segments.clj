@@ -3,12 +3,11 @@
             [vip.data-processor.db.translations.util :as util]))
 
 (def row-fn
-  (postgres/lazy-select-fn
+  (postgres/lazy-cursor-fetch
    10000
    (fn [import-id]
      (str "SELECT * FROM v5_1_street_segments"
-          " WHERE results_id = "
-          import-id))))
+          " WHERE results_id = " import-id))))
 
 (defn base-path [index]
   (str "VipObject.0.StreetSegment." index))
@@ -38,4 +37,4 @@
       :parent_with_id id-path
       :value (:id row)})))
 
-(def transformer (util/transformer row-fn transform-fn))
+(def transformer (util/transformer-with-conn row-fn transform-fn))

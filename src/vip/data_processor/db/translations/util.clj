@@ -1,5 +1,6 @@
 (ns vip.data-processor.db.translations.util
   (:require [clojure.string :as str]
+            [clojure.java.jdbc :as jdbc]
             [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]))
 
@@ -151,7 +152,10 @@
              #(assoc % :results_id import-id))
        rows))
 
-(defn transformer [row-fn ltree-fn]
+(defn transformer
+  "Translate a set of rows from `row-fn` using `ltree-fn`, then load
+  that into the database. `row-fn` should be a function of import-id."
+  [row-fn ltree-fn]
   (fn [{:keys [ltree-index import-id] :as ctx}]
     (let [idx-fn (index-generator ltree-index)
           ltree-rows (mapcat (partial ltree-fn idx-fn)
@@ -162,3 +166,20 @@
             (postgres/bulk-import postgres/xml-tree-values rows)
             (assoc :ltree-index (idx-fn)))
         ctx))))
+
+(defn transformer-with-conn
+  "Like `transformer`, but with a database connection passed to `row-fn`.
+  Useful when `row-fn` needs a single connection, e.g., when using a
+  database cursor."
+  [row-fn ltree-fn]
+  (fn [{:keys [ltree-index import-id] :as ctx}]
+    (jdbc/with-db-connection [conn (postgres/db-spec)]
+      (let [idx-fn (index-generator ltree-index)
+            ltree-rows (mapcat (partial ltree-fn idx-fn)
+                               (row-fn conn import-id))
+            rows (prep-for-insertion import-id ltree-rows)]
+        (if (seq rows)
+          (-> ctx
+              (postgres/bulk-import postgres/xml-tree-values rows)
+              (assoc :ltree-index (idx-fn)))
+          ctx)))))

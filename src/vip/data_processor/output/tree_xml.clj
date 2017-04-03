@@ -1,6 +1,7 @@
 (ns vip.data-processor.output.tree-xml
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]
+            [clojure.java.jdbc :as jdbc]
             [korma.core :as korma]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
             [vip.data-processor.db.postgres :as postgres]
@@ -10,6 +11,15 @@
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [org.apache.commons.lang StringEscapeUtils]))
+
+(def chunk-size 100000)
+
+(defn xml-header
+  [spec-version]
+  (str "<?xml version=\"1.0\"?>\n<VipObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" schemaVersion=\""
+       spec-version
+       "\" xsi:noNamespaceSchemaLocation=\"https://raw.githubusercontent.com/votinginfoproject/vip-specification/v"
+       spec-version "-release/vip_spec.xsd\">\n"))
 
 (defn attr
   "Return the attribute of a path, if there is one."
@@ -90,16 +100,17 @@
 (def opening-tags (map-str opening-tag))
 (def closing-tags (map-str closing-tag))
 
-(defn write-xml [file spec-version import-id]
+(defn write-xml
+  "Given a lazy-seq of `xs`, write a `spec-version` XML `file` from the run `import-id`"
+  [file spec-version import-id xs]
   (with-open [f (io/writer (.toFile file))]
-    (.write f (str "<?xml version=\"1.0\"?>\n<VipObject xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" schemaVersion=\"" spec-version "\" xsi:noNamespaceSchemaLocation=\"https://raw.githubusercontent.com/votinginfoproject/vip-specification/v" spec-version "-release/vip_spec.xsd\">\n"))
+    (.write f (xml-header spec-version))
     (let [last-seen-path (atom "VipObject.0")
           inside-open-tag (atom false)
           values-written (atom 0)]
-      (doseq [{:keys [path value simple_path] :as row}
-              (psql/lazy-select-xml-tree-values 100000 import-id)]
+      (doseq [{:keys [path value simple_path] :as row} xs]
         (swap! values-written inc)
-        (when (= (mod @values-written 100000) 0)
+        (when (zero? (mod @values-written chunk-size))
           (log/info "Wrote" @values-written "values"))
         (let [path (.getValue path)
               simple_path (.getValue simple_path)
@@ -140,8 +151,11 @@
           (.write f ">"))
         (.write f (closing-tags to-close))))))
 
-(defn generate-xml-file [{:keys [spec-version import-id xml-output-file] :as ctx}]
-  (write-xml xml-output-file @spec-version import-id)
+(defn generate-xml-file
+  [{:keys [spec-version import-id xml-output-file] :as ctx}]
+  (jdbc/with-db-connection [conn (psql/db-spec)]
+    (let [values (psql/lazy-select-xml-tree-values conn chunk-size import-id)]
+      (write-xml xml-output-file @spec-version import-id values)))
   ctx)
 
 (def pipeline

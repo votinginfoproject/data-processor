@@ -7,5 +7,6 @@
                  (.toFile file)
                  file)]
       (when (.exists file)
+        (log/info "Removing" (.toString file))
         (.delete file))))
   ctx)

@@ -10,8 +10,6 @@
             [vip.data-processor.util :as util]
             [clojure.core.async :as a]))
 
-(set! *print-length* 10)
-
 (def problem-types [:warnings :errors :critical :fatal])
 
 (defn csv-inputs [file-names]
@@ -50,8 +48,8 @@
                        :user (config [:postgres :user])
                        :password (config [:postgres :password])}]
 
-      (jdbc/execute! jdbc-config [(str "DROP DATABASE IF EXISTS " database-name)] :transaction? false)
-      (jdbc/execute! jdbc-config [(str "CREATE DATABASE " database-name)] :transaction? false)
+      (jdbc/execute! jdbc-config [(str "DROP DATABASE IF EXISTS " database-name)] {:transaction? false})
+      (jdbc/execute! jdbc-config [(str "CREATE DATABASE " database-name)] {:transaction? false})
 
       (psql/initialize)
       ;; these vars will be unbound until after psql/initialize, so
