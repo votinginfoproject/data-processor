@@ -12,7 +12,7 @@
            [java.nio.file.attribute FileAttribute]
            [org.apache.commons.lang StringEscapeUtils]))
 
-(def ^:dynamic *chunk-size* 100000)
+(def chunk-size 100000)
 
 (defn xml-header
   [spec-version]
@@ -110,7 +110,7 @@
           values-written (atom 0)]
       (doseq [{:keys [path value simple_path] :as row} xs]
         (swap! values-written inc)
-        (when (= (mod @values-written *chunk-size*) 0)
+        (when (zero? (mod @values-written chunk-size))
           (log/info "Wrote" @values-written "values"))
         (let [path (.getValue path)
               simple_path (.getValue simple_path)
@@ -154,7 +154,7 @@
 (defn generate-xml-file
   [{:keys [spec-version import-id xml-output-file] :as ctx}]
   (jdbc/with-db-connection [conn (psql/db-spec)]
-    (let [values (psql/lazy-select-xml-tree-values conn *chunk-size* import-id)]
+    (let [values (psql/lazy-select-xml-tree-values conn chunk-size import-id)]
       (write-xml xml-output-file @spec-version import-id values)))
   ctx)
 

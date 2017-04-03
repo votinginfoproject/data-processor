@@ -368,7 +368,7 @@
 (defn column-names [table]
   (map :column_name (columns table)))
 
-(defn from-cursor
+(defn fetch-from-cursor
   "Given a database connection, `conn`, and a cursor named `cursor`,
   fetch chunks of `n` rows until the cursor is exhausted. Returns a
   lazy-seq of results and closes the cursor when it is finished. Throws
@@ -419,7 +419,7 @@
         cursor (setup-cursor conn q)]
     (letfn [(chunked-rows []
               (try
-                (let [this-chunk (from-cursor conn cursor n)]
+                (let [this-chunk (fetch-from-cursor conn cursor n)]
                   (if (seq this-chunk)
                     (lazy-cat this-chunk (trampoline chunked-rows))
                     (do
@@ -442,7 +442,7 @@
           cursor (setup-cursor conn query)]
       (letfn [(chunked-rows []
               (try
-                (let [this-chunk (from-cursor conn cursor n)]
+                (let [this-chunk (fetch-from-cursor conn cursor n)]
                   (if (seq this-chunk)
                     (lazy-cat this-chunk (trampoline chunked-rows))
                     (do
