@@ -152,7 +152,10 @@
              #(assoc % :results_id import-id))
        rows))
 
-(defn transformer [row-fn ltree-fn]
+(defn transformer
+  "Translate a set of rows from `row-fn` using `ltree-fn`, then load
+  that into the database. `row-fn` should be a function of import-id."
+  [row-fn ltree-fn]
   (fn [{:keys [ltree-index import-id] :as ctx}]
     (let [idx-fn (index-generator ltree-index)
           ltree-rows (mapcat (partial ltree-fn idx-fn)
@@ -165,10 +168,9 @@
         ctx))))
 
 (defn transformer-with-conn
-  "Generates a transformation function that operates on a single
-  database connection? If `row-fn` is the sort of thing that requires a
-  connection, we'll need to setup a binding context and thread this
-  value to subsequent calls. "
+  "Like `transformer`, but with a database connection passed to `row-fn`.
+  Useful when `row-fn` needs a single connection, e.g., when using a
+  database cursor."
   [row-fn ltree-fn]
   (fn [{:keys [ltree-index import-id] :as ctx}]
     (jdbc/with-db-connection [conn (postgres/db-spec)]
