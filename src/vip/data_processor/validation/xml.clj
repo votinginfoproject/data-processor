@@ -212,25 +212,39 @@
                         (:content node))]
      (apply concat attribute-entries child-entries))))
 
+(defn insert
+  "A function to insert to `xml_tree_values`. `vals` should contain
+  ltree objects rather than strings."
+  [vals]
+  (korma/insert postgres/xml-tree-values
+    (korma/values vals)))
+
+(defn paths->ltree
+  "Convert a fixed set of paths in `m` into Postgres objects and add an
+  `id`. Essentialls a composition of `postgres/ltreeify` and
+  `postgres/prep-for-insertion`."
+  [id m]
+  (-> m
+      (update :path postgres/path->ltree)
+      (update :parent_with_id postgres/path->ltree)
+      (update :simple_path postgres/path->ltree)
+      (assoc :results_id id)))
+
 (defn load-xml-ltree
+  "Like `load-xml-ltree`, but with `pmap` and chunks of `n`. Is there a
+  chunk size that is most efficient? How could we determine this magic
+  number?"
   [ctx]
   (let [xml-file (first (:input ctx))
         import-id (:import-id ctx)]
     (with-open [reader (util/bom-safe-reader xml-file)]
-      (doseq [pvs (->> reader
-                       xml/parse
-                       path-and-values
-                       (partition 5000 5000 '())
-                       (map (fn [chunk]
-                              (map (fn [path-map]
-                                     (-> path-map
-                                         (update :path postgres/path->ltree)
-                                         (update :parent_with_id postgres/path->ltree)
-                                         (update :simple_path postgres/path->ltree)
-                                         (assoc :results_id import-id)))
-                                   chunk))))]
-        (korma/insert postgres/xml-tree-values
-          (korma/values pvs))))
+      (doall (pmap insert
+                   (->> reader
+                        xml/parse
+                        path-and-values
+                        (partition 5000 5000 '())
+                        (map (fn [chunk]
+                               (map (partial paths->ltree import-id) chunk)))))))
     ctx))
 
 (defn determine-spec-version [ctx]
