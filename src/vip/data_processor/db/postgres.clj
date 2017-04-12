@@ -271,6 +271,7 @@
 (defn populate-locality-table
   [ctx]
   (let [id (:import-id ctx)]
+    (log/info "Populating v5_dashboard.paths_by_locality")
     (korma/exec-raw
      (:conn xml-tree-values)
      ["select v5_dashboard.populate_locality_table(?)" [id]]))
@@ -303,7 +304,8 @@
 
 (defn v5-summary-branch
   [{:keys [spec-version] :as ctx}]
-  (if (= @spec-version "5.1")
+  (log/info "In v5-summary-branch")
+  (if (= (util/version-without-patch @spec-version) "5.1")
     (update ctx :pipeline (partial concat [populate-locality-table
                                            populate-i18n-table
                                            populate-sources-table

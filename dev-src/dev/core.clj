@@ -28,10 +28,10 @@
    psql/store-spec-version
    psql/store-public-id
    psql/store-election-id
+   psql/v5-summary-branch
    data-processor/add-validations
    errors/close-errors-chan
-   errors/await-statistics
-   psql/v5-summary-branch])
+   errors/await-statistics])
 
 (defn -main [filename]
   (psql/initialize)

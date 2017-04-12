@@ -129,6 +129,7 @@
   (let [errors-chan (a/chan 100)
         pipeline [psql/start-run
                   t/xml-csv-branch
+                  psql/v5-summary-branch
                   data-processor/add-validations
                   errors/close-errors-chan
                   errors/await-statistics]
