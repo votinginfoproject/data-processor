@@ -238,13 +238,14 @@
   (let [xml-file (first (:input ctx))
         import-id (:import-id ctx)]
     (with-open [reader (util/bom-safe-reader xml-file)]
-      (doall (pmap insert
-                   (->> reader
-                        xml/parse
-                        path-and-values
-                        (partition 5000 5000 '())
-                        (map (fn [chunk]
-                               (map (partial paths->ltree import-id) chunk)))))))
+      (dorun
+       (pmap insert
+             (->> reader
+                  xml/parse
+                  path-and-values
+                  (partition 5000 5000 '())
+                  (map (fn [chunk]
+                         (map (partial paths->ltree import-id) chunk)))))))
     ctx))
 
 (defn determine-spec-version [ctx]
