@@ -18,10 +18,14 @@
         source-count (-> result
                          first
                          :source_count)]
-    (if (> source-count 1)
-      (errors/add-errors ctx :fatal :source "VipObject.0.Source" :count
-                         :more-than-one)
-      ctx)))
+    (cond
+      (zero? source-count) (errors/add-errors
+                              ctx :fatal :source "VipObject.0.Source"
+                              :count :missing-source)
+      (> source-count 1) (errors/add-errors
+                            ctx :fatal :source "VipObject.0.Source"
+                            :count :more-than-one))
+    ctx))
 
 (def validate-name
   (util/build-xml-tree-value-query-validator
