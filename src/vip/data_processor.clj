@@ -61,10 +61,10 @@
            psql/store-spec-version
            psql/store-public-id
            psql/store-election-id
+           psql/v5-summary-branch
            add-validations
            errors/close-errors-chan
            errors/await-statistics
-           psql/v5-summary-branch
            s3/upload-to-s3
            cleanup/cleanup]))
 
