@@ -24,6 +24,7 @@
                             :scope :source
                             :identifier "VipObject.0.Source"
                             :error-type :count}))))
+
   (testing "one and only one Source element is OK"
     (let [errors-chan (a/chan 100)
           ctx {:input (xml-input "v5-one-source.xml")
@@ -33,7 +34,22 @@
                :errors-chan errors-chan}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
-      (assert-no-problems errors {}))))
+      (assert-no-problems errors {})))
+
+  (testing "having no Source element is a fatal error"
+    (let [errors-chan (a/chan 100)
+          ctx {:input (xml-input "v5-one-election.xml")
+               :pipeline [psql/start-run
+                          xml/load-xml-ltree
+                          v5.source/validate-one-source]
+               :errors-chan errors-chan}
+          out-ctx (pipeline/run-pipeline ctx)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :fatal
+                            :scope :source
+                            :identifier "VipObject.0.Source"
+                            :error-type :count})))))
 
 (deftest ^:postgres validate-name-test
   (testing "missing Name is a fatal error"

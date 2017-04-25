@@ -33,7 +33,23 @@
                       xml/load-xml-ltree
                       v5.election/validate-one-election)
           errors (all-errors errors-chan)]
-      (assert-no-problems errors {}))))
+      (assert-no-problems errors {})))
+
+  (testing "having no Election is a problem"
+    (let [errors-chan (a/chan 100)
+          ctx {:input (xml-input "v5-one-source.xml")
+               :pipeline []
+               :errors-chan errors-chan}
+          out-ctx (-> ctx
+                      psql/start-run
+                      xml/load-xml-ltree
+                      v5.election/validate-one-election)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :fatal
+                            :scope :election
+                            :identifier "VipObject.0.Election"
+                            :error-type :count})))))
 
 (deftest ^:postgres validate-date-test
   (testing "Date element missing is a fatal error"

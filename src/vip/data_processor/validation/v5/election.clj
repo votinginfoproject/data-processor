@@ -17,10 +17,14 @@
         election-count (-> result
                            first
                            :election_count)]
-    (if (> election-count 1)
-      (errors/add-errors ctx :fatal :election "VipObject.0.Election" :count
-                         :more-than-one)
-      ctx)))
+    (cond
+      (zero? election-count) (errors/add-errors
+                              ctx :fatal :election "VipObject.0.Election"
+                              :count :missing-election)
+      (> election-count 1) (errors/add-errors
+                            ctx :fatal :election "VipObject.0.Election"
+                            :count :more-than-one))
+    ctx))
 
 (def validate-date
   (util/build-xml-tree-value-query-validator
