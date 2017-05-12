@@ -14,6 +14,18 @@
 
   ctx)
 
+(defrecord V5ValidationError [ctx severity scope
+                                identifier error-type error-value parent-element-id])
+
+(defn v5-add-errors [{:keys [errors-chan] :as ctx}
+                     severity scope identifier error-type parent-element-id
+                     & error-data]
+  (doseq [error-value error-data]
+    (a/>!! errors-chan
+           (->V5ValidationError ctx severity scope identifier error-type error-value parent-element-id)))
+
+  ctx)
+
 (defn close-errors-chan [{:keys [errors-chan] :as ctx}]
   (a/close! errors-chan)
   ctx)

@@ -19,12 +19,12 @@
                          first
                          :source_count)]
     (cond
-      (zero? source-count) (errors/add-errors
+      (zero? source-count) (errors/v5-add-errors
                               ctx :fatal :source "VipObject.0.Source"
-                              :count :missing-source)
-      (> source-count 1) (errors/add-errors
+                              :count nil :missing-source)
+      (> source-count 1) (errors/v5-add-errors
                             ctx :fatal :source "VipObject.0.Source"
-                            :count :more-than-one))
+                            :count nil :more-than-one))
     ctx))
 
 (def validate-name
@@ -71,7 +71,16 @@
                                 :simple_path simple-path}))
         invalid-vip-ids (remove (comp fips/valid-fips? :value) vip-ids)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                                 :critical :source (-> row :path .getValue) :invalid-fips
-                                 (:value row)))
+              (let [parent-element-id (->(korma/exec-raw
+                                          (:conn postgres/xml-tree-values)
+                                          ["SELECT value
+                                            FROM xml_tree_values
+                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                            and results_id = ?" [(-> row :path .getValue) import-id]]
+                                          :results)
+                                        first
+                                        :value)]
+                (errors/v5-add-errors ctx
+                                   :critical :source (-> row :path .getValue) :invalid-fips parent-element-id
+                                   (:value row))))
             ctx invalid-vip-ids)))

@@ -360,8 +360,9 @@
    :error_data (pr-str error-value)})
 
 (defn xml-tree-validation-value
-  [{:keys [ctx severity scope identifier error-type error-value]}]
+  [{:keys [ctx severity scope identifier error-type parent-element-id error-value]}]
   {:results_id (:import-id ctx)
+   :parent_element_id parent-element-id
    :severity (name severity)
    :scope (name scope)
    :error_type (name error-type)

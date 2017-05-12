@@ -2,7 +2,9 @@
   (:require [vip.data-processor.validation.v5.util :as util]
             [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]
-            [clj-time.format :as f]))
+            [clj-time.format :as f]
+            [korma.core :as korma]
+            [vip.data-processor.db.postgres :as postgres]))
 
 (defn valid-time-with-zone? [time]
   (re-matches
@@ -22,9 +24,18 @@
                (str hours-open-path ".StartTime|EndTime.*{1}"))
         invalid-times (remove (comp valid-time-with-zone? :value) times)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                         :errors :hours-open (-> row :path .getValue) :format
-                         (:value row)))
+              (let [parent-element-id (->(korma/exec-raw
+                                          (:conn postgres/xml-tree-values)
+                                          ["SELECT value
+                                            FROM xml_tree_values
+                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                            and results_id = ?" [(-> row :path .getValue) import-id]]
+                                          :results)
+                                        first
+                                        :value)]
+                (errors/v5-add-errors ctx
+                           :errors :hours-open (-> row :path .getValue) :format parent-element-id
+                           (:value row))))
             ctx invalid-times)))
 
 (defn validate-dates [{:keys [import-id] :as ctx}]
@@ -35,7 +46,16 @@
                (str schedule-path ".StartDate|EndDate.*{1}"))
         invalid-dates (remove (comp valid-date? :value) dates)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                                 :errors :hours-open (-> row :path .getValue) :format
-                                 (:value row)))
+              (let [parent-element-id (->(korma/exec-raw
+                                          (:conn postgres/xml-tree-values)
+                                          ["SELECT value
+                                            FROM xml_tree_values
+                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                            and results_id = ?" [(-> row :path .getValue) import-id]]
+                                          :results)
+                                        first
+                                        :value)]
+                (errors/v5-add-errors ctx
+                                   :errors :hours-open (-> row :path .getValue) :format parent-element-id
+                                   (:value row))))
             ctx invalid-dates)))

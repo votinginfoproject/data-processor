@@ -24,10 +24,20 @@
                   ["SELECT * from street_segment_overlaps(?);" [import-id]]
                   :results)]
     (reduce (fn [ctx overlap]
-              (errors/add-errors ctx
-                                 :errors
-                                 :street-segment
-                                 (.getValue (:path overlap))
-                                 :overlaps
-                                 (:id overlap)))
+              (let [parent-element-id (->(korma/exec-raw
+                                          (:conn postgres/xml-tree-values)
+                                          ["SELECT value
+                                            FROM xml_tree_values
+                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                            and results_id = ?" [(-> :path overlap .getValue)  import-id]]
+                                          :results)
+                                        first
+                                        :value)]
+                (errors/v5-add-errors ctx
+                                   :errors
+                                   :street-segment
+                                   (.getValue (:path overlap))
+                                   :overlaps
+                                   parent-element-id
+                                   (:id overlap))))
             ctx overlaps)))

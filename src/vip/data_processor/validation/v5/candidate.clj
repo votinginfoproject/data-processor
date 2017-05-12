@@ -19,9 +19,18 @@
                                  :simple_path (postgres/path->ltree "VipObject.Candidate.PreElectionStatus")}))
         invalid-statuses (remove valid-pre-election-status? statuses)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                         :errors :candidates (-> row :path .getValue) :format
-                         (:value row)))
+              (let [parent-element-id (->(korma/exec-raw
+                                          (:conn postgres/xml-tree-values)
+                                          ["SELECT value
+                                            FROM xml_tree_values
+                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                            and results_id = ?" [(-> row :path .getValue) import-id]]
+                                          :results)
+                                         first
+                                         :value)]
+                (errors/v5-add-errors ctx
+                           :errors :candidates (-> row :path .getValue) :format parent-element-id
+                           (:value row))))
             ctx invalid-statuses)))
 
 (defn validate-post-election-statuses [{:keys [import-id] :as ctx}]
@@ -31,9 +40,18 @@
                                  :simple_path (postgres/path->ltree "VipObject.Candidate.PostElectionStatus")}))
         invalid-statuses (remove valid-post-election-status? statuses)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                                 :errors :candidates (-> row :path .getValue) :format
-                                 (:value row)))
+              (let [parent-element-id (->(korma/exec-raw
+                                          (:conn postgres/xml-tree-values)
+                                          ["SELECT value
+                                            FROM xml_tree_values
+                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                            and results_id = ?" [(-> row :path .getValue) import-id]]
+                                          :results)
+                                         first
+                                         :value)]
+                (errors/v5-add-errors ctx
+                           :errors :candidates (-> row :path .getValue) :format parent-element-id
+                           (:value row))))
             ctx invalid-statuses)))
 
 (def validate-no-missing-ballot-names

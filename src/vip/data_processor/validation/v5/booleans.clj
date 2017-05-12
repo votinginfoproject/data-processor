@@ -16,7 +16,16 @@
                 (if (contains? (:check value-format/boolean-valid)
                                (:value row))
                   ctx
-                  (errors/add-errors ctx
-                                     :errors :boolean (-> row :path .getValue) :format
-                                     (:value row))))
+                  (let [parent-element-id (->(korma/exec-raw
+                                               (:conn postgres/xml-tree-values)
+                                               ["SELECT value
+                                                  FROM xml_tree_values
+                                                  WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                                  and results_id = ?" [(-> row :path .getValue) import-id]]
+                                               :results)
+                                            first
+                                            :value)]
+                    (errors/v5-add-errors ctx
+                                       :errors :boolean (-> row :path .getValue) :format parent-element-id
+                                       (:value row)))))
               ctx boolean-values)))

@@ -27,8 +27,17 @@
       (->> missing-paths
            (map :path)
            (reduce (fn [ctx path]
-                     (errors/add-errors ctx severity scope (.getValue path) error-type
-                                        error-data))
+                     (let [parent-element-id (->(korma/exec-raw
+                                                 (:conn postgres/xml-tree-values)
+                                                 ["SELECT value
+                                                   FROM xml_tree_values
+                                                   WHERE path = subpath(?,0,4) || 'id'
+                                                   and results_id = ?" [path import-id]]
+                                                 :results)
+                                               first
+                                               :value)]
+                       (errors/v5-add-errors ctx severity scope (.getValue path) error-type parent-element-id
+                                          error-data)))
                    ctx)))))
 
 (defn select-lquery
@@ -107,9 +116,19 @@
               (let [missing (set/difference expected found)]
                 (reduce (fn [ctx path]
                           (let [missing-path (str path "."
-                                                  (last xml-element-path))]
-                            (errors/add-errors ctx :errors schema-type
+                                                  (last xml-element-path))
+                                 parent-element-id (->(korma/exec-raw
+                                                       (:conn postgres/xml-tree-values)
+                                                       ["SELECT value
+                                                         FROM xml_tree_values
+                                                         WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                                         and results_id = ?" [missing-path import-id]]
+                                                       :results)
+                                                     first
+                                                     :value)]
+                            (errors/v5-add-errors ctx :errors schema-type
                                                missing-path :missing
+                                               parent-element-id
                                                (->> element-path
                                                     (map name)
                                                     (str/join "-")
@@ -193,9 +212,18 @@
             elements (elements-at-simple-path import-id simple-path)
             invalid-elements (remove (comp valid? :value) elements)]
         (reduce (fn [ctx row]
-                  (errors/add-errors ctx error-severity error-root-element
-                                     (-> row :path .getValue) error-type
-                                     (:value row)))
+                  (let [parent-element-id (->(korma/exec-raw
+                                              (:conn postgres/xml-tree-values)
+                                              ["SELECT value
+                                                FROM xml_tree_values
+                                                WHERE path = subpath(text2ltree(?),0,4) || 'id'
+                                                and results_id = ?" [(-> row :path .getValue) import-id]]
+                                              :results)
+                                            first
+                                            :value)]
+                    (errors/v5-add-errors ctx error-severity error-root-element
+                                       (-> row :path .getValue) error-type parent-element-id
+                                       (:value row))))
                 ctx invalid-elements)))))
 
 (defn validate-elements
