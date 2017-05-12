@@ -31,7 +31,8 @@
    psql/v5-summary-branch
    data-processor/add-validations
    errors/close-errors-chan
-   errors/await-statistics])
+   errors/await-statistics
+   psql/delete-from-xml-tree-values])
 
 (defn -main [filename]
   (psql/initialize)
