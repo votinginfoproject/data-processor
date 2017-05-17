@@ -3,7 +3,6 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.v5.util :as util]
             [clojure.string :as str]
-            [clojure.edn :as edn]
             [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]))
 
