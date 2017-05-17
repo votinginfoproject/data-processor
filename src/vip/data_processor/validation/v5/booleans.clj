@@ -4,7 +4,8 @@
             [vip.data-processor.validation.data-spec.value-format :as value-format]
             [vip.data-processor.errors :as errors]
             [vip.data-processor.validation.xml.spec :as spec]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [vip.data-processor.validation.v5.util :as util]))
 
 (defn validate-format [{:keys [import-id] :as ctx}]
   (log/info "Validating booleans")
@@ -16,16 +17,9 @@
                 (if (contains? (:check value-format/boolean-valid)
                                (:value row))
                   ctx
-                  (let [parent-element-id (->(korma/exec-raw
-                                               (:conn postgres/xml-tree-values)
-                                               ["SELECT value
-                                                  FROM xml_tree_values
-                                                  WHERE path = subpath(text2ltree(?),0,4) || 'id'
-                                                  and results_id = ?" [(-> row :path .getValue) import-id]]
-                                               :results)
-                                            first
-                                            :value)]
-                    (errors/v5-add-errors ctx
-                                       :errors :boolean (-> row :path .getValue) :format parent-element-id
+                  (let [path (-> row :path .getValue)
+                        parent-element-id (util/get-parent-element-id path import-id)]
+                    (errors/add-v5-errors ctx
+                                       :errors :boolean path :format parent-element-id
                                        (:value row)))))
               ctx boolean-values)))

@@ -24,17 +24,10 @@
                (str hours-open-path ".StartTime|EndTime.*{1}"))
         invalid-times (remove (comp valid-time-with-zone? :value) times)]
     (reduce (fn [ctx row]
-              (let [parent-element-id (->(korma/exec-raw
-                                          (:conn postgres/xml-tree-values)
-                                          ["SELECT value
-                                            FROM xml_tree_values
-                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
-                                            and results_id = ?" [(-> row :path .getValue) import-id]]
-                                          :results)
-                                        first
-                                        :value)]
-                (errors/v5-add-errors ctx
-                           :errors :hours-open (-> row :path .getValue) :format parent-element-id
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                           :errors :hours-open path :format parent-element-id
                            (:value row))))
             ctx invalid-times)))
 
@@ -46,16 +39,9 @@
                (str schedule-path ".StartDate|EndDate.*{1}"))
         invalid-dates (remove (comp valid-date? :value) dates)]
     (reduce (fn [ctx row]
-              (let [parent-element-id (->(korma/exec-raw
-                                          (:conn postgres/xml-tree-values)
-                                          ["SELECT value
-                                            FROM xml_tree_values
-                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
-                                            and results_id = ?" [(-> row :path .getValue) import-id]]
-                                          :results)
-                                        first
-                                        :value)]
-                (errors/v5-add-errors ctx
-                                   :errors :hours-open (-> row :path .getValue) :format parent-element-id
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                                   :errors :hours-open path :format parent-element-id
                                    (:value row))))
             ctx invalid-dates)))

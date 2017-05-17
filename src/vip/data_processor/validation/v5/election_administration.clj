@@ -35,17 +35,10 @@
                                      (comp valid-voter-service-type? :value)
                                      imported-voter-service-types)]
     (reduce (fn [ctx row]
-              (let [parent-element-id (->(korma/exec-raw
-                                          (:conn postgres/xml-tree-values)
-                                          ["SELECT value
-                                            FROM xml_tree_values
-                                            WHERE path = subpath(text2ltree(?),0,4) || 'id'
-                                            and results_id = ?" [(-> row :path .getValue) import-id]]
-                                          :results)
-                                         first
-                                         :value)]
-                (errors/v5-add-errors ctx
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
                                    :errors :election-administration
-                                   (-> row :path .getValue) :format parent-element-id
+                                   path :format parent-element-id
                                    (:value row))))
             ctx invalid-voter-service-types)))
