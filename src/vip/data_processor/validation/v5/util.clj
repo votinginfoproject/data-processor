@@ -132,15 +132,7 @@
                 (reduce (fn [ctx path]
                           (let [missing-path (str path "."
                                                   (last xml-element-path))
-                                 parent-element-id (->(korma/exec-raw
-                                                       (:conn postgres/xml-tree-values)
-                                                       ["SELECT value
-                                                         FROM xml_tree_values
-                                                         WHERE path = subpath(text2ltree(?),0,4) || 'id'
-                                                         and results_id = ?" [missing-path import-id]]
-                                                       :results)
-                                                     first
-                                                     :value)]
+                                 parent-element-id (util/get-parent-element-id missing-path import-id)]
                             (errors/add-v5-errors ctx :errors schema-type
                                                missing-path :missing
                                                parent-element-id
@@ -227,17 +219,10 @@
             elements (elements-at-simple-path import-id simple-path)
             invalid-elements (remove (comp valid? :value) elements)]
         (reduce (fn [ctx row]
-                  (let [parent-element-id (->(korma/exec-raw
-                                              (:conn postgres/xml-tree-values)
-                                              ["SELECT value
-                                                FROM xml_tree_values
-                                                WHERE path = subpath(text2ltree(?),0,4) || 'id'
-                                                and results_id = ?" [(-> row :path .getValue) import-id]]
-                                              :results)
-                                            first
-                                            :value)]
+                  (let [path (-> row :path .getValue)
+                        parent-element-id (util/get-parent-element-id path import-id)]
                     (errors/add-v5-errors ctx error-severity error-root-element
-                                       (-> row :path .getValue) error-type parent-element-id
+                                       path error-type parent-element-id
                                        (:value row))))
                 ctx invalid-elements)))))
 
