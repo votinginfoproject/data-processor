@@ -132,7 +132,7 @@
                 (reduce (fn [ctx path]
                           (let [missing-path (str path "."
                                                   (last xml-element-path))
-                                 parent-element-id (util/get-parent-element-id missing-path import-id)]
+                                 parent-element-id (get-parent-element-id missing-path import-id)]
                             (errors/add-v5-errors ctx :errors schema-type
                                                missing-path :missing
                                                parent-element-id
@@ -220,7 +220,7 @@
             invalid-elements (remove (comp valid? :value) elements)]
         (reduce (fn [ctx row]
                   (let [path (-> row :path .getValue)
-                        parent-element-id (util/get-parent-element-id path import-id)]
+                        parent-element-id (get-parent-element-id path import-id)]
                     (errors/add-v5-errors ctx error-severity error-root-element
                                        path error-type parent-element-id
                                        (:value row))))
