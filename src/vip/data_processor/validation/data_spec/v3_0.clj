@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.data-spec.v3-0
   (:require [vip.data-processor.validation.data-spec.value-format :as format]
-            [vip.data-processor.validation.data-spec.coerce :as coerce]))
+            [vip.data-processor.validation.data-spec.coerce :as coerce]
+            [vip.data-processor.validation.data-spec.translate :as translate]))
 
 (def data-specs
   [{:filename "ballot.txt"
@@ -39,7 +40,7 @@
     :tag-name :ballot_response
     :stats true
     :columns [{:name "id" :required :critical :format format/all-digits :coerce coerce/coerce-integer}
-              {:name "text" :required :critical}
+              {:name "text" :required :critical :translate translate/clean-text}
               {:name "sort_order" :format format/all-digits :coerce coerce/coerce-integer}]}
    {:filename "candidate.txt"
     :table :candidates
@@ -291,7 +292,7 @@
               {:name "title" :required :critical}
               {:name "subtitle"}
               {:name "brief"}
-              {:name "text" :required :critical}
+              {:name "text" :required :critical :translate translate/clean-text}
               {:name "pro_statement"}
               {:name "con_statement"}
               {:name "passage_threshold"}

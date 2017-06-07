@@ -1,6 +1,7 @@
 (ns vip.data-processor.validation.data-spec.v5-1
   (:require [vip.data-processor.validation.data-spec.value-format :as format]
-            [vip.data-processor.validation.data-spec.coerce :as coerce]))
+            [vip.data-processor.validation.data-spec.coerce :as coerce]
+            [vip.data-processor.validation.data-spec.translate :as translate]))
 
 (def street-segments
   {:columns [{:name "id"}
@@ -65,11 +66,11 @@
               {:name "id"}
               {:name "con_statement"}
               {:name "effect_of_abstain"}
-              {:name "full_text"}
+              {:name "full_text" :translate translate/clean-text}
               {:name "info_uri"}
               {:name "passage_threshold"}
               {:name "pro_statement"}
-              {:name "summary_text"}
+              {:name "summary_text" :translate translate/clean-text}
               {:name "type"}
               {:name "other_type"}]}
    {:filename "ballot_measure_selection.txt"
@@ -82,7 +83,7 @@
     :columns [{:name "id"}
               {:name "ballot_measure_contest_ids"}
               {:name "ballot_measure_contest_selection_ids"}
-              {:name "text"}
+              {:name "text" :translate translate/clean-text}
               {:name "candidate_id"}
               {:name "endorsement_party_id"}
               {:name "is_write_in"}
@@ -335,11 +336,11 @@
               {:name "other_vote_variation"}
               {:name "con_statement"}
               {:name "effect_of_abstain"}
-              {:name "full_text"}
+              {:name "full_text" :translate translate/clean-text}
               {:name "info_uri"}
               {:name "passage_threshold"}
               {:name "pro_statement"}
-              {:name "summary_text"}
+              {:name "summary_text" :translate translate/clean-text}
               {:name "type"}
               {:name "other_type"}
               {:name "candidate_id"}
