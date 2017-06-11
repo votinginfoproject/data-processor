@@ -24,10 +24,13 @@
                   ["SELECT * from street_segment_overlaps(?);" [import-id]]
                   :results)]
     (reduce (fn [ctx overlap]
-              (errors/add-errors ctx
-                                 :errors
-                                 :street-segment
-                                 (.getValue (:path overlap))
-                                 :overlaps
-                                 (:id overlap)))
+              (let [path (-> :path overlap .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                                   :errors
+                                   :street-segment
+                                   path
+                                   :overlaps
+                                   parent-element-id
+                                   (:id overlap))))
             ctx overlaps)))

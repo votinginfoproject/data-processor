@@ -19,9 +19,11 @@
                                  :simple_path (postgres/path->ltree "VipObject.Candidate.PreElectionStatus")}))
         invalid-statuses (remove valid-pre-election-status? statuses)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                         :errors :candidates (-> row :path .getValue) :format
-                         (:value row)))
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                           :errors :candidates path :format parent-element-id
+                           (:value row))))
             ctx invalid-statuses)))
 
 (defn validate-post-election-statuses [{:keys [import-id] :as ctx}]
@@ -31,9 +33,11 @@
                                  :simple_path (postgres/path->ltree "VipObject.Candidate.PostElectionStatus")}))
         invalid-statuses (remove valid-post-election-status? statuses)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                                 :errors :candidates (-> row :path .getValue) :format
-                                 (:value row)))
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                           :errors :candidates path :format parent-element-id
+                           (:value row))))
             ctx invalid-statuses)))
 
 (def validate-no-missing-ballot-names

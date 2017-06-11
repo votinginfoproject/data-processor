@@ -13,6 +13,21 @@
   [{:keys [import-id]}]
   [import-id import-id])
 
+(defn get-parent-element-id
+  "Get the parent-element-id for an element with a given path.
+  Useful for when calling add-v5-errors where you need this
+  additional piece of information."
+  [path import-id]
+  (-> (korma/exec-raw
+        (:conn postgres/xml-tree-values)
+        ["SELECT value
+          FROM xml_tree_values
+          WHERE path = subpath(text2ltree(?),0,4) || 'id'
+          and results_id = ?" [path import-id]]
+        :results)
+     first
+     :value))
+
 (defn build-xml-tree-value-query-validator
   "Generate a validator that adds a validation error for every path in
   the results of the query. The params-fn must be a fn of one argument (the
@@ -27,8 +42,17 @@
       (->> missing-paths
            (map :path)
            (reduce (fn [ctx path]
-                     (errors/add-errors ctx severity scope (.getValue path) error-type
-                                        error-data))
+                     (let [parent-element-id (-> (korma/exec-raw
+                                                   (:conn postgres/xml-tree-values)
+                                                   ["SELECT value
+                                                     FROM xml_tree_values
+                                                     WHERE path = subpath(?,0,4) || 'id'
+                                                     and results_id = ?" [path import-id]]
+                                                   :results)
+                                               first
+                                               :value)]
+                       (errors/add-v5-errors ctx severity scope (.getValue path) error-type parent-element-id
+                                          error-data)))
                    ctx)))))
 
 (defn select-lquery
@@ -107,9 +131,11 @@
               (let [missing (set/difference expected found)]
                 (reduce (fn [ctx path]
                           (let [missing-path (str path "."
-                                                  (last xml-element-path))]
-                            (errors/add-errors ctx :errors schema-type
+                                                  (last xml-element-path))
+                                 parent-element-id (get-parent-element-id missing-path import-id)]
+                            (errors/add-v5-errors ctx :errors schema-type
                                                missing-path :missing
+                                               parent-element-id
                                                (->> element-path
                                                     (map name)
                                                     (str/join "-")
@@ -193,9 +219,11 @@
             elements (elements-at-simple-path import-id simple-path)
             invalid-elements (remove (comp valid? :value) elements)]
         (reduce (fn [ctx row]
-                  (errors/add-errors ctx error-severity error-root-element
-                                     (-> row :path .getValue) error-type
-                                     (:value row)))
+                  (let [path (-> row :path .getValue)
+                        parent-element-id (get-parent-element-id path import-id)]
+                    (errors/add-v5-errors ctx error-severity error-root-element
+                                       path error-type parent-element-id
+                                       (:value row))))
                 ctx invalid-elements)))))
 
 (defn validate-elements

@@ -301,6 +301,14 @@
    ["select v5_dashboard.populate_elections_table(?)" [import-id]])
   ctx)
 
+(defn delete-from-xml-tree-values
+  [{:keys [import-id] :as ctx}]
+  (log/info "Dropping from xml_tree_values")
+  (korma/exec-raw
+   (:conn xml-tree-values)
+   ["delete from xml_tree_values where results_id = ?" [import-id]])
+  ctx)
+
 
 (defn v5-summary-branch
   [{:keys [spec-version] :as ctx}]
@@ -360,8 +368,9 @@
    :error_data (pr-str error-value)})
 
 (defn xml-tree-validation-value
-  [{:keys [ctx severity scope identifier error-type error-value]}]
+  [{:keys [ctx severity scope identifier error-type parent-element-id error-value]}]
   {:results_id (:import-id ctx)
+   :parent_element_id parent-element-id
    :severity (name severity)
    :scope (name scope)
    :error_type (name error-type)

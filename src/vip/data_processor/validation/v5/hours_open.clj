@@ -2,7 +2,9 @@
   (:require [vip.data-processor.validation.v5.util :as util]
             [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]
-            [clj-time.format :as f]))
+            [clj-time.format :as f]
+            [korma.core :as korma]
+            [vip.data-processor.db.postgres :as postgres]))
 
 (defn valid-time-with-zone? [time]
   (re-matches
@@ -22,9 +24,11 @@
                (str hours-open-path ".StartTime|EndTime.*{1}"))
         invalid-times (remove (comp valid-time-with-zone? :value) times)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                         :errors :hours-open (-> row :path .getValue) :format
-                         (:value row)))
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                           :errors :hours-open path :format parent-element-id
+                           (:value row))))
             ctx invalid-times)))
 
 (defn validate-dates [{:keys [import-id] :as ctx}]
@@ -35,7 +39,9 @@
                (str schedule-path ".StartDate|EndDate.*{1}"))
         invalid-dates (remove (comp valid-date? :value) dates)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                                 :errors :hours-open (-> row :path .getValue) :format
-                                 (:value row)))
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                                   :errors :hours-open path :format parent-element-id
+                                   (:value row))))
             ctx invalid-dates)))

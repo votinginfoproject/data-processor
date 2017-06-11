@@ -3,7 +3,8 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.validation.data-spec.value-format :as value-format]
             [vip.data-processor.errors :as errors]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [vip.data-processor.validation.v5.util :as util]))
 
 (defn validate-emails [{:keys [import-id] :as ctx}]
   (log/info "Validating emails")
@@ -17,7 +18,9 @@
               (if (re-find (:check value-format/email)
                            (:value row))
                 ctx
-                (errors/add-errors ctx
-                                   :errors :email (-> row :path .getValue) :format
-                                   (:value row))))
+                (let [path (-> row :path .getValue)
+                      parent-element-id (util/get-parent-element-id path import-id)]
+                  (errors/add-v5-errors ctx
+                                     :errors :email path :format parent-element-id
+                                     (:value row)))))
             ctx emails)))
