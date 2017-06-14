@@ -19,12 +19,12 @@
                          first
                          :source_count)]
     (cond
-      (zero? source-count) (errors/add-errors
+      (zero? source-count) (errors/add-v5-errors
                               ctx :fatal :source "VipObject.0.Source"
-                              :count :missing-source)
-      (> source-count 1) (errors/add-errors
+                              :count nil :missing-source)
+      (> source-count 1) (errors/add-v5-errors
                             ctx :fatal :source "VipObject.0.Source"
-                            :count :more-than-one))
+                            :count nil :more-than-one))
     ctx))
 
 (def validate-name
@@ -71,7 +71,9 @@
                                 :simple_path simple-path}))
         invalid-vip-ids (remove (comp fips/valid-fips? :value) vip-ids)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                                 :critical :source (-> row :path .getValue) :invalid-fips
-                                 (:value row)))
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                                   :critical :source path :invalid-fips parent-element-id
+                                   (:value row))))
             ctx invalid-vip-ids)))

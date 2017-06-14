@@ -65,6 +65,7 @@
            add-validations
            errors/close-errors-chan
            errors/await-statistics
+           psql/delete-from-xml-tree-values
            s3/upload-to-s3
            cleanup/cleanup]))
 

@@ -35,8 +35,10 @@
                                      (comp valid-voter-service-type? :value)
                                      imported-voter-service-types)]
     (reduce (fn [ctx row]
-              (errors/add-errors ctx
-                                 :errors :election-administration
-                                 (-> row :path .getValue) :format
-                                 (:value row)))
+              (let [path (-> row :path .getValue)
+                    parent-element-id (util/get-parent-element-id path import-id)]
+                (errors/add-v5-errors ctx
+                                   :errors :election-administration
+                                   path :format parent-element-id
+                                   (:value row))))
             ctx invalid-voter-service-types)))
