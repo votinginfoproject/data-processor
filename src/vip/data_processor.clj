@@ -101,10 +101,10 @@
     (q/initialize)
     (psql/initialize)
     (q/publish {:id id :event "starting"} "qa-engine.status")
-    (let [consumer (consume)]
+    (let [consumer-id (consume)]
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn []
                                    (log/info "VIP Data Processor shutting down...")
                                    (q/publish {:id id :event "stopping"} "qa-engine.status")
-                                   (future-cancel consumer))))
+                                   (sqs/stop-consumer consumer-id))))
       @consumer)))
