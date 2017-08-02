@@ -1,6 +1,6 @@
 drop function if exists v5_dashboard.locality_stats (integer, text);
 
-create function v5_dashboard.new_locality_stats(rid int, lid text)
+create function v5_dashboard.locality_stats(rid int, lid text)
 returns table(results_id int, id text, name text, type text, error_count int,
               precinct_errors int, precinct_count int, precinct_completion int,
               polling_location_errors int, polling_location_count int, polling_location_completion int,
@@ -34,6 +34,7 @@ as $$
     election_administration_completion int;
     department_count int;
     error_count int;
+    street_segment_validations text;
   begin
     select ct.parent_with_id, ct.name, ct.type, ct.id
     into locality
@@ -101,6 +102,8 @@ as $$
     polling_location_count := cardinality(precinct_polling_locations);
     polling_location_completion := v5_dashboard.completion_rate(polling_location_count, polling_location_errors);
 
+    street_segment_validations := 'v5_street_segment_validations_' || rid;
+
     with paths as (
       select unnest (paths) as path
       from v5_dashboard.paths_by_locality pbl
@@ -108,7 +111,7 @@ as $$
         and pbl.locality_id = lid)
     select count (v.path)
     into street_segment_errors
-    from paths p, v5_street_segment_validations v
+    from paths p, street_segment_validations v
     where v.results_id = rid
       and v.path <@ p.path;
 
