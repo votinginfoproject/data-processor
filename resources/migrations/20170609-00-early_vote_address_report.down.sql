@@ -1,0 +1,1 @@
+drop function v3_dashboard.early_vote_location_address_report(text);
