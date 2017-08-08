@@ -69,6 +69,8 @@
    street-segment/validate-no-missing-city
    street-segment/validate-no-missing-state
    street-segment/validate-no-missing-zip
+   street-segment/validate-start-house-number
+   street-segment/validate-end-house-number
    street-segment/validate-no-street-segment-overlaps
    polling-location/validate-no-missing-address-lines
    polling-location/validate-no-missing-latitudes

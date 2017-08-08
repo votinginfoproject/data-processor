@@ -210,3 +210,51 @@
       "different street direction"  "VipObject.0.StreetSegment.19" nil
       "different street suffix"     "VipObject.0.StreetSegment.20" nil
       "different street suffix"     "VipObject.0.StreetSegment.21" nil)))
+
+(deftest ^:postgres validate-start-house-number
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-street-segment-start-house-number-invalid.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-start-house-number)
+        errors (all-errors errors-chan)]
+    (testing "start house number invalid"
+      (is (contains-error? errors
+                           {:severity :fatal
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.2.StartHouseNumber.2"
+                            :error-type :start-house-number
+                            :error-value "1A"})))
+    (testing "street-name present is OK"
+      (doseq [path ["VipObject.0.StreetSegment.0.StreetName"
+                    "VipObject.0.StreetSegment.1.StreetName"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :missing})))))
+
+(deftest ^:postgres validate-end-house-number
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-street-segment-end-house-number-invalid.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-end-house-number)
+        errors (all-errors errors-chan)]
+    (testing "end house number invalid"
+      (is (contains-error? errors
+                           {:severity :fatal
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.2.EndHouseNumber.3"
+                            :error-type :end-house-number
+                            :error-value "100B"})))
+    (testing "street-name present is OK"
+      (doseq [path ["VipObject.0.StreetSegment.0.StreetName"
+                    "VipObject.0.StreetSegment.1.StreetName"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :missing})))))

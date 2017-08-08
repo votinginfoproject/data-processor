@@ -16,6 +16,29 @@
 (def validate-odd-even-both-value
   (util/validate-enum-elements :oeb-enum :errors))
 
+(defn valid-house-number-or-nil?
+  [house-number]
+  (or (str/blank? house-number)
+      (try
+        (Integer/parseInt house-number)
+        true
+        (catch NumberFormatException ex
+          false))))
+
+(def validate-start-house-number
+  (util/validate-elements :street-segment
+                          [:start-house-number]
+                          valid-house-number-or-nil?
+                          :fatal
+                          :start-house-number))
+
+(def validate-end-house-number
+  (util/validate-elements :street-segment
+                          [:end-house-number]
+                          valid-house-number-or-nil?
+                          :fatal
+                          :end-house-number))
+
 (defn validate-no-street-segment-overlaps
   [{:keys [import-id] :as ctx}]
   (log/info "Validating street segment overlaps")

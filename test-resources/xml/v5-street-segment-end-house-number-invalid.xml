@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <StreetSegment id="ss001">
+    <OddEvenBoth>odd</OddEvenBoth>
+    <StreetName>Bath</StreetName>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>99</EndHouseNumber>
+    <City>Santa Barbara</City>
+    <State>CA</State>
+    <Zip>93101</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss002">
+    <OddEvenBoth>even</OddEvenBoth>
+    <StreetName>Bath</StreetName>
+    <City>Santa Barbara</City>
+    <State>CA</State>
+    <Zip>93101</Zip>
+  </StreetSegment>
+  <StreetSegment id="ss003">
+    <OddEvenBoth>both</OddEvenBoth>
+    <StreetName>Shower</StreetName>
+    <StartHouseNumber>1</StartHouseNumber>
+    <EndHouseNumber>100B</EndHouseNumber>
+    <City>Santa Barbara</City>
+    <State>CA</State>
+    <Zip>93101</Zip>
+  </StreetSegment>
+</VipObject>
