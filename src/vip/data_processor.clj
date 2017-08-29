@@ -110,4 +110,4 @@
                                    (log/info "VIP Data Processor shutting down...")
                                    (q/publish {:id id :event "stopping"} "qa-engine.status")
                                    (sqs/stop-consumer consumer-id))))
-      @consumer-id)))
+      consumer-id)))
