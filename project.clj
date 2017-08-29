@@ -10,9 +10,10 @@
                  [clj-time "0.12.2"]
                  [clj-aws-s3 "0.3.10" :exclusions [joda-time]]
                  [com.climate/clj-newrelic "0.2.1"]
-                 [democracyworks/squishy "2.0.0" :exclusions [joda-time
-                                                              org.slf4j/slf4j-simple
-                                                              org.slf4j/slf4j-api]]
+                 [democracyworks/squishy "3.0.1"
+                    :exclusions [joda-time
+                                 org.slf4j/slf4j-simple
+                                 org.slf4j/slf4j-api]]
                  [org.clojure/core.async "0.2.391"]
                  [democracyworks/utility-fns "0.2.0"]
                  [net.lingala.zip4j/zip4j "1.3.2"]

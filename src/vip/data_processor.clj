@@ -89,11 +89,14 @@
 
 (defn consume []
   (let [{:keys [access-key secret-key]} (config [:aws :creds])
-        {:keys [region queue fail-queue]} (config [:aws :sqs])
+        {:keys [region queue fail-queue
+                visibility-timeout]} (config [:aws :sqs])
         creds {:access-key access-key
                :access-secret secret-key
-               :region region}]
-    (sqs/consume-messages creds queue fail-queue process-message)))
+               :region region}
+        opts (when visibility-timeout
+               {:visibility-timeout visibility-timeout})]
+    (sqs/consume-messages creds queue fail-queue opts process-message)))
 
 (defn -main [& args]
   (let [id (java.util.UUID/randomUUID)]
@@ -101,10 +104,10 @@
     (q/initialize)
     (psql/initialize)
     (q/publish {:id id :event "starting"} "qa-engine.status")
-    (let [consumer (consume)]
+    (let [consumer-id (consume)]
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn []
                                    (log/info "VIP Data Processor shutting down...")
                                    (q/publish {:id id :event "stopping"} "qa-engine.status")
-                                   (future-cancel consumer))))
-      @consumer)))
+                                   (sqs/stop-consumer consumer-id))))
+      @consumer-id)))

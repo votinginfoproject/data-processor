@@ -4,7 +4,8 @@
             :processed-bucket #resource-config/env "VIP_DP_S3_PROCESSED_BUCKET"}
        :sqs {:region #aws/region #resource-config/env "VIP_DP_SQS_REGION"
              :queue #resource-config/env "VIP_DP_SQS_QUEUE"
-             :fail-queue #resource-config/env "VIP_DP_SQS_FAIL_QUEUE"}}
+             :fail-queue #resource-config/env "VIP_DP_SQS_FAIL_QUEUE"
+             :visibility-timeout 43200}}
  :postgres {:host #resource-config/env "DB_PORT_5432_TCP_ADDR"
             :port #resource-config/env "DB_PORT_5432_TCP_PORT"
             :user #resource-config/env "DB_ENV_POSTGRES_USER"
