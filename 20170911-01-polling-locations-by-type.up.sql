@@ -83,36 +83,7 @@ as $$
   ),
   regular_polling_locations as (
   select pl_path from polling_location_paths except (select pl_path from db_polling_location_paths union select pl_path from ev_polling_location_paths))
-  select count(*) from regular_polling_locations into polling_location_count;
-
-
-  with polling_location_paths_1 as(
-    select distinct countable_path(path) pl_path
-      FROM xml_tree_values values
-        WHERE values.results_id = rid
-          AND values.path ~ 'VipObject.0.PollingLocation.*'
-          and values.path is not null
-  ),
-  db_polling_location_paths_1 as (
-  SELECT parent_with_id pl_path
-    FROM xml_tree_values values
-    WHERE values.results_id = rid
-      AND values.path ~ 'VipObject.0.PollingLocation.*.IsDropBox.*'
-      AND values.path IS NOT NULL
-      AND value = 'true'
-  ),
-  ev_polling_location_paths_1 as (
-  SELECT parent_with_id pl_path
-    FROM xml_tree_values values
-    WHERE values.results_id = rid
-      AND values.path ~ 'VipObject.0.PollingLocation.*.IsEarlyVoting.*'
-      AND values.path IS NOT NULL
-      AND value = 'true'
-  ),
-  regular_polling_locations_1 as (
-  select pl_path from polling_location_paths_1 except (select pl_path from db_polling_location_paths_1 union select pl_path from ev_polling_location_paths_1))
-  select array_agg(pl_path) from regular_polling_locations_1 into polling_location_paths;
-  raise notice '%', polling_location_paths;
+  select array_agg(pl_path) from regular_polling_locations into polling_location_paths;
 
   select count(*) into polling_location_errors
   from xml_tree_validations xtv
@@ -123,7 +94,7 @@ as $$
 
     return query
     select
-      rid, polling_location_count, polling_location_errors, polling_location_completion,
+      rid, cardinality(polling_location_paths), polling_location_errors, polling_location_completion,
       cardinality(db_polling_location_paths), db_polling_location_errors, db_polling_location_completion,
       cardinality(ev_polling_location_paths), ev_polling_location_errors, ev_polling_location_completion;
 
