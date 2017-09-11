@@ -11,7 +11,8 @@
        postgres/column-names
        (filter #(str/ends-with? % "_count"))
        (map #(str/replace % #"_count" ""))
-       (map t-util/column->xml-elment)))
+       (map t-util/column->xml-elment)
+       (remove #(str/starts-with? % "PollingLocation"))))
 
 (defn error-query []
   (let [element-paths (str/join "|" (reported-elements))]
