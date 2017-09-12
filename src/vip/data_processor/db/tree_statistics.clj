@@ -10,6 +10,7 @@
   (->> postgres/v5-statistics
        postgres/column-names
        (filter #(str/ends-with? % "_count"))
+       (remove #(str/starts-with? % "polling_location"))
        (map #(str/replace % #"_count" ""))
        (map t-util/column->xml-elment)
        (remove #(str/starts-with? % "PollingLocation"))))
@@ -75,6 +76,9 @@
   (korma/insert postgres/v5-statistics
     (korma/values
      (assoc (stats ctx) :results_id import-id)))
+  (log/info "Getting additional feed stats")
+  (korma/exec-raw
+   ["select * from v5_dashboard.polling_locations_by_type(?)" [import-id]])
   (log/info "Building locality stats")
   (korma/exec-raw
    ["select * from v5_dashboard.feed_localities(?)" [import-id]])
