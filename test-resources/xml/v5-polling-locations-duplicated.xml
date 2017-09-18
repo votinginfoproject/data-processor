@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <Locality id="lc001">
+    <PollingLocationIds>pl001 pl002 pl003 pl004</PollingLocationIds>
+  </Locality>
+  <Precinct id="pc001">
+    <PollingLocationIds>pl001</PollingLocationIds>
+  </Precinct>
+  <Precinct id="pc002">
+    <PollingLocationIds>pl003</PollingLocationIds>
+  </Precinct>
+  <Precinct id="pc003">
+    <PollingLocationIds>pl005</PollingLocationIds>
+  </Precinct>
+  <PollingLocation id="pl001">
+  </PollingLocation>
+  <PollingLocation id="pl002">
+    <AddressLine>I'm an address line</AddressLine>
+  </PollingLocation>
+  <PollingLocation id="pl003">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Latitude>39.750016</Latitude>
+      <Longitude>-105.000361</Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+  <PollingLocation id="pl004">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Longitude>-105.000361</Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+  <PollingLocation id="pl005">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Latitude>39.750016</Latitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+  <PollingLocation id="pl006">
+    <AddressLine>I'm an address line</AddressLine>
+    <LatLng>
+      <Latitude>invalid latitude</Latitude>
+      <Longitude></Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+</VipObject>
