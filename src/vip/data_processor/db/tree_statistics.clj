@@ -7,16 +7,23 @@
             [vip.data-processor.db.translations.util :as t-util]))
 
 (defn reported-elements []
+  "Function to generate elements to use in the error-query; starting with the
+   column names from the v5_statistics table we have to manipulate the headings
+   where necessary to remove polling locations (i.e. starts-with PollingLocation)
+   and ev_polling_locations and db_polling_locations
+   (i.e. ends with PollingLocation) as their stats are all calculated by the 
+   v5_statistics.polling_locations_by_type function"
   (->> postgres/v5-statistics
        postgres/column-names
        (filter #(str/ends-with? % "_count"))
-       (remove #(str/starts-with? % "polling_location"))
        (map #(str/replace % #"_count" ""))
        (map t-util/column->xml-elment)
-       (remove #(str/starts-with? % "PollingLocation"))))
+       (remove #(str/starts-with? % "PollingLocation"))
+       (remove #(str/ends-with? % "PollingLocation"))))
 
 (defn error-query []
   (let [element-paths (str/join "|" (reported-elements))]
+    (log/info element-paths)
     (str
      "WITH errors AS (SELECT element_type(errors.path) AS element_type,
                          COUNT(errors.severity) AS error_count
