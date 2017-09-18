@@ -5,9 +5,16 @@
 (defrecord ValidationError [ctx severity scope
                             identifier error-type error-value])
 
-(defn add-errors [{:keys [errors-chan] :as ctx}
-                  severity scope identifier error-type
-                  & error-data]
+(defn add-errors
+  "Adds an error to the validations.
+  severity: keyword, one of :fatal, :critical, :errors, :warnings
+  scope: keyword, roughly the location of the error (:precinct, :id, :import, :global)
+  identifier: If it's a specific type like Precinct, the ID of the Precinct
+  error-type: keyword, specific subclass of error (:duplicate, :missing-data)
+  error-data: one or more value that caused the error (ie bad zip code)."
+  [{:keys [errors-chan] :as ctx}
+   severity scope identifier error-type
+   & error-data]
   (doseq [error-value error-data]
     (a/>!! errors-chan
            (->ValidationError ctx severity scope identifier error-type error-value)))
@@ -17,9 +24,13 @@
 (defrecord V5ValidationError [ctx severity scope
                                 identifier error-type error-value parent-element-id])
 
-(defn add-v5-errors [{:keys [errors-chan] :as ctx}
-                     severity scope identifier error-type parent-element-id
-                     & error-data]
+(defn add-v5-errors
+  "Same error options as add-errors, also with a parent-element-id which
+   is often used to associate some child error on, say, Id, to the element it
+   is in, ie Precinct."
+  [{:keys [errors-chan] :as ctx}
+   severity scope identifier error-type parent-element-id
+   & error-data]
   (doseq [error-value error-data]
     (a/>!! errors-chan
            (->V5ValidationError ctx severity scope identifier error-type error-value parent-element-id)))
