@@ -102,6 +102,26 @@ The message you send on the SQS queue must look like the following:
 It is an EDN map, with the key `:filename`, whose value is the name of
 a file in the `VIP_DP_S3_UNPROCESSED_BUCKET` S3 bucket.
 
+## Testing
+
+### Non-Postgres tests
+
+`lein test`
+
+### Postgres tests
+
+There are two ways you can do this.
+
+#### Local DB
+
+Using a locally running postgres db
+`lein test :postgres`
+
+#### Docker
+
+Will create a DB as part of the docker-compose stack
+`script/postgres-tests`
+
 ## Developing
 
 The processing pipeline is defined as a sequence of functions that
