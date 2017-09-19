@@ -33,7 +33,7 @@
    both Localities and Precincts. Usually, though not always,
    this is a misunderstanding, so let's warn if it happens."
   [{:keys [import-id] :as ctx}]
-  (log/info "Checking for Polling Places mapped to multiple levels for import: " import-id)
+  (log/info "Checking for Polling Places mapped to localities and precincts")
   (let [results
         (korma/exec-raw
          (:conn postgres/xml-tree-values)
