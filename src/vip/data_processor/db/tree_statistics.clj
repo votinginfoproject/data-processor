@@ -11,7 +11,7 @@
    column names from the v5_statistics table we have to manipulate the headings
    where necessary to remove polling locations (i.e. starts-with PollingLocation)
    and ev_polling_locations and db_polling_locations
-   (i.e. ends with PollingLocation) as their stats are all calculated by the 
+   (i.e. ends with PollingLocation) as their stats are all calculated by the
    v5_statistics.polling_locations_by_type function"
   (->> postgres/v5-statistics
        postgres/column-names
@@ -23,7 +23,6 @@
 
 (defn error-query []
   (let [element-paths (str/join "|" (reported-elements))]
-    (log/info element-paths)
     (str
      "WITH errors AS (SELECT element_type(errors.path) AS element_type,
                          COUNT(errors.severity) AS error_count
