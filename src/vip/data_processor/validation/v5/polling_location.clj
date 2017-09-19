@@ -51,7 +51,7 @@
          :results)
         ids (map :dup_id results)]
     (if (seq ids)
-      (errors/add-errors ctx :warning :id :global
+      (errors/add-errors ctx :warnings :id :global
                          :multiple-polling-locations-mappings
                          (str/join " " ids))
       ctx)))

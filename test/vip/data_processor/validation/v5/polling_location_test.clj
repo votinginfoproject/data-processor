@@ -100,7 +100,7 @@
         errors (all-errors errors-chan)
         dup-warning (matching-errors
                      errors
-                     {:severity :warning
+                     {:severity :warnings
                       :scope :id
                       :error-type :multiple-polling-locations-mappings})]
     (testing "there is a warning"
