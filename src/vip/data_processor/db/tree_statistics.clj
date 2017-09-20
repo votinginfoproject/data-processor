@@ -7,11 +7,19 @@
             [vip.data-processor.db.translations.util :as t-util]))
 
 (defn reported-elements []
+  "Function to generate elements to use in the error-query; starting with the
+   column names from the v5_statistics table we have to manipulate the headings
+   where necessary to remove polling locations (i.e. starts-with PollingLocation)
+   and ev_polling_locations and db_polling_locations
+   (i.e. ends with PollingLocation) as their stats are all calculated by the
+   v5_statistics.polling_locations_by_type function"
   (->> postgres/v5-statistics
        postgres/column-names
        (filter #(str/ends-with? % "_count"))
        (map #(str/replace % #"_count" ""))
-       (map t-util/column->xml-elment)))
+       (map t-util/column->xml-elment)
+       (remove #(str/starts-with? % "PollingLocation"))
+       (remove #(str/ends-with? % "PollingLocation"))))
 
 (defn error-query []
   (let [element-paths (str/join "|" (reported-elements))]
@@ -73,6 +81,9 @@
   (korma/insert postgres/v5-statistics
     (korma/values
      (assoc (stats ctx) :results_id import-id)))
+  (log/info "Getting additional feed stats")
+  (korma/exec-raw
+   ["select * from v5_dashboard.polling_locations_by_type(?)" [import-id]])
   (log/info "Building locality stats")
   (korma/exec-raw
    ["select * from v5_dashboard.feed_localities(?)" [import-id]])

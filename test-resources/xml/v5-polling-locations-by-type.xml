@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<VipObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="5.1" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/votinginfoproject/vip-specification/v5.1-release/vip_spec.xsd">
+  <Source id="src37">
+    <DateTime>2017-08-29T14:32:59</DateTime>
+    <Description>
+      <Text language="en">The North Carolina State Board of Elections is the official source of election information for North Carolina.</Text>
+    </Description>
+    <Name>North Carolina State Board of Elections</Name>
+    <OrganizationUri>http://www.ncsbe.gov/</OrganizationUri>
+    <VipId></VipId>
+  </Source>
+  <Election id="ele20171010">
+    <AbsenteeBallotInfo>
+      <Text language="en">http://www.ncsbe.gov/Voting/Absentee-Voting</Text>
+    </AbsenteeBallotInfo>
+    <AbsenteeRequestDeadline>2017-10-03</AbsenteeRequestDeadline>
+    <Date>2017-10-10</Date>
+    <ElectionType>
+      <Text language="en">PRIMARY</Text>
+    </ElectionType>
+    <HasElectionDayRegistration>false</HasElectionDayRegistration>
+    <IsStatewide>true</IsStatewide>
+    <Name>
+      <Text language="en">10/10/2017 BURLINGTON PRIMARY</Text>
+    </Name>
+    <RegistrationDeadline>2017-09-15</RegistrationDeadline>
+    <RegistrationInfo>
+      <Text language="en">http://www.ncsbe.gov/voter-info</Text>
+    </RegistrationInfo>
+    <ResultsUri>http://www.ncsbe.gov/</ResultsUri>
+    <StateId>st37</StateId>
+  </Election>
+  <State id="st37">
+    <ElectionAdministrationId>ea101</ElectionAdministrationId>
+    <Name>North Carolina</Name>
+  </State>
+  <StreetSegment id="ss092153076">
+    <City>RALEIGH</City>
+    <IncludesAllAddresses>false</IncludesAllAddresses>
+    <IncludesAllStreets>false</IncludesAllStreets>
+    <OddEvenBoth>even</OddEvenBoth>
+    <PrecinctId>pre09242sp0002</PrecinctId>
+    <StartHouseNumber>5300</StartHouseNumber>
+    <EndHouseNumber>5316</EndHouseNumber>
+    <State>NC</State>
+    <StreetName>COUNTRY</StreetName>
+    <StreetSuffix>CT</StreetSuffix>
+    <Zip>27609</Zip>
+  </StreetSegment>
+  <Precinct id="pre09242sp0002">
+    <ElectoralDistrictIds>ed0921247 ed0921248 ed0921249 ed0921281</ElectoralDistrictIds>
+    <IsMailOnly>false</IsMailOnly>
+    <LocalityId>loc092</LocalityId>
+    <Name>PRECINCT 01-43</Name>
+    <Number>01-43</Number>
+    <PollingLocationIds>pl09242 pl909218 pl90922 pl909225 pl909232 pl909246 pl909247 pl909248</PollingLocationIds>
+    <PrecinctSplitName>sp0002</PrecinctSplitName>
+  </Precinct>
+  <Locality id="loc092">
+    <ElectionAdministrationId>ea092</ElectionAdministrationId>
+    <Name>WAKE COUNTY BOARD OF ELECTIONS</Name>
+    <StateId>st37</StateId>
+    <Type>county</Type>
+  </Locality>
+  <ElectoralDistrict id="ed0921247">
+    <Name>WAKE CITY OF RALEIGH MAYOR</Name>
+    <Number>0</Number>
+    <Type>municipality</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed0921248">
+    <Name>WAKE CITY OF RALEIGH CITY COUNCIL AT-LARGE</Name>
+    <Number>0</Number>
+    <Type>municipality</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed0921249">
+    <Name>WAKE CITY OF RALEIGH CITY COUNCIL DISTRICT A</Name>
+    <Number>0</Number>
+    <Type>ward</Type>
+  </ElectoralDistrict>
+  <ElectoralDistrict id="ed0921281">
+    <Name>WAKE CITY OF RALEIGH TRANSPORTATION BONDS</Name>
+    <Number>0</Number>
+    <Type>municipality</Type>
+  </ElectoralDistrict>
+  <PollingLocation id="pl09242">
+    <Directions>
+      <Text language="en">GOING N ON FALLS OF NEUSE RD FROM THE INTERSECTION WITH MILLBROOK RD. CHURCH IS ON THE LEFT.</Text>
+    </Directions>
+    <HoursOpenId>h01</HoursOpenId>
+    <IsDropBox>true</IsDropBox>
+    <IsEarlyVoting>false</IsEarlyVoting>
+    <Name>ST RAPHAEL CATHOLIC CHURCH</Name>
+  </PollingLocation>
+  <PollingLocation id="pl909218">
+    <HoursOpenId>ho709218</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>true</IsEarlyVoting>
+    <Name>LL - LAKE LYNN COMMUNITY CENTER</Name>
+  </PollingLocation>
+  <PollingLocation id="pl90922">
+    <AddressLine>337 S SALISBURY ST RALEIGH NC 27601</AddressLine>
+    <Directions>
+      <Text language="en">CORNER OF SALISBURY AND DAVIE STS (NEXT TO COURTHOUSE)</Text>
+    </Directions>
+    <HoursOpenId>ho70922</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>true</IsEarlyVoting>
+    <Name>WAKE COUNTY BOARD OF ELECTIONS OFFICE</Name>
+  </PollingLocation>
+  <PollingLocation id="pl909225">
+    <AddressLine>101 WILKINSON AVE CARY NC 27513</AddressLine>
+    <HoursOpenId>ho709225</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>true</IsEarlyVoting>
+    <Name>CA - HERBERT C YOUNG COMMUNITY CENTER</Name>
+  </PollingLocation>
+  <PollingLocation id="pl909232">
+    <AddressLine>1300 E MARTIN ST RALEIGH NC 27610</AddressLine>
+    <HoursOpenId>ho709232</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>true</IsEarlyVoting>
+    <Name>RB - ROBERTS COMMUNITY CENTER</Name>
+  </PollingLocation>
+  <PollingLocation id="pl909246">
+    <AddressLine>4201 GREEN RD RALEIGH NC 27604</AddressLine>
+    <HoursOpenId>ho709246</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>true</IsEarlyVoting>
+    <Name>GREEN ROAD COMMUNITY CENTER</Name>
+  </PollingLocation>
+  <PollingLocation id="pl909247">
+    <AddressLine>1901 SPRING FOREST RD RALEIGH NC 27615</AddressLine>
+    <HoursOpenId>ho709247</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>false</IsEarlyVoting>
+    <Name>AG - ANNE GORDON CENTER FOR ACTIVE ADULTS</Name>
+  </PollingLocation>
+  <PollingLocation id="pl909248">
+    <AddressLine>514 METHOD RD RALEIGH NC 27607</AddressLine>
+    <HoursOpenId>ho709248</HoursOpenId>
+    <IsDropBox>false</IsDropBox>
+    <IsEarlyVoting>false</IsEarlyVoting>
+    <Name>MT - METHOD ROAD COMMUNITY CENTER</Name>
+  </PollingLocation>
+</VipObject>
