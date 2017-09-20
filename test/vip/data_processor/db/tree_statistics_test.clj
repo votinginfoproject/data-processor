@@ -7,8 +7,6 @@
             [vip.data-processor.test-helpers :refer :all]
             [korma.core :as korma]))
 
-(use-fixtures :once setup-postgres)
-
 (deftest camel->snake-test
   (testing "got the regex close"
     (are [x y] (= (camel->snake x) y)
@@ -18,6 +16,7 @@
        "lowercase" "lowercase")))
 
 (deftest ^:postgres validate-polling-locations-by-type
+  (setup-postgres #())
   (let [ctx {:input (xml-input "v5-polling-locations-by-type.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
