@@ -27,7 +27,11 @@
 (defn add-v5-errors
   "Same error options as add-errors, also with a parent-element-id which
    is often used to associate some child error on, say, Id, to the element it
-   is in, ie Precinct."
+   is in, ie Precinct. This is important since we drop the table that was
+   previously used to look this up. So if there is a parent element associated
+   to the particular error type, it's important to use this instead of
+   `add-errors` to preserve that information. If your error is of a more
+   global type of nature, you can just use `add-errors`."
   [{:keys [errors-chan] :as ctx}
    severity scope identifier error-type parent-element-id
    & error-data]
