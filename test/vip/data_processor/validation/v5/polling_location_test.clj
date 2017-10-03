@@ -4,7 +4,8 @@
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.validation.xml :as xml]
-            [clojure.core.async :as a]))
+            [clojure.core.async :as a]
+            [clojure.string :as str]))
 
 (use-fixtures :once setup-postgres)
 
@@ -87,3 +88,25 @@
                             :scope :lat-lng
                             :identifier "VipObject.0.PollingLocation.5.LatLng.1.Latitude.0"
                             :error-type :format})))))
+
+(deftest ^:postgres check-for-polling-locations-mapped-to-multiple-places-test
+  (let [errors-chan (a/chan 100)
+        ctx {:input (xml-input "v5-polling-locations-duplicated.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.polling-location/check-for-polling-locations-mapped-to-multiple-places)
+        errors (all-errors errors-chan)
+        dup-warning (matching-errors
+                     errors
+                     {:severity :warnings
+                      :scope :id
+                      :error-type :multiple-polling-locations-mappings})]
+    (testing "there is a warning"
+      (is (seq dup-warning))
+      (is (= 1 (count dup-warning)))
+      (testing "with duplicated polling location ids in the value"
+        (let [error-value (-> dup-warning first :error-value)]
+          (is (str/includes? error-value "pl001"))
+          (is (str/includes? error-value "pl003")))))))

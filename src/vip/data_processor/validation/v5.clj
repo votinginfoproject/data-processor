@@ -77,4 +77,5 @@
    polling-location/validate-no-missing-longitudes
    polling-location/validate-latitude
    polling-location/validate-longitude
+   polling-location/check-for-polling-locations-mapped-to-multiple-places
    booleans/validate-format])
