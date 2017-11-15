@@ -234,7 +234,6 @@ things:
 - `fleetctl` installed (available in Homebrew)
 - The public IP address of an EC2 instance in your chosen cluster (aka
   `$FLEETCTL_TUNNEL`),
-- The ssh key for that cluster (aka `$PEM_FILE`)
 - A [quay.io account][quay] to use with Docker (run `docker login quay.io` if you haven't
   already)
 
@@ -247,9 +246,8 @@ deployment should look something like this.
 
 ```
 $ export FLEETCTL_TUNNEL=an-ip-in-your-cluster
-$ PEM_FILE=/path/to/key.pem ./script/deploy
+$ ./script/deploy
 Agent pid 88741
-Identity added: /path/to/key.pem (/path/to/key.pem)
 Destroyed data-processor@.service
 Unit data-processor@.service inactive
 --- (re-)starting fleet service instances
