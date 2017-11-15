@@ -233,7 +233,7 @@ things:
 
 - `fleetctl` installed (available in Homebrew)
 - The public IP address of an EC2 instance in your chosen cluster (aka
-  `$FLEETCTL_TUNNEL`),
+  `$FLEETCTL_TUNNEL`), and the appropriate key for that environment added to your ssh-agent, e.g. `ssh-add ~/.ssh/key.pem`.
 - A [quay.io account][quay] to use with Docker (run `docker login quay.io` if you haven't
   already)
 
