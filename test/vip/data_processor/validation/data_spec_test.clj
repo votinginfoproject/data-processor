@@ -268,3 +268,20 @@
                               :identifier "1"
                               :error-type "name"
                               :error-value "Is not valid UTF-8."}))))))
+
+(deftest invalid-xml-chars?-test
+  (testing "marks any value with characters that are invalid in XML"
+    (let [errors-chan (a/chan 100)
+          ctx (merge {:input (csv-inputs ["invalid-xml-chars/candidate.txt"])
+                      :errors-chan errors-chan
+                      :data-specs v3-0/data-specs}
+                     (sqlite/temp-db "invalid-utf-8" "3.0"))
+          out-ctx (csv/load-csvs ctx)
+          errors (all-errors errors-chan)]
+      (testing "reports errors for values with the Unicode replacement character"
+        (is (contains-error? errors
+                             {:severity :fatal
+                              :scope :candidates
+                              :identifier "1"
+                              :error-type "biography"
+                              :error-value "Contains characters that are invalid in XML."}))))))

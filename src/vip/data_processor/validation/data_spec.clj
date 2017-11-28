@@ -3,7 +3,8 @@
             [clojure.tools.logging :as log]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
-            [vip.data-processor.errors :as errors]))
+            [vip.data-processor.errors :as errors])
+  (:import [org.apache.xerces.util XMLChar]))
 
 (def version-specs
   {"3.0" v3-0/data-specs
@@ -15,6 +16,11 @@
 
 (defn invalid-utf-8? [string]
   (.contains string "�"))
+
+(defn invalid-xml-chars? [string]
+  (if (and string (some #(XMLChar/isInvalid (int %)) string))
+    true
+    false))
 
 (defn create-format-rule
   "Create a function that applies a format check for a specific
@@ -42,6 +48,9 @@
 
           (invalid-utf-8? val)
           (errors/add-errors ctx :errors scope identifier name "Is not valid UTF-8.")
+
+          (invalid-xml-chars? val)
+          (errors/add-errors ctx :fatal scope identifier name "Contains characters that are invalid in XML.")
 
           (not (test-fn val))
           (errors/add-errors ctx severity scope identifier name (str message ": " val))
