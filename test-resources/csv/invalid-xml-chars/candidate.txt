@@ -1,0 +1,16 @@
+name,party,candidate_url,biography,phone,photo_url,filed_mailing_address_location_name,filed_mailing_address_line1,filed_mailing_address_line2,filed_mailing_address_line3,filed_mailing_address_city,filed_mailing_address_state,filed_mailing_address_zip,email,sort_order,id
+"Candidate (Candidate) Candidate",,,"Elected Experience: In 2013 I was appointed to council, and then elected in 2014 for a four year term.
+
+Other Professional Experience: I served as treasurer, secretary and president on the board of directors of the Foothill Historical Society, Womans Musical Literary club, and treasurer on the Friends of Buckley Library board.
+
+Education: Graduated from White River High School and attended Green River Community college as well as Washington State College.
+
+Community Service: For over 20 years I have held several different board office positions and have been an active volunteer with the Foothills Historical Museum and friends of Buckley library. 
+
+Statement: I have a long history of supporting the Buckley community throughtout my professional career as well as volunteering many hour to help build this magnifient community.
+
+As our city continues to grow, I will support projects and events that bring people together to strengthen a sense of community and of belonging. Our Youth Center, public parks, and Summer Series programs provide opportunities to welcome our new citizens.
+
+I am committed to preserving the history of Buckley. However, I am a firm believer that the old and the new can coexist as we preserve our history but plan for the future.
+
+If elected, I will make balanced decisions, aware that my vote affects all the members of our wonderful community.",360-555-5555,http://weiapplets.sos.wa.gov,,"PO BOX XXX",,,BUCKLEY,WA,99999,fake@email.com,2,1
