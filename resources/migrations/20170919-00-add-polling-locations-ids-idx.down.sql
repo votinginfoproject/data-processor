@@ -1,2 +1,0 @@
-DROP INDEX IF EXISTS xtv_localities_polling_locations_ids_idx;
-DROP INDEX IF EXISTS xtv_precincts_polling_locations_ids_idx;
