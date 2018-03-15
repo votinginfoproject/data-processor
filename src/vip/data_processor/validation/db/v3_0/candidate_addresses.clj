@@ -28,7 +28,7 @@
        (fn [ctx {:keys [id]}]
          ;; maybe this function should take a map
          (errors/add-errors
-          ctx :errors :candidates id
-          "incomplete-candidate-address" "Incomplete address"))
+          ctx :critical :candidates id
+          :incomplete-candidate-address "Incomplete address"))
        ctx bad-addresses)
       ctx)))
