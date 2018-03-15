@@ -22,6 +22,8 @@
           out-ctx (pipeline/run-pipeline ctx)
           errors (test-helpers/all-errors errors-chan)]
 
+      (is (= 2 (count errors)))
+
       (is (test-helpers/contains-error? errors
                                         {:severity :critical
                                          :scope :candidates
