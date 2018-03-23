@@ -52,7 +52,7 @@
   "Uses the supplied `format-rules` to process a given row. If there
   is a mismatch in the size of the columns in the row and the columns
   specified by the header, records an error. Increments the
-  line-number and returns the context ctx with the formatted row
+  line-number and returns the context `ctx` with the formatted row
   merged in."
   [{:keys [filename table] :as data-spec}
    {:keys [line-number headers headers-count format-rules] :as file-ctx}
@@ -82,11 +82,11 @@
 (defn process-row-chunks
   "Processes all the map rows in a chunk via `process-row` with the
   supplied format-rules (see `data-spec/create-format-rules` in
-  `do-bulk-import-and-validate-csv`) transforms (see
+  `do-bulk-import-and-validate-csv`) and transforms (see
   `data-spec/translation-fns` in
   `do-bulk-import-and-validate-csv`). Inserts the row into the
   database, and records any UNIQUE constraint-failing SQLExceptions as
-  errors. Returns the context ctx. If the supplied chunk is empty,
+  errors. Returns the context `ctx`. If the supplied chunk is empty,
   simply returns the context as-is."
   [{:keys [columns filename] :as data-spec}
    {:keys [transforms column-names headers sql-table line-number] :as file-ctx}
@@ -119,7 +119,7 @@
   "Converts the file into map rows using clojure.data.csv, chunks them
   up into partitions so that we don't go over our statement parameter
   limit, and then processes all the chunks using
-  `process-row-chunks`. Returns the context ctx. If no headers are
+  `process-row-chunks`. Returns the context `ctx`. If no headers are
   present reports an error and returns the context as-is."
   [ctx
    {:keys [table] :as data-spec}
@@ -166,7 +166,9 @@
   "Prepares all the necessary formatting and transformation functions
   along with other useful meta-data and initiates the insertion and
   preliminary validation of CSV data using the chunking mechanism in
-  vip.data-processor.db.util/chunk-rows."
+  vip.data-processor.db.util/chunk-rows. Returns the context `ctx`
+  having performed all necessary database insertions, error reporting,
+  and other preliminary validation."
   [{:keys [data-specs tables] :as ctx}
    {:keys [filename table columns] :as data-spec}
    in-file]
@@ -175,6 +177,7 @@
         ctx (warn-if-extraneous-headers ctx data-spec headers column-names)]
     (if (empty? (set/intersection (set headers) (set column-names)))
       (errors/add-errors ctx :critical table :global :no-header "No header row")
+      ;; Local file context needed for any given row during processing
       (->> {:in-file in-file
             :sql-table (get tables table)
             :headers headers
