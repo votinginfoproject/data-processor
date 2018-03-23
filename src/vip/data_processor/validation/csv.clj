@@ -85,9 +85,10 @@
   `do-bulk-import-and-validate-csv`) and transforms (see
   `data-spec/translation-fns` in
   `do-bulk-import-and-validate-csv`). Inserts the row into the
-  database, and records any UNIQUE constraint-failing SQLExceptions as
-  errors. Returns the context `ctx`. If the supplied chunk is empty,
-  simply returns the context as-is."
+  database, retries any UNIQUE id constraint-failing SQLExceptions
+  removing ids, and marks others as errors. Returns the context
+  `ctx`. If the supplied chunk is empty, simply returns the context
+  as-is."
   [{:keys [columns filename] :as data-spec}
    {:keys [transforms column-names headers sql-table line-number] :as file-ctx}
    ctx chunk]
@@ -140,6 +141,8 @@
   (->> reader .readLine csv/read-csv first))
 
 (defn warn-if-extraneous-headers
+  "Records an error if headers are present in the file that do not
+  correspond to any in the data-spec (`column-names`)."
   [ctx {:keys [table] :as data-spec} headers column-names]
   (let [extraneous-headers (seq (set/difference (set headers) (set column-names)))]
     (if extraneous-headers
@@ -149,6 +152,9 @@
       ctx)))
 
 (defn file-handle->string-keys
+  "Given a file handle, returns a collection of cleaned (of non word
+  characters), lower-cased string keys for the first line, assumed to
+  be the header row."
   [file-handle]
   (->> file-handle
        read-one-line
@@ -156,6 +162,9 @@
        (map str/lower-case)))
 
 (defn required-header-names
+  "Given a collection of column maps, returns cleaned (of non word
+  characters), lower-cased string names (:name) of all the columns
+  which are required (:required)."
   [columns]
   (-> (comp (filter :required)
             (map :name)
@@ -168,7 +177,10 @@
   preliminary validation of CSV data using the chunking mechanism in
   vip.data-processor.db.util/chunk-rows. Returns the context `ctx`
   having performed all necessary database insertions, error reporting,
-  and other preliminary validation."
+  and other preliminary validation.
+
+  Records an error if there are extraneous header columns or no
+  overlap between the file headers and the data-spec column-names."
   [{:keys [data-specs tables] :as ctx}
    {:keys [filename table columns] :as data-spec}
    in-file]
