@@ -82,7 +82,7 @@
 (defn process-row-chunks
   "Processes all the map rows in a chunk via `process-row` with the
   supplied format-rules (see `data-spec/create-format-rules` in
-  `do-bulk-import-and-validate-csv`) and transforms (see
+  `do-bulk-import-and-validate-csv`) and translations (see
   `data-spec/translation-fns` in
   `do-bulk-import-and-validate-csv`). Inserts the row into the
   database, retries any UNIQUE id constraint-failing SQLExceptions
@@ -90,29 +90,25 @@
   `ctx`. If the supplied chunk is empty, simply returns the context
   as-is."
   [{:keys [columns filename] :as data-spec}
-   {:keys [transforms column-names headers sql-table line-number] :as file-ctx}
+   {:keys [row-translation-fn column-names headers sql-table line-number] :as file-ctx}
    ctx chunk]
   (if (seq chunk)
-    (let [ctx (reduce (partial process-row data-spec file-ctx) ctx chunk)
-          transform-row-fn (comp
-                            transforms
-                            #(select-keys % column-names)
-                            (partial zipmap headers))
+    (let [ctx' (reduce (partial process-row data-spec file-ctx) ctx chunk)
           chunk-values (->> chunk
-                            (map transform-row-fn)
-                            (maybe-coerce-to-db-type ctx sql-table columns))]
+                            (map row-translation-fn)
+                            (maybe-coerce-to-db-type ctx' sql-table columns))]
       (try
         (korma/insert sql-table (korma/values chunk-values))
-        ctx
+        ctx'
         (catch java.sql.SQLException e
           (let [message (.getMessage e)]
             (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
-              (db.util/retry-chunk-without-dupe-ids ctx sql-table chunk-values)
-              (let [identifier (if (= "3.0" @(:spec-version ctx))
+              (db.util/retry-chunk-without-dupe-ids ctx' sql-table chunk-values)
+              (let [identifier (if (= "3.0" @(:spec-version ctx'))
                                  @line-number
                                  (csv-error-path filename @line-number))]
                 (errors/add-errors
-                 ctx :fatal (:name sql-table) identifier
+                 ctx' :fatal (:name sql-table) identifier
                  :unknown-sql-error message)))))))
     ctx))
 
@@ -171,8 +167,18 @@
             (map clojure.string/lower-case))
       (eduction columns)))
 
+(defn make-row-translation-fn
+  "Takes columns, column names, and headers, and composes a function
+  that takes a chunk of rows and applies each data-spec translation
+  function for a given row as provided by `data-spec/translation-fns`."
+  [columns column-names headers]
+  (comp
+   (apply comp (data-spec/translation-fns columns))
+   #(select-keys % column-names)
+   (partial zipmap headers)))
+
 (defn do-bulk-import-and-validate-csv
-  "Prepares all the necessary formatting and transformation functions
+  "Prepares all the necessary formatting and translation functions
   along with other useful meta-data and initiates the insertion and
   preliminary validation of CSV data using the chunking mechanism in
   vip.data-processor.db.util/chunk-rows. Returns the context `ctx`
@@ -197,9 +203,11 @@
             :column-names column-names
             :required-header-names (required-header-names columns)
             :line-number (atom 1)
-            :format-rules (data-spec/create-format-rules data-specs filename columns)
-            :transforms (apply comp (data-spec/translation-fns columns))}
-           (chunk-rows-and-process ctx data-spec)))))
+            :format-rules
+            (data-spec/create-format-rules data-specs filename columns)
+            :row-translation-fn
+            (make-row-translation-fn columns column-names headers)}
+            (chunk-rows-and-process ctx data-spec)))))
 
 (defn-traced bulk-import-and-validate-csv
   "Bulk importing and CSV validation is done in one go, so that it can
