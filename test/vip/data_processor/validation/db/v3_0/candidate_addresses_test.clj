@@ -20,18 +20,19 @@
                                  candidate-addresses/validate-addresses]}
                      (sqlite/temp-db "incomplete-candidate-addresses" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)
-          errors (test-helpers/all-errors errors-chan)]
+          errors (->> (test-helpers/all-errors errors-chan)
+                      (map #(dissoc % :ctx)))]
 
       (is (= 2 (count errors)))
 
-      (is (test-helpers/contains-error? errors
-                                        {:severity :critical
-                                         :scope :candidates
-                                         :identifier 10478
-                                         :error-type :incomplete-candidate-address}))
+      (is (test-helpers/contains-error?
+           errors {:severity :critical
+                   :scope :candidates
+                   :identifier 10478
+                   :error-type :incomplete-candidate-address}))
 
-      (is (test-helpers/contains-error? errors
-                                        {:severity :critical
-                                         :scope :candidates
-                                         :identifier 10479
-                                         :error-type :incomplete-candidate-address})))))
+      (is (test-helpers/contains-error?
+           errors {:severity :critical
+                   :scope :candidates
+                   :identifier 10479
+                   :error-type :incomplete-candidate-address})))))
