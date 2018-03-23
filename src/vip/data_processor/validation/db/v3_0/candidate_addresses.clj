@@ -10,22 +10,22 @@
     :filed_mailing_address_state
     :filed_mailing_address_zip})
 
-(defn invalid-address?
+(defn valid-address?
   [address]
   (let [address' (dissoc address :id)]
     (cond
       ;; if all address fields are empty then is valid
       (not (seq (remove str/blank? (vals address'))))
-      false
+      true
 
       ;; if there is an address with any required fields blank, then invalid
       (->> ((apply juxt required-address-fields) address')
            (some str/blank?))
-      true
+      false
 
       ;; Otherwise we have a valid address with all required fields
       :else
-      false)))
+      true)))
 
 (defn validate-addresses'
   "Given a candidates-table, confirms that all the rows are correct in
@@ -44,7 +44,7 @@
                      :filed_mailing_address_zip
                      :filed_mailing_address_city)
        (korma/select candidates-table)
-       (filter invalid-address?)))
+       (remove valid-address?)))
 
 (defn-traced validate-addresses
   [ctx]
