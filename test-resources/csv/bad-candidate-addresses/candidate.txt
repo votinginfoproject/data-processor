@@ -2,3 +2,4 @@ name,party,candidate_url,biography,phone,photo_url,filed_mailing_address_locatio
 "Fake Candidate 1","Republican","http://fakecandidate1.com","","540-710-9221","","","VA","214 Creek Lane","","","22407","","fake12345@aol.com","2","10478"
 "Fake Candidate 2","Democrat","http://fakecandidate2.com","","540-710-9221","","","","","","","22407","Some Town","fake22345@aol.com","2","10479"
 "Fake Candidate 3","Republican","http://fakecandidate3.com","","540-710-9221","","","VA","214 Creek Lane","","","22407","Some Town","fake32345@aol.com","2","10480"
+"Fake Candidate 4","Republican","http://fakecandidate4.com","","540-710-9221","","","","","","","","","fake42345@aol.com","2","10481"
