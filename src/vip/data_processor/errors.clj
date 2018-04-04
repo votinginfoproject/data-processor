@@ -18,7 +18,6 @@
   (doseq [error-value error-data]
     (a/>!! errors-chan
            (->ValidationError ctx severity scope identifier error-type error-value)))
-
   ctx)
 
 (defrecord V5ValidationError [ctx severity scope
