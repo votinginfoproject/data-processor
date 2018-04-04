@@ -164,7 +164,7 @@
   [columns]
   (-> (comp (filter :required)
             (map :name)
-            (map clojure.string/lower-case))
+            (map str/lower-case))
       (eduction columns)))
 
 (defn make-row-translation-fn
