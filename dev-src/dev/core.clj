@@ -17,9 +17,14 @@
             [vip.data-processor.s3 :refer [zip-filename]]
             [squishy.data-readers]))
 
+;; modify this to add flags to processing
+(defn set-context
+  [ctx]
+  (assoc ctx :post-process-street-segments? true))
 
 (def pipeline
-  [psql/start-run
+  [set-context
+   psql/start-run
    zip/assoc-file
    zip/extracted-contents
    t/remove-invalid-extensions

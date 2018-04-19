@@ -27,7 +27,9 @@
                                                                   org.slf4j/slf4j-api]]
                  [org.xerial/sqlite-jdbc "3.8.11.2"]
                  [commons-lang/commons-lang "2.6"]
-                 [xerces/xercesImpl "2.11.0"]]
+                 [xerces/xercesImpl "2.11.0"]
+                 [com.fasterxml.woodstox/woodstox-core "5.1.0"]
+                 [me.raynes/fs "1.4.6"]]
   :plugins [[com.pupeno/jar-copier "0.4.0"]]
   :profiles {:test {:resource-paths ["test-resources"]
                     :dependencies [[com.github.kyleburton/clj-xpath "1.4.5"]]}

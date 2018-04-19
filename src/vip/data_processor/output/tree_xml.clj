@@ -4,6 +4,7 @@
             [clojure.java.jdbc :as jdbc]
             [korma.core :as korma]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
+            [vip.data-processor.output.street-segments :refer [insert-street-segment-nodes]]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.util :as db.util]
             [clojure.tools.logging :as log]
@@ -160,4 +161,5 @@
 
 (def pipeline
   [create-xml-file
-   generate-xml-file])
+   generate-xml-file
+   insert-street-segment-nodes])

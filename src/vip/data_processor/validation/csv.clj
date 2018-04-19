@@ -18,28 +18,31 @@
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v5-1 :as v5-1]))
 
-(defn csv-filenames [data-specs]
-  (set (map :filename data-specs)))
+(defn good-filename?
+  "Compares `file`'s name against all the filenames in `data-specs` to
+  confirm the file is indeed one we are expecting."
+  [data-specs file]
+  (let [filename (str/lower-case (.getName file))]
+    (-> (set (map :filename data-specs))
+        (contains? filename))))
 
-(defn file-name [file]
-  (.getName file))
+(defn bad-files->string
+  "Given a collection of bad files, returns their names as a
+  comma-delimited string."
+  [bad-files]
+  (->> bad-files (map #(.getName %)) sort (str/join ", ")))
 
-(defn good-filename? [data-specs file]
-  (let [filename (str/lower-case (file-name file))]
-    (contains? (csv-filenames data-specs) filename)))
-
-(defn-traced remove-bad-filenames [ctx]
-  (let [input (:input ctx)
-        {good-files true
-         bad-files false} (group-by (partial good-filename? (:data-specs ctx)) input)]
+(defn-traced remove-bad-filenames
+  "Filters out any files in `input` from our files to process based on
+  whether or not they are included in our `data-spec`. Warns us if
+  we've found any bad ones, otherwise returns the context as-is."
+  [{:keys [data-specs input] :as ctx}]
+  (let [{good-files true
+         bad-files false} (group-by (partial good-filename? data-specs) input)]
     (if (seq bad-files)
-      (let [bad-filenames (->> bad-files (map file-name) sort)
-            bad-file-list (apply str (interpose ", " bad-filenames))]
-        (-> ctx
-            (errors/add-errors
-             :warnings :import :global :bad-filenames
-             bad-file-list)
-            (assoc :input good-files)))
+      (-> (assoc ctx :input good-files)
+          (errors/add-errors
+           :warnings :import :global :bad-filenames (bad-files->string bad-files)))
       ctx)))
 
 (defn csv-error-path
@@ -223,8 +226,13 @@
           (errors/add-errors ctx :fatal filename :global :csv-error (.getMessage e)))))
     ctx))
 
-(defn-traced load-csvs [ctx]
-  (reduce bulk-import-and-validate-csv ctx (:data-specs ctx)))
+(defn-traced load-csvs
+  [{:keys [data-specs post-process-street-segments?] :as ctx}]
+  (->> (if post-process-street-segments?
+         (do (log/info "Skipping street_segment.txt CSV file processing.")
+             (remove #(= (:filename %) "street_segment.txt") data-specs))
+         data-specs)
+       (reduce bulk-import-and-validate-csv ctx)))
 
 (defn error-on-missing-files
   "Add errors for any file with the :required key in the data-spec."

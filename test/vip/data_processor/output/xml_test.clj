@@ -20,8 +20,8 @@
   (testing "generates XML from an import"
     (let [db (sqlite/temp-db "xml-output" "3.0")
           filenames (->> v3-0/data-specs
-                         csv/csv-filenames
-                         (map #(io/as-file (io/resource (str "csv/full-good-run/" %))))
+                         (map
+                          #(io/as-file (io/resource (str "csv/full-good-run/" (:filename %)))))
                          (remove nil?))
           errors-chan (a/chan 100)
           ctx (merge {:input filenames
