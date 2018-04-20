@@ -2,8 +2,8 @@
   (:require [clojure.core.async :as a]
             [clojure.tools.logging :as log]))
 
-(defrecord ValidationError [ctx severity scope
-                            identifier error-type error-value])
+(defrecord ValidationError
+  [ctx severity scope identifier error-type error-value])
 
 (defn add-errors
   "Adds an error to the validations.
@@ -11,7 +11,14 @@
   scope: keyword, roughly the location of the error (:precinct, :id, :import, :global)
   identifier: If it's a specific type like Precinct, the ID of the Precinct
   error-type: keyword, specific subclass of error (:duplicate, :missing-data)
-  error-data: one or more value that caused the error (ie bad zip code)."
+  error-data: one or more value that caused the error (ie bad zip code).
+
+  NOTE: if you call this function when processing a v5 feed, then keep
+  in mind that, *unless your identifier is `:global` or
+  `:post-process-street-segments`*, then at the time the validation
+  (error is stored in the database, it will attempt to look up a path
+  for the identifier value. A bad or nonexistent identifier can break
+  statistic generation so this is important to be aware of."
   [{:keys [errors-chan] :as ctx}
    severity scope identifier error-type
    & error-data]
@@ -20,8 +27,20 @@
            (->ValidationError ctx severity scope identifier error-type error-value)))
   ctx)
 
-(defrecord V5ValidationError [ctx severity scope
-                                identifier error-type error-value parent-element-id])
+(defn record-error!
+  "Wrapper around `add-errors` to pass error arguments as a map so
+  argument types are explicit at the call site and so argument order
+  is irrelevant. See `add-errors` for a description of field values."
+  [ctx {:keys [severity scope identifier error-type error-data]}]
+  (if (seq error-data)
+    ;; we apply because the last arg, error-data, is varargs
+    (apply
+     add-errors
+     ctx severity scope identifier error-type error-data)
+    (add-errors ctx severity scope identifier error-type)))
+
+(defrecord V5ValidationError
+  [ctx severity scope identifier error-type error-value parent-element-id])
 
 (defn add-v5-errors
   "Same error options as add-errors, also with a parent-element-id which

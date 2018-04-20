@@ -1,26 +1,22 @@
 (ns vip.data-processor
   (:require [clojure.tools.logging :as log]
-            [clojure.core.async :as a]
             [com.climate.newrelic.trace :refer [defn-traced]]
             [squishy.core :as sqs]
             [turbovote.resource-config :refer [config]]
-            [korma.core :as korma]
             [vip.data-processor.cleanup :as cleanup]
+            [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.errors :as errors]
+            [vip.data-processor.output.street-segments :as output-ss]
+            [vip.data-processor.output.xml :as xml-output]
             [vip.data-processor.pipeline :as pipeline]
+            [vip.data-processor.queue :as q]
+            [vip.data-processor.s3 :as s3]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.db.v3-0 :as db.v3-0]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.v5 :as v5-1-validations]
-            [vip.data-processor.validation.xml :as xml]
-            [vip.data-processor.validation.zip :as zip]
-            [vip.data-processor.queue :as q]
-            [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.output.xml :as xml-output]
-            [vip.data-processor.s3 :as s3])
+            [vip.data-processor.validation.zip :as zip])
   (:gen-class))
 
 (def download-pipeline
@@ -63,6 +59,7 @@
            psql/store-election-id
            psql/v5-summary-branch
            add-validations
+           output-ss/insert-street-segment-nodes
            errors/close-errors-chan
            errors/await-statistics
            s3/upload-to-s3

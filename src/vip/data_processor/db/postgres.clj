@@ -375,7 +375,8 @@
    :scope (name scope)
    :error_type (name error-type)
    :error_data (pr-str error-value)
-   :path (when-not (= :global identifier) (path->ltree identifier))})
+   :path (when-not (#{:global :post-process-street-segments} identifier)
+           (path->ltree identifier))})
 
 (def statement-parameter-limit 10000)
 (def bulk-import (partial db.util/bulk-import statement-parameter-limit))

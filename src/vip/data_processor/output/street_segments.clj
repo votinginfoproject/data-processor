@@ -2,28 +2,16 @@
   (:require
    [clojure.data.csv :as csv]
    [clojure.java.io :as io]
+   [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
+   [korma.core :as korma]
    [me.raynes.fs :as fs]
+   [vip.data-processor.db.postgres :as psql]
+   [vip.data-processor.errors :as errors]
    [vip.data-processor.util :as util])
   (:import
    [javax.xml.stream XMLInputFactory XMLOutputFactory XMLEventFactory]))
-
-(defn read-one-line
-  "Reads one line at a time from a reader and parses it as a CSV
-  string. Does NOT close the reader at the end."
-  [reader]
-  (->> reader .readLine csv/read-csv first))
-
-(defn header-row
-  "Given a file handle, returns a collection of cleaned (of non word
-  characters), lower-cased string keys for the first line, assumed to
-  be the header row."
-  [file-handle]
-  (->> file-handle
-       read-one-line
-       (map #(str/replace % #"\W" ""))
-       (map (comp keyword str/lower-case))))
 
 (defn add-element
   [event-factory writer el-name el-content]
@@ -48,19 +36,79 @@
    :unit_number "UnitNumber"
    :zip "Zip"})
 
+(defn validate-required-field!
+  [ctx {:keys [id] :as street-segment-entry} field-key]
+  (if (str/blank? (field-key street-segment-entry))
+    (do (errors/record-error!
+         ctx {:severity :errors
+              :scope :street-segments
+              :identifier :post-process-street-segments
+              :error-type :missing-data
+              :error-data [(str "Missing" (field-key ss-fields)
+                                "for entry:" (pr-str street-segment-entry))]})
+        false)
+    true))
+
+(defn validate-precinct-id!
+  [ctx {:keys [precinct_id] :as street-segment-entry} precinct-ids]
+  (when-not (precinct-ids precinct_id)
+    (errors/record-error!
+     ctx {:severity :errors
+          :scope :street-segments
+          :identifier :post-process-street-segments
+          :error-type :missing-data
+          :error-data [(str "Precinct ID doesn't exist: " precinct_id
+                            "for entry:" (pr-str street-segment-entry))]})
+    false))
+
+(def required-fields
+  [:id :precinct_id :city :state])
+
+(defn validate-street-segment!
+  "Runs some basic validations on a given street segment, including
+  checking that required fields are present and that the precinct-id
+  exists. Returns boolean `true` if the street segment is valid,
+  `false` otherwise. Records errors for any invalidations."
+  [ctx street-segment-entry precinct-ids]
+  (->> (into
+        ;; Check if we have a valid precinct-id
+        [(validate-precinct-id! ctx street-segment-entry precinct-ids)]
+        ;; Check if required fields are missing
+        (mapv
+         #(validate-required-field! ctx street-segment-entry %)
+         required-fields))
+       (every? identity)))
+
+(defn header-row
+  "Given a file handle (java.io.Reader), returns a collection of
+  cleaned (of non word characters), lower-cased string keys for the
+  first line, assumed to be the header row."
+  [file-handle]
+  (let [read-one-line #(->> % .readLine csv/read-csv first)]
+    (->> file-handle
+         read-one-line
+         (map #(str/replace % #"\W" ""))
+         (map (comp keyword str/lower-case)))))
+
 (defn street-segments
-  [event-factory writer street-segment-file]
+  [ctx event-factory writer street-segment-file precinct-ids]
   (with-open [in-file (util/bom-safe-reader street-segment-file :encoding "UTF-8")]
-    (let [header-row (header-row in-file), line-count (atom 1)]
-      (log/info "HEADER ROW: " header-row)
+    (let [header-row (header-row in-file)]
       (doseq [line (csv/read-csv in-file)]
         (let [line' (zipmap header-row line)]
-          (swap! line-count inc)
+          (validate-street-segment! ctx line' precinct-ids)
           (.add writer (.createStartElement event-factory "" nil "StreetSegment"))
           (.add writer (.createAttribute event-factory "id" (:id line')))
           (doseq [[ss-key ss-name] ss-fields]
             (add-element event-factory writer ss-name (ss-key line')))
           (.add writer (.createEndElement event-factory "" nil "StreetSegment")))))))
+
+(defn load-precinct-ids
+  []
+  (jdbc/with-db-connection [conn (psql/db-spec)]
+    (->> (korma/select (psql/v5-1-tables :precincts)
+           (korma/fields :id))
+         (reduce #(conj %1 (:id %2)) #{}))))
 
 (defn process-xml
   [{:keys [xml-output-file] :as ctx}]
@@ -70,12 +118,13 @@
                       (.createXMLEventReader (XMLInputFactory/newInstance)))
           writer (->> (io/writer tmpfile)
                       (.createXMLEventWriter (XMLOutputFactory/newInstance)))
-          event-fact (XMLEventFactory/newInstance)]
+          event-fact (XMLEventFactory/newInstance)
+          precinct-ids (load-precinct-ids)]
       (while (.hasNext reader)
         (let [event (.nextEvent reader)]
           (when (and (.isEndElement event)
                      (= (str (.getName (.asEndElement event))) "VipObject"))
-            (street-segments event-fact writer ss-file))
+            (street-segments ctx event-fact writer ss-file precinct-ids))
           (.add writer event)))
       (.close reader)
       (.close writer)

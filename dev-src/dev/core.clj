@@ -1,21 +1,14 @@
 (ns dev.core
-  (:require [clojure.java.io :as io]
-            [clojure.core.async :as a]
-            [clojure.tools.logging :as log]
-            [clojure.pprint :as pprint]
+  (:require [clojure.pprint :as pprint]
+            [squishy.data-readers]
             [vip.data-processor :as data-processor]
-            [vip.data-processor.errors :as errors]
-            [vip.data-processor.pipeline :as pipeline]
-            [vip.data-processor.output.xml :as xml-output]
-            [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
-            [vip.data-processor.validation.db :as db]
-            [vip.data-processor.validation.db.v3-0 :as db.v3-0]
-            [vip.data-processor.validation.transforms :as t]
-            [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.db.postgres :as psql]
+            [vip.data-processor.errors :as errors]
+            [vip.data-processor.output.street-segments :as output-ss]
+            [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.s3 :refer [zip-filename]]
-            [squishy.data-readers]))
+            [vip.data-processor.validation.transforms :as t]
+            [vip.data-processor.validation.zip :as zip]))
 
 ;; modify this to add flags to processing
 (defn set-context
@@ -35,6 +28,7 @@
    psql/store-election-id
    psql/v5-summary-branch
    data-processor/add-validations
+   output-ss/insert-street-segment-nodes
    errors/close-errors-chan
    errors/await-statistics
    psql/delete-from-xml-tree-values])
