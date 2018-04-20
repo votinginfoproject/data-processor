@@ -3,7 +3,6 @@
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
-            [vip.data-processor.output.street-segments :refer [insert-street-segment-nodes]]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.util :as db.util]
             [clojure.tools.logging :as log]
@@ -159,4 +158,5 @@
   ctx)
 
 (def pipeline
-  [create-xml-file generate-xml-file])
+  [create-xml-file
+   generate-xml-file])
