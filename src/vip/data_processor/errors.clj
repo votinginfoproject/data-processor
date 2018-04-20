@@ -15,9 +15,9 @@
 
   NOTE: if you call this function when processing a v5 feed, then keep
   in mind that, *unless your identifier is `:global` or
-  `:post-process-street-segments`*, then at the time the validation
-  (error is stored in the database, it will attempt to look up a path
-  for the identifier value. A bad or nonexistent identifier can break
+  `:post-process-street-segments`*, at the time the validation error
+  is stored in the database, it will attempt to look up a path for the
+  identifier value. A bad or nonexistent identifier can break
   statistic generation so this is important to be aware of."
   [{:keys [errors-chan] :as ctx}
    severity scope identifier error-type
