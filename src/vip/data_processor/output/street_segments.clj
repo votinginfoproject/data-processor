@@ -44,21 +44,25 @@
               :scope :street-segments
               :identifier :post-process-street-segments
               :error-type :missing-data
-              :error-data [(str "Missing" (field-key ss-fields)
-                                "for entry:" (pr-str street-segment-entry))]})
+              :error-data [{:message (str "Missing " (field-key ss-fields)
+                                          " for entry with id " id)
+                            :missing-field (field-key ss-fields)
+                            :data street-segment-entry}]})
         false)
     true))
 
 (defn validate-precinct-id!
-  [ctx {:keys [precinct_id] :as street-segment-entry} precinct-ids]
+  [ctx {:keys [id precinct_id] :as street-segment-entry} precinct-ids]
   (when-not (precinct-ids precinct_id)
     (errors/record-error!
      ctx {:severity :errors
           :scope :street-segments
           :identifier :post-process-street-segments
           :error-type :missing-data
-          :error-data [(str "Precinct ID doesn't exist: " precinct_id
-                            "for entry:" (pr-str street-segment-entry))]})
+          :error-data [{:message (str "Precinct ID doesn't exist: " precinct_id
+                                      " for entry with id " id)
+                        :bad-precinct-id precinct_id
+                        :data street-segment-entry}]})
     false))
 
 (def required-fields

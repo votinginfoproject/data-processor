@@ -43,24 +43,43 @@
 (deftest inserts-street-segments
   ;; Someday I'll fix this so we don't have to call
   ;; `with-redefs`, but today is not that day
-  (with-redefs [errors/record-error! (fn [& _])
-                ss/load-precinct-ids (constantly #{"p001" "p002"})]
+  (let [errors (atom [])]
+    (with-redefs [errors/record-error! (fn [_ error] (swap! errors conj error))
+                  ss/load-precinct-ids (constantly #{"p001" "p002"})]
 
-    (testing "Given a street segment csv input file and an xml output
+      (testing "Given a street segment csv input file and an xml output
               file, inserts street segments into the xml output file,
               returning a new copy."
 
-      (let [output-file-copy (copy-to-temp-file "xml/v5_no_street_segments.xml")
-            input-files [(io/file (io/resource "csv/5-1/street_segment.txt"))]
-            {:keys [xml-output-file]} (ss/process-xml
-                                       {:xml-output-file (.toPath output-file-copy)
-                                        :input input-files})
-            nodes (xpath-query (.toString xml-output-file) "/VipObject/StreetSegment")]
+        (let [output-file-copy (copy-to-temp-file "xml/v5_no_street_segments.xml")
+              input-files [(io/file (io/resource "csv/5-1/street_segment.txt"))]
+              {:keys [xml-output-file]} (ss/process-xml
+                                         {:xml-output-file (.toPath output-file-copy)
+                                          :input input-files})
+              nodes (xpath-query (.toString xml-output-file) "/VipObject/StreetSegment")]
 
-        (is (= 2 (count nodes)))
-        (is (= #{"p001" "p002"} (set (map :precinct-id nodes))))
-        (is (= #{"20001" "20002"} (set (map :zip nodes))))
-        (is (= #{"DC"} (set (map :state nodes))))
-        (is (= #{"Delaware" "Wisconsin"} (set (map :street-name nodes))))
+          (is (= 2 (count nodes)))
+          (is (= #{"p001" "p002"} (set (map :precinct-id nodes))))
+          (is (= #{"20001" "20002"} (set (map :zip nodes))))
+          (is (= #{"DC"} (set (map :state nodes))))
+          (is (= #{"Delaware" "Wisconsin"} (set (map :street-name nodes))))))
 
-        ))))
+      (testing "Catches bad street segments, including those with missing
+              required fields and non-existent precinct-ids"
+
+        (let [output-file-copy (copy-to-temp-file "xml/v5_no_street_segments.xml")
+              input-files [(->> "csv/5-1/bad-street-segments/street_segment.txt"
+                                io/resource
+                                io/file)]
+              {:keys [xml-output-file]} (ss/process-xml
+                                         {:xml-output-file (.toPath output-file-copy)
+                                          :input input-files})
+              nodes (xpath-query (.toString xml-output-file) "/VipObject/StreetSegment")]
+
+          (is (= #{"City" "State"}
+                 (set (keep #(get-in % [:error-data 0 :missing-field]) @errors))))
+
+          (is (= #{"p003"}
+                 (set (keep #(get-in % [:error-data 0 :bad-precinct-id]) @errors))))
+
+          )))))
