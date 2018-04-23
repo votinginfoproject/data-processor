@@ -70,13 +70,13 @@
   exists. Returns boolean `true` if the street segment is valid,
   `false` otherwise. Records errors for any invalidations."
   [ctx street-segment-entry precinct-ids]
-  (->> (into
-        ;; Check if we have a valid precinct-id
-        [(validate-precinct-id! ctx street-segment-entry precinct-ids)]
+  (->> (mapv
         ;; Check if required fields are missing
-        (mapv
-         #(validate-required-field! ctx street-segment-entry %)
-         required-fields))
+        #(validate-required-field! ctx street-segment-entry %)
+        required-fields)
+       (into
+        ;; Check if we have a valid precinct-id
+        [(validate-precinct-id! ctx street-segment-entry precinct-ids)])
        (every? identity)))
 
 (defn header-row
