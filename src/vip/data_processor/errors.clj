@@ -18,7 +18,9 @@
   (doseq [error-value error-data]
     (a/>!! errors-chan
            (->ValidationError ctx severity scope identifier error-type error-value)))
-  ctx)
+  (if (= severity :fatal)
+    (assoc ctx :fatal-errors? true)
+    ctx))
 
 (defrecord V5ValidationError [ctx severity scope
                                 identifier error-type error-value parent-element-id])
@@ -37,8 +39,9 @@
   (doseq [error-value error-data]
     (a/>!! errors-chan
            (->V5ValidationError ctx severity scope identifier error-type error-value parent-element-id)))
-
-  ctx)
+  (if (= severity :fatal)
+    (assoc ctx :fatal-errors? true)
+    ctx))
 
 (defn close-errors-chan [{:keys [errors-chan] :as ctx}]
   (a/close! errors-chan)
