@@ -88,7 +88,7 @@
 
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
-  [{:keys [xml-output-file] :as ctx}]
+  [{:keys [fatal-errors? xml-output-file] :as ctx}]
   (let [zip-name (zip-filename ctx)
         zip-dir (Files/createTempDirectory tmp-path-prefix
                                            (into-array FileAttribute []))
@@ -101,7 +101,10 @@
                    xml-output-file
                    (.toFile xml-output-file))]
     (.createZipFile zip xml-file zip-params)
-    (put-object zip-name zip-file)
+    ;; We don't want to push this to S3 at all if we have fatal errors
+    ;; as it may break ingestion and waste time.
+    (when-not fatal-errors?
+      (put-object zip-name zip-file))
     (-> ctx
         (assoc :generated-xml-filename zip-name)
         (update :to-be-cleaned concat [zip-file zip-dir]))))
