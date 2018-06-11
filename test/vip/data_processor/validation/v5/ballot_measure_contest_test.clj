@@ -8,7 +8,7 @@
 
 (use-fixtures :once setup-postgres)
 
-(deftest ^:postgres validate-no-missing-types-test
+(deftest ^:postgres validate-no-missing-electoral-district-ids-test
   (let [errors-chan (a/chan 100)
         ctx {:input (xml-input "v5-ballot-measure-contests.xml")
              :errors-chan errors-chan}
@@ -17,21 +17,22 @@
                     xml/load-xml-ltree
                     v5.bmc/validate-no-missing-types)
         errors (all-errors errors-chan)]
-    (testing "type missing is an error"
-      (is (contains-error? errors
-                           {:severity :errors
-                            :scope :ballot-measure-contest
-                            :identifier "VipObject.0.BallotMeasureContest.0.Type"
-                            :error-type :missing})))
-    (testing "type present is OK"
-      (doseq [path ["VipObject.0.BallotMeasureContest.1.Type"
-                    "VipObject.0.BallotMeasureContest.2.Type"
-                    "VipObject.0.BallotMeasureContest.3.Type"
-                    "VipObject.0.BallotMeasureContest.4.Type"
-                    "VipObject.0.BallotMeasureContest.5.Type"]]
+    (testing "electoral-district-id missing is an error"
+      (is (contains-error?
+           errors
+           {:severity :errors
+            :scope :ballot-measure-contest
+            :identifier "VipObject.0.BallotMeasureContest.1.ElectoralDistrictId"
+            :error-type :missing})))
+    (testing "electoral-district-id present is OK"
+      (doseq [path ["VipObject.0.BallotMeasureContest.2.ElectoralDistrictId"
+                    "VipObject.0.BallotMeasureContest.3.ElectoralDistrictId"
+                    "VipObject.0.BallotMeasureContest.4.ElectoralDistrictId"
+                    "VipObject.0.BallotMeasureContest.5.ElectoralDistrictId"
+                    "VipObject.0.BallotMeasureContest.6.ElectoralDistrictId"]]
         (assert-no-problems errors {:scope :ballot-measure-contest
-                                      :identifier path
-                                      :error-type :missing})))))
+                                    :identifier path
+                                    :error-type :missing})))))
 
 (deftest ^:postgres validate-ballot-measure-types-test
   (let [errors-chan (a/chan 100)
@@ -46,13 +47,13 @@
       (is (contains-error? errors
                            {:severity :errors
                             :scope :ballot-measure-contest
-                            :identifier "VipObject.0.BallotMeasureContest.1.Type.0"
+                            :identifier "VipObject.0.BallotMeasureContest.2.Type.0"
                             :error-type :format})))
     (testing "a good type is okay"
-      (doseq [path ["VipObject.0.BallotMeasureContest.2.Type.0"
-                    "VipObject.0.BallotMeasureContest.3.Type.0"
+      (doseq [path ["VipObject.0.BallotMeasureContest.3.Type.0"
                     "VipObject.0.BallotMeasureContest.4.Type.0"
-                    "VipObject.0.BallotMeasureContest.5.Type.0"]]
+                    "VipObject.0.BallotMeasureContest.5.Type.0"
+                    "VipObject.0.BallotMeasureContest.6.Type.0"]]
         (assert-no-problems errors
                               {:scope :ballot-measure-contest
                                :identifier path

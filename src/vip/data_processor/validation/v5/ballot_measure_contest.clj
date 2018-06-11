@@ -5,4 +5,4 @@
   (util/validate-enum-elements :ballot-measure-type :errors))
 
 (def validate-no-missing-types
-  (util/validate-no-missing-elements :ballot-measure-contest [:type]))
+  (util/validate-no-missing-elements :ballot-measure-contest [:electoral-district-id]))
