@@ -12,7 +12,7 @@
 (deftest remove-bad-filenames-test
   (let [bad-filenames [(File. "/data/BAD_FILE_NAME")
                        (File. "/data/BAD_FILE_NAME_2")]
-        good-filenames (map #(File. (str "/data/" %)) (csv-filenames v3-0/data-specs))
+        good-filenames (map #(File. (str "/data/" (:filename %))) v3-0/data-specs)
         errors-chan (a/chan 100)
         ctx {:input good-filenames
              :errors-chan errors-chan

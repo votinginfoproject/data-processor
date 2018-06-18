@@ -265,8 +265,7 @@
 
 (defn set-input-as-xml-output-file
   [{:keys [input] :as ctx}]
-  (assoc ctx :xml-output-file
-         (first input)))
+  (assoc ctx :xml-output-file (first input)))
 
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db

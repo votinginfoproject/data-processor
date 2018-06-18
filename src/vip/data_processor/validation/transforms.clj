@@ -9,7 +9,11 @@
 
 (defn read-edn-sqs-message [ctx]
   (let [message (edn/read-string (get-in ctx [:input :body]))]
-    (assoc ctx :input message :skip-validations? (get message :skip-validations? false))))
+    (assoc
+     ctx
+     :input message
+     :skip-validations? (get message :skip-validations? false)
+     :post-process-street-segments? (get message :post-process-street-segments? false))))
 
 (defn assert-filename [ctx]
   (if-let [filename (get-in ctx [:input :filename])]

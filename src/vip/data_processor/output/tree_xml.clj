@@ -2,7 +2,6 @@
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
-            [korma.core :as korma]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.util :as db.util]
