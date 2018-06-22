@@ -1,14 +1,24 @@
 (ns dev.core
-  (:require [clojure.pprint :as pprint]
-            [squishy.data-readers]
-            [vip.data-processor :as data-processor]
-            [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.errors :as errors]
-            [vip.data-processor.output.street-segments :as output-ss]
-            [vip.data-processor.pipeline :as pipeline]
-            [vip.data-processor.s3 :refer [zip-filename]]
-            [vip.data-processor.validation.transforms :as t]
-            [vip.data-processor.validation.zip :as zip]))
+  (:require
+   [clojure.core.async :as a]
+   [clojure.java.io :as io]
+   [clojure.pprint :as pprint]
+   [clojure.tools.logging :as log]
+   [squishy.data-readers]
+   [turbovote.resource-config :refer [config]]
+   [vip.data-processor :as data-processor]
+   [vip.data-processor.db.postgres :as psql]
+   [vip.data-processor.errors :as errors]
+   [vip.data-processor.output.street-segments :as output-ss]
+   [vip.data-processor.output.xml :as xml-output]
+   [vip.data-processor.pipeline :as pipeline]
+   [vip.data-processor.s3 :as s3 :refer [zip-filename]]
+   [vip.data-processor.validation.data-spec :as data-spec]
+   [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
+   [vip.data-processor.validation.db :as db]
+   [vip.data-processor.validation.db.v3-0 :as db.v3-0]
+   [vip.data-processor.validation.transforms :as t]
+   [vip.data-processor.validation.zip :as zip]))
 
 ;; modify this to add flags to processing
 (defn set-context
@@ -18,7 +28,7 @@
 (def pipeline
   [set-context
    psql/start-run
-   zip/assoc-file
+   #(zip/assoc-file % 786432) ;(config [:max-zipfile-size] 3221225472)) ; 3GB
    zip/extracted-contents
    t/remove-invalid-extensions
    t/xml-csv-branch

@@ -13,4 +13,5 @@
             :database #resource-config/env "DB_ENV_POSTGRES_DATABASE"}
  :rabbitmq {:connection {:host #resource-config/env "RABBITMQ_PORT_5672_TCP_ADDR"
                          :port #resource-config/edn #resource-config/env "RABBITMQ_PORT_5672_TCP_PORT"}
-            :exchange #resource-config/env "VIP_DP_RABBITMQ_EXCHANGE"}}
+            :exchange #resource-config/env "VIP_DP_RABBITMQ_EXCHANGE"}
+ :max-zipfile-size #resource-config/env "VIP_DP_MAX_ZIPFILE_SIZE"}

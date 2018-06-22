@@ -14,19 +14,44 @@
       str
       (.endsWith ".zip")))
 
-(defn unzip-file [path]
+(defn too-big-msg
+  [size max-zipfile-size]
+  (str "Zip file size is " size
+       ", which is greater than the max-zipfile-size " max-zipfile-size))
+
+(defn get-uncompressed-size
+  "Given a net.lingala.zip4j.core.ZipFile returns the uncompressed
+  size as provided by the first header in the file."
+  [zip-file]
+  (.getUncompressedSize (first (.getFileHeaders zip-file))))
+
+(defn unzip-file [path max-zipfile-size]
   (let [zip-file (ZipFile. (str path))
+        size (get-uncompressed-size zip-file)
         tmp-dir (Files/createTempDirectory "vip-extracted-feed"
                                            (into-array FileAttribute []))]
-    (.extractAll zip-file (str tmp-dir))
-    tmp-dir))
+    (if (> size max-zipfile-size)
+      (-> (too-big-msg size max-zipfile-size)
+          (ex-info {:msg (too-big-msg size max-zipfile-size)
+                    :max-zipfile-size-exceeded true})
+          throw)
+      (do (.extractAll zip-file (str tmp-dir))
+          tmp-dir))))
 
-(defn assoc-file [ctx]
+(defn assoc-file [ctx max-zipfile-size]
   (let [path (:input ctx)]
     (log/info "Starting to process from path:" (str path))
     (cond
-      (zip-file? path) (assoc ctx :input (unzip-file path))
+      (zip-file? path)
+      (try
+        (assoc ctx :input (unzip-file path max-zipfile-size))
+        (catch Exception e
+          (if-let [max-zipfile-size-exceeded (ex-data e)]
+            (assoc ctx :stop (:msg (ex-data e)))
+            (throw e))))
+
       (xml-file? path) (assoc ctx :input path)
+
       :else (assoc ctx :stop (str path " is not a zip or xml file!")))))
 
 (defn zip-contents
