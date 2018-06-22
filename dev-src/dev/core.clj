@@ -28,7 +28,7 @@
 (def pipeline
   [set-context
    psql/start-run
-   #(zip/assoc-file % 786432) ;(config [:max-zipfile-size] 3221225472)) ; 3GB
+   #(zip/assoc-file (config [:max-zipfile-size] 3221225472)) ; 3GB
    zip/extracted-contents
    t/remove-invalid-extensions
    t/xml-csv-branch
