@@ -218,7 +218,7 @@
   [ctx {:keys [filename] :as data-spec}]
   (if-let [file-to-load (util/find-input-file ctx filename)]
     (do
-      (log/info "Loading" filename)
+      (log/info "Loading file" filename)
       (try
         (with-open [in-file (util/bom-safe-reader file-to-load :encoding "UTF-8")]
           (do-bulk-import-and-validate-csv ctx data-spec in-file))
