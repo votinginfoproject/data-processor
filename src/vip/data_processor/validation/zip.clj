@@ -21,7 +21,8 @@
 
 (defn get-uncompressed-size
   "Given a net.lingala.zip4j.core.ZipFile returns the uncompressed
-  size as provided by the first header in the file."
+  size as provided by the first (and presumably only) header in the
+  file."
   [zip-file]
   (.getUncompressedSize (first (.getFileHeaders zip-file))))
 
