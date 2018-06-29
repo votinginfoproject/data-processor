@@ -70,6 +70,7 @@ VIP_DP_SQS_REGION=
 VIP_DP_SQS_QUEUE=
 VIP_DP_SQS_FAIL_QUEUE=
 VIP_DP_RABBITMQ_EXCHANGE=
+VIP_DP_MAX_ZIPFILE_SIZE=(3221225472 = 3GB by default)
 ```
 
 As you can see, you'll need to have set up two S3 buckets and two SQS

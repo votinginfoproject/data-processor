@@ -24,7 +24,7 @@
    t/assert-filename
    psql/start-run
    t/download-from-s3
-   zip/assoc-file
+   #(zip/assoc-file % (config [:max-zipfile-size] 3221225472)) ; 3GB default
    zip/extracted-contents])
 
 (def v3-validation-pipeline
