@@ -25,7 +25,7 @@
                  [org.clojure/java.jdbc "0.6.1"]
                  [org.postgresql/postgresql "42.0.0" :exclusions [org.slf4j/slf4j-simple
                                                                   org.slf4j/slf4j-api]]
-                 [org.xerial/sqlite-jdbc "3.21.0.1"]
+                 [org.xerial/sqlite-jdbc "3.23.1"]
                  [commons-lang/commons-lang "2.6"]
                  [xerces/xercesImpl "2.11.0"]
                  [com.fasterxml.woodstox/woodstox-core "5.1.0"]

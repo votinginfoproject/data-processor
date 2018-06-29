@@ -12,3 +12,4 @@ data-processor@.service
 /test-resources/config.edn
 .env
 .idea/
+.java-version
