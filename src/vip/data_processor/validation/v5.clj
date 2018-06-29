@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.v5
   (:require [vip.data-processor.validation.v5.ballot-measure-contest :as ballot-measure-contest]
+            [vip.data-processor.validation.v5.candidate-contest :as candidate-contest]
             [vip.data-processor.validation.v5.candidate :as candidate]
             [vip.data-processor.validation.v5.email :as email]
             [vip.data-processor.validation.v5.external-identifiers :as external-identifiers]
@@ -26,6 +27,7 @@
 (def validations
   [ballot-measure-contest/validate-ballot-measure-types
    ballot-measure-contest/validate-no-missing-types
+   candidate-contest/validate-no-missing-types
    candidate/validate-no-missing-ballot-names
    candidate/validate-pre-election-statuses
    candidate/validate-post-election-statuses

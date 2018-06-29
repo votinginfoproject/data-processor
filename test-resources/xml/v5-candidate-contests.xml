@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<VipObject schemaVersion="5.1">
+  <ElectoralDistrict id="ed001">
+    <Name>Commonwealth of Virginia</Name>
+    <Type>state</Type>
+  </ElectoralDistrict>
+  <CandidateContest id="cc20001">
+    <Name>Missing ElectoralDistrictId</Name>
+  </CandidateContest>
+  <CandidateContest id="cc20002">
+    <ElectoralDistrictId>ed001</ElectoralDistrictId>
+    <Name>Has ElectoralDistrictId</Name>
+  </CandidateContest>
+</VipObject>
