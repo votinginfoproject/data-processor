@@ -31,8 +31,6 @@
         size (get-uncompressed-size zip-file)
         tmp-dir (Files/createTempDirectory "vip-extracted-feed"
                                            (into-array FileAttribute []))]
-    (log/info "zipfile size: " size " type? " (type size))
-    (log/info "max-zipfile-size: " max-zipfile-size " type? " (type max-zipfile-size))
     (if (> size (Long. max-zipfile-size))
       (-> (too-big-msg size max-zipfile-size)
           (ex-info {:msg (too-big-msg size max-zipfile-size)

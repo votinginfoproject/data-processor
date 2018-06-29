@@ -11,6 +11,12 @@
         uncompressed-size (-> (ZipFile. zipfile-path)
                               zip/get-uncompressed-size)
         max-zipfile-size 786432]
-    (is (= {:input zipfile-path
-            :stop (zip/too-big-msg uncompressed-size max-zipfile-size)}
-           (zip/assoc-file {:input zipfile-path} max-zipfile-size)))))
+    (testing "Don't proceed if the zipfile is bigger than the `max-zipfile-size'"
+      (is (= {:input zipfile-path
+              :stop (zip/too-big-msg uncompressed-size max-zipfile-size)}
+             (zip/assoc-file {:input zipfile-path} max-zipfile-size))))
+
+    (testing "Doesn't fail if max-zipfile-size is passed in as a string"
+      (is (= {:input zipfile-path
+              :stop (zip/too-big-msg uncompressed-size (str max-zipfile-size))}
+             (zip/assoc-file {:input zipfile-path} (str max-zipfile-size)))))))
