@@ -11,7 +11,8 @@
                                  [:city]
                                  [:state]
                                  [:street-name]
-                                 [:zip])
+                                 [:zip]
+                                 [:precinct-id])
 
 (def validate-odd-even-both-value
   (util/validate-enum-elements :oeb-enum :errors))
