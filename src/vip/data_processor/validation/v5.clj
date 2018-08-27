@@ -66,6 +66,7 @@
    party/validate-colors
    party-selection/validate-no-missing-party-ids
    ordered-contest/validate-no-missing-contest-ids
+   street-segment/validate-no-missing-precinct-id
    street-segment/validate-no-missing-odd-even-both
    street-segment/validate-odd-even-both-value
    street-segment/validate-no-missing-city
