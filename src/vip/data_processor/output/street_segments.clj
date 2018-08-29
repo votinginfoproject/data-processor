@@ -117,7 +117,7 @@
 (defn process-xml
   [{:keys [xml-output-file] :as ctx}]
   (if-let [ss-file (util/find-input-file ctx "street_segment.txt")]
-    (let [tmpfile (fs/temp-file "output-xml-tmp-")
+    (let [tmpfile (fs/temp-file "" ".xml")
           reader (->> (.toFile xml-output-file)
                       (.createXMLEventReader (XMLInputFactory/newInstance)))
           writer (->> (io/writer tmpfile)
