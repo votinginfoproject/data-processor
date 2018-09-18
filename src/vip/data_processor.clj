@@ -91,8 +91,9 @@
         creds {:access-key access-key
                :access-secret secret-key
                :region region}
-        opts (when visibility-timeout
-               {:visibility-timeout visibility-timeout})]
+        opts (merge {:delete-callback true}
+              (when visibility-timeout
+                {:visibility-timeout visibility-timeout}))]
     (sqs/consume-messages creds queue fail-queue opts process-message)))
 
 (defn -main [& args]
