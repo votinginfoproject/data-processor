@@ -19,10 +19,23 @@
             [vip.data-processor.validation.zip :as zip])
   (:gen-class))
 
+(defn ack-sqs-message
+  "If we were configured with a delete-callback from SQS, call it, effectively
+   acking that data-processor has received and kicked off processing.
+
+   This will allow us to process very long feeds without spawning zombie
+   processes after 12 hours, the maximum time we could keep a message
+   checked out."
+  [ctx]
+  (when-let [delete-callback (:delete-callback ctx)]
+    (delete-callback))
+  ctx)
+
 (def download-pipeline
   [t/read-edn-sqs-message
    t/assert-filename
    psql/start-run
+   ack-sqs-message
    t/download-from-s3
    #(zip/assoc-file % (config [:max-zipfile-size] 3221225472)) ; 3GB default
    zip/extracted-contents])
@@ -66,23 +79,27 @@
            psql/delete-from-xml-tree-values
            cleanup/cleanup]))
 
-(defn-traced process-message [message]
-  (q/publish {:initial-input message
-              :status :started}
-             "processing.started")
-  (let [result (pipeline/process pipeline message)]
-    (psql/complete-run result)
-    (log/info "New run completed:"
-              (psql/get-run result))
-    (let [exception (:exception result)
-          completed-message (cond-> {:initial-input message
-                                     :status :complete
-                                     :public-id (:public-id result)}
-                              exception (assoc :exception (.getMessage exception)))]
-      (q/publish completed-message
-                 "processing.complete")
-      (when exception
-        (throw exception)))))
+(defn-traced process-message
+  ([message]
+   (process-message message nil))
+  ([message delete-callback]
+   (log/info "processing SQS message" (pr-str message))
+   (q/publish {:initial-input message
+               :status :started}
+              "processing.started")
+   (let [result (pipeline/process pipeline message delete-callback)]
+     (psql/complete-run result)
+     (log/info "New run completed:"
+               (psql/get-run result))
+     (let [exception (:exception result)
+           completed-message (cond-> {:initial-input message
+                                      :status :complete
+                                      :public-id (:public-id result)}
+                               exception (assoc :exception (.getMessage exception)))]
+       (q/publish completed-message
+                  "processing.complete")
+       (when exception
+         (throw exception))))))
 
 (defn consume []
   (let [{:keys [access-key secret-key]} (config [:aws :creds])
@@ -108,4 +125,5 @@
                                    (log/info "VIP Data Processor shutting down...")
                                    (q/publish {:id id :event "stopping"} "qa-engine.status")
                                    (sqs/stop-consumer consumer-id))))
+      (log/info "SQS processing started")
       consumer-id)))

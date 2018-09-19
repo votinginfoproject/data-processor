@@ -27,8 +27,9 @@
                  [ragtime/ragtime.jdbc "0.6.4"]
                  [korma "0.4.3"]
                  [org.clojure/java.jdbc "0.7.8"]
-                 [org.postgresql/postgresql "42.2.5" :exclusions [org.slf4j/slf4j-simple
-                                                                  org.slf4j/slf4j-api]]
+                 [org.postgresql/postgresql "42.2.5"
+                  :exclusions [org.slf4j/slf4j-simple
+                               org.slf4j/slf4j-api]]
                  [org.xerial/sqlite-jdbc "3.23.1"]
                  [commons-lang/commons-lang "2.6"]
                  [xerces/xercesImpl "2.12.0"]
