@@ -26,9 +26,8 @@
    This will allow us to process very long feeds without spawning zombie
    processes after 12 hours, the maximum time we could keep a message
    checked out."
-  [ctx]
-  (when-let [delete-callback (:delete-callback ctx)]
-    (delete-callback))
+  [{:keys [delete-callback] :as ctx}]
+  (when delete-callback (delete-callback))
   ctx)
 
 (def download-pipeline
@@ -87,19 +86,19 @@
    (q/publish {:initial-input message
                :status :started}
               "processing.started")
-   (let [result (pipeline/process pipeline message delete-callback)]
-     (psql/complete-run result)
-     (log/info "New run completed:"
-               (psql/get-run result))
-     (let [exception (:exception result)
-           completed-message (cond-> {:initial-input message
-                                      :status :complete
-                                      :public-id (:public-id result)}
-                               exception (assoc :exception (.getMessage exception)))]
-       (q/publish completed-message
+   (let [result (pipeline/process pipeline message delete-callback)
+         _ (psql/complete-run result)
+         _ (log/info "New run completed:"
+                     (psql/get-run result))
+         exception (:exception result)
+         completed-message (cond-> {:initial-input message
+                                    :status :complete
+                                    :public-id (:public-id result)}
+                             exception (assoc :exception (.getMessage exception)))]
+     (q/publish completed-message
                   "processing.complete")
        (when exception
-         (throw exception))))))
+         (throw exception)))))
 
 (defn consume []
   (let [{:keys [access-key secret-key]} (config [:aws :creds])
