@@ -1,0 +1,1 @@
+alter table validations drop constraint validations_results_id_fkey;
