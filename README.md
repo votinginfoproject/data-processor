@@ -66,6 +66,7 @@ VIP_DP_AWS_ACCESS_KEY=
 VIP_DP_AWS_SECRET_KEY=
 VIP_DP_S3_UNPROCESSED_BUCKET=
 VIP_DP_S3_PROCESSED_BUCKET=
+VIP_DP_S3_REGION=
 VIP_DP_SQS_REGION=
 VIP_DP_SQS_QUEUE=
 VIP_DP_SQS_FAIL_QUEUE=
@@ -74,7 +75,12 @@ VIP_DP_MAX_ZIPFILE_SIZE=(3221225472 = 3GB by default)
 ```
 
 As you can see, you'll need to have set up two S3 buckets and two SQS
-queues. The value for `VIP_DP_SQS_REGION` is in the form of
+queues.
+
+There are two different places to set the region, one for S3 and one for
+SQS and the libraries we use require different forms of this setting. The
+`VIP_DP_S3_REGION` setting needs to be in the form of `us-east-1`.
+The value for `VIP_DP_SQS_REGION` is in the form of
 `US_WEST_2` (not `us-west-2`). The value for
 `VIP_DP_RABBITMQ_EXCHANGE` is whatever you'd like it to be.
 

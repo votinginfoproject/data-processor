@@ -40,22 +40,26 @@
 
   Runs the pipeline, returning the final context. An exception on the
   context will result in logging the exception."
-  [pipeline initial-input]
-  (let [ctx {:input initial-input
-             :skip-validations? false
-             :spec-version (atom nil)
-             :errors-chan (a/chan 1024)
-             :pipeline pipeline}
-        result (run-pipeline ctx)
-        import-id (:import-id result)]
-    (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
+  ([pipeline initial-input]
+   (process pipeline initial-input nil))
+  ([pipeline initial-input delete-callback]
+   (let [ctx (merge {:input initial-input
+                     :skip-validations? false
+                     :spec-version (atom nil)
+                     :errors-chan (a/chan 1024)
+                     :pipeline pipeline}
+                    (when-not (nil? delete-callback)
+                      {:delete-callback delete-callback}))
+         result (run-pipeline ctx)
+         import-id (:import-id result)]
+     (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
 
-    (when-let [stop (:stop result)]
-      (psql/fail-run import-id nil)
-      (log/error "Stopping run of" import-id "due to:" stop))
+     (when-let [stop (:stop result)]
+       (psql/fail-run import-id nil)
+       (log/error "Stopping run of" import-id "due to:" stop))
 
-    (when-let [ex (:exception result)]
-      (psql/fail-run import-id (with-out-str (stacktrace/print-throwable ex)))
-      (log/error (with-out-str (stacktrace/print-stack-trace ex))))
+     (when-let [ex (:exception result)]
+       (psql/fail-run import-id (with-out-str (stacktrace/print-throwable ex)))
+       (log/error (with-out-str (stacktrace/print-stack-trace ex))))
 
-    result))
+     result)))

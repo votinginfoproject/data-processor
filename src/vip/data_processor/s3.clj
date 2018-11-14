@@ -1,5 +1,5 @@
 (ns vip.data-processor.s3
-  (:require [aws.sdk.s3 :as s3]
+  (:require [amazonica.aws.s3 :as s3]
             [clojure.java.io :as io]
             [turbovote.resource-config :refer [config]]
             [korma.core :as korma]
@@ -13,13 +13,15 @@
            [net.lingala.zip4j.model ZipParameters]
            [net.lingala.zip4j.util Zip4jConstants]))
 
-(defn- get-object [key]
-  (s3/get-object (config [:aws :creds])
+(defn get-object [key]
+  (s3/get-object (merge (config [:aws :creds])
+                        {:endpoint (config [:aws :s3 :endpoint])})
                  (config [:aws :s3 :unprocessed-bucket])
                  key))
 
 (defn put-object [key value]
-  (s3/put-object (config [:aws :creds])
+  (s3/put-object (merge (config [:aws :creds])
+                        {:endpoint (config [:aws :s3 :endpoint])})
                  (config [:aws :s3 :processed-bucket])
                  key value))
 
@@ -31,10 +33,13 @@
   [key]
   (let [tmp-path (Files/createTempFile tmp-path-prefix key
                                        (into-array FileAttribute []))
-        s3-object (get-object key)]
-    (Files/copy (:content s3-object)
-                tmp-path
-                (into-array [StandardCopyOption/REPLACE_EXISTING]))
+        s3-object (get-object key)
+        stream (:input-stream s3-object)]
+    (try
+      (Files/copy stream
+                  tmp-path
+                  (into-array [StandardCopyOption/REPLACE_EXISTING]))
+      (finally (.close stream)))
     tmp-path))
 
 (defn format-fips [fips]
