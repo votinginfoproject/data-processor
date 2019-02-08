@@ -10,18 +10,18 @@
    [javax.xml.xpath XPathFactory XPathConstants]
    [org.xml.sax InputSource]))
 
-(defn append-node-to-map
-  [nodes m idx]
+(defn conj-node-to-array
+  [nodes a idx]
   (let [item (.item nodes idx)]
-    (assoc m (xml-name->keyword (.getNodeName item)) (.getTextContent item))))
+    (conj a [(xml-name->keyword (.getNodeName item)) (.getTextContent item)])))
 
-(defn street-segment-node->map
+(defn street-segment-node->array
   [node]
   (let [ss-nodes (.getChildNodes node)]
-    (->> ss-nodes 
+    (->> ss-nodes
          .getLength
          (range 0)
-         (reduce (partial append-node-to-map ss-nodes) {}))))
+         (reduce (partial conj-node-to-array ss-nodes) []))))
 
 (defn xpath-query
   [filepath query-string]
@@ -30,7 +30,7 @@
         nodes (.evaluate xpath query-string isource XPathConstants/NODESET)]
     (->> (.getLength nodes)
          (range 0)
-         (mapv #(street-segment-node->map (.item nodes %))))))
+         (mapv #(street-segment-node->array (.item nodes %))))))
 
 (defn copy-to-temp-file
   [resource-path]
@@ -39,6 +39,32 @@
     (-> (io/resource resource-path)
         io/file
         (fs/copy src-tmp-copy))))
+
+(def well-ordered-children
+  [:address-direction :city :includes-all-addresses
+   :includes-all-streets :odd-even-both :precinct-id
+   :start-house-number :end-house-number :state
+   :street-direction :street-name :street-suffix
+   :unit-number :zip])
+
+(defn well-ordered-children?
+  "Function to ensure that the child nodes are in the order as defined
+   by the XML sequence structure for street segments (though there may be
+   some missing children and that's fine in this instance)"
+  [children]
+  (letfn [(index-check [last-idx next-key]
+            (let [current-idx (.indexOf well-ordered-children next-key)]
+              (if (> current-idx last-idx)
+                current-idx
+                (throw (RuntimeException.
+                        (str next-key " index is out of order, found at "
+                             current-idx " and prior child key was found at "
+                             last-idx))))))]
+    (try (reduce index-check -1 children)
+         true
+         (catch RuntimeException ex
+           (println (.getMessage ex))
+           false))))
 
 (deftest inserts-street-segments
   ;; Someday I'll fix this so we don't have to call
@@ -56,13 +82,18 @@
               {:keys [xml-output-file]} (ss/process-xml
                                          {:xml-output-file (.toPath output-file-copy)
                                           :input input-files})
-              nodes (xpath-query (.toString xml-output-file) "/VipObject/StreetSegment")]
+              nodes (xpath-query (.toString xml-output-file) "/VipObject/StreetSegment")
+              nodes-as-maps (map #(into {} %) nodes)]
 
           (is (= 2 (count nodes)))
-          (is (= #{"p001" "p002"} (set (map :precinct-id nodes))))
-          (is (= #{"20001" "20002"} (set (map :zip nodes))))
-          (is (= #{"DC"} (set (map :state nodes))))
-          (is (= #{"Delaware" "Wisconsin"} (set (map :street-name nodes))))))
+          (is (= #{"p001" "p002"} (set (map :precinct-id nodes-as-maps))))
+          (is (= #{"20001" "20002"} (set (map :zip nodes-as-maps))))
+          (is (= #{"DC"} (set (map :state nodes-as-maps))))
+          (is (= #{"Delaware" "Wisconsin"} (set (map :street-name nodes-as-maps))))
+          (let [children-keys (->> nodes first (map first))]
+            (is (well-ordered-children? children-keys) (pr-str children-keys)))
+          (let [children-keys (->> nodes second (map first))]
+            (is (well-ordered-children? children-keys) (pr-str children-keys)))))
 
       (testing "Catches bad street segments, including those with missing
               required fields and non-existent precinct-ids"
