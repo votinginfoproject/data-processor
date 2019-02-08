@@ -20,21 +20,24 @@
     (.add writer (.createCharacters event-factory el-content))
     (.add writer (.createEndElement event-factory "" nil el-name))))
 
+(def ss-ordered-fields
+  [[:address_direction "AddressDirection"]
+   [:city "City"]
+   [:includes_all_addresses "IncludesAllAddresses"]
+   [:includes_all_streets "IncludesAllStreets"]
+   [:odd_even_both "OddEvenBoth"]
+   [:precinct_id "PrecinctId"]
+   [:start_house_number "StartHouseNumber"]
+   [:end_house_number "EndHouseNumber"]
+   [:state "State"]
+   [:street_direction "StreetDirection"]
+   [:street_name "StreetName"]
+   [:street_suffix "StreetSuffix"]
+   [:unit_number "UnitNumber"]
+   [:zip "Zip"]])
+
 (def ss-fields
-  {:address_direction "AddressDirection"
-   :city "City"
-   :includes_all_addresses "IncludesAllAddresses"
-   :includes_all_streets "IncludesAllStreets"
-   :odd_even_both "OddEvenBoth"
-   :precinct_id "PrecinctId"
-   :start_house_number "StartHouseNumber"
-   :end_house_number "EndHouseNumber"
-   :state "State"
-   :street_direction "StreetDirection"
-   :street_name "StreetName"
-   :street_suffix "StreetSuffix"
-   :unit_number "UnitNumber"
-   :zip "Zip"})
+  (into {} ss-ordered-fields))
 
 (defn validate-required-field!
   [ctx {:keys [id] :as street-segment-entry} field-key]
@@ -103,7 +106,7 @@
           (validate-street-segment! ctx line' precinct-ids)
           (.add writer (.createStartElement event-factory "" nil "StreetSegment"))
           (.add writer (.createAttribute event-factory "id" (:id line')))
-          (doseq [[ss-key ss-name] ss-fields]
+          (doseq [[ss-key ss-name] ss-ordered-fields]
             (add-element event-factory writer ss-name (ss-key line')))
           (.add writer (.createEndElement event-factory "" nil "StreetSegment")))))))
 
