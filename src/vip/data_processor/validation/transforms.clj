@@ -22,7 +22,8 @@
 
 (defn download-from-s3 [ctx]
   (let [filename (get-in ctx [:input :filename])
-        file (s3/download filename)]
+        bucket (get-in ctx [:input :bucket])
+        file (s3/download filename bucket)]
     (-> ctx
         (update :to-be-cleaned conj file)
         (assoc :input file))))
