@@ -13,10 +13,10 @@
            [net.lingala.zip4j.model ZipParameters]
            [net.lingala.zip4j.util Zip4jConstants]))
 
-(defn get-object [key]
+(defn get-object [key bucket]
   (s3/get-object (merge (config [:aws :creds])
                         {:endpoint (config [:aws :s3 :endpoint])})
-                 (config [:aws :s3 :unprocessed-bucket])
+                 bucket
                  key))
 
 (defn put-object [key value]
@@ -28,12 +28,12 @@
 (def tmp-path-prefix "vip-data-processor")
 
 (defn download
-  "Downloads the file named `key` from the configured S3 bucket to a
+  "Downloads the file named `key` from the passed in S3 `bucket` to a
   temporary file and returns that path."
-  [key]
+  [key bucket]
   (let [tmp-path (Files/createTempFile tmp-path-prefix key
                                        (into-array FileAttribute []))
-        s3-object (get-object key)
+        s3-object (get-object key bucket)
         stream (:input-stream s3-object)]
     (try
       (Files/copy stream
