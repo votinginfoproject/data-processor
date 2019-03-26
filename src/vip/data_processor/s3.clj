@@ -28,7 +28,7 @@
 (def tmp-path-prefix "vip-data-processor")
 
 (defn download
-  "Downloads the file named `key` from the configured S3 bucket to a
+  "Downloads the file named `key` from the passed in S3 `bucket` to a
   temporary file and returns that path."
   [key bucket]
   (let [tmp-path (Files/createTempFile tmp-path-prefix key
