@@ -1,7 +1,7 @@
 (ns vip.data-processor.output.xml-helpers
-  (:require [korma.core :as korma])
-  (:import [clojure.string :as str]
-           [java.nio.file Files]
+  (:require [clojure.string :as str]
+            [korma.core :as korma])
+  (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
 (defn create-xml-file
