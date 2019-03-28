@@ -1,14 +1,12 @@
 (ns vip.data-processor.output.xml-helpers
-  (:require [clojure.string :as str]
-            [korma.core :as korma])
+  (:require [korma.core :as korma])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
 (defn create-xml-file
-  [{:keys [filename] :as ctx}]
-  (let [base-filename (-> filename (str/split #" ") last)
-        xml-file (Files/createTempFile
-                  base-filename ".xml" (into-array FileAttribute []))]
+  [{:keys [import-id] :as ctx}]
+  (let [xml-file (Files/createTempFile
+                  import-id ".xml" (into-array FileAttribute []))]
     (-> ctx
         (assoc :xml-output-file xml-file)
         (update :to-be-cleaned conj xml-file))))
