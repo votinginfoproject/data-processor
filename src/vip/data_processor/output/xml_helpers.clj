@@ -6,7 +6,7 @@
 (defn create-xml-file
   [{:keys [import-id] :as ctx}]
   (let [xml-file (Files/createTempFile
-                  import-id ".xml" (into-array FileAttribute []))]
+                  (str import-id) ".xml" (into-array FileAttribute []))]
     (-> ctx
         (assoc :xml-output-file xml-file)
         (update :to-be-cleaned conj xml-file))))
