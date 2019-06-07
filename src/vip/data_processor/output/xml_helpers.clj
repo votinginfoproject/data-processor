@@ -4,8 +4,9 @@
            [java.nio.file.attribute FileAttribute]))
 
 (defn create-xml-file
-  [{:keys [filename] :as ctx}]
-  (let [xml-file (Files/createTempFile filename ".xml" (into-array FileAttribute []))]
+  [{:keys [import-id] :as ctx}]
+  (let [xml-file (Files/createTempFile
+                  (str import-id) ".xml" (into-array FileAttribute []))]
     (-> ctx
         (assoc :xml-output-file xml-file)
         (update :to-be-cleaned conj xml-file))))
