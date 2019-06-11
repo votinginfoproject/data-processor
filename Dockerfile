@@ -11,4 +11,4 @@ COPY . /usr/src/data-processor
 RUN lein test
 RUN mv "$(lein uberjar | sed -n 's/^Created \(.*standalone\.jar\)/\1/p')" data-processor-standalone.jar
 
-CMD java -Xmx8g -Dnewrelic.environment=$NEW_RELIC_ENVIRONMENT -javaagent:resources/jars/com.newrelic.agent.java/newrelic-agent.jar -jar data-processor-standalone.jar
+CMD java -Xmx8g -jar data-processor-standalone.jar

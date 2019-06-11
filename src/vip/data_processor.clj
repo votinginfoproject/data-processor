@@ -1,6 +1,5 @@
 (ns vip.data-processor
   (:require [clojure.tools.logging :as log]
-            [com.climate.newrelic.trace :refer [defn-traced]]
             [squishy.core :as sqs]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.cleanup :as cleanup]
@@ -78,7 +77,7 @@
            psql/delete-from-xml-tree-values
            cleanup/cleanup]))
 
-(defn-traced process-message
+(defn process-message
   ([message]
    (process-message message nil))
   ([message delete-callback]

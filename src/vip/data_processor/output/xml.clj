@@ -18,7 +18,6 @@
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
             [clojure.walk :as walk]
-            [com.climate.newrelic.trace :refer [defn-traced]]
             [vip.data-processor.output.v3-0.xml :as v3-0]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
             [vip.data-processor.errors :as errors])
@@ -54,7 +53,7 @@
       (.write writer (name tag))
       (.write writer CLOSE-TAG))))
 
-(defn-traced write-xml
+(defn write-xml
   "Writes out the XML elements of nodes from `xml-node-fns` as
   children of the base `vip_object` element."
   [{:keys [xml-output-file vip-version] :as ctx}]

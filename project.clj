@@ -13,7 +13,6 @@
                                com.amazonaws/amazon-kinesis-client]]
                  [com.amazonaws/aws-java-sdk-core "1.11.410"]
                  [com.amazonaws/aws-java-sdk-s3 "1.11.410"]
-                 [com.climate/clj-newrelic "0.2.1"]
                  [democracyworks/squishy "3.0.2"
                     :exclusions [joda-time
                                  org.slf4j/slf4j-simple
@@ -35,7 +34,6 @@
                  [xerces/xercesImpl "2.12.0"]
                  [com.fasterxml.woodstox/woodstox-core "5.1.0"]
                  [me.raynes/fs "1.4.6"]]
-  :plugins [[com.pupeno/jar-copier "0.4.0"]]
   :profiles {:test {:resource-paths ["test-resources"]
                     :dependencies [[com.github.kyleburton/clj-xpath "1.4.11"]]}
              :dev {:source-paths ["dev-src"]
@@ -45,8 +43,5 @@
                    :postgres :postgres
                    :all (constantly true)}
   :repl-options {:init (set! *print-length* 50)}
-  :java-agents [[com.newrelic.agent.java/newrelic-agent "4.5.0"]]
-  :jar-copier {:java-agents true
-               :destination "resources/jars"}
-  :prep-tasks ["javac" "compile" "jar-copier"]
+  :prep-tasks ["javac" "compile"]
   :main vip.data-processor)

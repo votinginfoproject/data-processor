@@ -3,7 +3,6 @@
             [clojure.set :as set]
             [clojure.string :as str]
             [clojure.tools.logging :as log]
-            [com.climate.newrelic.trace :refer [defn-traced]]
             [korma.core :as korma]
             [korma.db :as db]
             [vip.data-processor.db.postgres :as postgres]
@@ -32,7 +31,7 @@
   [bad-files]
   (->> bad-files (map #(.getName %)) sort (str/join ", ")))
 
-(defn-traced remove-bad-filenames
+(defn remove-bad-filenames
   "Filters out any files in `input` from our files to process based on
   whether or not they are included in our `data-spec`. Warns us if
   we've found any bad ones, otherwise returns the context as-is."
@@ -212,7 +211,7 @@
             (make-row-translation-fn columns column-names headers)}
             (chunk-rows-and-process ctx data-spec)))))
 
-(defn-traced bulk-import-and-validate-csv
+(defn bulk-import-and-validate-csv
   "Bulk importing and CSV validation is done in one go, so that it can
   be done without holding the entire file in memory at once."
   [ctx {:keys [filename] :as data-spec}]
@@ -226,7 +225,7 @@
           (errors/add-errors ctx :fatal filename :global :csv-error (.getMessage e)))))
     ctx))
 
-(defn-traced load-csvs
+(defn load-csvs
   [{:keys [data-specs post-process-street-segments?] :as ctx}]
   (->> (if post-process-street-segments?
          (do (log/info "Skipping street_segment.txt CSV file processing.")
