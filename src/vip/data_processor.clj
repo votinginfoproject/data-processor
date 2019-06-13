@@ -82,22 +82,20 @@
    (process-message message nil))
   ([message delete-callback]
    (log/info "processing SQS message" (pr-str message))
-   (q/publish {:initial-input message
-               :status :started}
-              "processing.started")
    (let [result (pipeline/process pipeline message delete-callback)
-         _ (psql/complete-run result)
-         _ (log/info "New run completed:"
-                     (psql/get-run result))
          exception (:exception result)
-         completed-message (cond-> {:initial-input message
-                                    :status :complete
-                                    :public-id (:public-id result)}
-                             exception (assoc :exception (.getMessage exception)))]
-     (q/publish completed-message
-                  "processing.complete")
-       (when exception
-         (throw exception)))))
+         completed-message {:initial-input message
+                            :status :complete
+                            :public-id (:public-id result)}]
+     (psql/complete-run result)
+     (log/info "New run completed:"
+               (psql/get-run result))
+     (if exception
+       (q/publish-failure (merge completed-message
+                                 {:exception (.getMessage exception)}))
+       (q/publish-success completed-message))
+     (when exception
+       (throw exception)))))
 
 (defn consume []
   (let [{:keys [access-key secret-key]} (config [:aws :creds])
@@ -116,12 +114,10 @@
     (log/info "VIP Data Processor starting up. ID:" id)
     (q/initialize)
     (psql/initialize)
-    (q/publish {:id id :event "starting"} "qa-engine.status")
     (let [consumer-id (consume)]
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn []
                                    (log/info "VIP Data Processor shutting down...")
-                                   (q/publish {:id id :event "stopping"} "qa-engine.status")
                                    (sqs/stop-consumer consumer-id))))
       (log/info "SQS processing started")
       consumer-id)))

@@ -5,13 +5,13 @@
        :sqs {:region #aws/region #resource-config/env "VIP_DP_SQS_REGION"
              :queue #resource-config/env "VIP_DP_SQS_QUEUE"
              :fail-queue #resource-config/env "VIP_DP_SQS_FAIL_QUEUE"
-             :visibility-timeout 43200}}
+             :visibility-timeout 43200}
+       :sns {:region #resource-config/env "VIP_DP_SNS_REGION"
+             :success-topic-arn #resource-config/env "VIP_DP_SNS_SUCCESS_TOPIC"
+             :failure-topic-arn #resource-config/env "VIP_DP_SNS_FAILURE_TOPIC"}}
  :postgres {:host #resource-config/env "DB_PORT_5432_TCP_ADDR"
             :port #resource-config/env "DB_PORT_5432_TCP_PORT"
             :user #resource-config/env "DB_ENV_POSTGRES_USER"
             :password #resource-config/env "DB_ENV_POSTGRES_PASSWORD"
             :database #resource-config/env "DB_ENV_POSTGRES_DATABASE"}
- :rabbitmq {:connection {:host #resource-config/env "RABBITMQ_PORT_5672_TCP_ADDR"
-                         :port #resource-config/edn #resource-config/env "RABBITMQ_PORT_5672_TCP_PORT"}
-            :exchange #resource-config/env "VIP_DP_RABBITMQ_EXCHANGE"}
- :max-zipfile-size #resource-config/edn #resource-config/env "VIP_DP_MAX_ZIPFILE_SIZE"}
+  :max-zipfile-size #resource-config/edn #resource-config/env "VIP_DP_MAX_ZIPFILE_SIZE"}

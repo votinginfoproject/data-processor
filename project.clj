@@ -5,7 +5,6 @@
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/tools.logging "0.5.0-alpha.1"]
                  [ch.qos.logback/logback-classic "1.2.3"]
-                 [com.novemberain/langohr "5.0.0"]
                  [joda-time "2.10.2"]
                  [clj-time "0.15.1"]
                  [amazonica "0.3.143"
@@ -13,6 +12,9 @@
                                com.amazonaws/amazon-kinesis-client]]
                  [com.amazonaws/aws-java-sdk-core "1.11.569"]
                  [com.amazonaws/aws-java-sdk-s3 "1.11.569"]
+                 [com.cognitect.aws/api "0.8.273"]
+                 [com.cognitect.aws/endpoints "1.1.11.507"]
+                 [com.cognitect.aws/sns "697.2.391.0"]
                  [democracyworks/squishy "3.0.2"
                     :exclusions [joda-time
                                  org.slf4j/slf4j-simple
