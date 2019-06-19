@@ -112,7 +112,6 @@
 (defn -main [& args]
   (let [id (java.util.UUID/randomUUID)]
     (log/info "VIP Data Processor starting up. ID:" id)
-    (q/initialize)
     (psql/initialize)
     (let [consumer-id (consume)]
       (.addShutdownHook (Runtime/getRuntime)
