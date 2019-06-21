@@ -84,9 +84,9 @@
    (log/info "processing SQS message" (pr-str message))
    (let [result (pipeline/process pipeline message delete-callback)
          exception (:exception result)
-         completed-message {:initial-input message
-                            :status :complete
-                            :public-id (:public-id result)}]
+         completed-message {:initialInput message
+                            :status "complete"
+                            :publicId (:public-id result)}]
      (psql/complete-run result)
      (log/info "New run completed:"
                (psql/get-run result))

@@ -1,5 +1,6 @@
 (ns vip.data-processor.queue
-  (:require [clojure.tools.logging :as log]
+  (:require [clojure.data.json :as json]
+            [clojure.tools.logging :as log]
             [cognitect.aws.client.api :as aws]
             [cognitect.aws.credentials :as credentials]
             [turbovote.resource-config :refer [config]]))
@@ -21,7 +22,7 @@
   [sns-client topic payload]
   (aws/invoke sns-client {:op :Publish
                           :request {:TopicArn topic
-                                    :Message (pr-str payload)}}))
+                                    :Message payload}}))
 
 (defn publish-success
   "Publish a successful feed processing message to the topic."
@@ -30,8 +31,9 @@
                     (config [:aws :sns :success-topic-arn])
                     payload))
   ([sns-client topic payload]
-   (log/debug "publishing success to " topic " with payload " (pr-str payload))
-   (publish sns-client topic payload)))
+   (let [json-payload (json/write-str payload)]
+     (log/debug "publishing success to " topic " with payload " json-payload)
+     (publish sns-client topic json-payload))))
 
 (defn publish-failure
   "Publish a failed feed processing message to the topic."
@@ -40,5 +42,6 @@
                     (config [:aws :sns :failure-topic-arn])
                     payload))
   ([sns-client topic payload]
-   (log/debug "publishing failure to " topic " with payload " (pr-str payload))
-   (publish sns-client topic payload)))
+   (let [json-payload (json/write-str payload)]
+     (log/debug "publishing failure to " topic " with payload " json-payload)
+     (publish sns-client topic json-payload))))

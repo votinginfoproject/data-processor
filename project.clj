@@ -2,6 +2,7 @@
   :description "Voting Information Project Data Processor"
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/data.csv "0.1.4"]
+                 [org.clojure/data.json "0.2.6"]
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/tools.logging "0.5.0-alpha.1"]
                  [ch.qos.logback/logback-classic "1.2.3"]
