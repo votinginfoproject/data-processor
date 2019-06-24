@@ -1,13 +1,11 @@
 {:aws {:creds {:access-key #resource-config/env "VIP_DP_AWS_ACCESS_KEY"
                :secret-key #resource-config/env "VIP_DP_AWS_SECRET_KEY"}
-       :s3 {:processed-bucket #resource-config/env "VIP_DP_S3_PROCESSED_BUCKET"
-            :endpoint #resource-config/env "VIP_DP_S3_REGION"}
-       :sqs {:region #aws/region #resource-config/env "VIP_DP_SQS_REGION"
-             :queue #resource-config/env "VIP_DP_SQS_QUEUE"
+       :region #resource-config/env "VIP_DP_AWS_REGION"
+       :s3 {:processed-bucket #resource-config/env "VIP_DP_S3_PROCESSED_BUCKET"}
+       :sqs {:queue #resource-config/env "VIP_DP_SQS_QUEUE"
              :fail-queue #resource-config/env "VIP_DP_SQS_FAIL_QUEUE"
              :visibility-timeout 43200}
-       :sns {:region #resource-config/env "VIP_DP_SNS_REGION"
-             :success-topic-arn #resource-config/env "VIP_DP_SNS_SUCCESS_TOPIC"
+       :sns {:success-topic-arn #resource-config/env "VIP_DP_SNS_SUCCESS_TOPIC"
              :failure-topic-arn #resource-config/env "VIP_DP_SNS_FAILURE_TOPIC"}}
  :postgres {:host #resource-config/env "DB_PORT_5432_TCP_ADDR"
             :port #resource-config/env "DB_PORT_5432_TCP_PORT"

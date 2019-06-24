@@ -9,14 +9,14 @@
   ([]
    (sns-client (config [:aws :creds :access-key])
                (config [:aws :creds :secret-key])
-               (config [:aws :sns :region])))
+               (config [:aws :region])))
   ([access-key secret-key region]
    (aws/client
     {:api                  :sns
+     :region               region
      :credentials-provider (credentials/basic-credentials-provider
                             {:access-key-id     access-key
-                             :secret-access-key secret-key
-                             :region            region})})))
+                             :secret-access-key secret-key})})))
 
 (defn- publish
   [sns-client topic payload]

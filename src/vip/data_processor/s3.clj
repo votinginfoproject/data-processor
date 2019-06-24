@@ -15,13 +15,13 @@
 
 (defn get-object [key bucket]
   (s3/get-object (merge (config [:aws :creds])
-                        {:endpoint (config [:aws :s3 :endpoint])})
+                        {:endpoint (config [:aws :region])})
                  bucket
                  key))
 
 (defn put-object [key value]
   (s3/put-object (merge (config [:aws :creds])
-                        {:endpoint (config [:aws :s3 :endpoint])})
+                        {:endpoint (config [:aws :region])})
                  (config [:aws :s3 :processed-bucket])
                  key value))
 

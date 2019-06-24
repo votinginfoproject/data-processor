@@ -3,7 +3,7 @@ processor:
   links:
     - testdb:db
   environment:
-    VIP_DP_SQS_REGION: US_WEST_2
+    VIP_DP_AWS_REGION: us-east-1
   command: lein test :postgres
 
 testdb:

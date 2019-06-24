@@ -64,13 +64,11 @@ POSTGRES_USER=
 POSTGRES_PASSWORD=
 VIP_DP_AWS_ACCESS_KEY=
 VIP_DP_AWS_SECRET_KEY=
+VIP_DP_AWS_REGION=
 VIP_DP_S3_UNPROCESSED_BUCKET=
 VIP_DP_S3_PROCESSED_BUCKET=
-VIP_DP_S3_REGION=
-VIP_DP_SQS_REGION=
 VIP_DP_SQS_QUEUE=
 VIP_DP_SQS_FAIL_QUEUE=
-VIP_DP_SNS_REGION=
 VIP_DP_SNS_SUCCESS_TOPIC=
 VIP_DP_SNS_FAILURE_TOPIC=
 VIP_DP_MAX_ZIPFILE_SIZE=(3221225472 = 3GB by default)
@@ -90,11 +88,7 @@ The SNS topics are for broadcasting the results of feed processing, one for succ
 outcomes and the other for failures. Interested applications will subscribe an SQS
 queue to the topic and get a copy of the message.
 
-There are three different places to set the region, one for S3, SQS and SNS, and the
-libraries we use require different forms of this setting. The
-`VIP_DP_S3_REGION` and `VIP_DP_SNS_REGION` setting needs to be in the form of `us-east-1`.
-The value for `VIP_DP_SQS_REGION` is in the form of
-`US_WEST_2` (not `us-west-2`).
+The format for the VIP_DP_AWS_REGION should be like `us-east-1`.
 
 Running it is as per usual for docker-compose:
 
