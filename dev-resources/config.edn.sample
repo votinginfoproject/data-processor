@@ -1,8 +1,7 @@
 {:aws {:creds {:access-key "AAAA..."
                :secret-key "sb3nfo..."}
        :region "us-east-1"
-       :s3 {:unprocessed-bucket "bucket-name"
-            :processed-bucket "bucket-name"}
+       :s3 {:processed-bucket "bucket-name"}
        :sqs {:queue "vip-processor-queue"
              :fail-queue "vip-processor-fail-queue"}
        :sns {:success-topic-arn "dev-feed-processed-success"

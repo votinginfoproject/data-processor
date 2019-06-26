@@ -12,4 +12,4 @@
             :user #resource-config/env "DB_ENV_POSTGRES_USER"
             :password #resource-config/env "DB_ENV_POSTGRES_PASSWORD"
             :database #resource-config/env "DB_ENV_POSTGRES_DATABASE"}
-  :max-zipfile-size #resource-config/edn #resource-config/env "VIP_DP_MAX_ZIPFILE_SIZE"}
+ :max-zipfile-size #resource-config/edn #resource-config/env "VIP_DP_MAX_ZIPFILE_SIZE"}
