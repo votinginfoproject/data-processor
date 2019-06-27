@@ -16,7 +16,7 @@
                  [com.cognitect.aws/api "0.8.273"]
                  [com.cognitect.aws/endpoints "1.1.11.507"]
                  [com.cognitect.aws/sns "697.2.391.0"]
-                 [democracyworks/squishy "3.0.2"
+                 [democracyworks/squishy "3.1.0-SNAPSHOT"
                     :exclusions [joda-time
                                  org.slf4j/slf4j-simple
                                  org.slf4j/slf4j-api]]
