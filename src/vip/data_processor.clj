@@ -16,7 +16,6 @@
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.v5 :as v5-1-validations]
             [vip.data-processor.validation.zip :as zip])
-  (:import [com.amazonaws.regions Regions Region])
   (:gen-class))
 
 (defn ack-sqs-message
@@ -100,14 +99,12 @@
 
 (defn consume []
   (let [{:keys [access-key secret-key]} (config [:aws :creds])
-        java-region (-> (config [:aws :region])
-                        Regions/fromName
-                        Region/getRegion)
+        region (config [:aws :region])
         {:keys [queue fail-queue
                 visibility-timeout]} (config [:aws :sqs])
         creds {:access-key access-key
                :access-secret secret-key
-               :region java-region}
+               :region region}
         opts (merge {:delete-callback true}
               (when visibility-timeout
                 {:visibility-timeout visibility-timeout}))]
