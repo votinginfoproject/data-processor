@@ -7,9 +7,12 @@
 
 (defn sns-client
   ([]
-   (sns-client (config [:aws :creds :access-key])
-               (config [:aws :creds :secret-key])
-               (config [:aws :region])))
+   ;; memoize the default sns-client construction, so that
+   ;; we can avoid creating extra thread pools over time.
+   ;; see https://github.com/cognitect-labs/aws-api/issues/80
+   (memoize (sns-client (config [:aws :creds :access-key])
+                        (config [:aws :creds :secret-key])
+                        (config [:aws :region]))))
   ([access-key secret-key region]
    (aws/client
     {:api                  :sns
