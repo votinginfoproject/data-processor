@@ -6,20 +6,24 @@
             [turbovote.resource-config :refer [config]]))
 
 (defn sns-client
-  ([]
+  [access-key secret-key region]
+   (aws/client
+    {:api                  :sns
+     :region               region
+     :credentials-provider (credentials/basic-credentials-provider
+                            {:access-key-id     access-key
+                             :secret-access-key secret-key})}))
+
+(def sns-client-memo (memoize sns-client))
+
+(defn default-sns-client
+  []
    ;; memoize the default sns-client construction, so that
    ;; we can avoid creating extra thread pools over time.
    ;; see https://github.com/cognitect-labs/aws-api/issues/80
    (memoize (sns-client (config [:aws :creds :access-key])
                         (config [:aws :creds :secret-key])
                         (config [:aws :region]))))
-  ([access-key secret-key region]
-   (aws/client
-    {:api                  :sns
-     :region               region
-     :credentials-provider (credentials/basic-credentials-provider
-                            {:access-key-id     access-key
-                             :secret-access-key secret-key})})))
 
 (defn- publish
   [sns-client topic payload]
@@ -30,7 +34,7 @@
 (defn publish-success
   "Publish a successful feed processing message to the topic."
   ([payload]
-   (publish-success (sns-client)
+   (publish-success (default-sns-client)
                     (config [:aws :sns :success-topic-arn])
                     payload))
   ([sns-client topic payload]
@@ -41,7 +45,7 @@
 (defn publish-failure
   "Publish a failed feed processing message to the topic."
   ([payload]
-   (publish-failure (sns-client)
+   (publish-failure (default-sns-client)
                     (config [:aws :sns :failure-topic-arn])
                     payload))
   ([sns-client topic payload]
