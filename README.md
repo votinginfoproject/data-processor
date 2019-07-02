@@ -83,7 +83,7 @@ The SQS queues are for initiating feed processing with a message structured like
 `{:filename "path/to/file.zip" :bucket "source-s3-bucket"}`. Sending this to
 the queue configured as `VIP_DP_SQS_QUEUE` will kick off processing of the file located
 in `source-s3-bucket/path/to/file.zip`. If, for some reason, processing fails, a copy of
-the message is sent to the FAIL_QUEUE, wrapped with some extra info about the attempt
+the message is sent to the `VIP_DP_SQS_FAIL_QUEUE`, wrapped with some extra info about the attempt
 and the cause of the failure.
 
 The SNS topics are for broadcasting the results of feed processing, one for successful
