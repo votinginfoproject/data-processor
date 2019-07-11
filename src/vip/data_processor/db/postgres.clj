@@ -489,3 +489,8 @@
                   (log/error "Lazy failure case: " (.getMessage e))
                   chunked-rows)))]
         (trampoline chunked-rows)))))
+
+(defn prep-v5-1-run [ctx]
+  (-> ctx
+      (assoc :tables v5-1-tables)
+      (assoc :ltree-index 0)))

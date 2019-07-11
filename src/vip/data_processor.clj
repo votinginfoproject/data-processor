@@ -1,6 +1,5 @@
 (ns vip.data-processor
   (:require [clojure.tools.logging :as log]
-            [squishy.core :as sqs]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.cleanup :as cleanup]
             [vip.data-processor.db.postgres :as psql]
@@ -18,22 +17,11 @@
             [vip.data-processor.validation.zip :as zip])
   (:gen-class))
 
-(defn ack-sqs-message
-  "If we were configured with a delete-callback from SQS, call it, effectively
-   acking that data-processor has received and kicked off processing.
-
-   This will allow us to process very long feeds without spawning zombie
-   processes after 12 hours, the maximum time we could keep a message
-   checked out."
-  [{:keys [delete-callback] :as ctx}]
-  (when delete-callback (delete-callback))
-  ctx)
-
 (def download-pipeline
   [t/read-edn-sqs-message
    t/assert-filename
    psql/start-run
-   ack-sqs-message
+   q/ack-sqs-message
    t/download-from-s3
    #(zip/assoc-file % (config [:max-zipfile-size] 3221225472)) ; 3GB default
    zip/extracted-contents])
@@ -81,7 +69,7 @@
   ([message]
    (process-message message nil))
   ([message delete-callback]
-   (log/info "processing SQS message" (pr-str message))
+   (log/info "processing message" (pr-str message))
    (let [result (pipeline/process pipeline message delete-callback)
          exception (:exception result)
          completed-message {:initialInput message
@@ -97,27 +85,14 @@
      (when exception
        (throw exception)))))
 
-(defn consume []
-  (let [{:keys [access-key secret-key]} (config [:aws :creds])
-        region (config [:aws :region])
-        {:keys [queue fail-queue
-                visibility-timeout]} (config [:aws :sqs])
-        creds {:access-key access-key
-               :access-secret secret-key
-               :region region}
-        opts (merge {:delete-callback true}
-              (when visibility-timeout
-                {:visibility-timeout visibility-timeout}))]
-    (sqs/consume-messages creds queue fail-queue opts process-message)))
-
 (defn -main [& args]
   (let [id (java.util.UUID/randomUUID)]
     (log/info "VIP Data Processor starting up. ID:" id)
     (psql/initialize)
-    (let [consumer-id (consume)]
+    (let [consumer-id (q/consume)]
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn []
                                    (log/info "VIP Data Processor shutting down...")
-                                   (sqs/stop-consumer consumer-id))))
+                                   (q/stop-consumer consumer-id))))
       (log/info "SQS processing started")
       consumer-id)))
