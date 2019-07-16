@@ -28,16 +28,6 @@
         (update :to-be-cleaned conj file)
         (assoc :input file))))
 
-(def xml-validations
-  [xml/determine-spec-version
-   xml/branch-on-spec-version])
-
-(def csv-validations
-  [csv/error-on-missing-files
-   csv/determine-spec-version
-   csv/remove-bad-filenames
-   csv/branch-on-spec-version])
-
 (defn remove-invalid-extensions [ctx]
   (let [files (:input ctx)
         valid-extensions #{"csv" "txt" "xml"}
@@ -54,13 +44,3 @@
       (errors/add-errors ctx :warnings :import :global :invalid-extensions
                          (map #(.getName %) invalid-files))
       ctx)))
-
-(defn xml-csv-branch [ctx]
-  (let [file-extensions (->> ctx
-                             :input
-                             (map #(-> % str (s/split #"\.") last s/lower-case))
-                             set)
-        filetype-validations (condp set/superset? file-extensions
-                               #{"txt" "csv"} csv-validations
-                               #{"xml"} xml-validations)]
-    (update ctx :pipeline (partial concat filetype-validations))))

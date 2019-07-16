@@ -4,18 +4,11 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [korma.core :as korma]
-            [korma.db :as db]
-            [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.db.translations.transformer :as v5-1-transformers]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.errors :as errors]
-            [vip.data-processor.errors.process :as process]
-            [vip.data-processor.output.tree-xml :as tree-xml]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.csv.file-set :as csv-files]
-            [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]))
+            [vip.data-processor.validation.data-spec :as data-spec]))
 
 (defn good-filename?
   "Compares `file`'s name against all the filenames in `data-specs` to
@@ -261,24 +254,3 @@
                                     (util/version-without-patch version))))))
     (errors/add-errors ctx :fatal :sources :global :missing-csv
                        "source.txt is missing")))
-
-(defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported CSV version: " (pr-str @spec-version))))
-
-(def version-pipelines
-  {"3.0" [sqlite/attach-sqlite-db
-          process/process-v3-validations
-          (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
-          load-csvs]
-   "5.1" (concat [(fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
-                  (fn [ctx] (assoc ctx :ltree-index 0))
-                  process/process-v5-validations
-                  load-csvs]
-                 v5-1-transformers/transformers
-                 tree-xml/pipeline)})
-
-(defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines
-                         (util/version-without-patch @spec-version))]
-    (update ctx :pipeline (partial concat pipeline))
-    (unsupported-version ctx)))

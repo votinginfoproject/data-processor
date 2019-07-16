@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.zip
-  (:require [clojure.tools.logging :as log])
+  (:require [clojure.tools.logging :as log]
+            [turbovote.resource-config :refer [config]])
   (:import [net.lingala.zip4j.core ZipFile]
            [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
@@ -39,21 +40,24 @@
       (do (.extractAll zip-file (str tmp-dir))
           tmp-dir))))
 
-(defn assoc-file [ctx max-zipfile-size]
-  (let [path (:input ctx)]
-    (log/info "Starting to process from path:" (str path))
-    (cond
-      (zip-file? path)
-      (try
-        (assoc ctx :input (unzip-file path max-zipfile-size))
-        (catch Exception e
-          (if-let [max-zipfile-size-exceeded (ex-data e)]
-            (assoc ctx :stop (:msg (ex-data e)))
-            (throw e))))
+(defn assoc-file
+  ([ctx]
+   (assoc-file ctx (config [:max-zipfile-size] 3221225472)))
+  ([ctx max-zipfile-size]
+   (let [path (:input ctx)]
+     (log/info "Starting to process from path:" (str path))
+     (cond
+       (zip-file? path)
+       (try
+         (assoc ctx :input (unzip-file path max-zipfile-size))
+         (catch Exception e
+           (if-let [max-zipfile-size-exceeded (ex-data e)]
+             (assoc ctx :stop (:msg (ex-data e)))
+             (throw e))))
 
-      (xml-file? path) (assoc ctx :input path)
+       (xml-file? path) (assoc ctx :input path)
 
-      :else (assoc ctx :stop (str path " is not a zip or xml file!")))))
+       :else (assoc ctx :stop (str path " is not a zip or xml file!"))))))
 
 (defn zip-contents
   "Returns a seq of Files from the path of a extracted zip file. If

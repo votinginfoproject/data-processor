@@ -16,8 +16,10 @@
 (defn error-if-not-one-row [ctx count]
   "If the count of the rows is not equal to 1, add an error."
   (if-not (= 1 (:count count))
-    (errors/add-errors ctx :errors (:name count) :global :row-constraint
-                       "File needs to contain exactly one row.")
+    (do
+      (println (:name count) " has " (:count count) " rows!")
+      (errors/add-errors ctx :errors (:name count) :global :row-constraint
+                           "File needs to contain exactly one row."))
     ctx))
 
 (defn tables-allow-only-one-record

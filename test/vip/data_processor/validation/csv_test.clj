@@ -197,30 +197,3 @@
                :spec-version (atom nil)}
           out-ctx (determine-spec-version ctx)]
       (is (= "5.1" @(get out-ctx :spec-version))))))
-
-(deftest branch-on-spec-version-test
-  (testing "add the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
-    (let [ctx {:spec-version (atom "3.0")}
-          out-ctx (branch-on-spec-version ctx)
-          three-point-0-pipeline (get version-pipelines "3.0")]
-      (is (= three-point-0-pipeline
-             (take (count three-point-0-pipeline) (:pipeline out-ctx))))))
-
-  (testing "add the 5.1 import pipeline to the front of the pipeline for 5.1 feeds"
-    (let [ctx {:spec-version (atom "5.1")}
-          out-ctx (branch-on-spec-version ctx)
-          five-point-0-pipeline (get version-pipelines "5.1")]
-      (is (= five-point-0-pipeline
-             (take (count five-point-0-pipeline) (:pipeline out-ctx))))))
-
-  (testing "stops with unsupported version for other versions"
-    (let [ctx {:spec-version (atom "2.0")   ; 2.0 is too old
-               :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported CSV version"))))
-
-  (testing "stops with unsupported version for other versions"
-    (let [ctx {:spec-version (atom "5.2")  ; 5.1 is cool; 5.2 is vaporware
-               :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported CSV version")))))

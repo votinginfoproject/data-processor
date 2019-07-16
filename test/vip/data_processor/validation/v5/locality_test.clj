@@ -1,5 +1,5 @@
 (ns vip.data-processor.validation.v5.locality-test
-  (:require [vip.data-processor.validation.v5.locality :as v5.locality]
+  (:require [vip.data-processor.validation.v5.locality :as locality]
             [clojure.test :refer :all]
             [korma.core :as korma]
             [vip.data-processor.test-helpers :refer :all]
@@ -9,8 +9,8 @@
             [vip.data-processor.errors.process :as process]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.transforms :as t]
-            [vip.data-processor.validation.v5 :as v5]
             [vip.data-processor.validation.xml :as xml]
+            [vip.data-processor.validation.v5 :as v5]
             [clojure.core.async :as a]))
 
 (use-fixtures :once setup-postgres)
@@ -22,7 +22,7 @@
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.locality/validate-no-missing-names)
+                    locality/validate-no-missing-names)
         errors (all-errors errors-chan)]
     (testing "name missing is an error"
       (is (contains-error? errors
@@ -44,7 +44,7 @@
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.locality/validate-no-missing-state-ids)
+                    locality/validate-no-missing-state-ids)
         errors (all-errors errors-chan)]
     (testing "state-id missing is an error"
       (is (contains-error? errors
@@ -61,12 +61,14 @@
 
 (deftest ^:postgres populating-paths-by-locality
   (let [errors-chan (a/chan 100)
-        pipeline [psql/start-run
-                  t/xml-csv-branch
-                  data-processor/add-validations
-                  errors/close-errors-chan
-                  errors/await-statistics
-                  psql/populate-locality-table]
+        pipeline (concat
+                  [psql/start-run
+                   process/process-v5-validations
+                   xml/load-xml-ltree
+                   psql/populate-locality-table]
+                  v5/validations
+                  [errors/close-errors-chan
+                   errors/await-statistics])
         ctx {:input (xml-input "v5-locality-summaries.xml")
              :spec-version (atom "5.1.2")
              :errors-chan errors-chan
@@ -90,13 +92,14 @@
 
 (deftest ^:postgres locality-error-report
   (let [errors-chan (a/chan 100)
-        pipeline [psql/start-run
-                  t/xml-csv-branch
-                  data-processor/add-validations
-                  errors/close-errors-chan
-                  errors/await-statistics
-                  psql/store-public-id
-                  psql/populate-locality-table]
+        pipeline (concat
+                  [psql/start-run
+                   process/process-v5-validations
+                   xml/load-xml-ltree
+                   psql/populate-locality-table]
+                  v5/validations
+                  [errors/close-errors-chan
+                   errors/await-statistics])
         ctx {:input (xml-input "v5-locality-summaries.xml")
              :spec-version (atom "5.1.2")
              :errors-chan errors-chan
@@ -127,12 +130,14 @@
 
 (deftest ^:postgres locality-summary-test
   (let [errors-chan (a/chan 100)
-        pipeline [psql/start-run
-                  t/xml-csv-branch
-                  psql/v5-summary-branch
-                  data-processor/add-validations
-                  errors/close-errors-chan
-                  errors/await-statistics]
+        pipeline (concat
+                  [psql/start-run
+                   process/process-v5-validations
+                   xml/load-xml-ltree
+                   psql/populate-locality-table]
+                  v5/validations
+                  [errors/close-errors-chan
+                   errors/await-statistics])
         ctx {:input (xml-input "v5-locality-summaries.xml")
              :spec-version (atom "5.1.2")
              :errors-chan errors-chan

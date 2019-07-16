@@ -6,7 +6,6 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.v5 :as v5-validations]
             [vip.data-processor.validation.xml.v5 :as xml.v5]
             [vip.data-processor.errors :as errors]
             [vip.data-processor.errors.process :as process]))
@@ -260,24 +259,6 @@
             (assoc :data-specs (get data-spec/version-specs
                                     (util/version-without-patch version))))))))
 
-(defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported XML version: " (pr-str @spec-version))))
-
 (defn set-input-as-xml-output-file
   [{:keys [input] :as ctx}]
   (assoc ctx :xml-output-file (first input)))
-
-(def version-pipelines
-  {"3.0" [sqlite/attach-sqlite-db
-          process/process-v3-validations
-          load-xml]
-   "5.1" [process/process-v5-validations
-          load-xml-ltree
-          xml.v5/load-xml-street-segments
-          set-input-as-xml-output-file]})
-
-(defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines
-                         (util/version-without-patch @spec-version))]
-    (update ctx :pipeline (partial concat pipeline))
-    (unsupported-version ctx)))

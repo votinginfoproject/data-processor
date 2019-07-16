@@ -1,7 +1,8 @@
 (ns vip.data-processor.output.xml-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
-            [vip.data-processor.output.xml :refer :all]
+            [vip.data-processor.output.xml :as output]
+            [vip.data-processor.output.xml-helpers :as helpers]
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
@@ -27,16 +28,18 @@
           ctx (merge {:input filenames
                       :spec-version (atom "3.0")
                       :errors-chan errors-chan
-                      :pipeline (concat [(data-spec/add-data-specs
-                                          v3-0/data-specs)
-                                         csv/error-on-missing-files
-                                         csv/determine-spec-version
-                                         csv/remove-bad-filenames
-                                         sqlite/attach-sqlite-db
-                                         (csv-files/validate-dependencies
-                                          csv-files/v3-0-file-dependencies)
-                                         csv/load-csvs]
-                                        pipeline)} db)
+                      :pipeline [(data-spec/add-data-specs
+                                  v3-0/data-specs)
+                                 csv/error-on-missing-files
+                                 csv/determine-spec-version
+                                 csv/remove-bad-filenames
+                                 sqlite/attach-sqlite-db
+                                 (csv-files/validate-dependencies
+                                  csv-files/v3-0-file-dependencies)
+                                 csv/load-csvs
+                                 helpers/create-xml-file
+                                 output/write-xml
+                                 output/validate-xml-output]} db)
           results-ctx (pipeline/run-pipeline ctx)
           xml-doc (-> results-ctx
                       :xml-output-file
@@ -105,7 +108,7 @@
           ctx {:xml-output-file good-xml
                :errors-chan errors-chan
                :vip-version "3.0"}
-          results-ctx (validate-xml-output ctx)
+          results-ctx (output/validate-xml-output ctx)
           errors (all-errors errors-chan)]
       (assert-no-problems errors {})))
 
@@ -118,7 +121,7 @@
           ctx {:xml-output-file bad-xml
                :errors-chan errors-chan
                :vip-version "3.0"}
-          results-ctx (validate-xml-output ctx)
+          results-ctx (output/validate-xml-output ctx)
           errors (all-errors errors-chan)]
       (is (contains-error? errors
                            {:severity :errors

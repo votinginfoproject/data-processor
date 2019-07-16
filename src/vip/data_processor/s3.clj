@@ -1,6 +1,7 @@
 (ns vip.data-processor.s3
   (:require [amazonica.aws.s3 :as s3]
             [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
             [turbovote.resource-config :refer [config]]
             [korma.core :as korma]
             [clojure.string :as str]
@@ -92,25 +93,31 @@
                          import-id "VipObject.Election.Date")]
       (zip-filename* fips state election-date))))
 
+(defn generate-xml-filename
+  [ctx]
+  (assoc ctx :generated-xml-filename (zip-filename ctx)))
+
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
-  [{:keys [fatal-errors? xml-output-file] :as ctx}]
-  (let [zip-name (zip-filename ctx)
-        zip-dir (Files/createTempDirectory tmp-path-prefix
-                                           (into-array FileAttribute []))
-        zip-file (File. (.toFile zip-dir) zip-name)
-        zip (ZipFile. zip-file)
-        zip-params (doto (ZipParameters.)
-                     (.setCompressionLevel
-                      Zip4jConstants/DEFLATE_LEVEL_NORMAL))
-        xml-file (if (instance? File xml-output-file)
-                   xml-output-file
-                   (.toFile xml-output-file))]
-    (.createZipFile zip xml-file zip-params)
-    ;; We don't want to push this to S3 at all if we have fatal errors
-    ;; as it may break ingestion and waste time.
-    (when-not fatal-errors?
-      (put-object zip-name zip-file))
-    (-> ctx
-        (assoc :generated-xml-filename zip-name)
-        (update :to-be-cleaned concat [zip-file zip-dir]))))
+  [{:keys [fatal-errors? xml-output-file generated-xml-filename] :as ctx}]
+  (if-not (get ctx :skip-upload? false)
+    (let [zip-name (zip-filename ctx)
+          zip-dir (Files/createTempDirectory tmp-path-prefix
+                                             (into-array FileAttribute []))
+          zip-file (File. (.toFile zip-dir) generated-xml-filename)
+          zip (ZipFile. zip-file)
+          zip-params (doto (ZipParameters.)
+                       (.setCompressionLevel
+                        Zip4jConstants/DEFLATE_LEVEL_NORMAL))
+          xml-file (if (instance? File xml-output-file)
+                     xml-output-file
+                     (.toFile xml-output-file))]
+      (log/info "CTX: " (pr-str ctx))
+      (.createZipFile zip xml-file zip-params)
+      ;; We don't want to push this to S3 at all if we have fatal errors
+      ;; as it may break ingestion and waste time.
+      (when-not fatal-errors?
+        (put-object generated-xml-filename zip-file))
+      (-> ctx
+          (update :to-be-cleaned concat [zip-file zip-dir])))
+    ctx))

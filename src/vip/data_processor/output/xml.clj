@@ -89,8 +89,3 @@
       ctx
       (catch SAXParseException e
         (errors/add-errors ctx :errors :xml-generation :global :invalid-xml (.getMessage e))))))
-
-(def pipeline
-  [create-xml-file
-   write-xml
-   validate-xml-output])

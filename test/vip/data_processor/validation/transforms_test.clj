@@ -1,8 +1,10 @@
 (ns vip.data-processor.validation.transforms-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
+            [vip.data-processor.errors.process :as process]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
+            [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
@@ -24,9 +26,16 @@
           ctx (merge {:input filenames
                       :errors-chan errors-chan
                       :spec-version (atom nil)
-                      :pipeline (concat [(data-spec/add-data-specs v3-0/data-specs)]
-                                        csv-validations
-                                        db/validations)} db)
+                      :pipeline (concat
+                                 [(data-spec/add-data-specs v3-0/data-specs)
+                                  csv/error-on-missing-files
+                                  csv/determine-spec-version
+                                  csv/remove-bad-filenames
+                                  sqlite/attach-sqlite-db
+                                  process/process-v3-validations
+                                  (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
+                                  csv/load-csvs]
+                                 db/validations)} db)
           results-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
       (is (nil? (:stop results-ctx)))

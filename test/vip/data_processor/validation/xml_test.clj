@@ -13,7 +13,8 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma]
-            [vip.data-processor.errors :as errors]))
+            [vip.data-processor.errors :as errors]
+            [vip.data-processor.errors.process :as process]))
 
 (deftest load-xml-test
   (testing "loads data into the db from an XML file"
@@ -150,7 +151,9 @@
                       :errors-chan errors-chan
                       :spec-version (atom nil)
                       :pipeline (concat [determine-spec-version
-                                         branch-on-spec-version]
+                                         sqlite/attach-sqlite-db
+                                         process/process-v3-validations
+                                         load-xml]
                                         db/validations)}
                      (sqlite/temp-db "full-good-xml" "3.0"))
           out-ctx (pipeline/run-pipeline ctx)
@@ -379,40 +382,6 @@
                :spec-version (atom nil)}
           out-ctx (determine-spec-version ctx)]
       (is (= "3.0" @(get out-ctx :spec-version))))))
-
-(deftest branch-on-spec-version-test
-  (testing "adds the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
-    (let [ctx {:spec-version (atom "3.0")}
-          out-ctx (branch-on-spec-version ctx)
-          v3-pipeline (get version-pipelines "3.0")]
-      (is (= v3-pipeline
-             (take (count v3-pipeline) (:pipeline out-ctx))))))
-  (testing "adds the 5.1 import pipeline to the front of the pipeline for 5.1 feeds"
-    (let [ctx {:spec-version (atom "5.1")
-               :pipeline [branch-on-spec-version]}
-          out-ctx (branch-on-spec-version ctx)
-          v5-pipeline (get version-pipelines "5.1")]
-      (is (= v5-pipeline
-             (take (count v5-pipeline) (:pipeline out-ctx)))))
-    (testing "for 5.1.1 feeds"
-      (let [ctx {:spec-version (atom "5.1.1")
-                 :pipeline [branch-on-spec-version]}
-            out-ctx (branch-on-spec-version ctx)
-            v5-pipeline (get version-pipelines "5.1")]
-        (is (= v5-pipeline
-               (take (count v5-pipeline) (:pipeline out-ctx))))))
-    (testing "and 5.1.2 feeds"
-      (let [ctx {:spec-version (atom "5.1.2")
-                 :pipeline [branch-on-spec-version]}
-            out-ctx (branch-on-spec-version ctx)
-            v5-pipeline (get version-pipelines "5.1")]
-        (is (= v5-pipeline
-               (take (count v5-pipeline) (:pipeline out-ctx)))))))
-  (testing "stops with unsupported version for other versions"
-    (let [ctx {:spec-version (atom "2.0")   ; 2.0 is too old
-               :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported XML version")))))
 
 (deftest path-and-values-test
   (let [node (data.xml/element :country

@@ -2,8 +2,9 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [korma.core :as korma]
-            [vip.data-processor.db.translations.v5-1.ordered-contests :as oc]
             [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.db.translations.v5-1.ordered-contests :as oc]
+            [vip.data-processor.errors.process :as process]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
@@ -18,11 +19,12 @@
           ctx {:input (csv-inputs ["5-1/ordered_contest.txt"])
                :errors-chan errors-chan
                :spec-version (atom "5.1")
-               :pipeline (concat
-                          [postgres/start-run
-                           (data-spec/add-data-specs v5-1/data-specs)]
-                          (get csv/version-pipelines "5.1")
-                          [oc/transformer])}
+               :pipeline [postgres/start-run
+                          (data-spec/add-data-specs v5-1/data-specs)
+                          postgres/prep-v5-1-run
+                          process/process-v5-validations
+                          csv/load-csvs
+                          oc/transformer]}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
       (assert-no-problems errors {})

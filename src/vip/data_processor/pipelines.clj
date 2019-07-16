@@ -7,21 +7,27 @@
 (defn choose-pipeline [ctx]
   (cond
     (and (= :csv (:format ctx))
-         (= "3.0" (:feed-family ctx)))
+         (= "3.0" (:spec-family ctx)))
     (update ctx :pipeline (partial concat csv.v3/pipeline))
 
     (and (= :csv (:format ctx))
-         (= "5.1" (:feed-family ctx)))
+         (= "5.1" (:spec-family ctx)))
     (update ctx :pipeline (partial concat csv.v5/pipeline))
 
+    (= :csv (:format ctx))
+    (assoc ctx :stop (str "Unsupported CSV version: " (:spec-family ctx)))
+
     (and (= :xml (:format ctx))
-         (= "3.0" (:feed-family ctx)))
+         (= "3.0" (:spec-family ctx)))
     (update ctx :pipeline (partial concat xml.v3/pipeline))
 
     (and (= :xml (:format ctx))
-         (= "5.1" (:feed-family ctx)))
+         (= "5.1" (:spec-family ctx)))
     (update ctx :pipeline (partial concat xml.v5/pipeline))
 
+    (= :xml (:format ctx))
+    (assoc ctx :stop (str "Unsupported XMl version: " (:spec-family ctx)))
+
     :else
-    (throw (ex-info "No pipeline matching format and feed-family version"
-                    (select-keys ctx [:format :feed-family])))))
+    (throw (ex-info "No pipeline matching format and spec-family version"
+                    (select-keys ctx [:format :spec-family])))))
