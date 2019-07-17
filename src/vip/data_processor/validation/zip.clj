@@ -1,7 +1,7 @@
 (ns vip.data-processor.validation.zip
   (:require [clojure.tools.logging :as log]
             [turbovote.resource-config :refer [config]])
-  (:import [net.lingala.zip4j.core ZipFile]
+  (:import [net.lingala.zip4j ZipFile]
            [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
@@ -21,7 +21,7 @@
        ", which is greater than the max-zipfile-size " max-zipfile-size))
 
 (defn get-uncompressed-size
-  "Given a net.lingala.zip4j.core.ZipFile returns the uncompressed
+  "Given a net.lingala.zip4j.ZipFile returns the uncompressed
   size as provided by the first (and presumably only) header in the
   file."
   [zip-file]

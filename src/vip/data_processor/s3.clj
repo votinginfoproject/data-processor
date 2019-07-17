@@ -10,9 +10,9 @@
   (:import [java.io File]
            [java.nio.file Files CopyOption StandardCopyOption]
            [java.nio.file.attribute FileAttribute]
-           [net.lingala.zip4j.core ZipFile]
+           [net.lingala.zip4j ZipFile]
            [net.lingala.zip4j.model ZipParameters]
-           [net.lingala.zip4j.util Zip4jConstants]))
+           [net.lingala.zip4j.model.enums CompressionLevel]))
 
 (defn get-object [key bucket]
   (s3/get-object (merge (config [:aws :creds])
@@ -108,16 +108,13 @@
           zip (ZipFile. zip-file)
           zip-params (doto (ZipParameters.)
                        (.setCompressionLevel
-                        Zip4jConstants/DEFLATE_LEVEL_NORMAL))
-          xml-file (if (instance? File xml-output-file)
-                     xml-output-file
-                     (.toFile xml-output-file))]
-      (log/info "CTX: " (pr-str ctx))
-      (.createZipFile zip xml-file zip-params)
+                        CompressionLevel/NORMAL))
+          xml-file (io/input-stream xml-output-file)]
+      (.addStream zip xml-file zip-params)
       ;; We don't want to push this to S3 at all if we have fatal errors
       ;; as it may break ingestion and waste time.
       (when-not fatal-errors?
-        (put-object generated-xml-filename zip-file))
+        (put-object generated-xml-filename (.getFile zip-file)))
       (-> ctx
-          (update :to-be-cleaned concat [zip-file zip-dir])))
+          (update :to-be-cleaned concat [(.getFile zip-file) zip-dir])))
     ctx))
