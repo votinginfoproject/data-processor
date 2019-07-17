@@ -17,9 +17,7 @@
             [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
-            [clojure.walk :as walk]
             [vip.data-processor.output.v3-0.xml :as v3-0]
-            [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
             [vip.data-processor.errors :as errors])
   (:import [javax.xml XMLConstants]
            [javax.xml.transform.stream StreamSource]

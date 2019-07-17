@@ -9,8 +9,7 @@
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec]
-            [clojure.set :as set])
+            [vip.data-processor.validation.data-spec :as data-spec])
   (:import [org.postgresql.util PGobject]
            [java.text Normalizer]))
 

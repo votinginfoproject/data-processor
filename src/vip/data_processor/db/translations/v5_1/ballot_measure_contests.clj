@@ -1,8 +1,7 @@
 (ns vip.data-processor.db.translations.v5-1.ballot-measure-contests
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.db.translations.util :as util]
-            [clojure.string :as str]))
+            [vip.data-processor.db.translations.util :as util]))
 
 (defn row-fn [import-id]
   (korma/select (postgres/v5-1-tables :ballot-measure-contests)

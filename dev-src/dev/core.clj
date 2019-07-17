@@ -3,7 +3,6 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.pipelines :as pipelines]
             [vip.data-processor.pipelines.common :as common]
-            [vip.data-processor.s3 :as s3]
             [vip.data-processor.validation.zip :as zip]
             [vip.data-processor.validation.transforms :as t]))
 

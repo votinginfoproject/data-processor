@@ -1,6 +1,5 @@
 (ns vip.data-processor
   (:require [clojure.tools.logging :as log]
-            [turbovote.resource-config :refer [config]]
             [vip.data-processor.queue :as q]
             [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.pipeline :as pipeline]

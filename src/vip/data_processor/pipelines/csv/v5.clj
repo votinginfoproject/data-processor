@@ -1,6 +1,5 @@
 (ns vip.data-processor.pipelines.csv.v5
   (:require [vip.data-processor.cleanup]
-            [vip.data-processor.db.sqlite]
             [vip.data-processor.db.postgres]
             [vip.data-processor.db.translations.transformer]
             [vip.data-processor.errors]
@@ -10,7 +9,6 @@
             [vip.data-processor.output.tree-xml]
             [vip.data-processor.s3]
             [vip.data-processor.validation.csv]
-            [vip.data-processor.validation.db]
             [vip.data-processor.validation.v5]))
 
 (def pipeline

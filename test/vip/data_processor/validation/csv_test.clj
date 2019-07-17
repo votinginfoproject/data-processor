@@ -4,7 +4,6 @@
             [vip.data-processor.validation.csv :refer :all]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.pipeline :as pipeline]
             [korma.core :as korma]
             [clojure.core.async :as a])
   (:import [java.io File]))

@@ -4,10 +4,8 @@
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
             [korma.core :as korma]
-            [korma.db :as db]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.util :as util]
             [clojure.core.async :as a]))
 
 (def problem-types [:warnings :errors :critical :fatal])

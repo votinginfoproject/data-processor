@@ -1,7 +1,6 @@
 (ns vip.data-processor.s3
   (:require [amazonica.aws.s3 :as s3]
             [clojure.java.io :as io]
-            [clojure.tools.logging :as log]
             [turbovote.resource-config :refer [config]]
             [korma.core :as korma]
             [clojure.string :as str]

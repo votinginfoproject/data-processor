@@ -6,9 +6,7 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.xml.v5 :as xml.v5]
-            [vip.data-processor.errors :as errors]
-            [vip.data-processor.errors.process :as process]))
+            [vip.data-processor.errors :as errors]))
 
 (def address-elements
   #{"address"

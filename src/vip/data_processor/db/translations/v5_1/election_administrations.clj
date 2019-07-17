@@ -2,7 +2,6 @@
   (:require [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.util :as util]
-            [vip.data-processor.db.translations.v5-1.contact-information :as ci]
             [vip.data-processor.db.translations.v5-1.departments :as ds]
             [vip.data-processor.db.translations.v5-1.voter-services :as vs]))
 

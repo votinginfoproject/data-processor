@@ -4,7 +4,6 @@
             [vip.data-processor.validation.xml :refer :all]
             [clojure.core.async :as a]
             [clojure.data.xml :as data.xml]
-            [vip.data-processor.validation.data-spec :as data-spec]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.db.v3-0.admin-addresses :as admin-addresses]
@@ -13,7 +12,6 @@
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma]
-            [vip.data-processor.errors :as errors]
             [vip.data-processor.errors.process :as process]))
 
 (deftest load-xml-test

@@ -2,7 +2,6 @@
   (:require [clojure.string :as str]
             [clojure.tools.logging :as log]
             [korma.core :as korma]
-            [vip.data-processor.util :as util]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.util :as t-util]))
 
