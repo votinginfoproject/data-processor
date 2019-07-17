@@ -1,5 +1,6 @@
 (ns vip.data-processor.util
   (:require [clojure.java.io :as io]
+            [clojure.string :as str]
             [clojure.tools.logging :as log]))
 
 (defn flatten-keys* [a ks m]
@@ -41,7 +42,7 @@
 (defn find-input-file [ctx filename]
   (->> ctx
        :input
-       (filter #(= filename (clojure.string/lower-case (.getName %))))
+       (filter #(= filename (str/lower-case (.getName %))))
        first))
 
 (defn version-without-patch
@@ -49,4 +50,4 @@
   numbers, e.g., \"5.1.2\" becomes \"5.1\"."
   [version]
   (when-not (empty? version)
-    (clojure.string/replace version #"^(\d+\.\d+)\.\d+$" "$1")))
+    (str/replace version #"^(\d+\.\d+)\.\d+$" "$1")))

@@ -4,6 +4,7 @@
             [vip.data-processor.errors]
             [vip.data-processor.errors.process]
             [vip.data-processor.s3]
+            [vip.data-processor.validation.v5]
             [vip.data-processor.validation.xml]
             [vip.data-processor.validation.xml.v5]))
 
