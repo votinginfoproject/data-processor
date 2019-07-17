@@ -36,7 +36,7 @@
   (let [id (java.util.UUID/randomUUID)]
     (log/info "VIP Data Processor starting up. ID:" id)
     (psql/initialize)
-    (let [consumer-id (q/consume)]
+    (let [consumer-id (q/consume process-message)]
       (.addShutdownHook (Runtime/getRuntime)
                         (Thread. (fn []
                                    (log/info "VIP Data Processor shutting down...")
