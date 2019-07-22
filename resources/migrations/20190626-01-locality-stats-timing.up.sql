@@ -1,4 +1,3 @@
-alter table v5_dashboard.localities add column overall_duration float default 0.0;
 alter table v5_dashboard.localities add column locality_duration float default 0.0;
 alter table v5_dashboard.localities add column pbl_duration float default 0.0;
 alter table v5_dashboard.localities add column precinct_polling_location_ids_duration float default 0.0;
@@ -23,3 +22,4 @@ alter table v5_dashboard.localities add column department_completion_duration fl
 alter table v5_dashboard.localities add column voter_service_errors_duration float default 0.0;
 alter table v5_dashboard.localities add column voter_service_count_duration float default 0.0;
 alter table v5_dashboard.localities add column voter_service_completion_duration float default 0.0;
+alter table v5_dashboard.localities add column overall_duration float default 0.0;
