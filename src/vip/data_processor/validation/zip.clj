@@ -1,7 +1,9 @@
 (ns vip.data-processor.validation.zip
   (:require [clojure.tools.logging :as log]
+            [clojure.java.io :as io]
             [turbovote.resource-config :refer [config]])
-  (:import [net.lingala.zip4j ZipFile]
+  (:import [java.util.zip ZipInputStream]
+           [java.io File]
            [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
@@ -20,25 +22,46 @@
   (str "Zip file size is " size
        ", which is greater than the max-zipfile-size " max-zipfile-size))
 
-(defn get-uncompressed-size
-  "Given a net.lingala.zip4j.ZipFile returns the uncompressed
-  size as provided by the first (and presumably only) header in the
-  file."
-  [zip-file]
-  (.getUncompressedSize (first (.getFileHeaders zip-file))))
+(defn open-zip-stream [file process-fn]
+  (with-open [stream (ZipInputStream. (io/input-stream file))]
+    (process-fn stream)))
 
-(defn unzip-file [path max-zipfile-size]
-  (let [zip-file (ZipFile. (str path))
-        size (get-uncompressed-size zip-file)
-        tmp-dir (Files/createTempDirectory "vip-extracted-feed"
-                                           (into-array FileAttribute []))]
+(defn get-uncompressed-size
+  "Given a File returns the uncompressed
+  size as provided by the first (and presumably only) entry in the
+  file."
+  [file]
+  (open-zip-stream file (fn [stream] (-> stream .getNextEntry .getSize))))
+
+(defn extract-zip [file tmp-dir]
+  (letfn [(entry-path [entry]
+            (str tmp-dir File/separatorChar (.getName entry)))
+          (extract [stream]
+            (loop [entry (.getNextEntry stream)]
+              (when entry
+                (let [save-path (entry-path entry)
+                      save-file (File. save-path)]
+                  (if (.isDirectory entry)
+                    (when-not (.exists save-file)
+                      (.mkdirs save-file))
+                    (let [parent-dir (.getParentFile save-file)]
+                      (when-not (.exists parent-dir) (.mkdirs parent-dir))
+                      (io/copy stream save-file))))
+                (recur (.getNextEntry stream)))))]
+    (open-zip-stream file extract)))
+
+(defn unzip-file [file max-zipfile-size]
+  (let [size (get-uncompressed-size file)]
     (if (> size (Long. max-zipfile-size))
       (-> (too-big-msg size max-zipfile-size)
           (ex-info {:msg (too-big-msg size max-zipfile-size)
                     :max-zipfile-size-exceeded true})
           throw)
-      (do (.extractAll zip-file (str tmp-dir))
-          tmp-dir))))
+      (let [tmp-dir (Files/createTempDirectory
+                     "vip-extracted-feed"
+                     (into-array FileAttribute []))]
+        (extract-zip file tmp-dir)
+        tmp-dir))))
 
 (defn assoc-file
   ([ctx]
