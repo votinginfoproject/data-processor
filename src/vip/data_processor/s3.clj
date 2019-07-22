@@ -6,12 +6,10 @@
             [clojure.string :as str]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.util :as util])
-  (:import [java.io File]
+  (:import [java.io File FileOutputStream FileInputStream]
            [java.nio.file Files CopyOption StandardCopyOption]
            [java.nio.file.attribute FileAttribute]
-           [net.lingala.zip4j ZipFile]
-           [net.lingala.zip4j.model ZipParameters]
-           [net.lingala.zip4j.model.enums CompressionLevel]))
+           [java.util.zip ZipOutputStream ZipEntry]))
 
 (defn get-object [key bucket]
   (s3/get-object (merge (config [:aws :creds])
@@ -96,24 +94,30 @@
   [ctx]
   (assoc ctx :generated-xml-filename (zip-filename ctx)))
 
+(defn zip-file
+  "Given a directory, a zip file name and an unzipped source file, creates
+   a zipped file with the name and zipped contents of the source file."
+  [zip-dir zip-name source-file]
+  (let [zip-file (File. (.toFile zip-dir) zip-name)]
+    (with-open [fos (FileOutputStream. zip-file)
+                zos (ZipOutputStream. fos)
+                fis (FileInputStream. source-file)]
+      (let [zip-entry (ZipEntry. (.getName source-file))]
+        (.putNextEntry zos zip-entry)
+        (io/copy fis zos)))
+    zip-file))
+
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
   [{:keys [fatal-errors? xml-output-file generated-xml-filename] :as ctx}]
   (if-not (get ctx :skip-upload? false)
-    (let [zip-name (zip-filename ctx)
-          zip-dir (Files/createTempDirectory tmp-path-prefix
+    (let [zip-dir (Files/createTempDirectory tmp-path-prefix
                                              (into-array FileAttribute []))
-          zip-file (File. (.toFile zip-dir) generated-xml-filename)
-          zip (ZipFile. zip-file)
-          zip-params (doto (ZipParameters.)
-                       (.setCompressionLevel
-                        CompressionLevel/NORMAL))
-          xml-file (io/input-stream xml-output-file)]
-      (.addStream zip xml-file zip-params)
+          zip-file (zip-file zip-dir generated-xml-filename xml-output-file)]
       ;; We don't want to push this to S3 at all if we have fatal errors
       ;; as it may break ingestion and waste time.
       (when-not fatal-errors?
-        (put-object generated-xml-filename (.getFile zip-file)))
+        (put-object generated-xml-filename zip-file))
       (-> ctx
-          (update :to-be-cleaned concat [(.getFile zip-file) zip-dir])))
+          (update :to-be-cleaned concat [zip-file zip-dir])))
     ctx))
