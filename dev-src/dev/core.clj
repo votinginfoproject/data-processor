@@ -29,7 +29,7 @@
   (let [file (if (zip/xml-file? filename)
                (java.nio.file.Paths/get filename (into-array [""]))
                (java.io.File. filename))
-        result (pipeline/process pipeline file)]
+        result (time (pipeline/process pipeline file))]
     (when-let [xml-output-file (:xml-output-file result)]
       (println "XML:" (.toString xml-output-file))
       (psql/complete-run result))))
