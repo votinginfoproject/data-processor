@@ -1,6 +1,7 @@
 (ns vip.data-processor.pipelines.xml.v5
   (:require [vip.data-processor.cleanup]
             [vip.data-processor.db.postgres]
+            [vip.data-processor.db.v5]
             [vip.data-processor.errors]
             [vip.data-processor.errors.process]
             [vip.data-processor.s3]
@@ -10,7 +11,8 @@
 
 (def pipeline
   (concat
-   [vip.data-processor.errors.process/process-v5-validations
+   [vip.data-processor.db.v5/add-feed-indexes
+    vip.data-processor.errors.process/process-v5-validations
     vip.data-processor.validation.xml/load-xml-ltree
     vip.data-processor.validation.xml.v5/load-xml-street-segments
     vip.data-processor.validation.xml/set-input-as-xml-output-file
@@ -26,5 +28,6 @@
     vip.data-processor.errors/await-statistics
     vip.data-processor.s3/generate-xml-filename
     vip.data-processor.s3/upload-to-s3
+    vip.data-processor.db.v5/drop-feed-indexes
     vip.data-processor.db.postgres/delete-from-xml-tree-values
     vip.data-processor.cleanup/cleanup]))
