@@ -248,7 +248,7 @@
     ctx))
 
 (defn determine-spec-version [ctx]
-  (let [xml-file (-> ctx :valid-file-paths first)]
+  (let [xml-file (:xml-source-file-path ctx)]
     (with-open [reader (util/bom-safe-reader xml-file)]
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]

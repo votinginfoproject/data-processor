@@ -145,6 +145,7 @@
   (testing "a good XML file produces no erorrs or warnings"
     (let [errors-chan (a/chan 100)
           ctx (merge {:xml-source-file-path (xml-input "full-good-run.xml")
+                      :format :xml
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :spec-version (atom nil)
@@ -377,6 +378,7 @@
 (deftest determine-spec-version-test
   (testing "finds and assocs the schemaVersion of the xml feed"
     (let [ctx {:xml-source-file-path (xml-input "full-good-run.xml")
+               :format :xml
                :spec-version (atom nil)}
           out-ctx (determine-spec-version ctx)]
       (is (= "3.0" @(get out-ctx :spec-version))))))
