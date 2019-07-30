@@ -13,7 +13,7 @@
 
 (deftest ^:postgres load-xml-ltree-test
   (testing "imports xml values into postgres"
-    (let [ctx {:input (xml-input "v5_sample_feed.xml")
+    (let [ctx {:xml-source-file-path (xml-input "v5_sample_feed.xml")
                :pipeline [psql/start-run
                           load-xml-ltree]}
           out-ctx (pipeline/run-pipeline ctx)]
@@ -29,7 +29,7 @@
 (deftest ^:postgres validate-emails-test
   (testing "adds errors to the context for badly formatted emails"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-bad-emails.xml")
+          ctx {:xml-source-file-path (xml-input "v5-bad-emails.xml")
                :errors-chan errors-chan
                :pipeline [psql/start-run
                           load-xml-ltree

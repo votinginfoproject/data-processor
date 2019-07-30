@@ -15,9 +15,9 @@
 
 (deftest ^:postgres transformer-test
   (testing "ballot_measure_contest.txt is loaded and transformed"
-    (let [csv-files (csv-inputs ["5-1/ballot_measure_contest.txt"])
+    (let [csv-file-paths (csv-inputs ["5-1/ballot_measure_contest.txt"])
           errors-chan (a/chan 100)
-          ctx {:input csv-files
+          ctx {:csv-source-file-paths csv-file-paths
                :errors-chan errors-chan
                :spec-version (atom "5.1")
                :spec-family "5.1"

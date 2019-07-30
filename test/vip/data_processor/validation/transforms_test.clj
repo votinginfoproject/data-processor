@@ -13,17 +13,18 @@
             [clojure.java.io :as io]
             [korma.core :as korma]
             [clojure.core.async :as a])
-  (:import [java.io File]))
+  (:import [java.nio.file Paths]))
 
 (deftest csv-validations-test
   (testing "full run on good files"
     (let [db (sqlite/temp-db "good-run-test" "3.0")
-          filenames (->> v3-0/data-specs
-                         (map
-                          #(io/as-file (io/resource (str "csv/full-good-run/" (:filename %)))))
-                         (remove nil?))
+          file-paths (->> v3-0/data-specs
+                          (map
+                           #(io/as-file (io/resource (str "csv/full-good-run/" (:filename %)))))
+                          (remove nil?)
+                          (map #(.toPath %)))
           errors-chan (a/chan 100)
-          ctx (merge {:input filenames
+          ctx (merge {:csv-source-file-paths file-paths
                       :errors-chan errors-chan
                       :spec-version (atom nil)
                       :pipeline (concat
@@ -43,16 +44,17 @@
       (assert-no-problems errors {}))))
 
 (deftest remove-invalid-extensions-test
-  (testing "removes non-csv, txt, or xml files from :input"
+  (testing "removes non-csv, txt, or xml files from :extracted-file-paths, placing the good ones in :valid-file-paths"
     (let [errors-chan (a/chan 100)
-          ctx {:input [(File. "good-file.xml")
-                       (File. "not-so-good-file.xls")
-                       (File. "logo.ai")]
+          ctx {:extracted-file-paths
+               [(Paths/get "good-file.xml" (into-array String []))
+                (Paths/get "not-so-good-file.xls" (into-array String []))
+                (Paths/get "logo.ai" (into-array String []))]
                :errors-chan errors-chan}
           results-ctx (remove-invalid-extensions ctx)
           errors (all-errors errors-chan)]
-      (is (= 1 (count (:input results-ctx))))
-      (is (= "good-file.xml" (-> results-ctx :input first .getName)))
+      (is (= 1 (count (:valid-file-paths results-ctx))))
+      (is (= "good-file.xml" (-> results-ctx :valid-file-paths first .toFile .getName)))
       (is (contains-error? errors
                            {:severity :warnings
                             :scope :import
@@ -61,15 +63,16 @@
                             :error-value '("not-so-good-file.xls" "logo.ai")}))))
   (testing "allows uppercase file extensions"
     (let [errors-chan (a/chan 100)
-          ctx {:input [(File. "this-is-okay.XML")
-                       (File. "so-is-this.TXT")
-                       (File. "but-not-this.NAIL")]
+          ctx {:extracted-file-paths
+               [(Paths/get "this-is-okay.XML" (into-array String []))
+                (Paths/get "so-is-this.TXT" (into-array String []))
+                (Paths/get "but-not-this.NAIL" (into-array String []))]
                :errors-chan errors-chan}
           results-ctx (remove-invalid-extensions ctx)
           errors (all-errors errors-chan)]
-      (is (= [(File. "this-is-okay.XML")
-              (File. "so-is-this.TXT")]
-             (:input results-ctx)))
+      (is (= [(Paths/get "this-is-okay.XML" (into-array String []))
+              (Paths/get "so-is-this.TXT" (into-array String []))]
+             (:valid-file-paths results-ctx)))
       (is (contains-error? errors
                            {:severity :warnings
                             :scope :import

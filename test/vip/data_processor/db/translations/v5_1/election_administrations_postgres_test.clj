@@ -14,10 +14,11 @@
 
 (deftest ^:postgres transformer-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (csv-inputs ["5-1/contact_information.txt"
-                                 "5-1/department.txt"
-                                 "5-1/voter_service.txt"
-                                 "5-1/election_administration.txt"])
+        ctx {:csv-source-file-paths
+             (csv-inputs ["5-1/contact_information.txt"
+                          "5-1/department.txt"
+                          "5-1/voter_service.txt"
+                          "5-1/election_administration.txt"])
              :errors-chan errors-chan
              :spec-version (atom "5.1")
              :pipeline [postgres/start-run

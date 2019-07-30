@@ -11,7 +11,8 @@
 
 (deftest validate-no-overlapping-street-segments-test
   (let [errors-chan (a/chan 100)
-        ctx (merge {:input (csv-inputs ["overlapping-street-segments/street_segment.txt"])
+        ctx (merge {:csv-source-file-paths
+                    (csv-inputs ["overlapping-street-segments/street_segment.txt"])
                     :errors-chan errors-chan
                     :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                csv/load-csvs

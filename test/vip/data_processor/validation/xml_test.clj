@@ -16,7 +16,7 @@
 
 (deftest load-xml-test
   (testing "loads data into the db from an XML file"
-    (let [ctx (merge {:input (xml-input "full-good-run.xml")
+    (let [ctx (merge {:xml-source-file-path (xml-input "full-good-run.xml")
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "load-xml-test" "3.0"))
           out-ctx (load-xml ctx)]
@@ -110,7 +110,7 @@
                  locality-early-vote-sites))))))
   (testing "adds errors for non-UTF-8 data"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "non-utf-8.xml")
+          ctx (merge {:xml-source-file-path (xml-input "non-utf-8.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml]}
@@ -125,7 +125,7 @@
                             :error-value "Is not valid UTF-8."}))))
   (testing "can continue after reaching malformed XML"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "malformed.xml")
+          ctx (merge {:xml-source-file-path (xml-input "malformed.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml]}
@@ -144,7 +144,7 @@
 (deftest full-good-run-test
   (testing "a good XML file produces no erorrs or warnings"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "full-good-run.xml")
+          ctx (merge {:xml-source-file-path (xml-input "full-good-run.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :spec-version (atom nil)
@@ -168,7 +168,7 @@
 (deftest validate-no-duplicated-ids-test
   (testing "returns an error when there is a duplicated id"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "duplicated-ids.xml")
+          ctx (merge {:xml-source-file-path (xml-input "duplicated-ids.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml db/validate-no-duplicated-ids]}
@@ -186,7 +186,7 @@
 (deftest validate-no-duplicated-rows-test
   (testing "returns a warning if two nodes have the same data"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "duplicated-rows.xml")
+          ctx (merge {:xml-source-file-path (xml-input "duplicated-rows.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml db/validate-no-duplicated-rows]}
@@ -208,7 +208,7 @@
 (deftest validate-references-test
   (testing "returns an error if there are unreferenced objects"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "unreferenced-ids.xml")
+          ctx (merge {:xml-source-file-path (xml-input "unreferenced-ids.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml db/validate-references]}
@@ -224,7 +224,7 @@
 (deftest validate-jurisdiction-references-test
   (testing "returns an error if there are unreferenced jurisdiction references"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "unreferenced-jurisdictions.xml")
+          ctx (merge {:xml-source-file-path (xml-input "unreferenced-jurisdictions.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml jurisdiction-references/validate-jurisdiction-references]}
@@ -240,7 +240,7 @@
 (deftest validate-one-record-limit-test
   (testing "returns an error if particular nodes are duplicated more than once"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "one-record-limit.xml")
+          ctx (merge {:xml-source-file-path (xml-input "one-record-limit.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml db/validate-one-record-limit]}
@@ -261,7 +261,7 @@
 (deftest validate-no-unreferenced-rows
   (testing "returns a warning if it finds rows that are unreferenced"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "unreferenced-rows.xml")
+          ctx (merge {:xml-source-file-path (xml-input "unreferenced-rows.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml db/validate-no-unreferenced-rows]}
@@ -276,7 +276,7 @@
 (deftest validate-no-overlapping-street-segments
   (testing "returns an error if street segments overlap"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "overlapping-street-segments.xml")
+          ctx (merge {:xml-source-file-path (xml-input "overlapping-street-segments.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml street-segment/validate-no-overlapping-street-segments]}
@@ -293,7 +293,7 @@
 (deftest validate-election-administration-addresses
   (testing "returns an error if either the physical or mailing address is incomplete"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "incomplete-election-administrations.xml")
+          ctx (merge {:xml-source-file-path (xml-input "incomplete-election-administrations.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml
@@ -314,7 +314,7 @@
 
 (deftest validate-data-formats
   (let [errors-chan (a/chan 100)
-        ctx (merge {:input (xml-input "bad-data-values.xml")
+        ctx (merge {:xml-source-file-path (xml-input "bad-data-values.xml")
                     :data-specs v3-0/data-specs
                     :errors-chan errors-chan
                     :pipeline [load-xml]}
@@ -347,7 +347,7 @@
 (deftest same-element-duplicate-ids-test
   (testing "doesn't die when elements share ids"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "same-element-duplicated-ids.xml")
+          ctx (merge {:xml-source-file-path (xml-input "same-element-duplicated-ids.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [load-xml]}
@@ -376,7 +376,7 @@
 
 (deftest determine-spec-version-test
   (testing "finds and assocs the schemaVersion of the xml feed"
-    (let [ctx {:input (xml-input "full-good-run.xml")
+    (let [ctx {:xml-source-file-path (xml-input "full-good-run.xml")
                :spec-version (atom nil)}
           out-ctx (determine-spec-version ctx)]
       (is (= "3.0" @(get out-ctx :spec-version))))))

@@ -16,7 +16,7 @@
   (testing "retention_contest.txt is loaded and transformed"
     (let [csv-files (csv-inputs ["5-1/retention_contest.txt"])
 errors-chan (a/chan 100)
-          ctx {:input csv-files
+          ctx {:csv-source-file-paths csv-files
                :errors-chan errors-chan
                :spec-version (atom "5.1")
                :pipeline [postgres/start-run

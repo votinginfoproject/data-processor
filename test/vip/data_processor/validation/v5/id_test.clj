@@ -11,7 +11,7 @@
 
 (deftest ^:postgres id-uniqueness-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-duplicate-ids.xml")
+        ctx {:xml-source-file-path (xml-input "v5-duplicate-ids.xml")
              :pipeline [psql/start-run
                         load-xml-ltree
                         v5.id/validate-unique-ids]
@@ -47,7 +47,7 @@
 
 (deftest ^:postgres validate-no-missing-ids-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-missing-ids.xml")
+        ctx {:xml-source-file-path (xml-input "v5-missing-ids.xml")
              :pipeline [psql/start-run
                         load-xml-ltree
                         v5.id/validate-no-missing-ids]
@@ -74,7 +74,7 @@
 
 (deftest ^:postgres validate-idrefs-refer-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-idrefs.xml")
+        ctx {:xml-source-file-path (xml-input "v5-idrefs.xml")
              :spec-version (atom "5.1")
              :pipeline [psql/start-run
                         load-xml-ltree
@@ -108,7 +108,7 @@
 
 (deftest ^:postgres validate-idrefs-plural-refer-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-idrefs.xml")
+        ctx {:xml-source-file-path (xml-input "v5-idrefs.xml")
              :spec-version (atom "5.1")
              :pipeline [psql/start-run
                         load-xml-ltree

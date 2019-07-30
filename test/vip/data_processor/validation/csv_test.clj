@@ -6,21 +6,23 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [korma.core :as korma]
             [clojure.core.async :as a])
-  (:import [java.io File]))
+  (:import [java.io File]
+           [java.nio.file Paths]))
 
 (deftest remove-bad-filenames-test
-  (let [bad-filenames [(File. "/data/BAD_FILE_NAME")
-                       (File. "/data/BAD_FILE_NAME_2")]
-        good-filenames (map #(File. (str "/data/" (:filename %))) v3-0/data-specs)
+  (let [data-dir (Paths/get "/data" (into-array String []))
+        bad-filenames [(.resolve data-dir "BAD_FILE_NAME")
+                       (.resolve data-dir "BAD_FILE_NAME_2")]
+        good-filenames (map #(.resolve data-dir (:filename %)) v3-0/data-specs)
         errors-chan (a/chan 100)
-        ctx {:input good-filenames
+        ctx {:csv-source-file-paths good-filenames
              :errors-chan errors-chan
              :spec-version (atom "3.0")
              :data-specs v3-0/data-specs}]
     (testing "with good filenames passes the context through"
       (is (= ctx (remove-bad-filenames ctx))))
     (testing "with bad filenames removes the bad files and warns"
-      (let [ctx (update ctx :input (partial concat bad-filenames))
+      (let [ctx (update ctx :csv-source-file-paths (partial concat bad-filenames))
             out-ctx (remove-bad-filenames ctx)
             errors (all-errors errors-chan)]
         (is (contains-error? errors
@@ -28,13 +30,15 @@
                               :scope :import
                               :identifier :global
                               :error-type :bad-filenames}))
-        (is (not-every? (partial good-filename? v3-0/data-specs) (:input ctx)))
-        (is (every? (partial good-filename? v3-0/data-specs) (:input out-ctx)))))))
+        (is (not-every? (partial good-filename? v3-0/data-specs)
+                        (:csv-source-file-paths ctx)))
+        (is (every? (partial good-filename? v3-0/data-specs)
+                    (:csv-source-file-paths out-ctx)))))))
 
-(deftest missing-files-test
+(deftest error-on-missing-files-test
   (testing "reports errors or warnings when certain files are missing"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["full-good-run/source.txt"])
+          ctx {:csv-source-file-paths (csv-inputs ["full-good-run/source.txt"])
                :errors-chan errors-chan
                :data-specs v3-0/data-specs}
           out-ctx (-> ctx
@@ -58,7 +62,7 @@
 (deftest csv-loader-test
   (testing "ignores unknown columns"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["bad-columns/state.txt"])
+          ctx (merge {:csv-source-file-paths (csv-inputs ["bad-columns/state.txt"])
                       :errors-chan errors-chan
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "ignore-columns-test" "3.0"))
@@ -74,7 +78,7 @@
                               :error-type :extraneous-headers})))))
   (testing "requires a header row"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["no-header-row/ballot.txt"])
+          ctx (merge {:csv-source-file-paths (csv-inputs ["no-header-row/ballot.txt"])
                       :errors-chan errors-chan
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "no-headers-test" "3.0"))
@@ -89,9 +93,9 @@
 
 (deftest missing-required-columns-test
   (let [errors-chan (a/chan 100)
-        ctx (merge {:input (csv-inputs ["missing-required-columns/contest.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["missing-required-columns/contest.txt"])
                     :errors-chan errors-chan
-                    :data-specs v3-0/data-specs}
+                    :data-specs (filter #(= :contests (:table %)) v3-0/data-specs)}
                    (sqlite/temp-db "missing-required-columns" "3.0"))
         out-ctx (load-csvs ctx)
         errors (all-errors errors-chan)]
@@ -106,7 +110,7 @@
 
 (deftest report-bad-rows-test
   (let [errors-chan (a/chan 100)
-        ctx (merge {:input (csv-inputs ["bad-number-of-values/contest.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["bad-number-of-values/contest.txt"])
                     :errors-chan errors-chan
                     :spec-version (atom "3.0")
                     :data-specs v3-0/data-specs}
@@ -128,7 +132,7 @@
 (deftest in-file-duplicate-ids-test
   (let [errors-chan (a/chan 100)
         db (sqlite/temp-db "in-file-duplicate-ids" "3.0")
-        ctx (merge {:input (csv-inputs ["in-file-duplicate-ids/contest.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["in-file-duplicate-ids/contest.txt"])
                     :errors-chan errors-chan
                     :data-specs v3-0/data-specs}
                    db)]
@@ -160,7 +164,7 @@
 
 (deftest byte-order-marker-test
   (let [db (sqlite/temp-db "byte-order-marker" "3.0")
-        ctx (merge {:input (csv-inputs ["byte-order-marker/source.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["byte-order-marker/source.txt"])
                     :data-specs v3-0/data-specs}
                    db)
         out-ctx (load-csvs ctx)]
@@ -173,7 +177,7 @@
 
 (deftest low-number-vip-id-test
   (let [db (sqlite/temp-db "low-number-vip-id-test" "3.0")
-        ctx (merge {:input (csv-inputs ["low-number-vip-id/source.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["low-number-vip-id/source.txt"])
                     :data-specs v3-0/data-specs}
                    db)
         out-ctx (load-csvs ctx)]
@@ -186,13 +190,13 @@
 
 (deftest determine-spec-version-test
   (testing "finds and assocs the version of the csv feed for 3.0 files"
-    (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])
+    (let [ctx {:csv-source-file-paths (csv-inputs ["full-good-run/source.txt"])
                :spec-version (atom nil)}
           out-ctx (determine-spec-version ctx)]
       (is (= "3.0" @(get out-ctx :spec-version)))))
 
   (testing "finds and assocs the version of the csv feed for 5.1 files"
-    (let [ctx {:input (csv-inputs ["5-1/spec-version/source.txt"])
+    (let [ctx {:csv-source-file-paths (csv-inputs ["5-1/spec-version/source.txt"])
                :spec-version (atom nil)}
           out-ctx (determine-spec-version ctx)]
       (is (= "5.1" @(get out-ctx :spec-version))))))

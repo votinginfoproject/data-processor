@@ -15,7 +15,8 @@
 (deftest ^:postgres ballot-measure-selection-transforms-test
   (testing "ballot_measure_selection.txt is loaded and transformed"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["5-1/ballot_measure_selection.txt"])
+          ctx {:csv-source-file-paths
+               (csv-inputs ["5-1/ballot_measure_selection.txt"])
                :errors-chan errors-chan
                :spec-version (atom "5.1")
                :pipeline [postgres/start-run

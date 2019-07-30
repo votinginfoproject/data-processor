@@ -10,8 +10,8 @@
 
 (defn determine-format [ctx]
   (let [file-extensions (->> ctx
-                             :input
-                             (map #(-> % str (s/split #"\.") last s/lower-case))
+                             :valid-file-paths
+                             (map #(-> % .toFile str (s/split #"\.") last s/lower-case))
                              set)
         feed-format (condp set/superset? file-extensions
                       #{"txt" "csv"} :csv
@@ -25,14 +25,23 @@
     (csv/determine-spec-version ctx)
     (xml/determine-spec-version ctx)))
 
+(defn organize-source-files
+  "Places the valid source files in the context into a location according to the
+  format of the feed, so that format specific steps can find them."
+  [{:keys [valid-file-paths] :as ctx}]
+  (if (= :xml (:format ctx))
+    (assoc ctx :xml-source-file-path (first valid-file-paths))
+    (assoc ctx :csv-source-file-paths valid-file-paths)))
+
 (def pipeline
-  [t/read-edn-sqs-message
-   t/assert-filename
+  [t/assert-filename-and-bucket
    psql/start-run
    q/ack-sqs-message
    t/download-from-s3
-   zip/assoc-file
-   zip/extracted-contents
+   t/assert-file
+   zip/assert-max-zip-size
+   zip/extract-contents
    t/remove-invalid-extensions
    determine-format
+   organize-source-files
    determine-spec])

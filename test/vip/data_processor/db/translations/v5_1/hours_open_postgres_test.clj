@@ -15,7 +15,7 @@
 (deftest ^:postgres hours-open->ltree-entries-test
   (testing "schedule.txt is loaded and transformed into HoursOpen entities"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["5-1/schedule.txt"])
+          ctx {:csv-source-file-paths (csv-inputs ["5-1/schedule.txt"])
                :errors-chan errors-chan
                :spec-version (atom "5.1")
                :pipeline [postgres/start-run

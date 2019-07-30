@@ -104,6 +104,9 @@
            run (cons fst (take-while #(= fv (f %)) next-n))]
        (cons run (partition-by-n f n (seq (drop (count run) s))))))))
 
+(defn extract-xml-file [ctx]
+  (-> ctx :xml-source-file-path))
+
 (defn load-xml
   "Load the XML input file into the database, validating as we go.
 
@@ -113,7 +116,7 @@
   may catch the exception and continue with further validations of
   what has been captured."
   [ctx]
-  (let [xml-file (first (:input ctx))
+  (let [xml-file (extract-xml-file ctx)
         reader (util/bom-safe-reader xml-file)
         partitioned-xml-elements (partition-by-n :tag 5000 (:content (xml/parse reader)))]
     (loop [ctx ctx
@@ -231,7 +234,7 @@
   chunk size that is most efficient? How could we determine this magic
   number?"
   [ctx]
-  (let [xml-file (first (:input ctx))
+  (let [xml-file (extract-xml-file ctx)
         import-id (:import-id ctx)]
     (with-open [reader (util/bom-safe-reader xml-file)]
       (dorun
@@ -245,7 +248,7 @@
     ctx))
 
 (defn determine-spec-version [ctx]
-  (let [xml-file (first (:input ctx))]
+  (let [xml-file (-> ctx :valid-file-paths first)]
     (with-open [reader (util/bom-safe-reader xml-file)]
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]
@@ -258,5 +261,5 @@
                                     (util/version-without-patch version))))))))
 
 (defn set-input-as-xml-output-file
-  [{:keys [input] :as ctx}]
-  (assoc ctx :xml-output-file (first input)))
+  [{:keys [xml-source-file-path] :as ctx}]
+  (assoc ctx :xml-output-file xml-source-file-path))

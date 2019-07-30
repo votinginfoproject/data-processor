@@ -11,7 +11,7 @@
 
 (deftest ^:postgres validate-no-missing-types-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-external-identifiers.xml")
+        ctx {:xml-source-file-path (xml-input "v5-external-identifiers.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         external-identifiers/validate-no-missing-types]
@@ -34,7 +34,7 @@
 
 (deftest ^:postgres validate-no-missing-values-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-external-identifiers.xml")
+        ctx {:xml-source-file-path (xml-input "v5-external-identifiers.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         external-identifiers/validate-no-missing-values]

@@ -7,7 +7,8 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.util :as util])
   (:import [java.io File FileOutputStream FileInputStream]
-           [java.nio.file Files CopyOption StandardCopyOption]
+           [java.nio.file Files Path
+            CopyOption StandardCopyOption StandardOpenOption]
            [java.nio.file.attribute FileAttribute]
            [java.util.zip ZipOutputStream ZipEntry]))
 
@@ -97,15 +98,18 @@
 (defn zip-file
   "Given a directory, a zip file name and an unzipped source file, creates
    a zipped file with the name and zipped contents of the source file."
-  [zip-dir zip-name source-file]
-  (let [zip-file (File. (.toFile zip-dir) zip-name)]
-    (with-open [fos (FileOutputStream. zip-file)
+  [zip-dir zip-name source-file-path]
+  (let [zip-file-path (.resolve zip-dir zip-name)]
+    (with-open [fos (Files/newOutputStream
+                     zip-file-path
+                     (into-array [StandardOpenOption/CREATE]))
                 zos (ZipOutputStream. fos)
-                fis (FileInputStream. source-file)]
-      (let [zip-entry (ZipEntry. (.getName source-file))]
+                fis (Files/newInputStream source-file-path
+                        (into-array [StandardOpenOption/READ]))]
+      (let [zip-entry (-> source-file-path .toFile .getName ZipEntry.)]
         (.putNextEntry zos zip-entry)
         (io/copy fis zos)))
-    zip-file))
+    (.toFile zip-file-path)))
 
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."

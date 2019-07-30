@@ -15,7 +15,8 @@
 (deftest ^:postgres candidate-selection-transforms-test
   (testing "candidate_selection.txt is loaded and transformed"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["5-1/candidate_selection.txt"])
+          ctx {:csv-source-file-paths
+               (csv-inputs ["5-1/candidate_selection.txt"])
                :errors-chan errors-chan
                :spec-version (atom "5.1")
                :pipeline [postgres/start-run

@@ -17,7 +17,7 @@
 
 (deftest ^:postgres validate-no-missing-names-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-localities.xml")
+        ctx {:xml-source-file-path (xml-input "v5-localities.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -39,7 +39,7 @@
 
 (deftest ^:postgres validate-no-missing-state-ids-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-localities.xml")
+        ctx {:xml-source-file-path (xml-input "v5-localities.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -69,7 +69,7 @@
                   v5/validations
                   [errors/close-errors-chan
                    errors/await-statistics])
-        ctx {:input (xml-input "v5-locality-summaries.xml")
+        ctx {:xml-source-file-path (xml-input "v5-locality-summaries.xml")
              :spec-version (atom "5.1.2")
              :errors-chan errors-chan
              :pipeline pipeline}
@@ -100,7 +100,7 @@
                   v5/validations
                   [errors/close-errors-chan
                    errors/await-statistics])
-        ctx {:input (xml-input "v5-locality-summaries.xml")
+        ctx {:xml-source-file-path (xml-input "v5-locality-summaries.xml")
              :spec-version (atom "5.1.2")
              :errors-chan errors-chan
              :pipeline pipeline}
@@ -138,7 +138,7 @@
                   v5/validations
                   [errors/close-errors-chan
                    errors/await-statistics])
-        ctx {:input (xml-input "v5-locality-summaries.xml")
+        ctx {:xml-source-file-path (xml-input "v5-locality-summaries.xml")
              :spec-version (atom "5.1.2")
              :errors-chan errors-chan
              :pipeline pipeline}

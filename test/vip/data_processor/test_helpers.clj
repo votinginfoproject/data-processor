@@ -6,22 +6,17 @@
             [korma.core :as korma]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.postgres :as psql]
-            [clojure.core.async :as a]))
+            [clojure.core.async :as a])
+  (:import [java.nio.file Paths]))
 
 (def problem-types [:warnings :errors :critical :fatal])
 
 (defn csv-inputs [file-names]
-  (map #(->> %
-             (str "csv/")
-             io/resource
-             io/as-file)
-       file-names))
+  (map #(Paths/get (.toURI (io/resource (str "csv/" %)))) file-names))
 
 (defn xml-input [file-name]
-  [(->> file-name
-         (str "xml/")
-         io/resource
-         io/as-file)])
+  ;; find all the places using xml-input and change to singular file type
+  (Paths/get (.toURI (io/resource (str "xml/" file-name)))))
 
 (defn assert-column [ctx table column values]
   (is (= values

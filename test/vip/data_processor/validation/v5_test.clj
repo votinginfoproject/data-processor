@@ -17,7 +17,7 @@
 (deftest ^:postgres full-good-v5-test
   (let [errors-chan (a/chan 100)
         ctx {:errors-chan errors-chan
-             :input (xml-input "v5_sample_feed.xml")
+             :xml-source-file-path (xml-input "v5_sample_feed.xml")
              :spec-version (atom nil)
              :pipeline (concat [psql/start-run
                                 xml/determine-spec-version
@@ -34,7 +34,7 @@
                  .listFiles
                  seq)
         errors-chan (a/chan 100)
-        ctx {:input csvs
+        ctx {:xml-source-file-path csvs
              :errors-chan errors-chan
              :spec-version (atom nil)
              :pipeline (concat [psql/start-run

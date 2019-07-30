@@ -10,7 +10,7 @@
 
 (deftest ^:postgres validate-no-missing-electoral-district-ids-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-ballot-measure-contests.xml")
+        ctx {:xml-source-file-path (xml-input "v5-ballot-measure-contests.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -36,7 +36,7 @@
 
 (deftest ^:postgres validate-ballot-measure-types-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-ballot-measure-contests.xml")
+        ctx {:xml-source-file-path (xml-input "v5-ballot-measure-contests.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run

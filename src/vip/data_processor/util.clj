@@ -31,7 +31,7 @@
   "Returns a reader from io/reader, which has advanced past a byte
   order marker if one exists."
   [x & opts]
-  (let [reader (apply io/reader x opts)]
+  (let [reader (apply io/reader (.toFile x) opts)]
     (.mark reader 10)
     (let [first-char (.read reader)]
       (if (= first-char BOM)
@@ -39,10 +39,11 @@
         (.reset reader))
       reader)))
 
-(defn find-input-file [ctx filename]
+(defn find-csv-source-file
+  [ctx filename]
   (->> ctx
-       :input
-       (filter #(= filename (str/lower-case (.getName %))))
+       :csv-source-file-paths
+       (filter #(= filename (str/lower-case (.getName (.toFile %)))))
        first))
 
 (defn version-without-patch

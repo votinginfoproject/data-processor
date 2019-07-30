@@ -12,9 +12,10 @@
 (deftest validate-no-missing-polling-locations-test
   (testing "finds precincts without polling locations"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["missing-polling-locations/precinct.txt"
-                                          "missing-polling-locations/polling_location.txt"
-                                          "missing-polling-locations/precinct_polling_location.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["missing-polling-locations/precinct.txt"
+                                   "missing-polling-locations/polling_location.txt"
+                                   "missing-polling-locations/precinct_polling_location.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs

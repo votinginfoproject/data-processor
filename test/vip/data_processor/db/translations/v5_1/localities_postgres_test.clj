@@ -15,7 +15,7 @@
 (deftest ^:postgres transformer-test
   (testing "locality.txt is loaded and transformed"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["5-1/locality.txt"])
+          ctx {:csv-source-file-paths (csv-inputs ["5-1/locality.txt"])
                :errors-chan errors-chan
                :spec-version (atom "5.1")
                :pipeline [postgres/start-run

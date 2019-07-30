@@ -20,12 +20,13 @@
 (deftest write-xml-test
   (testing "generates XML from an import"
     (let [db (sqlite/temp-db "xml-output" "3.0")
-          filenames (->> v3-0/data-specs
-                         (map
-                          #(io/as-file (io/resource (str "csv/full-good-run/" (:filename %)))))
-                         (remove nil?))
+          file-paths (->> v3-0/data-specs
+                          (map
+                           #(io/as-file (io/resource (str "csv/full-good-run/" (:filename %)))))
+                          (remove nil?)
+                          (map #(.toPath %)))
           errors-chan (a/chan 100)
-          ctx (merge {:input filenames
+          ctx (merge {:csv-source-file-paths file-paths
                       :spec-version (atom "3.0")
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs

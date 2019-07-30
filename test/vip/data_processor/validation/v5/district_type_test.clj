@@ -11,7 +11,7 @@
 (deftest ^:postgres validate-test
   (testing "Locality elements"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-localities.xml")
+          ctx {:xml-source-file-path (xml-input "v5-localities.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
@@ -38,7 +38,7 @@
                               :error-type :format})))))
   (testing "ElectoralDistrict elements"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-electoral-districts.xml")
+          ctx {:xml-source-file-path (xml-input "v5-electoral-districts.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run

@@ -10,7 +10,7 @@
 
 (deftest ^:postgres validate-no-missing-contest-ids-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-ordered-contests.xml")
+        ctx {:xml-source-file-path (xml-input "v5-ordered-contests.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run

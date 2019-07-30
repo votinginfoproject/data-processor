@@ -9,7 +9,7 @@
   (walk/postwalk
    (fn [dependencies]
      (if (string? dependencies)
-       `(util/find-input-file ~ctx-sym ~dependencies)
+       `(util/find-csv-source-file ~ctx-sym ~dependencies)
        dependencies))
    dependencies))
 
@@ -158,7 +158,7 @@
                             "precinct_split.txt")))
 
 (defn- validate-file-dependencies [ctx [file validator]]
-  (if (util/find-input-file ctx file)
+  (if (util/find-csv-source-file ctx file)
     (validator ctx)
     ctx))
 

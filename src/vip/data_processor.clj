@@ -1,5 +1,6 @@
 (ns vip.data-processor
-  (:require [clojure.tools.logging :as log]
+  (:require [clojure.edn :as edn]
+            [clojure.tools.logging :as log]
             [vip.data-processor.queue :as q]
             [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.pipeline :as pipeline]
@@ -12,11 +13,15 @@
           [pipelines/choose-pipeline]))
 
 (defn process-message
-  ([message]
-   (process-message message nil))
-  ([message delete-callback]
-   (log/info "processing message" (pr-str message))
-   (let [result (pipeline/process pipeline message delete-callback)
+  ([raw-message]
+   (process-message raw-message nil))
+  ([raw-message delete-callback]
+   (log/info "processing message" (pr-str raw-message))
+   (let [message (edn/read-string (:body raw-message))
+         initial-context (merge {:skip-validations? false
+                                 :post-process-street-segments? false}
+                                message)
+         result (pipeline/process pipeline initial-context delete-callback)
          exception (:exception result)
          completed-message {:initialInput message
                             :status "complete"

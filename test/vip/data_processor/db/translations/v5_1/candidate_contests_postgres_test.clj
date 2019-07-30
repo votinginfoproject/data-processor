@@ -15,7 +15,7 @@
 (deftest ^:postgres contest->ltree-entries-test
   (testing "tests run the important function"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["5-1/candidate_contest.txt"])
+          ctx {:csv-source-file-paths (csv-inputs ["5-1/candidate_contest.txt"])
                :errors-chan errors-chan
                :spec-version (atom "5.1")
                :pipeline [postgres/start-run
