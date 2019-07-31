@@ -1,6 +1,5 @@
 (ns vip.data-processor.validation.db.v3-0.candidate-addresses
   (:require [clojure.string :as str]
-            [com.climate.newrelic.trace :refer [defn-traced]]
             [korma.core :as korma]
             [vip.data-processor.errors :as errors]))
 
@@ -46,7 +45,7 @@
        (korma/select candidates-table)
        (remove valid-address?)))
 
-(defn-traced validate-addresses
+(defn validate-addresses
   [ctx]
   (let [bad-addresses (validate-addresses' (get-in ctx [:tables :candidates]))]
     (if (seq bad-addresses)

@@ -64,25 +64,33 @@ POSTGRES_USER=
 POSTGRES_PASSWORD=
 VIP_DP_AWS_ACCESS_KEY=
 VIP_DP_AWS_SECRET_KEY=
+VIP_DP_AWS_REGION=
 VIP_DP_S3_UNPROCESSED_BUCKET=
 VIP_DP_S3_PROCESSED_BUCKET=
-VIP_DP_S3_REGION=
-VIP_DP_SQS_REGION=
 VIP_DP_SQS_QUEUE=
 VIP_DP_SQS_FAIL_QUEUE=
-VIP_DP_RABBITMQ_EXCHANGE=
+VIP_DP_SNS_SUCCESS_TOPIC=
+VIP_DP_SNS_FAILURE_TOPIC=
 VIP_DP_MAX_ZIPFILE_SIZE=(3221225472 = 3GB by default)
 ```
 
-As you can see, you'll need to have set up two S3 buckets and two SQS
-queues.
+As you can see, you'll need to have set up an S3 bucket and two SQS
+queues and two SNS topics.
 
-There are two different places to set the region, one for S3 and one for
-SQS and the libraries we use require different forms of this setting. The
-`VIP_DP_S3_REGION` setting needs to be in the form of `us-east-1`.
-The value for `VIP_DP_SQS_REGION` is in the form of
-`US_WEST_2` (not `us-west-2`). The value for
-`VIP_DP_RABBITMQ_EXCHANGE` is whatever you'd like it to be.
+The S3 bucket is where the processed results file ends up (if applicable).
+
+The SQS queues are for initiating feed processing with a message structured like:
+`{:filename "path/to/file.zip" :bucket "source-s3-bucket"}`. Sending this to
+the queue configured as `VIP_DP_SQS_QUEUE` will kick off processing of the file located
+in `source-s3-bucket/path/to/file.zip`. If, for some reason, processing fails, a copy of
+the message is sent to the `VIP_DP_SQS_FAIL_QUEUE`, wrapped with some extra info about the attempt
+and the cause of the failure.
+
+The SNS topics are for broadcasting the results of feed processing, one for successful
+outcomes and the other for failures. Interested applications will subscribe an SQS
+queue to the topic and get a copy of the message.
+
+The format for the VIP_DP_AWS_REGION should be like `us-east-1`.
 
 Running it is as per usual for docker-compose:
 
@@ -95,10 +103,9 @@ While it's running, you can place messages on the SQS queue specified by
 `VIP_DP_SQS_QUEUE` and it will be picked up by the processor, downloading the
 file in the message, the file will be processed, the database populated, the XML
 output zipped up and placed in the bucket specified by
-`VIP_DP_S3_PROCESSED_BUCKET`, and a message sent on RabbitMQ to
-`VIP_DP_RABBITMQ_EXCHANGE`. While it's running, you can access the PostgreSQL
-server running within Docker on port `55432` and RabbitMQ console on port
-`55672` (so they don't clash with services that may already be running).
+`VIP_DP_S3_PROCESSED_BUCKET`, and a message sent the appropriate SNS topic
+depending on success/failure. While it's running, you can access the PostgreSQL
+server running within Docker on port `55432`.
 
 The message you send on the SQS queue must look like the following:
 
@@ -274,8 +281,6 @@ You can verify that a node is running properly by checking its logs.
 ```sh
 $ fleetctl journal -f data-processor@1
 Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.339 [main] INFO  vip.data-processor - VIP Data Processor starting up. ID: #uuid "9cc1b957-eb61-4e1d-883d-39fffda98967"
-Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.415 [main] INFO  vip.data-processor.queue - RabbitMQ connected.
-Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.422 [main] INFO  vip.data-processor.queue - RabbitMQ topic set.
 Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: 19:04:08.422 [main] INFO  vip.data-processor.db.postgres - Initializing Postgres
 Feb 20 19:04:08 ip-10-0-103-12 bash[25140]: Migrating #ragtime.jdbc.SqlDatabase{:db-spec {:connection-uri jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret}, :migrations-table ragtime_migrations, :url jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret, :connection-uri jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret, :db {:type :sql, :url jdbc:postgresql://your-db-host:5432/database?user=vip&password=secret-secret}, :migrator resources/migrations}
 Feb 20 19:04:09 ip-10-0-103-12 bash[25140]: 19:04:09.296 [clojure-agent-send-off-pool-0] INFO  squishy.core - Consuming SQS messages from https://sqs.us-east-1.amazonaws.com/1234/your-sqs-queue

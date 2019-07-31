@@ -1,15 +1,8 @@
 processor:
   build: .
   links:
-    - rabbitmq
     - db
   env_file: .env
-rabbitmq:
-  image: rabbitmq:3.6.5-management
-  ports:
-    - 45672:5672
-    - 55672:15672
-  hostname: qa-engine-rabbit
 db:
   image: postgres:9.4.7
   ports:

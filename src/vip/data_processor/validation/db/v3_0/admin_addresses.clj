@@ -1,6 +1,5 @@
 (ns vip.data-processor.validation.db.v3-0.admin-addresses
   (:require [korma.core :as korma]
-            [com.climate.newrelic.trace :refer [defn-traced]]
             [vip.data-processor.errors :as errors]))
 
 (defn transform-field [address-type field-name]
@@ -30,7 +29,7 @@
               ctx bad-addresses)
       ctx)))
 
-(defn-traced validate-addresses [ctx]
+(defn validate-addresses [ctx]
   (let [election-administrations (get-in ctx [:tables :election-administrations])
         rows (korma/select election-administrations
                            (korma/fields :id
