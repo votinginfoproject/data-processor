@@ -6,12 +6,12 @@
 (defn assert-filename-and-bucket
   "Asserts that we have a filename and bucket in the context
   so we know where to download the file from."
-  [{:keys [message] :as ctx}]
-  (let [filename (get message :filename nil)
-        bucket (get message :bucket nil)]
-    (if (and filename bucket)
-      ctx
-      (assoc ctx :stop "No filename or bucket!"))))
+  [ctx]
+  (let [filename (get ctx :filename nil)
+        bucket (get ctx :bucket nil)]
+    (if (some s/blank? [filename bucket])
+      (assoc ctx :stop "No filename or bucket!")
+      ctx)))
 
 (defn download-from-s3
   "Downloads the file from the bucket in S3"

@@ -15,6 +15,28 @@
             [clojure.core.async :as a])
   (:import [java.nio.file Paths]))
 
+(deftest assert-filename-and-bucket-test
+  (testing "missing filename"
+    (let [in-ctx {:bucket "foo"}
+          out-ctx (assert-filename-and-bucket in-ctx)]
+      (is (= (:stop out-ctx) "No filename or bucket!"))))
+  (testing "missing filename"
+    (let [in-ctx {:bucket "foo"}
+          out-ctx (assert-filename-and-bucket in-ctx)]
+      (is (= (:stop out-ctx) "No filename or bucket!"))))
+  (testing "missing bucket"
+    (let [in-ctx {:filename "file.zip"}
+          out-ctx (assert-filename-and-bucket in-ctx)]
+      (is (= (:stop out-ctx) "No filename or bucket!"))))
+  (testing "empty bucket"
+    (let [in-ctx {:filename "file.zip" :bucket ""}
+          out-ctx (assert-filename-and-bucket in-ctx)]
+      (is (= (:stop out-ctx) "No filename or bucket!"))))
+  (testing "good message"
+    (let [in-ctx {:filename "file.zip" :bucket "foo"}
+          out-ctx (assert-filename-and-bucket in-ctx)]
+      (is (= out-ctx in-ctx)))))
+
 (deftest csv-validations-test
   (testing "full run on good files"
     (let [db (sqlite/temp-db "good-run-test" "3.0")
