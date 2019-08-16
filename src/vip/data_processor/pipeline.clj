@@ -44,6 +44,8 @@
   ([pipeline initial-input]
    (process pipeline initial-input nil))
   ([pipeline initial-input delete-callback]
+   (log/info "pipeline process kicking off with initial-input:"
+             (pr-str initial-input))
    (let [ctx (merge {:spec-version (atom nil)
                      :errors-chan (a/chan 1024)
                      :pipeline pipeline}
