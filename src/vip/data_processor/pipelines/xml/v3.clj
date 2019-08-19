@@ -17,6 +17,7 @@
     vip.data-processor.validation.xml/load-xml
     vip.data-processor.db.postgres/analyze-xtv
     vip.data-processor.db.postgres/store-spec-version
+    vip.data-processor.db.postgres/store-public-id
     vip.data-processor.db.postgres/store-election-id]
 
    vip.data-processor.validation.db/validations

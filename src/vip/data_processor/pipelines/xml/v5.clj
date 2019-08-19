@@ -18,6 +18,7 @@
     vip.data-processor.validation.xml/set-input-as-xml-output-file
     vip.data-processor.db.postgres/analyze-xtv
     vip.data-processor.db.postgres/store-spec-version
+    vip.data-processor.db.postgres/store-public-id
     vip.data-processor.db.postgres/store-election-id
     vip.data-processor.db.postgres/populate-locality-table
     vip.data-processor.db.postgres/populate-i18n-table

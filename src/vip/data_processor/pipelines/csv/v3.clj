@@ -21,6 +21,7 @@
     vip.data-processor.validation.csv.file-set/validate-v3-0-file-dependencies
     vip.data-processor.validation.csv/load-csvs
     vip.data-processor.db.postgres/store-spec-version
+    vip.data-processor.db.postgres/store-public-id
     vip.data-processor.db.postgres/store-election-id]
 
    vip.data-processor.validation.db/validations
