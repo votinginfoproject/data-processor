@@ -10,10 +10,34 @@ reported upon.
 
 ## Running
 
+### Setup
+1. Install postgres 9.4 (`brew install postgresql9.4`)
+1. Install pgadmin 4 (handy GUI to administer postgres): `brew cask install pgadmin4`
+1. Once both are installed, make sure postgres is running; If it is not, you can run `brew services start postgresql@9.4`
+1. Bring up pgadmin4 via MacOS Applications
+    1. You will need to create a Master Password
+    1. You will then create a new Server that connects to localhost
+1. Within _Login/Group Roles_ in pgadmin4, Create a role called `dataprocessor`; Use the below SQL for guidance
+    ```sql
+	CREATE ROLE dataprocessor LOGIN
+	ENCRYPTED PASSWORD 'vip2016' SUPERUSER INHERIT CREATEDB CREATEROLE NOREPLICATION;
+    ```
+1. Within _Databases_ in pgadmin4, Create a database called `dataprocessor`. Use the below SQL for guidance
+    ```sql
+    CREATE DATABASE dataprocessor
+    WITH OWNER = dataprocessor
+    ENCODING = 'UTF8'
+    TABLESPACE = pg_default
+    LC_COLLATE = 'en_US.UTF-8'
+    LC_CTYPE = 'en_US.UTF-8'
+    CONNECTION LIMIT = -1;
+    ```
+
+
 ### lein
 
-To run the processor against a local .zip, you'll need Postgres
-running and a minimal conifguration file.
+To run the processor against a local .zip, you'll need to have followed the above Postgres
+steps and have it running and a minimal conifguration file.
 
 Create `dev-resources/config.edn` with a map that looks like the
 following (using values for your Postgres server):
