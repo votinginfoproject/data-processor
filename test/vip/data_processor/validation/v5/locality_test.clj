@@ -94,6 +94,9 @@
   (let [errors-chan (a/chan 100)
         pipeline (concat
                   [psql/start-run
+                   psql/store-spec-version
+                   psql/store-public-id
+                   psql/store-election-id
                    process/process-v5-validations
                    xml/load-xml-ltree
                    psql/populate-locality-table]
@@ -132,6 +135,9 @@
   (let [errors-chan (a/chan 100)
         pipeline (concat
                   [psql/start-run
+                   psql/store-spec-version
+                   psql/store-public-id
+                   psql/store-election-id
                    process/process-v5-validations
                    xml/load-xml-ltree
                    psql/populate-locality-table]

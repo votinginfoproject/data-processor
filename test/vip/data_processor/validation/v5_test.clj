@@ -34,7 +34,7 @@
                  .listFiles
                  seq)
         errors-chan (a/chan 100)
-        ctx {:xml-source-file-path csvs
+        ctx {:csv-source-file-paths csvs
              :errors-chan errors-chan
              :spec-version (atom nil)
              :pipeline (concat [psql/start-run
