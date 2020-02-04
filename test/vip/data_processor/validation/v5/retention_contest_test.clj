@@ -11,7 +11,7 @@
 
 (deftest ^:postgres validate-no-missing-candidate-ids-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-missing-candidate-ids.xml")
+        ctx {:xml-source-file-path (xml-input "v5-missing-candidate-ids.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         v5.retention-contest/validate-no-missing-candidate-ids]

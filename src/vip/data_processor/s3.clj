@@ -6,12 +6,11 @@
             [clojure.string :as str]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.util :as util])
-  (:import [java.io File]
-           [java.nio.file Files CopyOption StandardCopyOption]
+  (:import [java.io File FileOutputStream FileInputStream]
+           [java.nio.file Files Path
+            CopyOption StandardCopyOption StandardOpenOption]
            [java.nio.file.attribute FileAttribute]
-           [net.lingala.zip4j.core ZipFile]
-           [net.lingala.zip4j.model ZipParameters]
-           [net.lingala.zip4j.util Zip4jConstants]))
+           [java.util.zip ZipOutputStream ZipEntry]))
 
 (defn get-object [key bucket]
   (s3/get-object (merge (config [:aws :creds])
@@ -92,25 +91,37 @@
                          import-id "VipObject.Election.Date")]
       (zip-filename* fips state election-date))))
 
+(defn generate-xml-filename
+  [ctx]
+  (assoc ctx :generated-xml-filename (zip-filename ctx)))
+
+(defn zip-file
+  "Given a directory, a zip file name and an unzipped source file, creates
+   a zipped file with the name and zipped contents of the source file."
+  [zip-dir zip-name source-file-path]
+  (let [zip-file-path (.resolve zip-dir zip-name)]
+    (with-open [fos (Files/newOutputStream
+                     zip-file-path
+                     (into-array [StandardOpenOption/CREATE]))
+                zos (ZipOutputStream. fos)
+                fis (Files/newInputStream source-file-path
+                        (into-array [StandardOpenOption/READ]))]
+      (let [zip-entry (-> source-file-path .toFile .getName ZipEntry.)]
+        (.putNextEntry zos zip-entry)
+        (io/copy fis zos)))
+    (.toFile zip-file-path)))
+
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
-  [{:keys [fatal-errors? xml-output-file] :as ctx}]
-  (let [zip-name (zip-filename ctx)
-        zip-dir (Files/createTempDirectory tmp-path-prefix
-                                           (into-array FileAttribute []))
-        zip-file (File. (.toFile zip-dir) zip-name)
-        zip (ZipFile. zip-file)
-        zip-params (doto (ZipParameters.)
-                     (.setCompressionLevel
-                      Zip4jConstants/DEFLATE_LEVEL_NORMAL))
-        xml-file (if (instance? File xml-output-file)
-                   xml-output-file
-                   (.toFile xml-output-file))]
-    (.createZipFile zip xml-file zip-params)
-    ;; We don't want to push this to S3 at all if we have fatal errors
-    ;; as it may break ingestion and waste time.
-    (when-not fatal-errors?
-      (put-object zip-name zip-file))
-    (-> ctx
-        (assoc :generated-xml-filename zip-name)
-        (update :to-be-cleaned concat [zip-file zip-dir]))))
+  [{:keys [fatal-errors? xml-output-file generated-xml-filename] :as ctx}]
+  (if-not (get ctx :skip-upload? false)
+    (let [zip-dir (Files/createTempDirectory tmp-path-prefix
+                                             (into-array FileAttribute []))
+          zip-file (zip-file zip-dir generated-xml-filename xml-output-file)]
+      ;; We don't want to push this to S3 at all if we have fatal errors
+      ;; as it may break ingestion and waste time.
+      (when-not fatal-errors?
+        (put-object generated-xml-filename zip-file))
+      (-> ctx
+          (update :to-be-cleaned concat [zip-file zip-dir])))
+    ctx))

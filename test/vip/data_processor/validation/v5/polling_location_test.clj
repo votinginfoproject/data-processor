@@ -11,7 +11,7 @@
 
 (deftest ^:postgres validate-no-missing-address-lines-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-polling-locations.xml")
+        ctx {:xml-source-file-path (xml-input "v5-polling-locations.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -33,7 +33,7 @@
 
 (deftest ^:postgres validate-latitude-longitude-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-polling-locations.xml")
+        ctx {:xml-source-file-path (xml-input "v5-polling-locations.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -91,7 +91,8 @@
 
 (deftest ^:postgres check-for-polling-locations-mapped-to-multiple-places-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-polling-locations-duplicated.xml")
+        ctx {:xml-source-file-path
+             (xml-input "v5-polling-locations-duplicated.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run

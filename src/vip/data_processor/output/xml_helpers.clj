@@ -1,5 +1,6 @@
 (ns vip.data-processor.output.xml-helpers
-  (:require [korma.core :as korma])
+  (:require [clojure.string :as str]
+            [korma.core :as korma])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
@@ -38,7 +39,7 @@
 (defn id-keyword [s]
   (-> s
       name
-      (clojure.string/replace "-" "_")
+      (str/replace "-" "_")
       (str "_id")
       keyword))
 

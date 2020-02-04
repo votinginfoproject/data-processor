@@ -11,7 +11,7 @@
 
 (deftest ^:postgres validate-no-missing-names-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-precincts.xml")
+        ctx {:xml-source-file-path (xml-input "v5-precincts.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         precinct/validate-no-missing-names]
@@ -43,7 +43,7 @@
 
 (deftest ^:postgres validate-no-missing-locality-ids-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-precincts.xml")
+        ctx {:xml-source-file-path (xml-input "v5-precincts.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         precinct/validate-no-missing-locality-ids]

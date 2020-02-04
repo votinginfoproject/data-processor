@@ -12,12 +12,13 @@
 (deftest validate-jurisdiction-references-test
   (testing "finds bad jurisdiction references"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["bad-references/ballot_line_result.txt"
-                                          "bad-references/state.txt"
-                                          "bad-references/locality.txt"
-                                          "bad-references/precinct.txt"
-                                          "bad-references/precinct_split.txt"
-                                          "bad-references/electoral_district.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["bad-references/ballot_line_result.txt"
+                                   "bad-references/state.txt"
+                                   "bad-references/locality.txt"
+                                   "bad-references/precinct.txt"
+                                   "bad-references/precinct_split.txt"
+                                   "bad-references/electoral_district.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs

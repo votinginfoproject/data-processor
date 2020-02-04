@@ -2,22 +2,27 @@
   (:require [korma.core :as korma]
             [vip.data-processor.errors :as errors]))
 
-(defn count-rows [table]
+(defn count-rows
   "Takes a single table and counts the number of rows in it."
+  [table]
   (:cnt (first (korma/select table (korma/aggregate (count "*") :cnt)))))
 
-(defn name-and-count [tables]
+(defn name-and-count
   "Transforms the selected tables into a map of names and counts."
+  [tables]
   (map
    (fn [[table-name table]]
      {:name table-name :count (count-rows table)})
    tables))
 
-(defn error-if-not-one-row [ctx count]
+(defn error-if-not-one-row
   "If the count of the rows is not equal to 1, add an error."
+  [ctx count]
   (if-not (= 1 (:count count))
-    (errors/add-errors ctx :errors (:name count) :global :row-constraint
-                       "File needs to contain exactly one row.")
+    (do
+      (println (:name count) " has " (:count count) " rows!")
+      (errors/add-errors ctx :errors (:name count) :global :row-constraint
+                           "File needs to contain exactly one row."))
     ctx))
 
 (defn tables-allow-only-one-record

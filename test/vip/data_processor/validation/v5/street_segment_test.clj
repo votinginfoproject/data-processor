@@ -11,7 +11,7 @@
 
 (deftest ^:postgres validate-no-missing-odd-even-both
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -33,7 +33,7 @@
 
 (deftest ^:postgres validate-odd-even-both-value
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -57,7 +57,7 @@
 
 (deftest ^:postgres validate-no-missing-city
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -86,7 +86,7 @@
 
 (deftest ^:postgres validate-no-missing-state
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -115,7 +115,7 @@
 
 (deftest ^:postgres validate-no-missing-zip
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -144,7 +144,7 @@
 
 (deftest ^:postgres validate-no-missing-street-name
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -173,7 +173,7 @@
 
 (deftest ^:postgres validate-no-street-segment-overlaps-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment-overlaps.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-overlaps.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -213,7 +213,7 @@
 
 (deftest ^:postgres validate-start-house-number
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment-start-house-number-invalid.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-start-house-number-invalid.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -237,7 +237,7 @@
 
 (deftest ^:postgres validate-end-house-number
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-street-segment-end-house-number-invalid.xml")
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-end-house-number-invalid.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run

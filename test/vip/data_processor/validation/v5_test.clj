@@ -2,6 +2,8 @@
   (:require  [clojure.test :refer :all]
              [vip.data-processor.pipeline :as pipeline]
              [vip.data-processor.db.postgres :as psql]
+             [vip.data-processor.db.translations.transformer :as transformer]
+             [vip.data-processor.errors.process :as process]
              [vip.data-processor.validation.csv :as csv]
              [vip.data-processor.validation.xml :as xml]
              [vip.data-processor.test-helpers :refer :all]
@@ -15,7 +17,7 @@
 (deftest ^:postgres full-good-v5-test
   (let [errors-chan (a/chan 100)
         ctx {:errors-chan errors-chan
-             :input (xml-input "v5_sample_feed.xml")
+             :xml-source-file-path (xml-input "v5_sample_feed.xml")
              :spec-version (atom nil)
              :pipeline (concat [psql/start-run
                                 xml/determine-spec-version
@@ -32,12 +34,15 @@
                  .listFiles
                  seq)
         errors-chan (a/chan 100)
-        ctx {:input csvs
+        ctx {:csv-source-file-paths csvs
              :errors-chan errors-chan
              :spec-version (atom nil)
              :pipeline (concat [psql/start-run
-                                csv/determine-spec-version]
-                               (csv/version-pipelines "5.1")
+                                csv/determine-spec-version
+                                psql/prep-v5-1-run
+                                process/process-v5-validations
+                                csv/load-csvs]
+                               transformer/transformers
                                v5/validations
                                [psql/store-spec-version
                                 psql/store-public-id])}

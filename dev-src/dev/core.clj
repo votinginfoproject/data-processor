@@ -1,56 +1,43 @@
 (ns dev.core
-  (:require
-   [clojure.core.async :as a]
-   [clojure.java.io :as io]
-   [clojure.pprint :as pprint]
-   [clojure.tools.logging :as log]
-   [squishy.data-readers]
-   [turbovote.resource-config :refer [config]]
-   [vip.data-processor :as data-processor]
-   [vip.data-processor.db.postgres :as psql]
-   [vip.data-processor.errors :as errors]
-   [vip.data-processor.output.street-segments :as output-ss]
-   [vip.data-processor.output.xml :as xml-output]
-   [vip.data-processor.pipeline :as pipeline]
-   [vip.data-processor.s3 :as s3 :refer [zip-filename]]
-   [vip.data-processor.validation.data-spec :as data-spec]
-   [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
-   [vip.data-processor.validation.db :as db]
-   [vip.data-processor.validation.db.v3-0 :as db.v3-0]
-   [vip.data-processor.validation.transforms :as t]
-   [vip.data-processor.validation.zip :as zip]))
-
-;; modify this to add flags to processing
-(defn set-context
-  [ctx]
-  (assoc ctx :post-process-street-segments? true))
+  (:require [vip.data-processor.db.postgres :as psql]
+            [vip.data-processor.pipeline :as pipeline]
+            [vip.data-processor.pipelines :as pipelines]
+            [vip.data-processor.pipelines.common :as common]
+            [vip.data-processor.validation.zip :as zip]
+            [vip.data-processor.validation.transforms :as t]))
 
 (def pipeline
-  [set-context
-   psql/start-run
-   #(zip/assoc-file % (config [:max-zipfile-size] 3221225472)) ; 3GB
-   zip/extracted-contents
+  [psql/start-run
+   t/assert-file
+   zip/assert-max-zip-size
+   zip/extract-contents
    t/remove-invalid-extensions
-   t/xml-csv-branch
-   psql/analyze-xtv
-   psql/store-spec-version
-   psql/store-public-id
-   psql/store-election-id
-   psql/v5-summary-branch
-   data-processor/add-validations
-   output-ss/insert-street-segment-nodes
-   errors/close-errors-chan
-   errors/await-statistics
-   psql/delete-from-xml-tree-values])
+   common/determine-format
+   common/organize-source-files
+   common/determine-spec
+   pipelines/choose-pipeline])
 
-(defn -main [filename]
+(defn -main
+  "Runs a modified pipeline that skips downloading from S3 in favor of a :file
+  that is provided on the command line. As such, it replaces the common pipeline
+  with one suited for just this task. Alter any of the flags in the
+  initial-context to turn on/off certain features:
+
+  :post-process-street-segments? works the same as in a normal production
+    pipeline to indicate if street segments should skip being added to the db
+    (true) or if they should be added (false)
+  :keep-feed-on-complete? should be set to true if you want the feed left
+    in the database when the processing is done, so you can do query tuning
+  :skip-upload? should be set to true if you do not want to upload to S3 when
+    processing is complete"
+  [filename]
   (psql/initialize)
-  (let [file (if (zip/xml-file? filename)
-               (java.nio.file.Paths/get filename (into-array [""]))
-               (java.io.File. filename))
-        result (pipeline/process pipeline file)]
+  (let [file (java.nio.file.Paths/get filename (into-array [""]))
+        initial-context {:file file
+                         :post-process-street-segments? true
+                         :keep-feed-on-complete? false
+                         :skip-upload? true}
+        result (time (pipeline/process pipeline initial-context))]
     (when-let [xml-output-file (:xml-output-file result)]
       (println "XML:" (.toString xml-output-file))
-      (let [filename (zip-filename result)
-            results (assoc result :generated-xml-filename filename)]
-        (psql/complete-run results)))))
+      (psql/complete-run result))))

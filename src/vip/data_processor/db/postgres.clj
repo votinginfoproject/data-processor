@@ -9,8 +9,7 @@
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec]
-            [clojure.set :as set])
+            [vip.data-processor.validation.data-spec :as data-spec])
   (:import [org.postgresql.util PGobject]
            [java.text Normalizer]))
 
@@ -303,10 +302,11 @@
 
 (defn delete-from-xml-tree-values
   [{:keys [import-id] :as ctx}]
-  (log/info "Dropping from xml_tree_values")
-  (korma/exec-raw
-   (:conn xml-tree-values)
-   ["delete from xml_tree_values where results_id = ?" [import-id]])
+  (when-not (:keep-feed-on-complete? ctx)
+    (log/info "Dropping from xml_tree_values")
+    (korma/exec-raw
+     (:conn xml-tree-values)
+     ["delete from xml_tree_values where results_id = ?" [import-id]]))
   ctx)
 
 
@@ -489,3 +489,8 @@
                   (log/error "Lazy failure case: " (.getMessage e))
                   chunked-rows)))]
         (trampoline chunked-rows)))))
+
+(defn prep-v5-1-run [ctx]
+  (-> ctx
+      (assoc :tables v5-1-tables)
+      (assoc :ltree-index 0)))

@@ -6,10 +6,7 @@
             [vip.data-processor.db.sqlite :as sqlite]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.v5 :as v5-validations]
-            [vip.data-processor.validation.xml.v5 :as xml.v5]
-            [vip.data-processor.errors :as errors]
-            [vip.data-processor.errors.process :as process]))
+            [vip.data-processor.errors :as errors]))
 
 (def address-elements
   #{"address"
@@ -107,6 +104,9 @@
            run (cons fst (take-while #(= fv (f %)) next-n))]
        (cons run (partition-by-n f n (seq (drop (count run) s))))))))
 
+(defn extract-xml-file [ctx]
+  (-> ctx :xml-source-file-path))
+
 (defn load-xml
   "Load the XML input file into the database, validating as we go.
 
@@ -116,7 +116,7 @@
   may catch the exception and continue with further validations of
   what has been captured."
   [ctx]
-  (let [xml-file (first (:input ctx))
+  (let [xml-file (extract-xml-file ctx)
         reader (util/bom-safe-reader xml-file)
         partitioned-xml-elements (partition-by-n :tag 5000 (:content (xml/parse reader)))]
     (loop [ctx ctx
@@ -234,7 +234,7 @@
   chunk size that is most efficient? How could we determine this magic
   number?"
   [ctx]
-  (let [xml-file (first (:input ctx))
+  (let [xml-file (extract-xml-file ctx)
         import-id (:import-id ctx)]
     (with-open [reader (util/bom-safe-reader xml-file)]
       (dorun
@@ -248,7 +248,7 @@
     ctx))
 
 (defn determine-spec-version [ctx]
-  (let [xml-file (first (:input ctx))]
+  (let [xml-file (:xml-source-file-path ctx)]
     (with-open [reader (util/bom-safe-reader xml-file)]
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]
@@ -256,27 +256,10 @@
             (update :spec-version (fn [spec-version]
                                     (reset! spec-version version)
                                     spec-version))
+            (assoc :spec-family (util/version-without-patch version))
             (assoc :data-specs (get data-spec/version-specs
                                     (util/version-without-patch version))))))))
 
-(defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported XML version: " (pr-str @spec-version))))
-
 (defn set-input-as-xml-output-file
-  [{:keys [input] :as ctx}]
-  (assoc ctx :xml-output-file (first input)))
-
-(def version-pipelines
-  {"3.0" [sqlite/attach-sqlite-db
-          process/process-v3-validations
-          load-xml]
-   "5.1" [process/process-v5-validations
-          load-xml-ltree
-          xml.v5/load-xml-street-segments
-          set-input-as-xml-output-file]})
-
-(defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines
-                         (util/version-without-patch @spec-version))]
-    (update ctx :pipeline (partial concat pipeline))
-    (unsupported-version ctx)))
+  [{:keys [xml-source-file-path] :as ctx}]
+  (assoc ctx :xml-output-file xml-source-file-path))

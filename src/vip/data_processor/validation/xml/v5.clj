@@ -37,8 +37,8 @@
 
 (defn load-xml-street-segments
   [{:keys [import-id] :as ctx}]
-  (let [xml-file (first (:input ctx))]
-    (with-open [reader (util/bom-safe-reader xml-file)]
+  (let [xml-file-path (:xml-source-file-path ctx)]
+    (with-open [reader (util/bom-safe-reader xml-file-path)]
       (->> reader
            xml/parse
            :content

@@ -2,20 +2,22 @@
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
             [vip.data-processor.util :refer :all])
-  (:import [java.io File]))
+  (:import [java.nio.file Paths]))
 
-(deftest find-input-file-test
-  (let [election-file (File. "/data/election.txt")
-        state-file    (File. "/data/state.txt")
-        upper-case-source (File. "/data/Source.txt")
-        ctx {:input [election-file state-file upper-case-source]}]
+(deftest find-csv-source-file-test
+  ;;Note, these file Paths aren't of any actual files, just names.
+  (let [election-file (Paths/get "/data" (into-array String ["election.txt"]))
+        state-file    (Paths/get "/data" (into-array String ["state.txt"]))
+        upper-case-source
+        (Paths/get "/data" (into-array String ["Source.txt"]))
+        ctx {:csv-source-file-paths [election-file state-file upper-case-source]}]
     (testing "finds files from their name"
-      (is (= election-file (find-input-file ctx "election.txt")))
-      (is (= state-file    (find-input-file ctx "state.txt"))))
+      (is (= election-file (find-csv-source-file ctx "election.txt")))
+      (is (= state-file    (find-csv-source-file ctx "state.txt"))))
     (testing "returns nil if not found"
-      (is (nil? (find-input-file ctx "DOES_NOT_EXIST.txt"))))
+      (is (nil? (find-csv-source-file ctx "DOES_NOT_EXIST.txt"))))
     (testing "finds files without regard to the file's case"
-      (is (= upper-case-source (find-input-file ctx "source.txt"))))))
+      (is (= upper-case-source (find-csv-source-file ctx "source.txt"))))))
 
 (deftest format-date-test
   (testing "date-strings with forward-slashes are normalized"
