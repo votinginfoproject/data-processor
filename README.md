@@ -325,3 +325,5 @@ To delete any but the most recent 5 versions of a feed (where two feeds are cons
 ```sql
 delete from results where id in (select unnest(old_runs) from cleanup.feeds_by_election);
 ```
+
+Also the cleanup process will delete any uncompleted feeds that started more than 5 days ago. This will catch feeds that for whatever reason failed but give us enough time to notice them and decide if actions should be taken to re-run them.
