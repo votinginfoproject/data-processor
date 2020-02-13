@@ -2,7 +2,7 @@ CREATE FUNCTION clear_xml_table() RETURNS trigger AS $$
 	BEGIN
 		LOCK TABLE public.results;
 		IF (SELECT COUNT(*) FROM public.results WHERE complete = false) = 0 THEN
-			TRUNCATE TABLE public.xml_tree_results;
+			TRUNCATE TABLE public.xml_tree_values;
 		END IF;
 		RETURN null;
 	END; $$
