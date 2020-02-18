@@ -11,9 +11,9 @@ reported upon.
 ## Running
 
 ### Setup
-1. Install postgres 9.4 (`brew install postgresql9.4`)
+1. Install postgres 11 (`brew install postgresql11`)
 1. Install pgadmin 4 (handy GUI to administer postgres): `brew cask install pgadmin4`
-1. Once both are installed, make sure postgres is running; If it is not, you can run `brew services start postgresql@9.4`
+1. Once both are installed, make sure postgres is running; If it is not, you can run `brew services start postgresql@11`
 1. Bring up pgadmin4 via MacOS Applications
     1. You will need to create a Master Password
     1. You will then create a new Server that connects to localhost
