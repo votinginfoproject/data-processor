@@ -1,0 +1,22 @@
+
+../benchmarking/5.1-files/4-5.1-large-vipFeed-53-2020-02-11.xml
+
+real	338m6.663s
+user	60m2.250s
+sys	5m38.910s
+
+real	333m17.106s
+user	59m3.338s
+sys	5m26.978s
+
+real	328m50.670s
+user	62m27.499s
+sys	5m41.739s
+
+real	324m1.375s
+user	59m24.497s
+sys	5m38.703s
+
+real	348m14.811s
+user	61m37.169s
+sys	5m41.621s

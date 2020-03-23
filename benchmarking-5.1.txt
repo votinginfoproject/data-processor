@@ -1,0 +1,67 @@
+../benchmarking/5.1-files/1-5.1-small-ga-2019-12-03.xml
+
+real	1m18.905s
+user	0m16.187s
+sys	0m1.220s
+
+real	1m18.090s
+user	0m16.549s
+sys	0m1.037s
+
+real	1m17.730s
+user	0m16.461s
+sys	0m1.032s
+
+real	1m18.570s
+user	0m17.415s
+sys	0m1.132s
+
+real	1m20.494s
+user	0m19.232s
+sys	0m1.247s
+
+
+../benchmarking/5.1-files/2-5.1-small-tx-2020-03-03.xml
+
+real	1m22.624s
+user	0m26.036s
+sys	0m1.602s
+
+real	1m20.264s
+user	0m23.322s
+sys	0m1.360s
+
+real	1m19.858s
+user	0m23.356s
+sys	0m1.361s
+
+real	1m19.593s
+user	0m22.562s
+sys	0m1.268s
+
+real	1m22.627s
+user	0m25.147s
+sys	0m1.495s
+
+
+../benchmarking/5.1-files/3-5.1-med-1541532404789-370922399.xml
+
+real	71m9.089s
+user	4m33.326s
+sys	0m18.516s
+
+real	69m42.781s
+user	3m47.697s
+sys	0m9.675s
+
+real	69m23.939s
+user	3m45.742s
+sys	0m8.395s
+
+real	69m38.536s
+user	3m33.578s
+sys	0m7.001s
+
+real	69m27.136s
+user	3m50.051s
+sys	0m7.759s
