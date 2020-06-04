@@ -1,6 +1,6 @@
 (ns vip.data-processor.validation.zip
   (:require [clojure.tools.logging :as log])
-  (:import [net.lingala.zip4j.core ZipFile]
+  (:import [net.lingala.zip4j ZipFile]
            [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 

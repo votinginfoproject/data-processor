@@ -2,7 +2,8 @@
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
-            [vip.data-processor.output.xml-helpers :refer [create-xml-file]]
+            [vip.data-processor.output.xml-helpers :refer [create-xml-file
+                                                           generate-file-basename]]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.util :as db.util]
             [clojure.tools.logging :as log]
@@ -158,5 +159,6 @@
   ctx)
 
 (def pipeline
-  [create-xml-file
+  [generate-file-basename
+   create-xml-file
    generate-xml-file])
