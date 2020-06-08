@@ -3,6 +3,33 @@
             [clojure.string :as str]
             [clojure.test :refer :all]))
 
+(deftest format-fips-test
+  (testing "empty"
+    (is (= "XX" (format-fips "")))
+    (is (= "XX" (format-fips nil))))
+  (testing "1 digit fips"
+    (is (= "01" (format-fips "1"))))
+  (testing "2 digit fips"
+    (is (= "08" (format-fips "08")))
+    (is (= "10" (format-fips "10"))))
+  (testing "3 digit fips (shouldn't be many/any of these)"
+    (is (= "00008" (format-fips "008")))
+    (is (= "00101" (format-fips "101"))))
+  (testing "4 digit fips (could be a county fips from a low number state)"
+    (is (= "08001" (format-fips "8001"))))
+  (testing "5 digit fips (county fips)"
+    (is (= "08001" (format-fips "08001")))
+    (is (= "10101" (format-fips "10101")))))
+
+(deftest format-state-test
+  (testing "empty"
+    (is (= "YY" (format-state "")))
+    (is (= "YY" (format-state nil))))
+  (testing "Single Word State"
+    (is (= "Colorado" (format-state "Colorado"))))
+  (testing "Two Word State"
+    (is (= "New-York" (format-state "New York")))))
+
 (deftest filename*-test
   (testing "nicely formatted dates make nice filenames"
     (is (= "vipfeed-51-VA-2015-03-24"
