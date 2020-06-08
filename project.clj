@@ -22,7 +22,7 @@
                                  org.slf4j/slf4j-api]]
                  [org.clojure/core.async "0.4.500"]
                  [democracyworks/utility-fns "0.2.0"]
-                 [net.lingala.zip4j/zip4j "1.3.3"]
+                 [net.lingala.zip4j/zip4j "2.6.1"]
                  [turbovote.resource-config "0.2.1"]
                  [joplin.jdbc "0.3.11"
                   :exclusions [ragtime/ragtime.jdbc]]

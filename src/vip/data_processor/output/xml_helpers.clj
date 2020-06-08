@@ -1,12 +1,74 @@
 (ns vip.data-processor.output.xml-helpers
-  (:require [korma.core :as korma])
-  (:import [java.nio.file Files]
+  (:require [clojure.string :as str]
+            [korma.core :as korma]
+            [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.s3 :as s3]
+            [vip.data-processor.util :as util])
+  (:import [java.nio.file Files CopyOption StandardCopyOption]
            [java.nio.file.attribute FileAttribute]))
 
+(defn format-fips [fips]
+  (cond
+    (empty? fips) "XX"
+    (< (count fips) 3) (format "%02d" (Integer/parseInt fips))
+    (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
+    :else fips))
+
+(defn format-state
+  [state]
+  (if (empty? state)
+    "YY"
+    (clojure.string/replace (clojure.string/trim state) #"\s" "-")))
+
+(defn filename* [fips state election-date]
+  (let [fips (format-fips fips)
+        state (format-state state)
+        date (util/format-date election-date)]
+    (str/join "-" ["vipfeed" fips state date])))
+
+(defn generate-file-basename
+  [{:keys [spec-version tables import-id] :as ctx}]
+  (condp = (util/version-without-patch @spec-version)
+    "3.0"
+    (let [fips (-> tables
+                   :sources
+                   korma/select
+                   first
+                   :vip_id)
+          state (-> tables
+                    :states
+                    korma/select
+                    first
+                    :name)
+          election-date (-> tables
+                            :elections
+                            korma/select
+                            first
+                            :date)]
+      (assoc ctx :output-file-basename
+             (filename* fips state election-date)))
+
+    "5.1"
+    (let [fips (postgres/find-value-for-simple-path
+                import-id "VipObject.Source.VipId")
+          state (postgres/find-value-for-simple-path
+                 import-id "VipObject.State.Name")
+          election-date (postgres/find-value-for-simple-path
+                         import-id "VipObject.Election.Date")]
+      (assoc ctx :output-file-basename
+             (filename* fips state election-date)))))
+
 (defn create-xml-file
-  [{:keys [import-id] :as ctx}]
-  (let [xml-file (Files/createTempFile
-                  (str import-id) ".xml" (into-array FileAttribute []))]
+  "Creates a temp file for the output xml, then moves it to a name without
+   the randomness that temp files get automatically added to their names."
+  [{:keys [import-id output-file-basename] :as ctx}]
+  (let [tmp-xml-file (Files/createTempFile
+                      (str import-id) ".xml" (into-array FileAttribute []))
+        xml-file (.resolveSibling tmp-xml-file
+                                  (str output-file-basename ".xml"))
+        xml-file (Files/move tmp-xml-file xml-file
+                             (into-array
+                              [StandardCopyOption/REPLACE_EXISTING]))]
     (-> ctx
         (assoc :xml-output-file xml-file)
         (update :to-be-cleaned conj xml-file))))
