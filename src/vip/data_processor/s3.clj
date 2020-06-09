@@ -2,16 +2,13 @@
   (:require [amazonica.aws.s3 :as s3]
             [clojure.java.io :as io]
             [turbovote.resource-config :refer [config]]
-            [korma.core :as korma]
-            [clojure.string :as str]
-            [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.util :as util])
+            [clojure.string :as str])
   (:import [java.io File]
-           [java.nio.file Files CopyOption StandardCopyOption]
+           [java.nio.file Files StandardCopyOption]
            [java.nio.file.attribute FileAttribute]
-           [net.lingala.zip4j.core ZipFile]
+           [net.lingala.zip4j ZipFile]
            [net.lingala.zip4j.model ZipParameters]
-           [net.lingala.zip4j.util Zip4jConstants]))
+           [net.lingala.zip4j.model.enums CompressionLevel]))
 
 (defn get-object [key bucket]
   (s3/get-object (merge (config [:aws :creds])
@@ -43,54 +40,9 @@
       (finally (.close stream)))
     tmp-path))
 
-(defn format-fips [fips]
-  (cond
-    (empty? fips) "XX"
-    (< (count fips) 3) (format "%02d" (Integer/parseInt fips))
-    (< (count fips) 5) (format "%05d" (Integer/parseInt fips))
-    :else fips))
-
-(defn format-state
-  [state]
-  (if (empty? state)
-    "YY"
-    (clojure.string/replace (clojure.string/trim state) #"\s" "-")))
-
-(defn zip-filename* [fips state election-date]
-  (let [fips (format-fips fips)
-        state (format-state state)
-        date (util/format-date election-date)]
-    (str (str/join "-" ["vipfeed" fips state date]) ".zip")))
-
 (defn zip-filename
-  [{:keys [spec-version tables import-id] :as ctx}]
-  (condp = (util/version-without-patch @spec-version)
-    "3.0"
-    (let [fips (-> tables
-                   :sources
-                   korma/select
-                   first
-                   :vip_id)
-          state (-> tables
-                    :states
-                    korma/select
-                    first
-                    :name)
-          election-date (-> tables
-                            :elections
-                            korma/select
-                            first
-                            :date)]
-      (zip-filename* fips state election-date))
-
-    "5.1"
-    (let [fips (postgres/find-value-for-simple-path
-                import-id "VipObject.Source.VipId")
-          state (postgres/find-value-for-simple-path
-                 import-id "VipObject.State.Name")
-          election-date (postgres/find-value-for-simple-path
-                         import-id "VipObject.Election.Date")]
-      (zip-filename* fips state election-date))))
+  [{:keys [output-file-basename]}]
+  (str output-file-basename ".zip"))
 
 (defn upload-to-s3
   "Uploads the generated xml file to the specified S3 bucket."
@@ -102,11 +54,11 @@
         zip (ZipFile. zip-file)
         zip-params (doto (ZipParameters.)
                      (.setCompressionLevel
-                      Zip4jConstants/DEFLATE_LEVEL_NORMAL))
+                      CompressionLevel/NORMAL))
         xml-file (if (instance? File xml-output-file)
                    xml-output-file
                    (.toFile xml-output-file))]
-    (.createZipFile zip xml-file zip-params)
+    (.addFile zip xml-file zip-params)
     ;; We don't want to push this to S3 at all if we have fatal errors
     ;; as it may break ingestion and waste time.
     (when-not fatal-errors?

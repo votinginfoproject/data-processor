@@ -4,7 +4,7 @@
    [clojure.test :refer [deftest testing is use-fixtures run-tests]]
    [vip.data-processor.validation.zip :as zip])
   (:import
-   [net.lingala.zip4j.core ZipFile]))
+   [net.lingala.zip4j ZipFile]))
 
 (deftest wont-open-too-big-zipfile
   (let [zipfile-path (.getPath (io/resource "example.zip"))
