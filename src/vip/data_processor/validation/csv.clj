@@ -12,6 +12,7 @@
             [vip.data-processor.errors :as errors]
             [vip.data-processor.errors.process :as process]
             [vip.data-processor.output.tree-xml :as tree-xml]
+            [vip.data-processor.output.xml-helpers :as xml-helpers]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.csv.file-set :as csv-files]
             [vip.data-processor.validation.data-spec :as data-spec]
@@ -268,13 +269,15 @@
   {"3.0" [sqlite/attach-sqlite-db
           process/process-v3-validations
           (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
-          load-csvs]
+          load-csvs
+          xml-helpers/generate-file-basename]
    "5.1" (concat [(fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
                   (fn [ctx] (assoc ctx :ltree-index 0))
                   process/process-v5-validations
                   load-csvs]
                  v5-1-transformers/transformers
-                 tree-xml/pipeline)})
+                 tree-xml/pipeline
+                 [xml-helpers/generate-file-basename])})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines
