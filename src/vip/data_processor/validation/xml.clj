@@ -9,8 +9,7 @@
             [vip.data-processor.validation.v5 :as v5-validations]
             [vip.data-processor.validation.xml.v5 :as xml.v5]
             [vip.data-processor.errors :as errors]
-            [vip.data-processor.errors.process :as process]
-            [vip.data-processor.output.xml-helpers :as xml-helpers]))
+            [vip.data-processor.errors.process :as process]))
 
 (def address-elements
   #{"address"
@@ -270,13 +269,11 @@
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
           process/process-v3-validations
-          load-xml
-          xml-helpers/generate-file-basename]
+          load-xml]
    "5.1" [process/process-v5-validations
           load-xml-ltree
           xml.v5/load-xml-street-segments
-          set-input-as-xml-output-file
-          xml-helpers/generate-file-basename]})
+          set-input-as-xml-output-file]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines
