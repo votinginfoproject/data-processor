@@ -10,7 +10,8 @@
             [vip.data-processor.validation.xml.v5 :as xml.v5]
             [vip.data-processor.errors :as errors]
             [vip.data-processor.errors.process :as process]
-            [vip.data-processor.output.xml-helpers :as xml-helpers]))
+            [vip.data-processor.output.xml-helpers :as xml-helpers])
+  (:import [java.nio.file Files StandardCopyOption]))
 
 (def address-elements
   #{"address"
@@ -264,8 +265,13 @@
   (assoc ctx :stop (str "Unsupported XML version: " (pr-str @spec-version))))
 
 (defn set-input-as-xml-output-file
-  [{:keys [input] :as ctx}]
-  (assoc ctx :xml-output-file (first input)))
+  [{:keys [input output-file-basename] :as ctx}]
+  (let [input-path (-> input first .toPath)
+        output-path (.resolveSibling input-path
+                                     (str output-file-basename ".xml"))]
+    (assoc ctx :xml-output-file
+           (Files/move input-path output-path
+                       (into-array [StandardCopyOption/REPLACE_EXISTING])))))
 
 (def version-pipelines
   {"3.0" [sqlite/attach-sqlite-db
@@ -275,8 +281,8 @@
    "5.1" [process/process-v5-validations
           load-xml-ltree
           xml.v5/load-xml-street-segments
-          set-input-as-xml-output-file
-          xml-helpers/generate-file-basename]})
+          xml-helpers/generate-file-basename
+          set-input-as-xml-output-file]})
 
 (defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
   (if-let [pipeline (get version-pipelines
