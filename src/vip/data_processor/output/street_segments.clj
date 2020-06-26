@@ -11,7 +11,8 @@
    [vip.data-processor.errors :as errors]
    [vip.data-processor.util :as util])
   (:import
-   [javax.xml.stream XMLInputFactory XMLOutputFactory XMLEventFactory]))
+   [javax.xml.stream XMLInputFactory XMLOutputFactory XMLEventFactory]
+   [java.nio.file Files StandardCopyOption]))
 
 (defn add-element
   [event-factory writer el-name el-content]
@@ -135,9 +136,9 @@
           (.add writer event)))
       (.close reader)
       (.close writer)
-      (-> (assoc ctx :xml-output-file (.toPath tmpfile))
-          ;; Not sure if we care about this, we may want to just throw it away
-          (assoc :xml-output-file-old xml-output-file)))
+      (assoc ctx :xml-output-file
+             (Files/move (.toPath tmpfile) xml-output-file
+                         (into-array [StandardCopyOption/REPLACE_EXISTING]))))
     ctx))
 
 (defn insert-street-segment-nodes

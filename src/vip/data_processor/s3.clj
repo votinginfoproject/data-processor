@@ -44,11 +44,12 @@
   [{:keys [output-file-basename]}]
   (str output-file-basename ".zip"))
 
-(defn upload-to-s3
-  "Uploads the generated xml file to the specified S3 bucket."
-  [{:keys [fatal-errors? xml-output-file] :as ctx}]
-  (let [zip-name (zip-filename ctx)
-        zip-dir (Files/createTempDirectory tmp-path-prefix
+(defn prepare-zip-file
+  "Creates a temp directory, a new zip file in that directory, and adds
+   the xml-output-file to the zip. It returns the zip file and directory
+   so they can be used and cleaned up at the end of processing."
+  [zip-name xml-output-file]
+  (let [zip-dir (Files/createTempDirectory tmp-path-prefix
                                            (into-array FileAttribute []))
         zip-file (File. (.toFile zip-dir) zip-name)
         zip (ZipFile. zip-file)
@@ -59,6 +60,14 @@
                    xml-output-file
                    (.toFile xml-output-file))]
     (.addFile zip xml-file zip-params)
+    {:zip-dir zip-dir :zip-file zip-file}))
+
+(defn upload-to-s3
+  "Zips up the xml output file and uploads to the specified S3 bucket if there
+   are no fatal errors."
+  [{:keys [fatal-errors? xml-output-file] :as ctx}]
+  (let [zip-name (zip-filename ctx)
+        {:keys [zip-dir zip-file]} (prepare-zip-file zip-name xml-output-file)]
     ;; We don't want to push this to S3 at all if we have fatal errors
     ;; as it may break ingestion and waste time.
     (when-not fatal-errors?
