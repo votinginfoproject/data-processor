@@ -134,11 +134,12 @@ server running within Docker on port `55432`.
 The message you send on the SQS queue must look like the following:
 
 ```clj
-{:filename "some-feed.xml"}
+{:filename "some-feed.xml"
+ :bucket "some-s3-bucket-name"}
 ```
 
-It is an EDN map, with the key `:filename`, whose value is the name of
-a file in the `VIP_DP_S3_UNPROCESSED_BUCKET` S3 bucket.
+These two values let `data-processor` know where to find the file and what name
+it has.
 
 ## Testing
 
@@ -247,6 +248,40 @@ required for XML or CSV processing, it should be added to the
 `xml-validations` or `csv-validations` lists respectively in the
 `vip.data-processor.validation.transforms` namespace.
 
+## Separated Pipelines
+
+Prior versions of the codebase had one basic pipeline that jumped around from namespace
+to namespace and sometimes branched based on feed format (xml/csv) and/or spec version,
+with the branches then concatenating new steps into the pipeline. This was often
+confusing to follow, and it also encouraged some aspects of the context to pull double
+duty, being treated differently based on which format and spec version was currently
+being processed. The prime example of this is the `:input` keyword, which at first held
+the EDN message that kicks off processing, then the zip/xml file, then the extracted
+file contents (or if it was a plain XML file, it got wrapped into a vector so that
+it had the same collection mechanics that the collection of CSV files does).
+
+The new pipelines are more explicit. There's a common section that all of the pipelines
+run to process the EDN message, download the file from S3, validate some file aspects
+(like maximum uncompressed size, weeding out files with irrelevant extensions), and lastly
+determining which format and spec the feed is in, and then placing the files in a
+format appropriate location in the context (`:xml-source-file-path` and
+`:csv-source-file-paths`). No more is the XML file the first in a collection of files, which
+presumably only holds the one file. It's now the only file path at `:xml-source-file-path`.
+And rather than `:input` being mutated over and over again from step to step in the common
+pipeline, there are separate keywords in the context for holding `:filename`, `:file`,
+`:extracted-file-paths`, `:valid-file-paths`, and then lastly the source file paths mentioned
+above. Soon we'll add some specs to pre-validate calls to the pipeline functions that expect
+the context to have a certain shape on entry and post-validate additions to the context.
+
+Once the feed format and spec have been determined and the source files put into their
+appropriate places in the context, then there's one jump to the pipeline for that
+particular combination of format and spec. You can find these pipelines under the
+namespaces `vip.data-processor.pipelines.xml` and `vip.data-processor.pipelines.csv`, both
+of which then have namespaces `v3` and `v5`. In these namespace you can see all/most of the
+steps for that particular flavor of pipeline laid out, rather than needing to trace
+execution from namespace to namespace. There are still a few sub-pipelines that collect
+a lot of the validations out there that are concatenated in, but in general it should be much
+easier to follow, and to make changes to a specific pipeline.
 
 ## Deploying
 

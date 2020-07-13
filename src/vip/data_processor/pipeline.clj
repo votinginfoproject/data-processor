@@ -13,6 +13,7 @@
     (processing-fn ctx)
     (catch Throwable e
       (log/error e)
+      (log/error ctx)
       (assoc ctx :stop "Exception caught"
                  :thrown-by processing-fn
                  :exception e))))
@@ -34,20 +35,21 @@
 
 (defn process
   "A pipeline is a sequence of functions that take and return a
-  `processing context`. The `initial-input` will be placed as the
-  `:input` on the processing context for the first function in the
-  pipeline.
+  `processing context`. The `initial-input` should be a map and will
+  be merged with defaults before being passed as the processing
+  context for the first function in the pipeline.
 
   Runs the pipeline, returning the final context. An exception on the
   context will result in logging the exception."
   ([pipeline initial-input]
    (process pipeline initial-input nil))
   ([pipeline initial-input delete-callback]
-   (let [ctx (merge {:input initial-input
-                     :skip-validations? false
-                     :spec-version (atom nil)
+   (log/info "pipeline process kicking off with initial-input:"
+             (pr-str initial-input))
+   (let [ctx (merge {:spec-version (atom nil)
                      :errors-chan (a/chan 1024)
                      :pipeline pipeline}
+                    initial-input
                     (when-not (nil? delete-callback)
                       {:delete-callback delete-callback}))
          result (run-pipeline ctx)

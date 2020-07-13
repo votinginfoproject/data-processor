@@ -1,8 +1,9 @@
 (ns vip.data-processor.db.translations.v5-1.states-postgres-test
   (:require [clojure.test :refer :all]
             [vip.data-processor.test-helpers :refer :all]
-            [vip.data-processor.db.translations.v5-1.states :as states]
             [vip.data-processor.db.postgres :as postgres]
+            [vip.data-processor.db.translations.v5-1.states :as s]
+            [vip.data-processor.errors.process :as process]
             [vip.data-processor.pipeline :as pipeline]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.data-spec :as data-spec]
@@ -14,13 +15,15 @@
 (deftest ^:postgres -transformer-test
   (testing "state.txt is loaded and transformed"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["5-1/state.txt"])
+          ctx {:csv-source-file-paths (csv-inputs ["5-1/state.txt"])
                :errors-chan errors-chan
                :spec-version (atom "5.1")
-               :pipeline (concat
-                          [postgres/start-run
-                           (data-spec/add-data-specs v5-1/data-specs)]
-                          (get csv/version-pipelines "5.1"))}
+               :pipeline [postgres/start-run
+                          (data-spec/add-data-specs v5-1/data-specs)
+                          postgres/prep-v5-1-run
+                          process/process-v5-validations
+                          csv/load-csvs
+                          s/transformer]}
           out-ctx (pipeline/run-pipeline ctx)
           errors (all-errors errors-chan)]
       (assert-no-problems errors {})

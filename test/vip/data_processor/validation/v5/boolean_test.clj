@@ -11,7 +11,7 @@
 
 (deftest ^:postgres boolean-incorrect-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-incorrect-booleans.xml")
+        ctx {:xml-source-file-path (xml-input "v5-incorrect-booleans.xml")
              :pipeline [psql/start-run
                         load-xml-ltree
                         v5.booleans/validate-format]

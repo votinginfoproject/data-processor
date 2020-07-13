@@ -2193,6 +2193,7 @@
   <!-- Retention Contests -->
   <RetentionContest id="rc0001">
     <CandidateId>can10214</CandidateId>
+    <ElectoralDistrictId>ed60129</ElectoralDistrictId>
     <Type>other</Type>
   </RetentionContest>
   <!-- End of additions for tests -->

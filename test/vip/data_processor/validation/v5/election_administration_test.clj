@@ -12,7 +12,7 @@
 (deftest ^:postgres validate-no-missing-departments-test
   (testing "missing Department element is an error"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-election-administrations.xml")
+          ctx {:xml-source-file-path (xml-input "v5-election-administrations.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
@@ -35,7 +35,7 @@
 
 (deftest ^:postgres validate-voter-service-type-format-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-election-administrations.xml")
+        ctx {:xml-source-file-path (xml-input "v5-election-administrations.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run

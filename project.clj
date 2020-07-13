@@ -6,16 +6,16 @@
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/tools.logging "0.5.0-alpha.1"]
                  [ch.qos.logback/logback-classic "1.2.3"]
-                 [joda-time "2.10.2"]
+                 [joda-time "2.10.3"]
                  [clj-time "0.15.1"]
                  [amazonica "0.3.143"
                   :exclusions [com.amazonaws/aws-java-sdk
                                com.amazonaws/amazon-kinesis-client]]
-                 [com.amazonaws/aws-java-sdk-core "1.11.569"]
-                 [com.amazonaws/aws-java-sdk-s3 "1.11.569"]
-                 [com.cognitect.aws/api "0.8.273"]
-                 [com.cognitect.aws/endpoints "1.1.11.507"]
-                 [com.cognitect.aws/sns "697.2.391.0"]
+                 [com.amazonaws/aws-java-sdk-core "1.11.592"]
+                 [com.amazonaws/aws-java-sdk-s3 "1.11.592"]
+                 [com.cognitect.aws/api "0.8.345"]
+                 [com.cognitect.aws/endpoints "1.1.11.590"]
+                 [com.cognitect.aws/sns "718.2.444.0"]
                  [democracyworks/squishy "3.1.0"
                     :exclusions [joda-time
                                  org.slf4j/slf4j-simple
@@ -29,14 +29,16 @@
                  [ragtime/ragtime.jdbc "0.6.4"]
                  [korma "0.4.3"]
                  [org.clojure/java.jdbc "0.7.9"]
-                 [org.postgresql/postgresql "42.2.5"
+                 [org.postgresql/postgresql "42.2.6"
                   :exclusions [org.slf4j/slf4j-simple
                                org.slf4j/slf4j-api]]
-                 [org.xerial/sqlite-jdbc "3.27.2.1"]
+                 [org.xerial/sqlite-jdbc "3.28.0"]
                  [commons-lang/commons-lang "2.6"]
                  [xerces/xercesImpl "2.12.0"]
-                 [com.fasterxml.woodstox/woodstox-core "5.2.1"]
+                 [com.fasterxml.woodstox/woodstox-core "6.0.0.pr1"]
                  [me.raynes/fs "1.4.6"]]
+  :managed-dependencies [[com.mchange/c3p0 "0.9.5.4"]
+                         [com.fasterxml.jackson.core/jackson-databind "2.9.9.1"]]
   :profiles {:test {:resource-paths ["test-resources"]
                     :dependencies [[com.github.kyleburton/clj-xpath "1.4.11"]]}
              :dev {:source-paths ["dev-src"]

@@ -4,7 +4,7 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.util :as util])
-  (:import [java.nio.file Files CopyOption StandardCopyOption]
+  (:import [java.nio.file Files StandardCopyOption]
            [java.nio.file.attribute FileAttribute]))
 
 (defn format-fips [fips]
@@ -100,7 +100,7 @@
 (defn id-keyword [s]
   (-> s
       name
-      (clojure.string/replace "-" "_")
+      (str/replace "-" "_")
       (str "_id")
       keyword))
 

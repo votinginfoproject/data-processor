@@ -4,42 +4,35 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [korma.core :as korma]
-            [korma.db :as db]
-            [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.db.translations.transformer :as v5-1-transformers]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.errors :as errors]
-            [vip.data-processor.errors.process :as process]
-            [vip.data-processor.output.tree-xml :as tree-xml]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.csv.file-set :as csv-files]
-            [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.data-spec.v5-1 :as v5-1]))
+            [vip.data-processor.validation.data-spec :as data-spec]))
 
 (defn good-filename?
-  "Compares `file`'s name against all the filenames in `data-specs` to
+  "Compares `file-path`'s name against all the filenames in `data-specs` to
   confirm the file is indeed one we are expecting."
-  [data-specs file]
-  (let [filename (str/lower-case (.getName file))]
+  [data-specs file-path]
+  (let [filename (str/lower-case (.getName (.toFile file-path)))]
     (-> (set (map :filename data-specs))
         (contains? filename))))
 
 (defn bad-files->string
-  "Given a collection of bad files, returns their names as a
+  "Given a collection of bad file Paths, returns their names as a
   comma-delimited string."
-  [bad-files]
-  (->> bad-files (map #(.getName %)) sort (str/join ", ")))
+  [bad-file-paths]
+  (->> bad-file-paths (map #(.getName (.toFile %))) sort (str/join ", ")))
 
 (defn remove-bad-filenames
-  "Filters out any files in `input` from our files to process based on
-  whether or not they are included in our `data-spec`. Warns us if
-  we've found any bad ones, otherwise returns the context as-is."
-  [{:keys [data-specs input] :as ctx}]
+  "Filters out any files in `csv-source-file-paths` from our files to
+  process based on whether or not they are included in our `data-spec`.
+  Warns us if we've found any bad ones, otherwise returns the context as-is."
+  [{:keys [data-specs csv-source-file-paths] :as ctx}]
   (let [{good-files true
-         bad-files false} (group-by (partial good-filename? data-specs) input)]
+         bad-files false} (group-by (partial good-filename? data-specs) csv-source-file-paths)]
     (if (seq bad-files)
-      (-> (assoc ctx :input good-files)
+      (-> (assoc ctx :csv-source-file-paths good-files)
           (errors/add-errors
            :warnings :import :global :bad-filenames (bad-files->string bad-files)))
       ctx)))
@@ -215,7 +208,7 @@
   "Bulk importing and CSV validation is done in one go, so that it can
   be done without holding the entire file in memory at once."
   [ctx {:keys [filename] :as data-spec}]
-  (if-let [file-to-load (util/find-input-file ctx filename)]
+  (if-let [file-to-load (util/find-csv-source-file ctx filename)]
     (do
       (log/info "Loading file" filename)
       (try
@@ -238,7 +231,7 @@
   [{:keys [data-specs] :as ctx}]
   (let [required-files (filter :required data-specs)]
     (reduce (fn [ctx {:keys [filename required table]}]
-              (if (util/find-input-file ctx filename)
+              (if (util/find-csv-source-file ctx filename)
                 ctx
                 (errors/add-errors ctx
                                    required table :global :missing-csv
@@ -246,7 +239,7 @@
             ctx required-files)))
 
 (defn determine-spec-version [ctx]
-  (if-let [source-file (util/find-input-file ctx "source.txt")]
+  (if-let [source-file (util/find-csv-source-file ctx "source.txt")]
     (with-open [reader (util/bom-safe-reader source-file :encoding "UTF-8")]
       (let [headers (read-one-line reader)
             line1 (read-one-line reader)
@@ -256,28 +249,8 @@
             (update :spec-version (fn [spec-version]
                                     (reset! spec-version version)
                                     spec-version))
+            (assoc :spec-family (util/version-without-patch version))
             (assoc :data-specs (get data-spec/version-specs
                                     (util/version-without-patch version))))))
     (errors/add-errors ctx :fatal :sources :global :missing-csv
                        "source.txt is missing")))
-
-(defn unsupported-version [{:keys [spec-version] :as ctx}]
-  (assoc ctx :stop (str "Unsupported CSV version: " (pr-str @spec-version))))
-
-(def version-pipelines
-  {"3.0" [sqlite/attach-sqlite-db
-          process/process-v3-validations
-          (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
-          load-csvs]
-   "5.1" (concat [(fn [ctx] (assoc ctx :tables postgres/v5-1-tables))
-                  (fn [ctx] (assoc ctx :ltree-index 0))
-                  process/process-v5-validations
-                  load-csvs]
-                 v5-1-transformers/transformers
-                 tree-xml/pipeline)})
-
-(defn branch-on-spec-version [{:keys [spec-version] :as ctx}]
-  (if-let [pipeline (get version-pipelines
-                         (util/version-without-patch @spec-version))]
-    (update ctx :pipeline (partial concat pipeline))
-    (unsupported-version ctx)))

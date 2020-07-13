@@ -1,6 +1,5 @@
 (ns vip.data-processor.validation.data-spec
   (:require [clojure.string :as str]
-            [clojure.tools.logging :as log]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.data-spec.v5-1 :as v5-1]
             [vip.data-processor.errors :as errors])

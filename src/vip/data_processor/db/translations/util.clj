@@ -1,7 +1,6 @@
 (ns vip.data-processor.db.translations.util
   (:require [clojure.string :as str]
             [clojure.java.jdbc :as jdbc]
-            [korma.core :as korma]
             [vip.data-processor.db.postgres :as postgres]))
 
 (defn id-path [path]

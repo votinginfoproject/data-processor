@@ -2,17 +2,17 @@
   (:require [clojure.string :as str]
             [clojure.tools.logging :as log]
             [korma.core :as korma]
-            [vip.data-processor.util :as util]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.util :as t-util]))
 
-(defn reported-elements []
+(defn reported-elements
   "Function to generate elements to use in the error-query; starting with the
    column names from the v5_statistics table we have to manipulate the headings
    where necessary to remove polling locations (i.e. starts-with PollingLocation)
    and ev_polling_locations and db_polling_locations
    (i.e. ends with PollingLocation) as their stats are all calculated by the
    v5_statistics.polling_locations_by_type function"
+  []
   (->> postgres/v5-statistics
        postgres/column-names
        (filter #(str/ends-with? % "_count"))

@@ -1,11 +1,9 @@
 (ns vip.data-processor.output.tree-xml
-  (:require [clojure.data.xml :as xml]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file
                                                            generate-file-basename]]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.db.util :as db.util]
             [clojure.tools.logging :as log]
             [vip.data-processor.db.postgres :as psql])
   (:import [java.nio.file Files]
