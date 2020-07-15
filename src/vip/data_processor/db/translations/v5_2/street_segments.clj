@@ -6,7 +6,7 @@
   (postgres/lazy-cursor-fetch
    10000
    (fn [import-id]
-     (str "SELECT * FROM v5_1_street_segments"
+     (str "SELECT * FROM v5_2_street_segments"
           " WHERE results_id = " import-id))))
 
 (defn base-path [index]

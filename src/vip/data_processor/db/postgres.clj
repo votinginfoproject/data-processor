@@ -64,13 +64,11 @@
     (korma/table "v5_dashboard.localities")
     (korma/database results-db))
   (korma/defentity v5-2-street-segments
-    (korma/table "v5_1_street_segments"))
+    (korma/table "v5_2_street_segments"))
   (korma/defentity v5-dashboard-paths-by-locality
     (korma/table "v5_dashboard.paths_by_locality"))
   (def v5-2-tables
-    (db.util/make-entities "5.1" results-db [:offices
-                                             :voter-services
-                                             :ballot-measure-contests
+    (db.util/make-entities "5.2" results-db [:ballot-measure-contests
                                              :ballot-measure-selections
                                              :ballot-selections
                                              :ballot-styles
@@ -84,6 +82,7 @@
                                              :election-administrations
                                              :electoral-districts
                                              :localities
+                                             :offices
                                              :ordered-contests
                                              :parties
                                              :party-contests
@@ -95,7 +94,8 @@
                                              :schedules
                                              :sources
                                              :states
-                                             :street-segments]))
+                                             :street-segments
+                                             :voter-services]))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 
