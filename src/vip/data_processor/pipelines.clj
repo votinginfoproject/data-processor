@@ -11,7 +11,7 @@
     (update ctx :pipeline (partial concat csv.v3/pipeline))
 
     (and (= :csv (:format ctx))
-         (= "5.1" (:spec-family ctx)))
+         (= "5.2" (:spec-family ctx)))
     (update ctx :pipeline (partial concat csv.v5/pipeline))
 
     (= :csv (:format ctx))
@@ -22,7 +22,7 @@
     (update ctx :pipeline (partial concat xml.v3/pipeline))
 
     (and (= :xml (:format ctx))
-         (= "5.1" (:spec-family ctx)))
+         (= "5.2" (:spec-family ctx)))
     (update ctx :pipeline (partial concat xml.v5/pipeline))
 
     (= :xml (:format ctx))

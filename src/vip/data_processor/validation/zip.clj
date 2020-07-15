@@ -89,19 +89,3 @@
            (assoc :extracted-file-paths [path]))
 
        :else (assoc ctx :stop (str path " is not a zip or xml file!"))))))
-
-#_(defn extracted-contents
-  "Assumes the potential zip file is at the keyword :file in the context.
-   If it is a zip file, it extracts it and places the results at
-   :extracted-file-paths. If it's a single XML file instead, it places
-   it in a vector also at :extracted-file-paths"
-  [ctx]
-  (let [path (:file ctx)]
-    (if (xml-file? path)
-      (assoc ctx :extracted-file-paths
-             [path])
-      (let [files (zip-contents path)]
-        (-> ctx
-            (assoc :extracted-file-paths files)
-            (update :to-be-cleaned concat files)
-            (update :to-be-cleaned concat path))))))

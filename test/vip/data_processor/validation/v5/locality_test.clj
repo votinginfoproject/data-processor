@@ -70,7 +70,8 @@
                   [errors/close-errors-chan
                    errors/await-statistics])
         ctx {:xml-source-file-path (xml-input "v5-locality-summaries.xml")
-             :spec-version (atom "5.1.2")
+             :spec-version "5.2"
+             :spec-family "5.2"
              :errors-chan errors-chan
              :pipeline pipeline}
 
@@ -104,7 +105,8 @@
                   [errors/close-errors-chan
                    errors/await-statistics])
         ctx {:xml-source-file-path (xml-input "v5-locality-summaries.xml")
-             :spec-version (atom "5.1.2")
+             :spec-version "5.2"
+             :spec-family "5.2"
              :errors-chan errors-chan
              :pipeline pipeline}
         out-ctx (pipeline/run-pipeline ctx)
@@ -145,7 +147,8 @@
                   [errors/close-errors-chan
                    errors/await-statistics])
         ctx {:xml-source-file-path (xml-input "v5-locality-summaries.xml")
-             :spec-version (atom "5.1.2")
+             :spec-version "5.2"
+             :spec-family "5.2"
              :errors-chan errors-chan
              :pipeline pipeline}
 

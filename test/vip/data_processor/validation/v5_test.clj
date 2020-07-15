@@ -18,7 +18,8 @@
   (let [errors-chan (a/chan 100)
         ctx {:errors-chan errors-chan
              :xml-source-file-path (xml-input "v5_sample_feed.xml")
-             :spec-version (atom nil)
+             :spec-version nil
+             :spec-family nil
              :pipeline (concat [psql/start-run
                                 xml/determine-spec-version
                                 xml/load-xml-ltree]
@@ -27,8 +28,8 @@
         errors (all-errors errors-chan)]
     (assert-no-problems errors {})))
 
-(deftest ^:postgres full-good-v51-csv-test
-  (let [csvs (-> "csv/5-1/full-good-run"
+(deftest ^:postgres full-good-v5-csv-test
+  (let [csvs (-> "csv/5-2/full-good-run"
                  io/resource
                  io/as-file
                  .listFiles
@@ -36,10 +37,11 @@
         errors-chan (a/chan 100)
         ctx {:csv-source-file-paths csvs
              :errors-chan errors-chan
-             :spec-version (atom nil)
+             :spec-version nil
+             :spec-family nil
              :pipeline (concat [psql/start-run
                                 csv/determine-spec-version
-                                psql/prep-v5-1-run
+                                psql/prep-v5-2-run
                                 process/process-v5-validations
                                 csv/load-csvs]
                                transformer/transformers

@@ -52,9 +52,11 @@
 
 (deftest v5-summary-branch-test
   (let [v3-ctx {:pipeline []
-                 :spec-version (atom "3.0")}
+                :spec-version "3.0"
+                :spec-family "3.0"}
         v5-ctx {:pipeline []
-                :spec-version (atom "5.1")}
+                :spec-version "5.1.2"
+                :spec-family "5.2"}
         v3-out-ctx (v5-summary-branch v3-ctx)
         v5-out-ctx (v5-summary-branch v5-ctx)]
     (is (= (count (v3-out-ctx :pipeline)) 0))

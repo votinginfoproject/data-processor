@@ -63,11 +63,11 @@
   (korma/defentity v5-dashboard-localities
     (korma/table "v5_dashboard.localities")
     (korma/database results-db))
-  (korma/defentity v5-1-street-segments
+  (korma/defentity v5-2-street-segments
     (korma/table "v5_1_street_segments"))
   (korma/defentity v5-dashboard-paths-by-locality
     (korma/table "v5_dashboard.paths_by_locality"))
-  (def v5-1-tables
+  (def v5-2-tables
     (db.util/make-entities "5.1" results-db [:offices
                                              :voter-services
                                              :ballot-measure-contests
@@ -203,10 +203,10 @@
      :import-id import-id
      :vip-id vip-id}))
 
-(defn get-public-id-data [{:keys [spec-version] :as ctx}]
-  (condp = (util/version-without-patch @spec-version)
+(defn get-public-id-data [{:keys [spec-family] :as ctx}]
+  (condp = spec-family
     "3.0" (get-v3-public-id-data ctx)
-    "5.1" (get-xml-tree-public-id-data ctx)
+    "5.2" (get-xml-tree-public-id-data ctx)
     {}))
 
 (defn generate-public-id [ctx]
@@ -253,10 +253,10 @@
     ctx))
 
 (defn store-spec-version [{:keys [spec-version import-id] :as ctx}]
-  (when @spec-version
-    (log/info "Storing spec-verion," @spec-version)
+  (when spec-version
+    (log/info "Storing spec-verion," spec-version)
     (korma/update results
-      (korma/set-fields {:spec_version @spec-version})
+      (korma/set-fields {:spec_version spec-version})
       (korma/where {:id import-id})))
   ctx)
 
@@ -311,9 +311,9 @@
 
 
 (defn v5-summary-branch
-  [{:keys [spec-version] :as ctx}]
+  [{:keys [spec-family] :as ctx}]
   (log/info "In v5-summary-branch")
-  (if (= (util/version-without-patch @spec-version) "5.1")
+  (if (= spec-family "5.2")
     (update ctx :pipeline (partial concat [populate-locality-table
                                            populate-i18n-table
                                            populate-sources-table
@@ -490,7 +490,7 @@
                   chunked-rows)))]
         (trampoline chunked-rows)))))
 
-(defn prep-v5-1-run [ctx]
+(defn prep-v5-2-run [ctx]
   (-> ctx
-      (assoc :tables v5-1-tables)
+      (assoc :tables v5-2-tables)
       (assoc :ltree-index 0)))

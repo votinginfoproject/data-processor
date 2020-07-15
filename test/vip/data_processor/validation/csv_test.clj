@@ -17,7 +17,8 @@
         errors-chan (a/chan 100)
         ctx {:csv-source-file-paths good-filenames
              :errors-chan errors-chan
-             :spec-version (atom "3.0")
+             :spec-version "3.0"
+             :spec-family "3.0"
              :data-specs v3-0/data-specs}]
     (testing "with good filenames passes the context through"
       (is (= ctx (remove-bad-filenames ctx))))
@@ -112,7 +113,8 @@
   (let [errors-chan (a/chan 100)
         ctx (merge {:csv-source-file-paths (csv-inputs ["bad-number-of-values/contest.txt"])
                     :errors-chan errors-chan
-                    :spec-version (atom "3.0")
+                    :spec-version "3.0"
+                    :spec-family "3.0"
                     :data-specs v3-0/data-specs}
                    (sqlite/temp-db "bad-number-of-values" "3.0"))
         out-ctx (load-csvs ctx)
@@ -191,12 +193,17 @@
 (deftest determine-spec-version-test
   (testing "finds and assocs the version of the csv feed for 3.0 files"
     (let [ctx {:csv-source-file-paths (csv-inputs ["full-good-run/source.txt"])
-               :spec-version (atom nil)}
+               :spec-version nil
+               :spec-family nil}
           out-ctx (determine-spec-version ctx)]
-      (is (= "3.0" @(get out-ctx :spec-version)))))
+      (is (= "3.0" (:spec-version out-ctx))
+          (= "3.0" (:spec-family out-ctx)))))
 
-  (testing "finds and assocs the version of the csv feed for 5.1 files"
-    (let [ctx {:csv-source-file-paths (csv-inputs ["5-1/spec-version/source.txt"])
-               :spec-version (atom nil)}
+  (testing "finds and assocs the version of the csv feed for 5.2 files, upgrading
+            the 5.1 spec version to the 5.2 spec family"
+    (let [ctx {:csv-source-file-paths (csv-inputs ["5-2/spec-version/source.txt"])
+               :spec-version nil
+               :spec-family nil}
           out-ctx (determine-spec-version ctx)]
-      (is (= "5.1" @(get out-ctx :spec-version))))))
+      (is (= "5.1" (:spec-version out-ctx)))
+      (is (= "5.2" (:spec-family out-ctx))))))

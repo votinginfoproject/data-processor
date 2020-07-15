@@ -114,7 +114,7 @@
 (defn load-precinct-ids
   []
   (jdbc/with-db-connection [conn (psql/db-spec)]
-    (->> (korma/select (psql/v5-1-tables :precincts)
+    (->> (korma/select (psql/v5-2-tables :precincts)
            (korma/fields :id))
          (reduce #(conj %1 (:id %2)) #{}))))
 

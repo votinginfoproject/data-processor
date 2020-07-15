@@ -58,7 +58,7 @@
         ctx (data-spec/apply-format-rules format-rules ctx row-map @line-number)]
     (if (= headers-count row-count)
       ctx
-      (let [identifier (if (= "3.0" @(:spec-version ctx))
+      (let [identifier (if (= "3.0" (:spec-version ctx))
                          @line-number
                          (csv-error-path filename @line-number))]
         (errors/add-errors
@@ -99,7 +99,7 @@
           (let [message (.getMessage e)]
             (if (re-find #"UNIQUE constraint failed: (\w+).id" message)
               (db.util/retry-chunk-without-dupe-ids ctx' sql-table chunk-values)
-              (let [identifier (if (= "3.0" @(:spec-version ctx'))
+              (let [identifier (if (= "3.0" (:spec-version ctx'))
                                  @line-number
                                  (csv-error-path filename @line-number))]
                 (errors/add-errors
@@ -246,9 +246,7 @@
             csv-map (zipmap headers line1)
             version (get csv-map "version" "3.0")]
         (-> ctx
-            (update :spec-version (fn [spec-version]
-                                    (reset! spec-version version)
-                                    spec-version))
+            (assoc :spec-version version)
             (assoc :spec-family (util/version-without-patch version))
             (assoc :data-specs (get data-spec/version-specs
                                     (util/version-without-patch version))))))

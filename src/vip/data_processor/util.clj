@@ -48,8 +48,11 @@
        first))
 
 (defn version-without-patch
-  "Strip the patch-level from `spec-version`. Assumes three or fewer version
-  numbers, e.g., \"5.1.2\" becomes \"5.1\"."
+  "Strip the patch-level from `spec-version` and conform it to either 3.0 or 5.2."
   [version]
   (when-not (empty? version)
-    (str/replace version #"^(\d+\.\d+)\.\d+$" "$1")))
+    (let [base-version (str/replace version #"^(\d+\.\d+)\.\d+$" "$1")]
+      (case base-version
+        "3.0" "3.0"
+        "5.1" "5.2"
+        "5.2" "5.2"))))

@@ -75,7 +75,8 @@
 (deftest ^:postgres validate-idrefs-refer-test
   (let [errors-chan (a/chan 100)
         ctx {:xml-source-file-path (xml-input "v5-idrefs.xml")
-             :spec-version (atom "5.1")
+             :spec-version "5.2"
+             :spec-family "5.2"
              :pipeline [psql/start-run
                         load-xml-ltree
                         v5.id/validate-idref-references
@@ -109,7 +110,8 @@
 (deftest ^:postgres validate-idrefs-plural-refer-test
   (let [errors-chan (a/chan 100)
         ctx {:xml-source-file-path (xml-input "v5-idrefs.xml")
-             :spec-version (atom "5.1")
+             :spec-version "5.2"
+             :spec-family "5.2"
              :pipeline [psql/start-run
                         load-xml-ltree
                         v5.id/validate-idrefs-references]

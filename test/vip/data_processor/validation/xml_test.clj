@@ -148,7 +148,8 @@
                       :format :xml
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
-                      :spec-version (atom nil)
+                      :spec-version nil
+                      :spec-family nil
                       :pipeline (concat [determine-spec-version
                                          sqlite/attach-sqlite-db
                                          process/process-v3-validations
@@ -379,9 +380,11 @@
   (testing "finds and assocs the schemaVersion of the xml feed"
     (let [ctx {:xml-source-file-path (xml-input "full-good-run.xml")
                :format :xml
-               :spec-version (atom nil)}
+               :spec-version nil
+               :spec-family nil}
           out-ctx (determine-spec-version ctx)]
-      (is (= "3.0" @(get out-ctx :spec-version))))))
+      (is (= "3.0" (:spec-version out-ctx))
+          (= "3.0" (:spec-family out-ctx))))))
 
 (deftest path-and-values-test
   (let [node (data.xml/element :country

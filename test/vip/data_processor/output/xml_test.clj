@@ -27,7 +27,8 @@
                           (map #(.toPath %)))
           errors-chan (a/chan 100)
           ctx (merge {:csv-source-file-paths file-paths
-                      :spec-version (atom "3.0")
+                      :spec-version "3.0"
+                      :spec-family "3.0"
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs
                                   v3-0/data-specs)

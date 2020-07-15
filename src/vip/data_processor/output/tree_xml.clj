@@ -153,7 +153,7 @@
   [{:keys [spec-version import-id xml-output-file] :as ctx}]
   (jdbc/with-db-connection [conn (psql/db-spec)]
     (let [values (psql/lazy-select-xml-tree-values conn chunk-size import-id)]
-      (write-xml xml-output-file @spec-version import-id values)))
+      (write-xml xml-output-file spec-version import-id values)))
   ctx)
 
 (def pipeline

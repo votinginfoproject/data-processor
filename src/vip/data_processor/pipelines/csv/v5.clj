@@ -2,31 +2,31 @@
   (:require [vip.data-processor.cleanup]
             [vip.data-processor.db.postgres]
             [vip.data-processor.db.translations.transformer]
-            [vip.data-processor.db.translations.v5-1.ballot-measure-contests]
-            [vip.data-processor.db.translations.v5-1.ballot-measure-selections]
-            [vip.data-processor.db.translations.v5-1.ballot-selections]
-            [vip.data-processor.db.translations.v5-1.ballot-styles]
-            [vip.data-processor.db.translations.v5-1.candidate-contests]
-            [vip.data-processor.db.translations.v5-1.candidate-selections]
-            [vip.data-processor.db.translations.v5-1.candidates]
-            [vip.data-processor.db.translations.v5-1.contests]
-            [vip.data-processor.db.translations.v5-1.election]
-            [vip.data-processor.db.translations.v5-1.election-administrations]
-            [vip.data-processor.db.translations.v5-1.electoral-districts]
-            [vip.data-processor.db.translations.v5-1.hours-open]
-            [vip.data-processor.db.translations.v5-1.localities]
-            [vip.data-processor.db.translations.v5-1.offices]
-            [vip.data-processor.db.translations.v5-1.ordered-contests]
-            [vip.data-processor.db.translations.v5-1.parties]
-            [vip.data-processor.db.translations.v5-1.party-contests]
-            [vip.data-processor.db.translations.v5-1.party-selections]
-            [vip.data-processor.db.translations.v5-1.people]
-            [vip.data-processor.db.translations.v5-1.polling-locations]
-            [vip.data-processor.db.translations.v5-1.precincts]
-            [vip.data-processor.db.translations.v5-1.retention-contests]
-            [vip.data-processor.db.translations.v5-1.sources]
-            [vip.data-processor.db.translations.v5-1.states]
-            [vip.data-processor.db.translations.v5-1.street-segments]
+            [vip.data-processor.db.translations.v5-2.ballot-measure-contests]
+            [vip.data-processor.db.translations.v5-2.ballot-measure-selections]
+            [vip.data-processor.db.translations.v5-2.ballot-selections]
+            [vip.data-processor.db.translations.v5-2.ballot-styles]
+            [vip.data-processor.db.translations.v5-2.candidate-contests]
+            [vip.data-processor.db.translations.v5-2.candidate-selections]
+            [vip.data-processor.db.translations.v5-2.candidates]
+            [vip.data-processor.db.translations.v5-2.contests]
+            [vip.data-processor.db.translations.v5-2.election]
+            [vip.data-processor.db.translations.v5-2.election-administrations]
+            [vip.data-processor.db.translations.v5-2.electoral-districts]
+            [vip.data-processor.db.translations.v5-2.hours-open]
+            [vip.data-processor.db.translations.v5-2.localities]
+            [vip.data-processor.db.translations.v5-2.offices]
+            [vip.data-processor.db.translations.v5-2.ordered-contests]
+            [vip.data-processor.db.translations.v5-2.parties]
+            [vip.data-processor.db.translations.v5-2.party-contests]
+            [vip.data-processor.db.translations.v5-2.party-selections]
+            [vip.data-processor.db.translations.v5-2.people]
+            [vip.data-processor.db.translations.v5-2.polling-locations]
+            [vip.data-processor.db.translations.v5-2.precincts]
+            [vip.data-processor.db.translations.v5-2.retention-contests]
+            [vip.data-processor.db.translations.v5-2.sources]
+            [vip.data-processor.db.translations.v5-2.states]
+            [vip.data-processor.db.translations.v5-2.street-segments]
             [vip.data-processor.errors]
             [vip.data-processor.errors.process]
             [vip.data-processor.output.xml-helpers]
@@ -63,35 +63,35 @@
   (concat
    [vip.data-processor.validation.csv/error-on-missing-files
     vip.data-processor.validation.csv/remove-bad-filenames
-    vip.data-processor.db.postgres/prep-v5-1-run
+    vip.data-processor.db.postgres/prep-v5-2-run
     vip.data-processor.errors.process/process-v5-validations
     vip.data-processor.validation.csv/load-csvs]
 
-   [vip.data-processor.db.translations.v5-1.sources/transformer
-    vip.data-processor.db.translations.v5-1.election/transformer
-    vip.data-processor.db.translations.v5-1.states/transformer
-    vip.data-processor.db.translations.v5-1.ballot-measure-contests/transformer
-    vip.data-processor.db.translations.v5-1.ballot-measure-selections/transformer
-    vip.data-processor.db.translations.v5-1.ballot-selections/transformer
-    vip.data-processor.db.translations.v5-1.ballot-styles/transformer
-    vip.data-processor.db.translations.v5-1.candidate-contests/transformer
-    vip.data-processor.db.translations.v5-1.candidate-selections/transformer
-    vip.data-processor.db.translations.v5-1.candidates/transformer
-    vip.data-processor.db.translations.v5-1.contests/transformer
-    vip.data-processor.db.translations.v5-1.election-administrations/transformer
-    vip.data-processor.db.translations.v5-1.electoral-districts/transformer
-    vip.data-processor.db.translations.v5-1.hours-open/transformer
-    vip.data-processor.db.translations.v5-1.localities/transformer
-    vip.data-processor.db.translations.v5-1.offices/transformer
-    vip.data-processor.db.translations.v5-1.ordered-contests/transformer
-    vip.data-processor.db.translations.v5-1.parties/transformer
-    vip.data-processor.db.translations.v5-1.party-contests/transformer
-    vip.data-processor.db.translations.v5-1.party-selections/transformer
-    vip.data-processor.db.translations.v5-1.people/transformer
-    vip.data-processor.db.translations.v5-1.polling-locations/transformer
-    vip.data-processor.db.translations.v5-1.precincts/transformer
-    vip.data-processor.db.translations.v5-1.retention-contests/transformer
-    vip.data-processor.db.translations.v5-1.street-segments/transformer]
+   [vip.data-processor.db.translations.v5-2.sources/transformer
+    vip.data-processor.db.translations.v5-2.election/transformer
+    vip.data-processor.db.translations.v5-2.states/transformer
+    vip.data-processor.db.translations.v5-2.ballot-measure-contests/transformer
+    vip.data-processor.db.translations.v5-2.ballot-measure-selections/transformer
+    vip.data-processor.db.translations.v5-2.ballot-selections/transformer
+    vip.data-processor.db.translations.v5-2.ballot-styles/transformer
+    vip.data-processor.db.translations.v5-2.candidate-contests/transformer
+    vip.data-processor.db.translations.v5-2.candidate-selections/transformer
+    vip.data-processor.db.translations.v5-2.candidates/transformer
+    vip.data-processor.db.translations.v5-2.contests/transformer
+    vip.data-processor.db.translations.v5-2.election-administrations/transformer
+    vip.data-processor.db.translations.v5-2.electoral-districts/transformer
+    vip.data-processor.db.translations.v5-2.hours-open/transformer
+    vip.data-processor.db.translations.v5-2.localities/transformer
+    vip.data-processor.db.translations.v5-2.offices/transformer
+    vip.data-processor.db.translations.v5-2.ordered-contests/transformer
+    vip.data-processor.db.translations.v5-2.parties/transformer
+    vip.data-processor.db.translations.v5-2.party-contests/transformer
+    vip.data-processor.db.translations.v5-2.party-selections/transformer
+    vip.data-processor.db.translations.v5-2.people/transformer
+    vip.data-processor.db.translations.v5-2.polling-locations/transformer
+    vip.data-processor.db.translations.v5-2.precincts/transformer
+    vip.data-processor.db.translations.v5-2.retention-contests/transformer
+    vip.data-processor.db.translations.v5-2.street-segments/transformer]
 
    [vip.data-processor.output.xml-helpers/generate-file-basename
     vip.data-processor.output.xml-helpers/create-xml-file

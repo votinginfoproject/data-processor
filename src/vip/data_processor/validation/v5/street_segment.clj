@@ -44,7 +44,7 @@
   [{:keys [import-id] :as ctx}]
   (log/info "Validating street segment overlaps")
   (let [overlaps (korma/exec-raw
-                  (:conn postgres/v5-1-street-segments)
+                  (:conn postgres/v5-2-street-segments)
                   ["SELECT * from street_segment_overlaps(?);" [import-id]]
                   :results)]
     (reduce (fn [ctx overlap]

@@ -5,8 +5,8 @@
 (deftest type->simple-paths-test
   (testing "generates lists of simple paths for a type for a spec"
     (are [type version expected] (= (set (type->simple-paths type version)) expected)
-      "Locality"     "5.1" #{"VipObject.Locality"}
-      "DistrictType" "5.1" #{"VipObject.ElectoralDistrict.Type"
+      "Locality"     "5.2" #{"VipObject.Locality"}
+      "DistrictType" "5.2" #{"VipObject.ElectoralDistrict.Type"
                              "VipObject.Locality.Type"}
       "xs:date"      "3.0" #{"vip_object.contest.filing_closed_date"
                              "vip_object.early_vote_site.end_date"
@@ -15,7 +15,7 @@
                              "vip_object.election.date"
                              "vip_object.election.registration_deadline"}
       ;; The big one
-      "InternationalizedText" "5.1" #{"VipObject.BallotMeasureContest.ConStatement"
+      "InternationalizedText" "5.2" #{"VipObject.BallotMeasureContest.ConStatement"
                                       "VipObject.BallotMeasureContest.BallotSubTitle"
                                       "VipObject.BallotMeasureContest.BallotTitle"
                                       "VipObject.BallotMeasureContest.EffectOfAbstain"
@@ -26,6 +26,8 @@
                                       "VipObject.BallotMeasureContest.SummaryText"
                                       "VipObject.BallotMeasureSelection.Selection"
                                       "VipObject.Candidate.BallotName"
+                                      "VipObject.Candidate.ContactInformation.Hours"
+                                      "VipObject.Candidate.ContactInformation.Directions"
                                       "VipObject.CandidateContest.BallotSubTitle"
                                       "VipObject.CandidateContest.BallotTitle"
                                       "VipObject.CandidateContest.ElectorateSpecification"
@@ -42,6 +44,8 @@
                                       "VipObject.ElectionAdministration.Department.VoterService.ContactInformation.Hours"
                                       "VipObject.ElectionAdministration.Department.VoterService.ContactInformation.Directions"
                                       "VipObject.ElectionAdministration.Department.VoterService.Description"
+                                      "VipObject.ElectionAdministration.ElectionNotice.NoticeText"
+                                      "VipObject.Office.Description"
                                       "VipObject.Office.ContactInformation.Hours"
                                       "VipObject.Office.ContactInformation.Directions"
                                       "VipObject.Office.Name"

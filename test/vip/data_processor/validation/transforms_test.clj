@@ -48,7 +48,8 @@
           errors-chan (a/chan 100)
           ctx (merge {:csv-source-file-paths file-paths
                       :errors-chan errors-chan
-                      :spec-version (atom nil)
+                      :spec-version nil
+                      :spec-family nil
                       :pipeline (concat
                                  [(data-spec/add-data-specs v3-0/data-specs)
                                   csv/error-on-missing-files

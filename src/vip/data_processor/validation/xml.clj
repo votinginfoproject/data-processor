@@ -254,9 +254,7 @@
       (let [vip-object (xml/parse reader)
             version (get-in vip-object [:attrs :schemaVersion])]
         (-> ctx
-            (update :spec-version (fn [spec-version]
-                                    (reset! spec-version version)
-                                    spec-version))
+            (assoc :spec-version version)
             (assoc :spec-family (util/version-without-patch version))
             (assoc :data-specs (get data-spec/version-specs
                                     (util/version-without-patch version))))))))

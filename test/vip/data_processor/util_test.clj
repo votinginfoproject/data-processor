@@ -43,8 +43,8 @@
     (is (nil? (version-without-patch nil)))
     (is (nil? (version-without-patch ""))))
 
-  (testing "with a two-part version number, we get our input back"
-    (is (= "5.1" (version-without-patch "5.1"))))
+  (testing "with a two-part version number, we get our input back, upgraded"
+    (is (= "5.2" (version-without-patch "5.1"))))
 
-  (testing "with a three-part version number, we strip the patch level"
-    (is (= "5.1" (version-without-patch "5.1.1")))))
+  (testing "with a three-part version number, we get back the upgraded version"
+    (is (= "5.2" (version-without-patch "5.1.1")))))

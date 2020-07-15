@@ -78,7 +78,7 @@
               returning a new copy."
 
         (let [output-file-copy (copy-to-temp-file "xml/v5_no_street_segments.xml")
-              file-paths [(.toPath (io/file (io/resource "csv/5-1/street_segment.txt")))]
+              file-paths [(.toPath (io/file (io/resource "csv/5-2/street_segment.txt")))]
               {:keys [xml-output-file]} (ss/process-xml
                                          {:xml-output-file (.toPath output-file-copy)
                                           :csv-source-file-paths file-paths})
@@ -99,7 +99,7 @@
               required fields and non-existent precinct-ids"
 
         (let [output-file-copy (copy-to-temp-file "xml/v5_no_street_segments.xml")
-              file-paths [(->> "csv/5-1/bad-street-segments/street_segment.txt"
+              file-paths [(->> "csv/5-2/bad-street-segments/street_segment.txt"
                                io/resource
                                io/file
                                .toPath)]
