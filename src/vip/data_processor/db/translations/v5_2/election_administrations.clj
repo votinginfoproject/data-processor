@@ -30,7 +30,9 @@
                           (util/simple-value->ltree :registration_uri)
                           (util/simple-value->ltree :rules_uri)
                           (util/simple-value->ltree :what_is_on_my_ballot_uri)
-                          (util/simple-value->ltree :where_do_i_vote_uri)])
+                          (util/simple-value->ltree :where_do_i_vote_uri)
+                          (util/simple-value->ltree :ballot_tracking_uri)
+                          (util/simple-value->ltree :ballot_tracking_provisional_uri)])
                  {:path id-path
                   :simple_path (util/path->simple-path id-path)
                   :parent_with_id id-path
