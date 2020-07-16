@@ -37,35 +37,6 @@
           out-ctx (assert-filename-and-bucket in-ctx)]
       (is (= out-ctx in-ctx)))))
 
-(deftest csv-validations-test
-  (testing "full run on good files"
-    (let [db (sqlite/temp-db "good-run-test" "3.0")
-          file-paths (->> v3-0/data-specs
-                          (map
-                           #(io/as-file (io/resource (str "csv/full-good-run/" (:filename %)))))
-                          (remove nil?)
-                          (map #(.toPath %)))
-          errors-chan (a/chan 100)
-          ctx (merge {:csv-source-file-paths file-paths
-                      :errors-chan errors-chan
-                      :spec-version nil
-                      :spec-family nil
-                      :pipeline (concat
-                                 [(data-spec/add-data-specs v3-0/data-specs)
-                                  csv/error-on-missing-files
-                                  csv/determine-spec-version
-                                  csv/remove-bad-filenames
-                                  sqlite/attach-sqlite-db
-                                  process/process-v3-validations
-                                  (csv-files/validate-dependencies csv-files/v3-0-file-dependencies)
-                                  csv/load-csvs]
-                                 db/validations)} db)
-          results-ctx (pipeline/run-pipeline ctx)
-          errors (all-errors errors-chan)]
-      (is (nil? (:stop results-ctx)))
-      (is (nil? (:exception results-ctx)))
-      (assert-no-problems errors {}))))
-
 (deftest remove-invalid-extensions-test
   (testing "removes non-csv, txt, or xml files from :extracted-file-paths, placing the good ones in :valid-file-paths"
     (let [errors-chan (a/chan 100)
