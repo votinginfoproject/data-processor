@@ -141,32 +141,6 @@
         (is (= [{:id 39 :name "Ohio" :election_administration_id 3456}]
                (korma/select (get-in out-ctx [:tables :states]))))))))
 
-(deftest full-good-run-test
-  (testing "a good XML file produces no erorrs or warnings"
-    (let [errors-chan (a/chan 100)
-          ctx (merge {:xml-source-file-path (xml-input "full-good-run.xml")
-                      :format :xml
-                      :data-specs v3-0/data-specs
-                      :errors-chan errors-chan
-                      :spec-version nil
-                      :spec-family nil
-                      :pipeline (concat [determine-spec-version
-                                         sqlite/attach-sqlite-db
-                                         process/process-v3-validations
-                                         load-xml]
-                                        db/validations)}
-                     (sqlite/temp-db "full-good-xml" "3.0"))
-          out-ctx (pipeline/run-pipeline ctx)
-          errors (all-errors errors-chan)]
-      (is (nil? (:stop out-ctx)))
-      (is (nil? (:exception out-ctx)))
-      (assert-no-problems errors {})
-      (testing "inserts values for columns not in the first element of a type"
-        (let [mail-only-precinct (first
-                                  (korma/select (get-in out-ctx [:tables :precincts])
-                                                (korma/where {:id 10203})))]
-          (is (= 1 (:mail_only mail-only-precinct))))))))
-
 (deftest validate-no-duplicated-ids-test
   (testing "returns an error when there is a duplicated id"
     (let [errors-chan (a/chan 100)
