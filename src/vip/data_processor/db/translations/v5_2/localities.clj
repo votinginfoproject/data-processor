@@ -22,7 +22,8 @@
               (util/simple-value->ltree :polling_location_ids)
               (util/simple-value->ltree :state_id)
               (util/simple-value->ltree :type)
-              (util/simple-value->ltree :other_type)])
+              (util/simple-value->ltree :other_type)
+              (util/simple-value->ltree :is_mail_only)])
      {:path id-path
       :simple_path (util/path->simple-path id-path)
       :parent_with_id id-path

@@ -235,7 +235,8 @@
               {:name "external_identifier_type"}
               {:name "external_identifier_othertype"}
               {:name "external_identifier_value"}
-              {:name "polling_location_ids"}]}
+              {:name "polling_location_ids"}
+              {:name "is_mail_only"}]}
    {:filename "ordered_contest.txt"
     :table :ordered-contests
     :columns [{:name "id"}
