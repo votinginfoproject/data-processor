@@ -31,7 +31,7 @@
   "Returns a reader from io/reader, which has advanced past a byte
   order marker if one exists."
   [x & opts]
-  (let [reader (apply io/reader (io/as-file x) opts)]
+  (let [reader (apply io/reader (.toFile x) opts)]
     (.mark reader 10)
     (let [first-char (.read reader)]
       (if (= first-char BOM)

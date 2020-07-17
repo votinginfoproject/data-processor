@@ -76,6 +76,7 @@
     vip.data-processor.validation.v5.electoral-district/validate-no-missing-types
     vip.data-processor.validation.v5.election-administration/validate-no-missing-departments
     vip.data-processor.validation.v5.election-administration/validate-voter-service-type-format
+    vip.data-processor.validation.v5.election-administration/validate-no-missing-notice-texts
     vip.data-processor.validation.v5.election/validate-one-election
     vip.data-processor.validation.v5.election/validate-date
     vip.data-processor.validation.v5.election/validate-state-id

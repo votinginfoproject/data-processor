@@ -31,7 +31,11 @@
       (assert-no-problems errors
                           {:severity :errors
                            :scope :election-administration
-                           :identifier "VipObject.0.ElectionAdministration.1.Department"}))))
+                           :identifier "VipObject.0.ElectionAdministration.1.Department"})
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :election-administration
+                           :identifier "VipObject.0.ElectionAdministration.3.Department"}))))
 
 (deftest ^:postgres validate-voter-service-type-format-test
   (let [errors-chan (a/chan 100)
@@ -61,3 +65,38 @@
                                                        "VoterService" "0"
                                                        "Type" "0"])
                             :error-type :format})))))
+
+(deftest ^:postgres validate-no-missing-notice-texts
+  (testing "missing Department element is an error"
+    (let [errors-chan (a/chan 100)
+          ctx {:xml-source-file-path (xml-input "v5-election-administrations.xml")
+               :errors-chan errors-chan}
+          out-ctx (-> ctx
+                      psql/start-run
+                      xml/load-xml-ltree
+                      v5.election-admin/validate-no-missing-notice-texts)
+          errors (all-errors errors-chan)]
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :election-administration
+                            :error-value :missing-election-notice-text
+                            :parent-element-id "ea003"
+                            :error-type :missing}))
+      (assert-no-problems errors
+                          {:severity :errors
+                            :scope :election-administration
+                            :error-value :missing-election-notice-text
+                            :parent-element-id "ea001"
+                           :error-type :missing})
+      (assert-no-problems errors
+                          {:severity :errors
+                            :scope :election-administration
+                            :error-value :missing-election-notice-text
+                            :parent-element-id "ea002"
+                           :error-type :missing})
+      (assert-no-problems errors
+                          {:severity :errors
+                            :scope :election-administration
+                            :error-value :missing-election-notice-text
+                            :parent-element-id "ea004"
+                           :error-type :missing}))))

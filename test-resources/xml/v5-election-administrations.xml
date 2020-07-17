@@ -6,6 +6,13 @@
         <Type>polling-places</Type>
       </VoterService>
     </Department>
+    <ElectionNotice>
+      <NoticeText>
+	<Text language="en">Some Notice Text</Text>
+	<Text language="es">Algo Palabras de Noticias</Text>
+      </NoticeText>
+      <NoticeUri>https://both.uri</NoticeUri>
+    </ElectionNotice>
   </ElectionAdministration>
   <ElectionAdministration id="ea002">
     <Department>
@@ -13,8 +20,23 @@
         <Type>not-a-real-type</Type>
       </VoterService>
     </Department>
+    <ElectionNotice>
+      <NoticeText>
+	<Text language="en">Some Notice Text</Text>
+      </NoticeText>
+    </ElectionNotice>
   </ElectionAdministration>
   <ElectionAdministration id="ea003">
     <AmIRegisteredUri>http://www.example.com/</AmIRegisteredUri>
+    <ElectionNotice>
+      <NoticeUri>https://only.uri</NoticeUri>
+    </ElectionNotice>
+  </ElectionAdministration>
+  <ElectionAdministration id="ea004">
+    <Department>
+      <VoterService>
+        <Type>polling-places</Type>
+      </VoterService>
+    </Department>
   </ElectionAdministration>
 </VipObject>

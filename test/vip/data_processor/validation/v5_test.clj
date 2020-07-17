@@ -10,7 +10,8 @@
              [vip.data-processor.validation.v5 :as v5]
              [clojure.java.io :as io]
              [korma.core :as korma]
-             [clojure.core.async :as a]))
+             [clojure.core.async :as a])
+  (:import [java.nio.file Files]))
 
 (use-fixtures :once setup-postgres)
 
@@ -32,8 +33,10 @@
   (let [csvs (-> "csv/5-2/full-good-run"
                  io/resource
                  io/as-file
-                 .listFiles
-                 seq)
+                 .toPath
+                 Files/list
+                 .iterator
+                 iterator-seq)
         errors-chan (a/chan 100)
         ctx {:csv-source-file-paths csvs
              :errors-chan errors-chan

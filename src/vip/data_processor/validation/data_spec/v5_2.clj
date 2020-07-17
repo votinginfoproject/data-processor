@@ -204,7 +204,9 @@
               {:name "what_is_on_my_ballot_uri"}
               {:name "where_do_i_vote_uri"}
               {:name "ballot_tracking_uri"}
-              {:name "ballot_tracking_provisional_uri"}]}
+              {:name "ballot_tracking_provisional_uri"}
+              {:name "election_notice_text"}
+              {:name "election_notice_uri"}]}
    {:filename "electoral_district.txt"
     :table :electoral-districts
     :columns [{:name "id"}

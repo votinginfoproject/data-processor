@@ -140,6 +140,18 @@
                (simple-value->ltree :term_end_date "EndDate" parent-with-id)
                (simple-value->ltree :term_type "Type" parent-with-id)]))))
 
+(defn election-notice->ltree
+  [idx-fn parent-path row]
+  (when-not (and (str/blank? (:election_notice_text row))
+                 (str/blank? (:election_notice_uri row)))
+    (let [index (idx-fn)
+          base-path (str parent-path ".ElectionNotice." index)
+          parent-with-id (id-path parent-path)
+          sub-idx-fn (index-generator 0)]
+      (mapcat #(% sub-idx-fn base-path row)
+              [(internationalized-text->ltree :election_notice_text "NoticeText" parent-with-id)
+               (simple-value->ltree :election_notice_uri "NoticeUri" parent-with-id)]))))
+
 (defn ltreeify [row]
   (-> row
       (update :path postgres/path->ltree)
