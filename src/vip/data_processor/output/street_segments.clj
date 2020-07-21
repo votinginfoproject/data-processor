@@ -30,6 +30,8 @@
    [:precinct_id "PrecinctId"]
    [:start_house_number "StartHouseNumber"]
    [:end_house_number "EndHouseNumber"]
+   [:house_number_prefix "HouseNumberPrefix"]
+   [:house_number_suffix "HouseNumberSuffix"]
    [:state "State"]
    [:street_direction "StreetDirection"]
    [:street_name "StreetName"]

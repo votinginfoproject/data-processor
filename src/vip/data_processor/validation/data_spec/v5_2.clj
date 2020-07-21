@@ -17,6 +17,8 @@
              {:name "end_house_number"
               :format format/all-digits
               :coerce coerce/coerce-integer}
+             {:name "house_number_prefix"}
+             {:name "house_number_suffix"}
              {:name "state"}
              {:name "street_direction"}
              {:name "street_name"}
@@ -386,6 +388,8 @@
               {:name "end_house_number"
                :format format/all-digits
                :coerce coerce/coerce-integer}
+              {:name "house_number_prefix"}
+              {:name "house_number_suffix"}
               {:name "unit_number"}
               {:name "state"}
               {:name "street_direction"}

@@ -26,6 +26,8 @@
               (util/simple-value->ltree :precinct_id)
               (util/simple-value->ltree :start_house_number)
               (util/simple-value->ltree :end_house_number)
+              (util/simple-value->ltree :house_number_prefix)
+              (util/simple-value->ltree :house_number_suffix)
               (util/simple-value->ltree :state)
               (util/simple-value->ltree :street_direction)
               (util/simple-value->ltree :street_name)

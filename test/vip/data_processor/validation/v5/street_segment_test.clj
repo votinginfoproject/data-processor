@@ -258,3 +258,147 @@
                             {:scope :street-segment
                              :identifier path
                              :error-type :missing})))))
+
+(deftest ^:postgres validate-house-number-prefix-no-includes-all-addresses
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-house-number-prefix.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-no-includes-all-addresses-with-house-number-prefix)
+        errors (all-errors errors-chan)]
+    (testing "cannot includes all addresses with house number prefix"
+      (is (contains-error? errors
+                           {:severity :error
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.1.HouseNumberPrefix"
+                            :error-type :invalid
+                            :error-value :invalid-house-number-prefix-with-includes-all-addresses})))
+    (testing "Other segments are fine"
+      (doseq [path ["VipObject.0.StreetSegment.0.HouseNumberPrefix"
+                    "VipObject.0.StreetSegment.2.HouseNumberPrefix"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :invalid})))))
+
+(deftest ^:postgres validate-house-number-prefix-no-includes-all-streets
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-house-number-prefix.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-no-includes-all-streets-with-house-number-prefix)
+        errors (all-errors errors-chan)]
+    (testing "cannot includes all addresses with house number prefix"
+      (is (contains-error? errors
+                           {:severity :error
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.2.HouseNumberPrefix"
+                            :error-type :invalid
+                            :error-value :invalid-house-number-prefix-with-includes-all-streets})))
+    (testing "Other segments are fine"
+      (doseq [path ["VipObject.0.StreetSegment.0.HouseNumberPrefix"
+                    "VipObject.0.StreetSegment.1.HouseNumberPrefix"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :invalid})))))
+
+(deftest ^:postgres validate-house-number-prefix-start-end-house-numbers
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-house-number-prefix.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-start-end-house-number-with-house-number-prefix)
+        errors (all-errors errors-chan)]
+    (testing "cannot have different start/end house numbers when house number prefix is present"
+      (is (contains-error? errors
+                           {:severity :error
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.0.HouseNumberPrefix"
+                            :error-type :invalid
+                            :error-value :start-and-end-house-numbers-must-be-identical-when-house-number-prefix-specified})))
+    (testing "Other segments are fine"
+      (doseq [path ["VipObject.0.StreetSegment.1.HouseNumberPrefix"
+                    "VipObject.0.StreetSegment.2.HouseNumberPrefix"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :invalid})))))
+
+(deftest ^:postgres validate-house-number-suffix-no-includes-all-addresses
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-house-number-suffix.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-no-includes-all-addresses-with-house-number-suffix)
+        errors (all-errors errors-chan)]
+    (testing "cannot includes all addresses with house number suffix"
+      (is (contains-error? errors
+                           {:severity :error
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.1.HouseNumberSuffix"
+                            :error-type :invalid
+                            :error-value :invalid-house-number-suffix-with-includes-all-addresses})))
+    (testing "Other segments are fine"
+      (doseq [path ["VipObject.0.StreetSegment.0.HouseNumberSuffix"
+                    "VipObject.0.StreetSegment.2.HouseNumberSuffix"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :invalid})))))
+
+(deftest ^:postgres validate-house-number-suffix-no-includes-all-streets
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-house-number-suffix.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-no-includes-all-streets-with-house-number-suffix)
+        errors (all-errors errors-chan)]
+    (testing "cannot includes all streets with house number suffix"
+      (is (contains-error? errors
+                           {:severity :error
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.2.HouseNumberSuffix"
+                            :error-type :invalid
+                            :error-value :invalid-house-number-suffix-with-includes-all-streets})))
+    (testing "Other segments are fine"
+      (doseq [path ["VipObject.0.StreetSegment.0.HouseNumberSuffix"
+                    "VipObject.0.StreetSegment.1.HouseNumberSuffix"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :invalid})))))
+
+(deftest ^:postgres validate-house-number-suffix-start-end-house-numbers
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-street-segment-house-number-suffix.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.ss/validate-start-end-house-number-with-house-number-suffix)
+        errors (all-errors errors-chan)]
+    (testing "cannot have different start/end house numbers when house number suffix is present"
+      (is (contains-error? errors
+                           {:severity :error
+                            :scope :street-segment
+                            :identifier "VipObject.0.StreetSegment.0.HouseNumberSuffix"
+                            :error-type :invalid
+                            :error-value :start-and-end-house-numbers-must-be-identical-when-house-number-suffix-specified})))
+    (testing "Other segments are fine"
+      (doseq [path ["VipObject.0.StreetSegment.1.HouseNumberSuffix"
+                    "VipObject.0.StreetSegment.2.HouseNumberSuffix"]]
+        (assert-no-problems errors
+                            {:scope :street-segment
+                             :identifier path
+                             :error-type :invalid})))))
