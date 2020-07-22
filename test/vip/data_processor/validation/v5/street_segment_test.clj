@@ -270,7 +270,7 @@
         errors (all-errors errors-chan)]
     (testing "cannot includes all addresses with house number prefix"
       (is (contains-error? errors
-                           {:severity :error
+                           {:severity :errors
                             :scope :street-segment
                             :identifier "VipObject.0.StreetSegment.1.HouseNumberPrefix"
                             :error-type :invalid
@@ -294,7 +294,7 @@
         errors (all-errors errors-chan)]
     (testing "cannot includes all addresses with house number prefix"
       (is (contains-error? errors
-                           {:severity :error
+                           {:severity :errors
                             :scope :street-segment
                             :identifier "VipObject.0.StreetSegment.2.HouseNumberPrefix"
                             :error-type :invalid
@@ -318,7 +318,7 @@
         errors (all-errors errors-chan)]
     (testing "cannot have different start/end house numbers when house number prefix is present"
       (is (contains-error? errors
-                           {:severity :error
+                           {:severity :errors
                             :scope :street-segment
                             :identifier "VipObject.0.StreetSegment.0.HouseNumberPrefix"
                             :error-type :invalid
@@ -342,7 +342,7 @@
         errors (all-errors errors-chan)]
     (testing "cannot includes all addresses with house number suffix"
       (is (contains-error? errors
-                           {:severity :error
+                           {:severity :errors
                             :scope :street-segment
                             :identifier "VipObject.0.StreetSegment.1.HouseNumberSuffix"
                             :error-type :invalid
@@ -366,7 +366,7 @@
         errors (all-errors errors-chan)]
     (testing "cannot includes all streets with house number suffix"
       (is (contains-error? errors
-                           {:severity :error
+                           {:severity :errors
                             :scope :street-segment
                             :identifier "VipObject.0.StreetSegment.2.HouseNumberSuffix"
                             :error-type :invalid
@@ -390,7 +390,7 @@
         errors (all-errors errors-chan)]
     (testing "cannot have different start/end house numbers when house number suffix is present"
       (is (contains-error? errors
-                           {:severity :error
+                           {:severity :errors
                             :scope :street-segment
                             :identifier "VipObject.0.StreetSegment.0.HouseNumberSuffix"
                             :error-type :invalid

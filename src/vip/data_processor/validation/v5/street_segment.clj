@@ -54,19 +54,19 @@
   (util/validate-elements :street-segment
                           [:house-number-prefix]
                           valid-house-number-fix-or-nil?
-                          :error
+                          :errors
                           :house-number-prefix))
 
 (def validate-house-number-suffix-value
   (util/validate-elements :street-segment
                           [:house-number-suffix]
                           valid-house-number-fix-or-nil?
-                          :error
+                          :errors
                           :house-number-suffix))
 
 (def validate-no-includes-all-addresses-with-house-number-prefix
   (util/build-xml-tree-value-query-validator
-   :error :street-segment :invalid :invalid-house-number-prefix-with-includes-all-addresses
+   :errors :street-segment :invalid :invalid-house-number-prefix-with-includes-all-addresses
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
           parent_with_id, simple_path
@@ -81,7 +81,7 @@
 
 (def validate-no-includes-all-streets-with-house-number-prefix
   (util/build-xml-tree-value-query-validator
-   :error :street-segment :invalid :invalid-house-number-prefix-with-includes-all-streets
+   :errors :street-segment :invalid :invalid-house-number-prefix-with-includes-all-streets
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
           parent_with_id, simple_path
@@ -96,7 +96,7 @@
 
 (def validate-no-includes-all-addresses-with-house-number-suffix
   (util/build-xml-tree-value-query-validator
-   :error :street-segment :invalid :invalid-house-number-suffix-with-includes-all-addresses
+   :errors :street-segment :invalid :invalid-house-number-suffix-with-includes-all-addresses
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
           parent_with_id, simple_path
@@ -111,7 +111,7 @@
 
 (def validate-no-includes-all-streets-with-house-number-suffix
   (util/build-xml-tree-value-query-validator
-   :error :street-segment :invalid :invalid-house-number-suffix-with-includes-all-streets
+   :errors :street-segment :invalid :invalid-house-number-suffix-with-includes-all-streets
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
           parent_with_id, simple_path
@@ -126,7 +126,7 @@
 
 (def validate-start-end-house-number-with-house-number-prefix
   (util/build-xml-tree-value-query-validator
-   :error :street-segment :invalid :start-and-end-house-numbers-must-be-identical-when-house-number-prefix-specified
+   :errors :street-segment :invalid :start-and-end-house-numbers-must-be-identical-when-house-number-prefix-specified
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
           parent_with_id
@@ -146,7 +146,7 @@
 
 (def validate-start-end-house-number-with-house-number-suffix
   (util/build-xml-tree-value-query-validator
-   :error :street-segment :invalid :start-and-end-house-numbers-must-be-identical-when-house-number-suffix-specified
+   :errors :street-segment :invalid :start-and-end-house-numbers-must-be-identical-when-house-number-suffix-specified
    "SELECT xtv.path
     FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
           parent_with_id
