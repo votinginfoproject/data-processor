@@ -152,6 +152,26 @@
               [(internationalized-text->ltree :election_notice_text "NoticeText" parent-with-id)
                (simple-value->ltree :election_notice_uri "NoticeUri" parent-with-id)]))))
 
+(defn simple-address->ltree
+  [idx-fn parent-path row]
+  (when-not (and (str/blank? (:structured_address_1 row))
+                 (str/blank? (:structured_address_2 row))
+                 (str/blank? (:structured_address_3 row))
+                 (str/blank? (:structured_city row))
+                 (str/blank? (:structured_state row))
+                 (str/blank? (:structured_zip row)))
+    (let [index (idx-fn)
+          base-path (str parent-path ".AddressStructured." index)
+          parent-with-id (id-path parent-path)
+          sub-idx-fn (index-generator 0)]
+      (mapcat #(% sub-idx-fn base-path row)
+              [(simple-value->ltree :structured_line_1 "Line1" parent-with-id)
+               (simple-value->ltree :structured_line_2 "Line2" parent-with-id)
+               (simple-value->ltree :structured_line_3 "Line3" parent-with-id)
+               (simple-value->ltree :structured_city "City" parent-with-id)
+               (simple-value->ltree :structured_state "State" parent-with-id)
+               (simple-value->ltree :structured_zip "Zip" parent-with-id)]))))
+
 (defn ltreeify [row]
   (-> row
       (update :path postgres/path->ltree)

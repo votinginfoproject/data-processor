@@ -53,6 +53,7 @@
    electoral-district/validate-no-missing-types
    election-admin/validate-no-missing-departments
    election-admin/validate-voter-service-type-format
+   election-admin/validate-no-missing-notice-texts
    election/validate-one-election
    election/validate-date
    election/validate-state-id
@@ -74,8 +75,17 @@
    street-segment/validate-no-missing-zip
    street-segment/validate-start-house-number
    street-segment/validate-end-house-number
+   street-segment/validate-no-includes-all-addresses-with-house-number-prefix
+   street-segment/validate-no-includes-all-streets-with-house-number-prefix
+   street-segment/validate-no-includes-all-addresses-with-house-number-suffix
+   street-segment/validate-no-includes-all-streets-with-house-number-suffix
+   street-segment/validate-start-end-house-number-with-house-number-prefix
+   street-segment/validate-start-end-house-number-with-house-number-suffix
    street-segment/validate-no-street-segment-overlaps
-   polling-location/validate-no-missing-address-lines
+   polling-location/validate-no-missing-address
+   polling-location/validate-structured-address-line-1
+   polling-location/validate-structured-address-city
+   polling-location/validate-structured-address-state
    polling-location/validate-no-missing-latitudes
    polling-location/validate-no-missing-longitudes
    polling-location/validate-latitude

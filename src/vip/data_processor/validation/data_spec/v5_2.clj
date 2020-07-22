@@ -300,6 +300,12 @@
     :columns [{:name "id"}
               {:name "name"}
               {:name "address_line"}
+              {:name "structured_line_1"}
+              {:name "structured_line_2"}
+              {:name "structured_line_3"}
+              {:name "structured_city"}
+              {:name "structured_state"}
+              {:name "structured_zip"}
               {:name "directions"}
               {:name "hours"}
               {:name "hours_open_id"}

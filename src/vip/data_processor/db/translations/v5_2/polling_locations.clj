@@ -18,6 +18,7 @@
     (conj
      (mapcat #(% child-idx-fn path row)
              [(util/simple-value->ltree :address_line)
+              util/simple-address->ltree
               (util/internationalized-text->ltree :directions)
               (util/internationalized-text->ltree :hours)
               (util/simple-value->ltree :hours_open_id)

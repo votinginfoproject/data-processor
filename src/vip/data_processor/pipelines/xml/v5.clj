@@ -105,7 +105,10 @@
     vip.data-processor.validation.v5.street-segment/validate-start-end-house-number-with-house-number-prefix
     vip.data-processor.validation.v5.street-segment/validate-start-end-house-number-with-house-number-suffix
     vip.data-processor.validation.v5.street-segment/validate-no-street-segment-overlaps
-    vip.data-processor.validation.v5.polling-location/validate-no-missing-address-lines
+    vip.data-processor.validation.v5.polling-location/validate-no-missing-address
+    vip.data-processor.validation.v5.polling-location/validate-structured-address-line-1
+    vip.data-processor.validation.v5.polling-location/validate-structured-address-city
+    vip.data-processor.validation.v5.polling-location/validate-structured-address-state
     vip.data-processor.validation.v5.polling-location/validate-no-missing-latitudes
     vip.data-processor.validation.v5.polling-location/validate-no-missing-longitudes
     vip.data-processor.validation.v5.polling-location/validate-latitude
