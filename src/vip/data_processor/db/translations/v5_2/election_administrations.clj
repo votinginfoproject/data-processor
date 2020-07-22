@@ -25,15 +25,15 @@
                  (mapcat #(% child-idx-fn path ea)
                          [(util/simple-value->ltree :absentee_uri)
                           (util/simple-value->ltree :am_i_registered_uri)
+                          (util/simple-value->ltree :ballot_tracking_uri)
+                          (util/simple-value->ltree :ballot_tracking_provisional_uri)
                           (ds/departments->ltree ds voter-services id-path)
+                          util/election-notice->ltree
                           (util/simple-value->ltree :elections_uri)
                           (util/simple-value->ltree :registration_uri)
                           (util/simple-value->ltree :rules_uri)
                           (util/simple-value->ltree :what_is_on_my_ballot_uri)
-                          (util/simple-value->ltree :where_do_i_vote_uri)
-                          (util/simple-value->ltree :ballot_tracking_uri)
-                          (util/simple-value->ltree :ballot_tracking_provisional_uri)
-                          util/election-notice->ltree])
+                          (util/simple-value->ltree :where_do_i_vote_uri)])
                  {:path id-path
                   :simple_path (util/path->simple-path id-path)
                   :parent_with_id id-path
