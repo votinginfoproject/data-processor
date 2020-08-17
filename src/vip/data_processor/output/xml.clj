@@ -17,10 +17,7 @@
             [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
-            [clojure.walk :as walk]
             [vip.data-processor.output.v3-0.xml :as v3-0]
-            [vip.data-processor.output.xml-helpers :refer [create-xml-file
-                                                           generate-file-basename]]
             [vip.data-processor.errors :as errors])
   (:import [javax.xml XMLConstants]
            [javax.xml.transform.stream StreamSource]
@@ -90,9 +87,3 @@
       ctx
       (catch SAXParseException e
         (errors/add-errors ctx :errors :xml-generation :global :invalid-xml (.getMessage e))))))
-
-(def pipeline
-  [generate-file-basename
-   create-xml-file
-   write-xml
-   validate-xml-output])

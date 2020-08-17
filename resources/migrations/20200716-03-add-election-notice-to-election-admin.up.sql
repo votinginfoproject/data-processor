@@ -1,0 +1,2 @@
+ALTER TABLE v5_2_election_administrations ADD COLUMN election_notice_text text;
+ALTER TABLE v5_2_election_administrations ADD COLUMN election_notice_uri text;

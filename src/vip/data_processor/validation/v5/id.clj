@@ -91,7 +91,7 @@
 (defn validate-idref-references
   [{:keys [import-id spec-version] :as ctx}]
   (log/info "Validating idref references")
-  (let [idref-simple-paths (->> (spec/type->simple-paths "xs:IDREF" @spec-version)
+  (let [idref-simple-paths (->> (spec/type->simple-paths "xs:IDREF" spec-version)
                                 (map postgres/path->ltree))]
     (reduce validate-idref-type-refers
             ctx idref-simple-paths)))
@@ -99,7 +99,7 @@
 (defn validate-idrefs-references
   [{:keys [import-id spec-version] :as ctx}]
   (log/info "Validating idrefs references")
-  (let [idrefs-simple-paths (->> (spec/type->simple-paths "xs:IDREFS" @spec-version)
+  (let [idrefs-simple-paths (->> (spec/type->simple-paths "xs:IDREFS" spec-version)
                                  (map postgres/path->ltree))]
     (reduce validate-idrefs-type-refers
             ctx idrefs-simple-paths)))

@@ -35,4 +35,26 @@
       <Source>I'm a source</Source>
     </LatLng>
   </PollingLocation>
+  <PollingLocation id="pl007">
+    <AddressStructured>
+      <Line1>123 Main St</Line1>
+      <City>Denver</City>
+      <State>CO</State>
+    </AddressStructured>
+    <LatLng>
+      <Latitude>39.750016</Latitude>
+      <Longitude>-105.000361</Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
+  <PollingLocation id="pl008">
+    <AddressStructured>
+      <Line2>Second Floor</Line2>
+    </AddressStructured>
+    <LatLng>
+      <Latitude>39.750016</Latitude>
+      <Longitude>-105.000361</Longitude>
+      <Source>I'm a source</Source>
+    </LatLng>
+  </PollingLocation>
 </VipObject>

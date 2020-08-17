@@ -30,6 +30,8 @@
    [:precinct_id "PrecinctId"]
    [:start_house_number "StartHouseNumber"]
    [:end_house_number "EndHouseNumber"]
+   [:house_number_prefix "HouseNumberPrefix"]
+   [:house_number_suffix "HouseNumberSuffix"]
    [:state "State"]
    [:street_direction "StreetDirection"]
    [:street_name "StreetName"]
@@ -114,13 +116,13 @@
 (defn load-precinct-ids
   []
   (jdbc/with-db-connection [conn (psql/db-spec)]
-    (->> (korma/select (psql/v5-1-tables :precincts)
+    (->> (korma/select (psql/v5-2-tables :precincts)
            (korma/fields :id))
          (reduce #(conj %1 (:id %2)) #{}))))
 
 (defn process-xml
   [{:keys [xml-output-file] :as ctx}]
-  (if-let [ss-file (util/find-input-file ctx "street_segment.txt")]
+  (if-let [ss-file (util/find-csv-source-file ctx "street_segment.txt")]
     (let [tmpfile (fs/temp-file "" ".xml")
           reader (->> (.toFile xml-output-file)
                       (.createXMLEventReader (XMLInputFactory/newInstance)))

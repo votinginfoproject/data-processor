@@ -4,7 +4,7 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.s3 :as s3]
             [vip.data-processor.util :as util])
-  (:import [java.nio.file Files CopyOption StandardCopyOption]
+  (:import [java.nio.file Files StandardCopyOption]
            [java.nio.file.attribute FileAttribute]))
 
 (defn format-fips [fips]
@@ -27,8 +27,8 @@
     (str/join "-" ["vipfeed" fips state date])))
 
 (defn generate-file-basename
-  [{:keys [spec-version tables import-id] :as ctx}]
-  (condp = (util/version-without-patch @spec-version)
+  [{:keys [spec-family tables import-id] :as ctx}]
+  (condp = spec-family
     "3.0"
     (let [fips (-> tables
                    :sources
@@ -48,7 +48,7 @@
       (assoc ctx :output-file-basename
              (filename* fips state election-date)))
 
-    "5.1"
+    "5.2"
     (let [fips (postgres/find-value-for-simple-path
                 import-id "VipObject.Source.VipId")
           state (postgres/find-value-for-simple-path
@@ -100,7 +100,7 @@
 (defn id-keyword [s]
   (-> s
       name
-      (clojure.string/replace "-" "_")
+      (str/replace "-" "_")
       (str "_id")
       keyword))
 

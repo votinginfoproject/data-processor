@@ -13,3 +13,4 @@ data-processor@.service
 .env
 .idea/
 .java-version
+/samples

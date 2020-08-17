@@ -10,7 +10,7 @@
 
 (deftest ^:postgres validate-no-missing-names-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-offices.xml")
+        ctx {:xml-source-file-path (xml-input "v5-offices.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -32,7 +32,7 @@
 
 (deftest ^:postgres validate-no-missing-term-types-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-offices.xml")
+        ctx {:xml-source-file-path (xml-input "v5-offices.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -65,7 +65,7 @@
 
 (deftest ^:postgres validate-term-types-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-offices.xml")
+        ctx {:xml-source-file-path (xml-input "v5-offices.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run

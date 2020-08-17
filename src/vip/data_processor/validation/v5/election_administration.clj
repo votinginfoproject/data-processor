@@ -42,3 +42,20 @@
                                    path :format parent-element-id
                                    (:value row))))
             ctx invalid-voter-service-types)))
+
+;;ElectionNotice is required to have at least one NoticeText if ElectionNotice
+;;is present in the feed. This checks for that condition.
+;;Additionally, there is already an existing test for all InternationalizedText
+;;types (which NoticeText is of that type) to verify they have at least one Text
+;;child element always, so that test will catch an empty NoticeText.
+(def validate-no-missing-notice-texts
+  (util/build-xml-tree-value-query-validator
+   :errors :election-administration :missing :missing-election-notice-text
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 6) || 'NoticeText' AS path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path, 0, 3) = 'VipObject.ElectionAdministration.ElectionNotice') xtv
+    LEFT JOIN (SELECT path FROM xml_tree_values WHERE results_id = ?) xtv2
+    ON xtv.path = subltree(xtv2.path, 0, 7)
+    WHERE xtv2.path IS NULL"
+   util/two-import-ids))

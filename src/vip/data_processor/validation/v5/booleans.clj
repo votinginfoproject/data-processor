@@ -9,7 +9,7 @@
 
 (defn validate-format [{:keys [import-id] :as ctx}]
   (log/info "Validating booleans")
-  (let [boolean-paths (spec/type->simple-paths "xs:boolean" "5.1")
+  (let [boolean-paths (spec/type->simple-paths "xs:boolean" "5.2")
         boolean-values (korma/select postgres/xml-tree-values
                           (korma/where {:results_id import-id
                                         :simple_path [in (map postgres/path->ltree boolean-paths)]}))]

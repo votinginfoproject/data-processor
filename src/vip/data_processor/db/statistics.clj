@@ -1,8 +1,7 @@
 (ns vip.data-processor.db.statistics
   (:require [clojure.string :as str]
             [korma.core :as korma]
-            [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.util :as util]))
+            [vip.data-processor.db.postgres :as psql]))
 
 (defn data-specs-with-stats [data-specs]
   (filter :stats data-specs))

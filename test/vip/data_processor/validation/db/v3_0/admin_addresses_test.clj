@@ -12,7 +12,8 @@
 (deftest validate-election-administration-addresses-test
   (testing "errors are returned if either the physical or mailing address is incomplete"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["bad-election-administration-addresses/election_administration.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["bad-election-administration-addresses/election_administration.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs

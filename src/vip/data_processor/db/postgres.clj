@@ -9,8 +9,7 @@
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.util :as db.util]
             [vip.data-processor.util :as util]
-            [vip.data-processor.validation.data-spec :as data-spec]
-            [clojure.set :as set])
+            [vip.data-processor.validation.data-spec :as data-spec])
   (:import [org.postgresql.util PGobject]
            [java.text Normalizer]))
 
@@ -64,14 +63,12 @@
   (korma/defentity v5-dashboard-localities
     (korma/table "v5_dashboard.localities")
     (korma/database results-db))
-  (korma/defentity v5-1-street-segments
-    (korma/table "v5_1_street_segments"))
+  (korma/defentity v5-2-street-segments
+    (korma/table "v5_2_street_segments"))
   (korma/defentity v5-dashboard-paths-by-locality
     (korma/table "v5_dashboard.paths_by_locality"))
-  (def v5-1-tables
-    (db.util/make-entities "5.1" results-db [:offices
-                                             :voter-services
-                                             :ballot-measure-contests
+  (def v5-2-tables
+    (db.util/make-entities "5.2" results-db [:ballot-measure-contests
                                              :ballot-measure-selections
                                              :ballot-selections
                                              :ballot-styles
@@ -85,6 +82,7 @@
                                              :election-administrations
                                              :electoral-districts
                                              :localities
+                                             :offices
                                              :ordered-contests
                                              :parties
                                              :party-contests
@@ -96,7 +94,8 @@
                                              :schedules
                                              :sources
                                              :states
-                                             :street-segments]))
+                                             :street-segments
+                                             :voter-services]))
   (def v3-0-import-entities
     (db.util/make-entities "3.0" results-db db.util/import-entity-names)))
 
@@ -204,10 +203,10 @@
      :import-id import-id
      :vip-id vip-id}))
 
-(defn get-public-id-data [{:keys [spec-version] :as ctx}]
-  (condp = (util/version-without-patch @spec-version)
+(defn get-public-id-data [{:keys [spec-family] :as ctx}]
+  (condp = spec-family
     "3.0" (get-v3-public-id-data ctx)
-    "5.1" (get-xml-tree-public-id-data ctx)
+    "5.2" (get-xml-tree-public-id-data ctx)
     {}))
 
 (defn generate-public-id [ctx]
@@ -254,10 +253,10 @@
     ctx))
 
 (defn store-spec-version [{:keys [spec-version import-id] :as ctx}]
-  (when @spec-version
-    (log/info "Storing spec-verion," @spec-version)
+  (when spec-version
+    (log/info "Storing spec-verion," spec-version)
     (korma/update results
-      (korma/set-fields {:spec_version @spec-version})
+      (korma/set-fields {:spec_version spec-version})
       (korma/where {:id import-id})))
   ctx)
 
@@ -303,17 +302,18 @@
 
 (defn delete-from-xml-tree-values
   [{:keys [import-id] :as ctx}]
-  (log/info "Dropping from xml_tree_values")
-  (korma/exec-raw
-   (:conn xml-tree-values)
-   ["delete from xml_tree_values where results_id = ?" [import-id]])
+  (when-not (:keep-feed-on-complete? ctx)
+    (log/info "Dropping from xml_tree_values")
+    (korma/exec-raw
+     (:conn xml-tree-values)
+     ["delete from xml_tree_values where results_id = ?" [import-id]]))
   ctx)
 
 
 (defn v5-summary-branch
-  [{:keys [spec-version] :as ctx}]
+  [{:keys [spec-family] :as ctx}]
   (log/info "In v5-summary-branch")
-  (if (= (util/version-without-patch @spec-version) "5.1")
+  (if (= spec-family "5.2")
     (update ctx :pipeline (partial concat [populate-locality-table
                                            populate-i18n-table
                                            populate-sources-table
@@ -489,3 +489,8 @@
                   (log/error "Lazy failure case: " (.getMessage e))
                   chunked-rows)))]
         (trampoline chunked-rows)))))
+
+(defn prep-v5-2-run [ctx]
+  (-> ctx
+      (assoc :tables v5-2-tables)
+      (assoc :ltree-index 0)))

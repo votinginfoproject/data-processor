@@ -11,7 +11,7 @@
 (deftest ^:postgres validate-no-missing-names-test
   (testing "missing Name is an error"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-electoral-districts.xml")
+          ctx {:xml-source-file-path (xml-input "v5-electoral-districts.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
@@ -37,7 +37,7 @@
 (deftest ^:postgres validate-no-missing-types-test
   (testing "missing Type is an error"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-electoral-districts.xml")
+          ctx {:xml-source-file-path (xml-input "v5-electoral-districts.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run

@@ -40,11 +40,135 @@
                           :fatal
                           :end-house-number))
 
+(defn valid-house-number-fix-or-nil?
+  "Validate the prefix or suffix house number. They are restricted to
+   alphabetical characters, numbers, and the '/' character."
+  [house-number-fix]
+  (or (str/blank? house-number-fix)
+      (not (str/blank? (re-find #"^[a-zA-z0-9\/-]+$" house-number-fix)))))
+
+;; The next two validations are temporarily being disabled until we hear
+;; back from Google exactly what constraints they may want us to check
+;; against.
+(def validate-house-number-prefix-value
+  (util/validate-elements :street-segment
+                          [:house-number-prefix]
+                          valid-house-number-fix-or-nil?
+                          :errors
+                          :house-number-prefix))
+
+(def validate-house-number-suffix-value
+  (util/validate-elements :street-segment
+                          [:house-number-suffix]
+                          valid-house-number-fix-or-nil?
+                          :errors
+                          :house-number-suffix))
+
+(def validate-no-includes-all-addresses-with-house-number-prefix
+  (util/build-xml-tree-value-query-validator
+   :errors :street-segment :invalid :invalid-house-number-prefix-with-includes-all-addresses
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
+          parent_with_id, simple_path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.HouseNumberPrefix') xtv
+    JOIN (SELECT path, parent_with_id
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.IncludesAllAddresses'
+          AND value = 'true') xtv2
+    ON xtv.parent_with_id = xtv2.parent_with_id"
+   util/two-import-ids))
+
+(def validate-no-includes-all-streets-with-house-number-prefix
+  (util/build-xml-tree-value-query-validator
+   :errors :street-segment :invalid :invalid-house-number-prefix-with-includes-all-streets
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
+          parent_with_id, simple_path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.HouseNumberPrefix') xtv
+    JOIN (SELECT path, parent_with_id
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.IncludesAllStreets'
+          AND value = 'true') xtv2
+    ON xtv.parent_with_id = xtv2.parent_with_id"
+   util/two-import-ids))
+
+(def validate-no-includes-all-addresses-with-house-number-suffix
+  (util/build-xml-tree-value-query-validator
+   :errors :street-segment :invalid :invalid-house-number-suffix-with-includes-all-addresses
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
+          parent_with_id, simple_path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.HouseNumberSuffix') xtv
+    JOIN (SELECT path, parent_with_id
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.IncludesAllAddresses'
+          AND value = 'true') xtv2
+    ON xtv.parent_with_id = xtv2.parent_with_id"
+   util/two-import-ids))
+
+(def validate-no-includes-all-streets-with-house-number-suffix
+  (util/build-xml-tree-value-query-validator
+   :errors :street-segment :invalid :invalid-house-number-suffix-with-includes-all-streets
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
+          parent_with_id, simple_path
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.HouseNumberSuffix') xtv
+    JOIN (SELECT path, parent_with_id
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.IncludesAllStreets'
+          AND value = 'true') xtv2
+    ON xtv.parent_with_id = xtv2.parent_with_id"
+   util/two-import-ids))
+
+(def validate-start-end-house-number-with-house-number-prefix
+  (util/build-xml-tree-value-query-validator
+   :errors :street-segment :invalid :start-and-end-house-numbers-must-be-identical-when-house-number-prefix-specified
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
+          parent_with_id
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.HouseNumberPrefix') xtv
+    INNER JOIN (SELECT parent_with_id, value
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.StartHouseNumber') xtv2
+    ON xtv.parent_with_id = xtv2.parent_with_id
+    INNER JOIN (SELECT parent_with_id, value
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.EndHouseNumber') xtv3
+    ON xtv.parent_with_id = xtv3.parent_with_id
+    WHERE xtv2.value <> xtv3.value"
+   (fn [{:keys [import-id]}]
+     [import-id import-id import-id])))
+
+(def validate-start-end-house-number-with-house-number-suffix
+  (util/build-xml-tree-value-query-validator
+   :errors :street-segment :invalid :start-and-end-house-numbers-must-be-identical-when-house-number-suffix-specified
+   "SELECT xtv.path
+    FROM (SELECT DISTINCT subltree(path, 0, 5) AS path,
+          parent_with_id
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.HouseNumberSuffix') xtv
+    INNER JOIN (SELECT parent_with_id, value
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.StartHouseNumber') xtv2
+    ON xtv.parent_with_id = xtv2.parent_with_id
+    INNER JOIN (SELECT parent_with_id, value
+          FROM xml_tree_values WHERE results_id = ?
+          AND subltree(simple_path,0,3) = 'VipObject.StreetSegment.EndHouseNumber') xtv3
+    ON xtv.parent_with_id = xtv3.parent_with_id
+    WHERE xtv2.value <> xtv3.value"
+   (fn [{:keys [import-id]}]
+     [import-id import-id import-id])))
+
 (defn validate-no-street-segment-overlaps
   [{:keys [import-id] :as ctx}]
   (log/info "Validating street segment overlaps")
   (let [overlaps (korma/exec-raw
-                  (:conn postgres/v5-1-street-segments)
+                  (:conn postgres/v5-2-street-segments)
                   ["SELECT * from street_segment_overlaps(?);" [import-id]]
                   :results)]
     (reduce (fn [ctx overlap]
