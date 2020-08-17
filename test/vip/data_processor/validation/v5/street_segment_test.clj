@@ -292,7 +292,7 @@
                     xml/load-xml-ltree
                     v5.ss/validate-no-includes-all-streets-with-house-number-prefix)
         errors (all-errors errors-chan)]
-    (testing "cannot includes all addresses with house number prefix"
+    (testing "cannot includes all streets with house number prefix"
       (is (contains-error? errors
                            {:severity :errors
                             :scope :street-segment
