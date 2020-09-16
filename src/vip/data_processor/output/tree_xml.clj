@@ -1,11 +1,9 @@
 (ns vip.data-processor.output.tree-xml
-  (:require [clojure.data.xml :as xml]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
             [vip.data-processor.output.xml-helpers :refer [create-xml-file
                                                            generate-file-basename]]
             [vip.data-processor.db.postgres :as postgres]
-            [vip.data-processor.db.util :as db.util]
             [clojure.tools.logging :as log]
             [vip.data-processor.db.postgres :as psql])
   (:import [java.nio.file Files]
@@ -155,7 +153,7 @@
   [{:keys [spec-version import-id xml-output-file] :as ctx}]
   (jdbc/with-db-connection [conn (psql/db-spec)]
     (let [values (psql/lazy-select-xml-tree-values conn chunk-size import-id)]
-      (write-xml xml-output-file @spec-version import-id values)))
+      (write-xml xml-output-file spec-version import-id values)))
   ctx)
 
 (def pipeline

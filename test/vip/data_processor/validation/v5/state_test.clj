@@ -11,7 +11,7 @@
 
 (deftest ^:postgres validate-no-missing-names-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-states.xml")
+        ctx {:xml-source-file-path (xml-input "v5-states.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         state/validate-no-missing-names]

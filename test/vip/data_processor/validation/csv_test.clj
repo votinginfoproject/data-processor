@@ -4,24 +4,26 @@
             [vip.data-processor.validation.csv :refer :all]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.db.sqlite :as sqlite]
-            [vip.data-processor.pipeline :as pipeline]
             [korma.core :as korma]
             [clojure.core.async :as a])
-  (:import [java.io File]))
+  (:import [java.io File]
+           [java.nio.file Paths]))
 
 (deftest remove-bad-filenames-test
-  (let [bad-filenames [(File. "/data/BAD_FILE_NAME")
-                       (File. "/data/BAD_FILE_NAME_2")]
-        good-filenames (map #(File. (str "/data/" (:filename %))) v3-0/data-specs)
+  (let [data-dir (Paths/get "/data" (into-array String []))
+        bad-filenames [(.resolve data-dir "BAD_FILE_NAME")
+                       (.resolve data-dir "BAD_FILE_NAME_2")]
+        good-filenames (map #(.resolve data-dir (:filename %)) v3-0/data-specs)
         errors-chan (a/chan 100)
-        ctx {:input good-filenames
+        ctx {:csv-source-file-paths good-filenames
              :errors-chan errors-chan
-             :spec-version (atom "3.0")
+             :spec-version "3.0"
+             :spec-family "3.0"
              :data-specs v3-0/data-specs}]
     (testing "with good filenames passes the context through"
       (is (= ctx (remove-bad-filenames ctx))))
     (testing "with bad filenames removes the bad files and warns"
-      (let [ctx (update ctx :input (partial concat bad-filenames))
+      (let [ctx (update ctx :csv-source-file-paths (partial concat bad-filenames))
             out-ctx (remove-bad-filenames ctx)
             errors (all-errors errors-chan)]
         (is (contains-error? errors
@@ -29,13 +31,15 @@
                               :scope :import
                               :identifier :global
                               :error-type :bad-filenames}))
-        (is (not-every? (partial good-filename? v3-0/data-specs) (:input ctx)))
-        (is (every? (partial good-filename? v3-0/data-specs) (:input out-ctx)))))))
+        (is (not-every? (partial good-filename? v3-0/data-specs)
+                        (:csv-source-file-paths ctx)))
+        (is (every? (partial good-filename? v3-0/data-specs)
+                    (:csv-source-file-paths out-ctx)))))))
 
-(deftest missing-files-test
+(deftest error-on-missing-files-test
   (testing "reports errors or warnings when certain files are missing"
     (let [errors-chan (a/chan 100)
-          ctx {:input (csv-inputs ["full-good-run/source.txt"])
+          ctx {:csv-source-file-paths (csv-inputs ["full-good-run/source.txt"])
                :errors-chan errors-chan
                :data-specs v3-0/data-specs}
           out-ctx (-> ctx
@@ -59,7 +63,7 @@
 (deftest csv-loader-test
   (testing "ignores unknown columns"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["bad-columns/state.txt"])
+          ctx (merge {:csv-source-file-paths (csv-inputs ["bad-columns/state.txt"])
                       :errors-chan errors-chan
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "ignore-columns-test" "3.0"))
@@ -75,7 +79,7 @@
                               :error-type :extraneous-headers})))))
   (testing "requires a header row"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["no-header-row/ballot.txt"])
+          ctx (merge {:csv-source-file-paths (csv-inputs ["no-header-row/ballot.txt"])
                       :errors-chan errors-chan
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "no-headers-test" "3.0"))
@@ -90,9 +94,9 @@
 
 (deftest missing-required-columns-test
   (let [errors-chan (a/chan 100)
-        ctx (merge {:input (csv-inputs ["missing-required-columns/contest.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["missing-required-columns/contest.txt"])
                     :errors-chan errors-chan
-                    :data-specs v3-0/data-specs}
+                    :data-specs (filter #(= :contests (:table %)) v3-0/data-specs)}
                    (sqlite/temp-db "missing-required-columns" "3.0"))
         out-ctx (load-csvs ctx)
         errors (all-errors errors-chan)]
@@ -107,9 +111,10 @@
 
 (deftest report-bad-rows-test
   (let [errors-chan (a/chan 100)
-        ctx (merge {:input (csv-inputs ["bad-number-of-values/contest.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["bad-number-of-values/contest.txt"])
                     :errors-chan errors-chan
-                    :spec-version (atom "3.0")
+                    :spec-version "3.0"
+                    :spec-family "3.0"
                     :data-specs v3-0/data-specs}
                    (sqlite/temp-db "bad-number-of-values" "3.0"))
         out-ctx (load-csvs ctx)
@@ -129,7 +134,7 @@
 (deftest in-file-duplicate-ids-test
   (let [errors-chan (a/chan 100)
         db (sqlite/temp-db "in-file-duplicate-ids" "3.0")
-        ctx (merge {:input (csv-inputs ["in-file-duplicate-ids/contest.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["in-file-duplicate-ids/contest.txt"])
                     :errors-chan errors-chan
                     :data-specs v3-0/data-specs}
                    db)]
@@ -161,7 +166,7 @@
 
 (deftest byte-order-marker-test
   (let [db (sqlite/temp-db "byte-order-marker" "3.0")
-        ctx (merge {:input (csv-inputs ["byte-order-marker/source.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["byte-order-marker/source.txt"])
                     :data-specs v3-0/data-specs}
                    db)
         out-ctx (load-csvs ctx)]
@@ -174,7 +179,7 @@
 
 (deftest low-number-vip-id-test
   (let [db (sqlite/temp-db "low-number-vip-id-test" "3.0")
-        ctx (merge {:input (csv-inputs ["low-number-vip-id/source.txt"])
+        ctx (merge {:csv-source-file-paths (csv-inputs ["low-number-vip-id/source.txt"])
                     :data-specs v3-0/data-specs}
                    db)
         out-ctx (load-csvs ctx)]
@@ -187,40 +192,18 @@
 
 (deftest determine-spec-version-test
   (testing "finds and assocs the version of the csv feed for 3.0 files"
-    (let [ctx {:input (csv-inputs ["full-good-run/source.txt"])
-               :spec-version (atom nil)}
+    (let [ctx {:csv-source-file-paths (csv-inputs ["full-good-run/source.txt"])
+               :spec-version nil
+               :spec-family nil}
           out-ctx (determine-spec-version ctx)]
-      (is (= "3.0" @(get out-ctx :spec-version)))))
+      (is (= "3.0" (:spec-version out-ctx))
+          (= "3.0" (:spec-family out-ctx)))))
 
-  (testing "finds and assocs the version of the csv feed for 5.1 files"
-    (let [ctx {:input (csv-inputs ["5-1/spec-version/source.txt"])
-               :spec-version (atom nil)}
+  (testing "finds and assocs the version of the csv feed for 5.2 files, upgrading
+            the 5.1 spec version to the 5.2 spec family"
+    (let [ctx {:csv-source-file-paths (csv-inputs ["5-2/spec-version/source.txt"])
+               :spec-version nil
+               :spec-family nil}
           out-ctx (determine-spec-version ctx)]
-      (is (= "5.1" @(get out-ctx :spec-version))))))
-
-(deftest branch-on-spec-version-test
-  (testing "add the 3.0 import pipeline to the front of the pipeline for 3.0 feeds"
-    (let [ctx {:spec-version (atom "3.0")}
-          out-ctx (branch-on-spec-version ctx)
-          three-point-0-pipeline (get version-pipelines "3.0")]
-      (is (= three-point-0-pipeline
-             (take (count three-point-0-pipeline) (:pipeline out-ctx))))))
-
-  (testing "add the 5.1 import pipeline to the front of the pipeline for 5.1 feeds"
-    (let [ctx {:spec-version (atom "5.1")}
-          out-ctx (branch-on-spec-version ctx)
-          five-point-0-pipeline (get version-pipelines "5.1")]
-      (is (= five-point-0-pipeline
-             (take (count five-point-0-pipeline) (:pipeline out-ctx))))))
-
-  (testing "stops with unsupported version for other versions"
-    (let [ctx {:spec-version (atom "2.0")   ; 2.0 is too old
-               :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported CSV version"))))
-
-  (testing "stops with unsupported version for other versions"
-    (let [ctx {:spec-version (atom "5.2")  ; 5.1 is cool; 5.2 is vaporware
-               :pipeline [branch-on-spec-version]}
-          out-ctx (pipeline/run-pipeline ctx)]
-      (is (.startsWith (:stop out-ctx) "Unsupported CSV version")))))
+      (is (= "5.1" (:spec-version out-ctx)))
+      (is (= "5.2" (:spec-family out-ctx))))))

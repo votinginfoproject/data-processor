@@ -1,0 +1,2 @@
+ALTER TABLE v5_2_election_administrations ADD COLUMN ballot_tracking_uri text;
+ALTER TABLE v5_2_election_administrations ADD COLUMN ballot_tracking_provisional_uri text;

@@ -38,7 +38,7 @@
                 (.parse doc-builder is)))
 
 (def spec-docs
-  (let [versions ["3.0" "5.1" "5.1.1" "5.1.2"]]
+  (let [versions ["3.0" "5.1" "5.1.1" "5.1.2" "5.2"]]
     (zipmap versions
             (map parse-spec-by-version versions))))
 

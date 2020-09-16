@@ -11,7 +11,7 @@
 (deftest ^:postgres validate-one-election-test
   (testing "more than one Election element is a fatal error"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-more-than-one-election.xml")
+          ctx {:xml-source-file-path (xml-input "v5-more-than-one-election.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
@@ -25,7 +25,7 @@
                             :error-type :count}))))
   (testing "one and only one Election element is OK"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-one-election.xml")
+          ctx {:xml-source-file-path (xml-input "v5-one-election.xml")
                :pipeline []
                :errors-chan errors-chan}
           out-ctx (-> ctx
@@ -37,7 +37,7 @@
 
   (testing "having no Election is a problem"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-one-source.xml")
+          ctx {:xml-source-file-path (xml-input "v5-one-source.xml")
                :pipeline []
                :errors-chan errors-chan}
           out-ctx (-> ctx
@@ -54,7 +54,7 @@
 (deftest ^:postgres validate-date-test
   (testing "Date element missing is a fatal error"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-one-election.xml")
+          ctx {:xml-source-file-path (xml-input "v5-one-election.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
@@ -68,7 +68,7 @@
                             :error-type :missing}))))
   (testing "Date element present is OK"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-election-with-date.xml")
+          ctx {:xml-source-file-path (xml-input "v5-election-with-date.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
@@ -80,7 +80,7 @@
 (deftest ^:postgres validate-state-id-test
   (testing "StateId element missing is a fatal error"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-one-election.xml")
+          ctx {:xml-source-file-path (xml-input "v5-one-election.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run
@@ -94,7 +94,7 @@
                             :error-type :missing}))))
   (testing "StateId element present is OK"
     (let [errors-chan (a/chan 100)
-          ctx {:input (xml-input "v5-election-with-state-id.xml")
+          ctx {:xml-source-file-path (xml-input "v5-election-with-state-id.xml")
                :errors-chan errors-chan}
           out-ctx (-> ctx
                       psql/start-run

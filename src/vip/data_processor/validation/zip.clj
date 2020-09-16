@@ -1,5 +1,6 @@
 (ns vip.data-processor.validation.zip
-  (:require [clojure.tools.logging :as log])
+  (:require [clojure.tools.logging :as log]
+            [turbovote.resource-config :refer [config]])
   (:import [net.lingala.zip4j ZipFile]
            [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
@@ -20,11 +21,27 @@
        ", which is greater than the max-zipfile-size " max-zipfile-size))
 
 (defn get-uncompressed-size
-  "Given a net.lingala.zip4j.core.ZipFile returns the uncompressed
-  size as provided by the first (and presumably only) header in the
+  "Given a net.lingala.zip4j.ZipFile returns the uncompressed
+  size as provided by the first (and presumably only) entry in the
   file."
   [zip-file]
   (.getUncompressedSize (first (.getFileHeaders zip-file))))
+
+(defn find-files
+  "Returns a seq of Files from the path of a extracted zip file. If
+  the zip file included a directory named 'data' it will be the files
+  in that directory. Otherwise, it will be the files from the
+  top-level."
+  [path]
+  (let [data-dir (-> path
+                     (.resolve "data"))
+        base-dir (if (.exists (.toFile data-dir))
+                   data-dir
+                   path)]
+    (-> base-dir
+        Files/list
+        .iterator
+        iterator-seq)))
 
 (defn unzip-file [path max-zipfile-size]
   (let [zip-file (ZipFile. (str path))
@@ -37,46 +54,38 @@
                     :max-zipfile-size-exceeded true})
           throw)
       (do (.extractAll zip-file (str tmp-dir))
-          tmp-dir))))
+          {:dir tmp-dir
+           :files (find-files tmp-dir)}))))
 
-(defn assoc-file [ctx max-zipfile-size]
-  (let [path (:input ctx)]
-    (log/info "Starting to process from path:" (str path))
-    (cond
-      (zip-file? path)
-      (try
-        (assoc ctx :input (unzip-file path max-zipfile-size))
-        (catch Exception e
-          (if-let [max-zipfile-size-exceeded (ex-data e)]
-            (assoc ctx :stop (:msg (ex-data e)))
-            (throw e))))
+(defn process-file
+  "Given a context with the incoming source file at :input,
+   conditionally unzips the contents (if it is a zip file)
+   and puts them at :file. Also checks to see that the zip
+   contents are not over the max-zipfile-size, if they are then
+   it stops processing. If the :input just happens to be an unzipped
+   xml file, it also just places that at :file and continues on."
+  ([ctx]
+   (process-file ctx (config [:max-zipfile-size] 3221225472)))
+  ([ctx max-zipfile-size]
+   (let [path (:file ctx)]
+     (log/info "Starting to process from path:" (str path))
+     (cond
+       (zip-file? path)
+       (try
+         (let [{:keys [dir files]} (unzip-file path max-zipfile-size)]
+           (-> ctx
+               (assoc :file-type :zip)
+               (assoc :extracted-file-paths files)
+               (update :to-be-cleaned concat files)
+               (update :to-be-cleaned concat dir)))
+         (catch Exception e
+           (if-let [max-zipfile-size-exceeded (ex-data e)]
+             (assoc ctx :stop (:msg (ex-data e)))
+             (throw e))))
 
-      (xml-file? path) (assoc ctx :input path)
+       (xml-file? path)
+       (-> ctx
+           (assoc :file-type :xml)
+           (assoc :extracted-file-paths [path]))
 
-      :else (assoc ctx :stop (str path " is not a zip or xml file!")))))
-
-(defn zip-contents
-  "Returns a seq of Files from the path of a extracted zip file. If
-  the zip file included a directory named 'data' it will be the files
-  in that directory. Otherwise, it will be the files from the
-  top-level."
-  [path]
-  (let [data-dir (-> path
-                     (.resolve "data")
-                     .toFile)
-        base-dir (if (.exists data-dir)
-                   data-dir
-                   (.toFile path))]
-    (-> base-dir
-        .listFiles
-        seq)))
-
-(defn extracted-contents [ctx]
-  (let [path (:input ctx)]
-    (if (xml-file? path)
-      (assoc ctx :input
-             [(.toFile path)])
-      (let [files (zip-contents path)]
-        (-> ctx
-            (assoc :input files)
-            (update :to-be-cleaned concat files))))))
+       :else (assoc ctx :stop (str path " is not a zip or xml file!"))))))

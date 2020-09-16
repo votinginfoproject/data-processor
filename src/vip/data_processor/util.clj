@@ -1,5 +1,6 @@
 (ns vip.data-processor.util
   (:require [clojure.java.io :as io]
+            [clojure.string :as str]
             [clojure.tools.logging :as log]))
 
 (defn flatten-keys* [a ks m]
@@ -30,7 +31,7 @@
   "Returns a reader from io/reader, which has advanced past a byte
   order marker if one exists."
   [x & opts]
-  (let [reader (apply io/reader x opts)]
+  (let [reader (apply io/reader (.toFile x) opts)]
     (.mark reader 10)
     (let [first-char (.read reader)]
       (if (= first-char BOM)
@@ -38,15 +39,20 @@
         (.reset reader))
       reader)))
 
-(defn find-input-file [ctx filename]
+(defn find-csv-source-file
+  [ctx filename]
+  (letfn [(->file [f])])
   (->> ctx
-       :input
-       (filter #(= filename (clojure.string/lower-case (.getName %))))
+       :csv-source-file-paths
+       (filter #(= filename (str/lower-case (.getName (io/as-file %)))))
        first))
 
 (defn version-without-patch
-  "Strip the patch-level from `spec-version`. Assumes three or fewer version
-  numbers, e.g., \"5.1.2\" becomes \"5.1\"."
+  "Strip the patch-level from `spec-version` and conform it to either 3.0 or 5.2."
   [version]
   (when-not (empty? version)
-    (clojure.string/replace version #"^(\d+\.\d+)\.\d+$" "$1")))
+    (let [base-version (str/replace version #"^(\d+\.\d+)\.\d+$" "$1")]
+      (case base-version
+        "3.0" "3.0"
+        "5.1" "5.2"
+        "5.2" "5.2"))))

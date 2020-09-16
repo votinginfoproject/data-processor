@@ -13,7 +13,8 @@
 (deftest validate-valid-source-vip-id-test
   (testing "adds an error if the source's vip_id is bad from a csv"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["invalid-source-vip-id/source.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["invalid-source-vip-id/source.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
@@ -28,7 +29,7 @@
                                    :error-value "5199955554447"}))))
   (testing "adds an error if the source's vip_id is bad from a xml"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (xml-input "invalid-source-vip-id.xml")
+          ctx (merge {:xml-source-file-path (xml-input "invalid-source-vip-id.xml")
                       :data-specs v3-0/data-specs
                       :errors-chan errors-chan
                       :pipeline [xml/load-xml validate-valid-source-vip-id]}

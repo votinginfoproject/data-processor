@@ -255,7 +255,8 @@
 (deftest invalid-utf-8-test
   (testing "marks any value with a Unicode replacement character as invalid UTF-8 because that's what we assume we get"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["invalid-utf8/source.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["invalid-utf8/source.txt"])
                       :errors-chan errors-chan
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "invalid-utf-8" "3.0"))
@@ -272,7 +273,7 @@
 (deftest invalid-xml-chars?-test
   (testing "marks any value with characters that are invalid in XML"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["invalid-xml-chars/candidate.txt"])
+          ctx (merge {:csv-source-file-paths (csv-inputs ["invalid-xml-chars/candidate.txt"])
                       :errors-chan errors-chan
                       :data-specs v3-0/data-specs}
                      (sqlite/temp-db "invalid-utf-8" "3.0"))

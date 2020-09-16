@@ -1,0 +1,2 @@
+ALTER TABLE v5_2_election_administrations DROP COLUMN election_notice_text;
+ALTER TABLE v5_2_election_administrations DROP COLUMN election_notice_uri;

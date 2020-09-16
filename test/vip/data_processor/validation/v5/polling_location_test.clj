@@ -9,31 +9,39 @@
 
 (use-fixtures :once setup-postgres)
 
-(deftest ^:postgres validate-no-missing-address-lines-test
+(deftest ^:postgres validate-no-missing-address
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-polling-locations.xml")
+        ctx {:xml-source-file-path (xml-input "v5-polling-locations.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
                     xml/load-xml-ltree
-                    v5.polling-location/validate-no-missing-address-lines)
+                    v5.polling-location/validate-no-missing-address)
         errors (all-errors errors-chan)]
     (testing "address-line missing is an error"
       (is (contains-error? errors
                            {:severity :errors
                             :scope :polling-location
-                            :identifier "VipObject.0.PollingLocation.0.AddressLine"
-                            :error-type :missing})))
+                            :identifier "VipObject.0.PollingLocation.0"
+                            :error-type :missing
+                            :error-value :missing-either-address-line-or-address-structured})))
     (testing "address-line present is OK"
       (assert-no-problems errors
                           {:severity :errors
                            :scope :polling-location
-                           :identifier "VipObject.0.PollingLocation.1.AddressLine"
-                           :error-type :missing}))))
+                           :identifier "VipObject.0.PollingLocation.1"
+                           :error-type :missing}))
+    (testing "structured address present is OK"
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :polling-location
+                           :identifier "VipObject.0.PollingLocation.6"
+                           :error-type :missing}))
+    (is (= 1 (count errors)))))
 
 (deftest ^:postgres validate-latitude-longitude-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-polling-locations.xml")
+        ctx {:xml-source-file-path (xml-input "v5-polling-locations.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -91,7 +99,8 @@
 
 (deftest ^:postgres check-for-polling-locations-mapped-to-multiple-places-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-polling-locations-duplicated.xml")
+        ctx {:xml-source-file-path
+             (xml-input "v5-polling-locations-duplicated.xml")
              :errors-chan errors-chan}
         out-ctx (-> ctx
                     psql/start-run
@@ -110,3 +119,81 @@
         (let [error-value (-> dup-warning first :error-value)]
           (is (str/includes? error-value "pl001"))
           (is (str/includes? error-value "pl003")))))))
+
+(deftest ^:postgres validate-structured-address-line-1
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-polling-locations.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.polling-location/validate-structured-address-line-1)
+        errors (all-errors errors-chan)]
+    (testing "structured-address-line-1 missing is an error"
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :polling-location
+                            :identifier "VipObject.0.PollingLocation.7.AddressStructured.0.Line1"
+                            :error-type :missing
+                            :error-value :missing-address-structured-line-1
+                            :parent-element-id "pl008"})))
+    (testing "structured-address-line-1 present is OK"
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :polling-location
+                           :identifier "VipObject.0.PollingLocation.6.AddressStructured.0.Line1"
+                           :error-type :missing
+                           :error-value :missing-address-structured-line-1}))
+    (is (= 1 (count errors)))))
+
+(deftest ^:postgres validate-structured-address-city
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-polling-locations.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.polling-location/validate-structured-address-city)
+        errors (all-errors errors-chan)]
+    (testing "structured-address-city missing is an error"
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :polling-location
+                            :identifier "VipObject.0.PollingLocation.7.AddressStructured.0.City"
+                            :error-type :missing
+                            :error-value :missing-address-structured-city
+                            :parent-element-id "pl008"})))
+    (testing "structured-address-city present is OK"
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :polling-location
+                           :identifier "VipObject.0.PollingLocation.6.AddressStructured.0.City"
+                           :error-type :missing
+                           :error-value :missing-address-structured-city}))
+    (is (= 1 (count errors)))))
+
+(deftest ^:postgres validate-structured-address-state
+  (let [errors-chan (a/chan 100)
+        ctx {:xml-source-file-path (xml-input "v5-polling-locations.xml")
+             :errors-chan errors-chan}
+        out-ctx (-> ctx
+                    psql/start-run
+                    xml/load-xml-ltree
+                    v5.polling-location/validate-structured-address-state)
+        errors (all-errors errors-chan)]
+    (testing "structured-address-state missing is an error"
+      (is (contains-error? errors
+                           {:severity :errors
+                            :scope :polling-location
+                            :identifier "VipObject.0.PollingLocation.7.AddressStructured.0.State"
+                            :error-type :missing
+                            :error-value :missing-address-structured-state
+                            :parent-element-id "pl008"})))
+    (testing "structured-address-state present is OK"
+      (assert-no-problems errors
+                          {:severity :errors
+                           :scope :polling-location
+                           :identifier "VipObject.0.PollingLocation.6.AddressStructured.0.State"
+                           :error-type :missing
+                           :error-value :missing-address-structured-state}))
+    (is (= 1 (count errors)))))

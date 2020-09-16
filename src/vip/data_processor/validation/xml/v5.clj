@@ -4,7 +4,7 @@
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec]
-            [vip.data-processor.validation.data-spec.v5-1 :as data-spec.v5-1]))
+            [vip.data-processor.validation.data-spec.v5-2 :as data-spec.v5-2]))
 
 (defn element->database-key [element]
   (->> element
@@ -37,8 +37,8 @@
 
 (defn load-xml-street-segments
   [{:keys [import-id] :as ctx}]
-  (let [xml-file (first (:input ctx))]
-    (with-open [reader (util/bom-safe-reader xml-file)]
+  (let [xml-file-path (:xml-source-file-path ctx)]
+    (with-open [reader (util/bom-safe-reader xml-file-path)]
       (->> reader
            xml/parse
            :content
@@ -46,5 +46,5 @@
            (map (fn [ss] (-> ss
                              ss->map
                              (assoc :results_id import-id))))
-           (data-spec/coerce-rows (:columns data-spec.v5-1/street-segments))
-           (postgres/bulk-import ctx postgres/v5-1-street-segments)))))
+           (data-spec/coerce-rows (:columns data-spec.v5-2/street-segments))
+           (postgres/bulk-import ctx postgres/v5-2-street-segments)))))

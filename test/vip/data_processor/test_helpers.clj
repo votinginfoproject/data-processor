@@ -4,26 +4,19 @@
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
             [korma.core :as korma]
-            [korma.db :as db]
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.postgres :as psql]
-            [vip.data-processor.util :as util]
-            [clojure.core.async :as a]))
+            [clojure.core.async :as a])
+  (:import [java.nio.file Paths]))
 
 (def problem-types [:warnings :errors :critical :fatal])
 
 (defn csv-inputs [file-names]
-  (map #(->> %
-             (str "csv/")
-             io/resource
-             io/as-file)
-       file-names))
+  (map #(Paths/get (.toURI (io/resource (str "csv/" %)))) file-names))
 
 (defn xml-input [file-name]
-  [(->> file-name
-         (str "xml/")
-         io/resource
-         io/as-file)])
+  ;; find all the places using xml-input and change to singular file type
+  (Paths/get (.toURI (io/resource (str "xml/" file-name)))))
 
 (defn assert-column [ctx table column values]
   (is (= values
@@ -54,8 +47,8 @@
       (psql/initialize)
       ;; these vars will be unbound until after psql/initialize, so
       ;; don't set psql-tables until after that's been run
-      (def psql-tables (concat (vals psql/v5-1-tables)
-                               [psql/v5-1-street-segments
+      (def psql-tables (concat (vals psql/v5-2-tables)
+                               [psql/v5-2-street-segments
                                 psql/xml-tree-validations
                                 psql/xml-tree-values
                                 psql/election_approvals

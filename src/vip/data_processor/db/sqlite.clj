@@ -33,7 +33,7 @@
 (def bulk-import (partial util/bulk-import statement-parameter-limit))
 
 (defn attach-sqlite-db [{:keys [import-id spec-version] :as ctx}]
-  (let [db (temp-db import-id @spec-version)
+  (let [db (temp-db import-id spec-version)
         db-file (get-in db [:db :subname])]
     (-> ctx
         (merge db)

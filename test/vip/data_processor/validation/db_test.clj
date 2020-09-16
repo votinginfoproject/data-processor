@@ -12,8 +12,9 @@
 (deftest validate-no-duplicated-ids-test
   (testing "finds duplicated ids across CSVs and errors"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["duplicate-ids/contest.txt"
-                                          "duplicate-ids/candidate.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["duplicate-ids/contest.txt"
+                                   "duplicate-ids/candidate.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
@@ -36,9 +37,10 @@
 (deftest validate-no-duplicated-rows-test
   (testing "finds possibly duplicated rows in a table and warns"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["duplicate-rows/candidate.txt"
-                                          "duplicate-rows/ballot_candidate.txt"
-                                          "duplicate-rows/ballot.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["duplicate-rows/candidate.txt"
+                                   "duplicate-rows/ballot_candidate.txt"
+                                   "duplicate-rows/ballot.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
@@ -77,7 +79,8 @@
 (deftest validate-one-record-limit-test
   (testing "validates that only one row exists in certain files"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["bad-number-of-rows/election.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["bad-number-of-rows/election.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
@@ -95,8 +98,9 @@
 (deftest validate-references-test
   (testing "finds bad references"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["bad-references/ballot.txt"
-                                          "bad-references/referendum.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["bad-references/ballot.txt"
+                                   "bad-references/referendum.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs
@@ -114,10 +118,11 @@
 (deftest validate-no-unreferenced-rows-test
   (testing "finds rows not referenced"
     (let [errors-chan (a/chan 100)
-          ctx (merge {:input (csv-inputs ["unreferenced-rows/ballot.txt"
-                                          "unreferenced-rows/candidate.txt"
-                                          "unreferenced-rows/contest.txt"
-                                          "unreferenced-rows/ballot_candidate.txt"])
+          ctx (merge {:csv-source-file-paths
+                      (csv-inputs ["unreferenced-rows/ballot.txt"
+                                   "unreferenced-rows/candidate.txt"
+                                   "unreferenced-rows/contest.txt"
+                                   "unreferenced-rows/ballot_candidate.txt"])
                       :errors-chan errors-chan
                       :pipeline [(data-spec/add-data-specs v3-0/data-specs)
                                  csv/load-csvs

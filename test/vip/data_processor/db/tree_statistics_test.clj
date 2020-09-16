@@ -4,7 +4,7 @@
             [vip.data-processor.db.tree-statistics :refer :all]
             [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.validation.xml :as xml]
-            [vip.data-processor.test-helpers :refer :all]
+            [vip.data-processor.test-helpers :as helpers]
             [korma.core :as korma]))
 
 (deftest camel->snake-test
@@ -16,8 +16,9 @@
        "lowercase" "lowercase")))
 
 (deftest ^:postgres validate-polling-locations-by-type
-  (setup-postgres #())
-  (let [ctx {:input (xml-input "v5-polling-locations-by-type.xml")
+  (helpers/setup-postgres #())
+  (let [ctx {:xml-source-file-path (helpers/xml-input
+                                   "v5-polling-locations-by-type.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         store-tree-stats]}

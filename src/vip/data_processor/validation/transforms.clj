@@ -1,66 +1,50 @@
 (ns vip.data-processor.validation.transforms
-  (:require [clojure.edn :as edn]
-            [clojure.set :as set]
-            [clojure.string :as s]
+  (:require [clojure.string :as s]
             [vip.data-processor.s3 :as s3]
-            [vip.data-processor.validation.csv :as csv]
-            [vip.data-processor.validation.xml :as xml]
             [vip.data-processor.errors :as errors]))
 
-(defn read-edn-sqs-message [ctx]
-  (let [message (edn/read-string (get-in ctx [:input :body]))]
-    (assoc
-     ctx
-     :input message
-     :skip-validations? (get message :skip-validations? false)
-     :post-process-street-segments? (get message :post-process-street-segments? false))))
+(defn assert-filename-and-bucket
+  "Asserts that we have a filename and bucket in the context
+  so we know where to download the file from."
+  [ctx]
+  (let [filename (get ctx :filename nil)
+        bucket (get ctx :bucket nil)]
+    (if (some s/blank? [filename bucket])
+      (assoc ctx :stop "No filename or bucket!")
+      ctx)))
 
-(defn assert-filename [ctx]
-  (if-let [filename (get-in ctx [:input :filename])]
-    (assoc ctx :filename filename)
-    (assoc ctx :stop "No filename!")))
-
-(defn download-from-s3 [ctx]
-  (let [filename (get-in ctx [:input :filename])
-        bucket (get-in ctx [:input :bucket])
+(defn download-from-s3
+  "Downloads the file from the bucket in S3"
+  [ctx]
+  (let [filename (:filename ctx)
+        bucket (:bucket ctx)
         file (s3/download filename bucket)]
     (-> ctx
         (update :to-be-cleaned conj file)
-        (assoc :input file))))
+        (assoc :file file))))
 
-(def xml-validations
-  [xml/determine-spec-version
-   xml/branch-on-spec-version])
-
-(def csv-validations
-  [csv/error-on-missing-files
-   csv/determine-spec-version
-   csv/remove-bad-filenames
-   csv/branch-on-spec-version])
+(defn assert-file
+  "Asserts that somehow we have a file to process, whether it was downloaded
+  or provided directly to the pipeline."
+  [ctx]
+  (if-let [file (get ctx :file nil)]
+    ctx
+    (assoc ctx :stop "No file!")))
 
 (defn remove-invalid-extensions [ctx]
-  (let [files (:input ctx)
+  (let [file-paths (:extracted-file-paths ctx)
         valid-extensions #{"csv" "txt" "xml"}
-        invalid-fn (fn [file]
+        invalid-fn (fn [file-path]
                      (not (get valid-extensions
-                               (-> file
+                               (-> file-path
+                                   .toFile
                                    .getName
                                    (s/split #"\.")
                                    last
                                    s/lower-case))))
-        {valid-files false invalid-files true} (group-by invalid-fn files)
-        ctx (assoc ctx :input valid-files)]
+        {valid-files false invalid-files true} (group-by invalid-fn file-paths)
+        ctx (assoc ctx :valid-file-paths valid-files)]
     (if (seq invalid-files)
       (errors/add-errors ctx :warnings :import :global :invalid-extensions
-                         (map #(.getName %) invalid-files))
+                         (map #(.getName (.toFile %)) invalid-files))
       ctx)))
-
-(defn xml-csv-branch [ctx]
-  (let [file-extensions (->> ctx
-                             :input
-                             (map #(-> % str (s/split #"\.") last s/lower-case))
-                             set)
-        filetype-validations (condp set/superset? file-extensions
-                               #{"txt" "csv"} csv-validations
-                               #{"xml"} xml-validations)]
-    (update ctx :pipeline (partial concat filetype-validations))))

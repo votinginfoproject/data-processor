@@ -2,9 +2,7 @@
   (:require [vip.data-processor.validation.v5.util :as util]
             [vip.data-processor.errors :as errors]
             [clojure.tools.logging :as log]
-            [clj-time.format :as f]
-            [korma.core :as korma]
-            [vip.data-processor.db.postgres :as postgres]))
+            [clj-time.format :as f]))
 
 (defn valid-time-with-zone? [time]
   (re-matches

@@ -12,7 +12,7 @@
 (deftest ^:postgres validate-pre-election-statuses-test
   (let [errors-chan (a/chan 100)
         ctx {:errors-chan errors-chan
-             :input (xml-input "v5-election-statuses.xml")
+             :xml-source-file-path (xml-input "v5-election-statuses.xml")
              :pipeline [psql/start-run
                         xml/load-xml-ltree
                         v5.candidate/validate-pre-election-statuses]}
@@ -39,7 +39,7 @@
 
 (deftest ^:postgres validate-post-election-statuses-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-election-statuses.xml")
+        ctx {:xml-source-file-path (xml-input "v5-election-statuses.xml")
              :errors-chan errors-chan
              :pipeline [psql/start-run
                         xml/load-xml-ltree
@@ -67,7 +67,7 @@
 
 (deftest ^:postgres validate-no-missing-ballot-names-test
   (let [errors-chan (a/chan 100)
-        ctx {:input (xml-input "v5-missing-ballot-names.xml")
+        ctx {:xml-source-file-path (xml-input "v5-missing-ballot-names.xml")
              :errors-chan errors-chan
              :pipeline [psql/start-run
                         xml/load-xml-ltree

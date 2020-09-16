@@ -4,7 +4,7 @@
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [clojure.test :refer :all]
             [clojure.core.async :as a])
-  (:import [java.io File]))
+  (:import [java.nio.file Paths]))
 
 (deftest validate-dependencies-test
   (let [dependencies (build-dependencies
@@ -14,9 +14,10 @@
         validator (validate-dependencies dependencies)]
     (testing "does not add errors when dependencies are met"
       (let [errors-chan (a/chan 100)
-            ctx {:input [(File. "ballot.txt")
-                         (File. "candidate.txt")
-                         (File. "election.txt")]
+            ctx {:csv-source-file-paths
+                 [(Paths/get "ballot.txt" (into-array String []))
+                  (Paths/get "candidate.txt" (into-array String []))
+                  (Paths/get "election.txt" (into-array String []))]
                  :errors-chan errors-chan
                  :data-specs v3-0/data-specs}
             out-ctx (validator ctx)
@@ -24,10 +25,11 @@
         (assert-no-problems errors {}))
       (testing "with sub-dependencies"
         (let [errors-chan (a/chan 100)
-              ctx {:input [(File. "ballot.txt")
-                           (File. "candidate.txt")
-                           (File. "precinct.txt")
-                           (File. "source.txt")]
+              ctx {:csv-source-file-paths
+                   [(Paths/get "ballot.txt" (into-array String []))
+                    (Paths/get "candidate.txt" (into-array String []))
+                    (Paths/get "precinct.txt" (into-array String []))
+                    (Paths/get "source.txt" (into-array String []))]
                    :errors-chan errors-chan
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
@@ -35,8 +37,9 @@
           (assert-no-problems errors {}))))
     (testing "adds errors when dependencies are not met"
       (let [errors-chan (a/chan 100)
-            ctx {:input [(File. "ballot.txt")
-                         (File. "precinct.txt")]
+            ctx {:csv-source-file-paths
+                 [(Paths/get "ballot.txt" (into-array String []))
+                  (Paths/get "precinct.txt" (into-array String []))]
                  :errors-chan errors-chan
                  :data-specs v3-0/data-specs}
             out-ctx (validator ctx)
@@ -55,11 +58,12 @@
     (testing "polling_location.txt dependencies"
       (testing "with precinct splits"
         (let [errors-chan (a/chan 100)
-              ctx {:input [(File. "polling_location.txt")
-                           (File. "precinct.txt")
-                           (File. "precinct_split.txt")
-                           (File. "polling_location.txt")
-                           (File. "precinct_split_polling_location.txt")]
+              ctx {:csv-source-file-paths
+                   [(Paths/get "polling_location.txt" (into-array String []))
+                    (Paths/get "precinct.txt" (into-array String []))
+                    (Paths/get "precinct_split.txt" (into-array String []))
+                    (Paths/get "polling_location.txt" (into-array String []))
+                    (Paths/get "precinct_split_polling_location.txt" (into-array String []))]
                    :errors-chan errors-chan
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
@@ -67,10 +71,11 @@
           (assert-no-problems errors {})))
       (testing "with precincts"
         (let [errors-chan (a/chan 100)
-              ctx {:input [(File. "polling_location.txt")
-                           (File. "precinct.txt")
-                           (File. "polling_location.txt")
-                           (File. "precinct_polling_location.txt")]
+              ctx {:csv-source-file-paths
+                   [(Paths/get "polling_location.txt" (into-array String []))
+                    (Paths/get "precinct.txt" (into-array String []))
+                    (Paths/get "polling_location.txt" (into-array String []))
+                    (Paths/get "precinct_polling_location.txt" (into-array String []))]
                    :errors-chan errors-chan
                    :data-specs v3-0/data-specs}
               out-ctx (validator ctx)
