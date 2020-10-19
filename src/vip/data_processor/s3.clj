@@ -3,9 +3,10 @@
             [clojure.java.io :as io]
             [turbovote.resource-config :refer [config]]
             [clojure.string :as str])
-  (:import [java.io File]
+  (:import [java.io File ByteArrayOutputStream]
            [java.nio.file Files StandardCopyOption]
            [java.nio.file.attribute FileAttribute]
+           [java.security MessageDigest]
            [net.lingala.zip4j ZipFile]
            [net.lingala.zip4j.model ZipParameters]
            [net.lingala.zip4j.model.enums CompressionLevel]))
@@ -61,16 +62,32 @@
     (.addFile zip xml-file zip-params)
     {:zip-dir zip-dir :zip-file zip-file}))
 
+(defn checksum
+  "Computes a SHA 512 checksum of the zip file"
+  [file]
+  (let [bytes'
+        (with-open [xin (io/input-stream file)
+                    xout (ByteArrayOutputStream.)]
+          (io/copy xin xout)
+          (.toByteArray xout))
+        algorithm (MessageDigest/getInstance "sha-512")
+        raw (.digest algorithm bytes')]
+    (format "%032x" (BigInteger. 1 raw))))
+
 (defn upload-to-s3
   "Zips up the xml output file and uploads to the specified S3 bucket if there
    are no fatal errors."
   [{:keys [fatal-errors? xml-output-file skip-upload?] :as ctx}]
   (let [zip-name (zip-filename ctx)
-        {:keys [zip-dir zip-file]} (prepare-zip-file zip-name xml-output-file)]
+        {:keys [zip-dir zip-file]} (prepare-zip-file zip-name xml-output-file)
+        upload? (not (or fatal-errors? skip-upload?))
+        check (when upload?
+                {:checksum (checksum zip-file)})]
     ;; We don't want to push this to S3 at all if we have fatal errors
     ;; as it may break ingestion and waste time.
-    (when-not (or fatal-errors? skip-upload?)
+    (when upload?
       (put-object zip-name zip-file))
     (-> ctx
+        (merge check)
         (assoc :generated-xml-filename zip-name)
         (update :to-be-cleaned concat [zip-file zip-dir]))))
