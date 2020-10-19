@@ -25,7 +25,9 @@
   size as provided by the first (and presumably only) entry in the
   file."
   [zip-file]
-  (.getUncompressedSize (first (.getFileHeaders zip-file))))
+  (letfn [(sum-header-size [sum header]
+            (+ sum (.getUncompressedSize header)))]
+    (reduce sum-header-size 0 (.getFileHeaders zip-file))))
 
 (defn find-files
   "Returns a seq of Files from the path of a extracted zip file. If
