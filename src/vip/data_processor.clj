@@ -36,7 +36,8 @@
      (if exception
        (q/publish-failure (merge completed-message
                                  {:exception (.getMessage exception)}))
-       (q/publish-success completed-message))
+       (q/publish-success (merge completed-message
+                                 (select-keys result [:checksum]))))
      (when exception
        (throw exception)))))
 
