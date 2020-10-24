@@ -72,7 +72,7 @@
           (.toByteArray xout))
         algorithm (MessageDigest/getInstance "sha-512")
         raw (.digest algorithm bytes')]
-    (format "%032x" (BigInteger. 1 raw))))
+    (apply str (map #(format "%02x" %) raw))))
 
 (defn upload-to-s3
   "Zips up the xml output file and uploads to the specified S3 bucket if there
