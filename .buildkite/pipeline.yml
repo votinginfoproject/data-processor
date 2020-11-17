@@ -1,0 +1,14 @@
+steps:
+  - command: "script/postgres-tests"
+    label: "Postgres tests"
+    agents:
+    - "region=us-west-2"
+    branches: "NONE"
+    timeout: 10
+
+  - wait
+
+  - command: "script/build"
+    label: "build and deploy"
+    agents:
+    - "region=us-west-2"
