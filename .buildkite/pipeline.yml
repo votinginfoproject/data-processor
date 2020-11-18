@@ -12,3 +12,7 @@ steps:
     label: "build and deploy"
     agents:
     - "region=us-west-2"
+    plugins:
+      - ecr#v2.1.1:
+          login: true
+          region: "us-east-1"
