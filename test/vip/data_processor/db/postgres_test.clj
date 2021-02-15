@@ -1,6 +1,18 @@
 (ns vip.data-processor.db.postgres-test
   (:require [vip.data-processor.db.postgres :refer :all]
+            [turbovote.resource-config :refer [config]]
             [clojure.test :refer :all]))
+
+(deftest url-test
+  (let [db-spec-1 {:host "host"
+                   :port "5678"
+                   :user "us&r"
+                   :password "p&ssw@rd"
+                   :database "database"}]
+    (with-redefs [config (constantly db-spec-1)]
+      (is (= "jdbc:postgresql://host:5678/database?user=us%26r&password=p%26ssw%40rd"
+             (url))
+          "Percent encoding is done for username and password values"))))
 
 (deftest build-public-id-test
   (testing "builds public ids with as much information as it has"
