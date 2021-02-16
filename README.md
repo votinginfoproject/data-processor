@@ -80,6 +80,7 @@ project. Create that file, copy the following into it and provide
 values for each environment variable.
 
 ```
+AWS_REGION=
 DB_PORT_5432_TCP_ADDR=
 DB_ENV_POSTGRES_USER=
 DB_ENV_POSTGRES_PASSWORD=
@@ -88,7 +89,6 @@ POSTGRES_USER=
 POSTGRES_PASSWORD=
 VIP_DP_AWS_ACCESS_KEY=
 VIP_DP_AWS_SECRET_KEY=
-VIP_DP_AWS_REGION=
 VIP_DP_S3_UNPROCESSED_BUCKET=
 VIP_DP_S3_PROCESSED_BUCKET=
 VIP_DP_SQS_QUEUE=
@@ -114,7 +114,7 @@ The SNS topics are for broadcasting the results of feed processing, one for succ
 outcomes and the other for failures. Interested applications will subscribe an SQS
 queue to the topic and get a copy of the message.
 
-The format for the VIP_DP_AWS_REGION should be like `us-east-1`.
+The format for the `AWS_REGION` should be like `us-east-1`.
 
 Running it is as per usual for docker-compose:
 
