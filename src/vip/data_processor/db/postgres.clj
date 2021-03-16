@@ -11,11 +11,15 @@
             [vip.data-processor.util :as util]
             [vip.data-processor.validation.data-spec :as data-spec])
   (:import [org.postgresql.util PGobject]
+           [java.net URLEncoder]
            [java.text Normalizer]))
 
 (defn url []
   (let [{:keys [host port user password database]} (config [:postgres])]
-    (str "jdbc:postgresql://" host ":" port "/" database "?user=" user "&password=" password)))
+    (apply format
+           "jdbc:postgresql://%s:%s/%s?user=%s&password=%s"
+           (map (comp #(URLEncoder/encode % "UTF-8") str)
+                [host port database user password]))))
 
 (defn db-spec []
   (let [{:keys [host port user password database]} (config [:postgres])]
