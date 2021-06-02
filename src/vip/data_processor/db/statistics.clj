@@ -44,8 +44,8 @@
   (let [specs (data-specs-with-stats (:data-specs ctx))]
     (into {} (map (juxt :table (partial stats-for-table ctx)) specs))))
 
-(defn stats-map [ctx]
-  (let [stats (stats ctx)]
+(defn stats-map [{:keys [import-id] :as ctx}]
+  (let [stats (stats import-id)]
     (->> stats
          (map (fn [[table {:keys [count error-count complete]}]]
                 (let [table-prefix (-> table
@@ -58,5 +58,5 @@
 
 (defn store-stats [{:keys [import-id] :as ctx}]
   (korma/insert psql/statistics
-    (korma/values (assoc (stats-map ctx) :results_id import-id)))
+    (korma/values (assoc (stats-map import-id) :results_id import-id)))
   ctx)
