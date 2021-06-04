@@ -24,8 +24,9 @@
   been completed or until a `:stop` key is added to the context."
   [c]
   (loop [ctx c]
-    (let [[next-step & rest-pipeline] (:pipeline ctx)]
-      (if next-step
+    (let [[next-step & rest-pipeline] (:pipeline ctx)
+          continue? (not (psql/get-stop-requested ctx))]
+      (if (and next-step continue?)
         (let [ctx-with-rest-pipeline (assoc ctx :pipeline rest-pipeline)
               next-ctx (try-processing-fn next-step ctx-with-rest-pipeline)]
           (if (:stop next-ctx)
