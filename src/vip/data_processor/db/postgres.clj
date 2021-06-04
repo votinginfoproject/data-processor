@@ -351,7 +351,6 @@
      ["delete from xml_tree_values where results_id = ?" [import-id]]))
   ctx)
 
-
 (defn v5-summary-branch
   [{:keys [spec-family] :as ctx}]
   (log/info "In v5-summary-branch")
@@ -380,6 +379,13 @@
 (defn get-run [ctx]
   (korma/select results
                 (korma/where {:id (:import-id ctx)})))
+
+(defn get-stop-requested [ctx]
+  (log/info "Checking feed stop request")
+  (:stop_requested
+    (korma/select results
+      (korma/fields :stop_requested)
+      (korma/where {:id (:import-id ctx)}))))
 
 (def global-identifier -1)
 (def invalid-identifier -2)
