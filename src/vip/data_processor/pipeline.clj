@@ -18,17 +18,25 @@
                  :thrown-by processing-fn
                  :exception e))))
 
+(defn check-stop-flag
+  [ctx]
+  (log/info "Checking stop request flag")
+  (if (psql/get-run-field ctx :stop_requested)
+    (assoc ctx :stop "Stop requested")
+    ctx))
+
 (defn run-pipeline
   "Run the `pipeline` attached to a processing context. Will return
   the context after all processing functions in the pipeline have
   been completed or until a `:stop` key is added to the context."
   [c]
   (loop [ctx c]
-    (let [[next-step & rest-pipeline] (:pipeline ctx)
-          continue? (not (psql/get-stop-requested ctx))]
-      (if (and next-step continue?)
+    (let [[next-step & rest-pipeline] (:pipeline ctx)]
+      (if next-step
         (let [ctx-with-rest-pipeline (assoc ctx :pipeline rest-pipeline)
-              next-ctx (try-processing-fn next-step ctx-with-rest-pipeline)]
+              next-ctx (->> ctx-with-rest-pipeline
+                         (try-processing-fn next-step)
+                         (check-stop-flag))]
           (if (:stop next-ctx)
             next-ctx
             (recur next-ctx)))

@@ -380,12 +380,13 @@
   (korma/select results
                 (korma/where {:id (:import-id ctx)})))
 
-(defn get-stop-requested [ctx]
-  (log/info "Checking feed stop request")
-  (:stop_requested
-    (korma/select results
-      (korma/fields :stop_requested)
-      (korma/where {:id (:import-id ctx)}))))
+(defn get-run-field [ctx field]
+  (let [response (korma/select results
+                  (korma/fields field)
+                  (korma/where {:id (:import-id ctx)}))]
+    (->> response
+      (first)
+      (field))))
 
 (def global-identifier -1)
 (def invalid-identifier -2)
