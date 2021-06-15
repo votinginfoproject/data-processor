@@ -30,10 +30,48 @@
      :user user
      :password password}))
 
-(defn migrate []
-  (j/migrate-db {:db {:type :sql
-                      :url (url)}
-                 :migrator "resources/migrations"}))
+(defn joplin-spec []
+  {:db {:type :sql
+        :url (url)}
+   :migrator "resources/migrations"})
+
+(defn migrate
+  "Migrate forward any pending migrations."
+  []
+  (j/migrate-db (joplin-spec)))
+
+(defn pending
+  "List any migrations that haven't been applied yet."
+  []
+  (j/pending-migrations (joplin-spec)))
+
+(defn rollback
+  "With no parameters, rolls the db back 1 migrations. You can also send a
+   parameter that is either an integer or the id of a migration. When it's
+   and integer it rolls back that many migrations. When it's a string, it
+   should be the id of a migration and it rolls back any migrations up to
+   but not including that migration."
+  ([]
+   (j/rollback-db (joplin-spec) 1))
+  ([num-or-id]
+   (letfn [(parse-int [n-or-i]
+             (try
+               (Integer/parseInt n-or-i)
+               (catch Exception e
+                 nil)))]
+     (if-let [num (parse-int num-or-id)]
+       ;; we got a int, use it
+       (j/rollback-db (joplin-spec) num)
+       ;; assume it was a String id
+       (j/rollback-db (joplin-spec) num-or-id)))))
+
+(defn create
+  "Creates a new migration up/down with the id suffix. Joplin automatically
+   prepends the date in YYYYMMDD- format before this provided id, so if you
+   intend to write multiple migrations on the same day that need to be applied
+   in a particular order, it's ideal to start your id with 01-, 02-, 03-, etc"
+  [id]
+  (j/create-migration (joplin-spec) id))
 
 (declare results-db results
          validations
