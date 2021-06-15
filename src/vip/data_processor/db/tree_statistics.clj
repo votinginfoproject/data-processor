@@ -77,7 +77,7 @@
        (reduce merge)))
 
 (defn prepare-temp-data-for-locality-stats
-  "Adds steet segment validation data to processing table for faster
+  "Adds street segment validation data to processing table for faster
    processing, only used for the locality stats computations and then
    deleted"
   [import-id]
