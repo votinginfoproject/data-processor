@@ -34,9 +34,10 @@
     (let [[next-step & rest-pipeline] (:pipeline ctx)]
       (if next-step
         (let [ctx-with-rest-pipeline (assoc ctx :pipeline rest-pipeline)
-              next-ctx (->> ctx-with-rest-pipeline
-                         (try-processing-fn next-step)
-                         (check-stop-flag))]
+              check-stop-flag-fn (:check-stop-flag-fn ctx)
+              next-ctx (cond->> ctx-with-rest-pipeline
+                         true (try-processing-fn next-step)
+                         check-stop-flag-fn (check-stop-flag-fn))]
           (if (:stop next-ctx)
             next-ctx
             (recur next-ctx)))
@@ -58,7 +59,8 @@
    (let [ctx (merge {:spec-version nil
                      :spec-family nil
                      :errors-chan (a/chan 1024)
-                     :pipeline pipeline}
+                     :pipeline pipeline
+                     :check-stop-flag-fn check-stop-flag}
                     initial-input
                     (when-not (nil? delete-callback)
                       {:delete-callback delete-callback}))
