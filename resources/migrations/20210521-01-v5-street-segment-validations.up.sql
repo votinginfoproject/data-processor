@@ -1,3 +1,5 @@
+create extension btree_gist;
+
 create table v5_street_segment_validations (
     results_id bigint NOT NULL,
     path ltree,
@@ -16,4 +18,4 @@ WITH (
 )
 TABLESPACE pg_default;
 
-create index v5_street_segment_paths on v5_street_segment_validations using gist (path);
+create index v5_street_segment_paths on v5_street_segment_validations using gist (results_id, path);
