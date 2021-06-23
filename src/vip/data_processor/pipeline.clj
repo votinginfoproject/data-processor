@@ -69,7 +69,7 @@
      (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
 
      (when-let [stop (:stop result)]
-       (psql/fail-run import-id nil)
+       (psql/delete-run import-id)
        (log/error "Stopping run of" import-id "due to:" stop))
 
      (when-let [ex (:exception result)]
