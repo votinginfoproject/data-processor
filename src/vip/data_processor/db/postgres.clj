@@ -388,6 +388,10 @@
       (first)
       (field))))
 
+(defn delete-run [id]
+  (korma/delete results
+    (korma/where {:id id})))
+
 (def global-identifier -1)
 (def invalid-identifier -2)
 
