@@ -1,4 +1,4 @@
-create extension btree_gist;
+create extension if not exists btree_gist;
 
 create table v5_street_segment_validations (
     results_id bigint NOT NULL,
