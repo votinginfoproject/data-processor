@@ -13,12 +13,12 @@
   "A dev pipeline step to save the resulting zip file to a local file at the
    end of processing, should you want to examine it. To activate it, flip
    the context keyword `:save-zip-locally?` to true above."
-  [{:keys [xml-output-file save-zip-locally?] :as ctx}]
+  [{:keys [xml-output-file save-zip-locally? gis-file-paths] :as ctx}]
   (if save-zip-locally?
     (let [zip-name (s3/zip-filename ctx)
 
           {:keys [zip-file zip-dir]}
-          (s3/prepare-zip-file zip-name xml-output-file)
+          (s3/prepare-zip-file zip-name xml-output-file gis-file-paths)
 
           current-dir (-> ""
                           (Paths/get (into-array String []))

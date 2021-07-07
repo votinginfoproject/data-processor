@@ -2,7 +2,8 @@
   (:require [amazonica.aws.s3 :as s3]
             [clojure.java.io :as io]
             [turbovote.resource-config :refer [config]]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [vip.data-processor.util :as util])
   (:import [java.io File ByteArrayOutputStream]
            [java.nio.file Files StandardCopyOption]
            [java.nio.file.attribute FileAttribute]
@@ -48,7 +49,7 @@
   "Creates a temp directory, a new zip file in that directory, and adds
    the xml-output-file to the zip. It returns the zip file and directory
    so they can be used and cleaned up at the end of processing."
-  [zip-name xml-output-file]
+  [zip-name xml-output-file gis-file-paths]
   (let [zip-dir (Files/createTempDirectory tmp-path-prefix
                                            (into-array FileAttribute []))
         zip-file (File. (.toFile zip-dir) zip-name)
@@ -58,8 +59,10 @@
                       CompressionLevel/NORMAL))
         xml-file (if (instance? File xml-output-file)
                    xml-output-file
-                   (.toFile xml-output-file))]
-    (.addFile zip xml-file zip-params)
+                   (.toFile xml-output-file))
+        gis-files (mapv #(.toFile %) gis-file-paths)
+        files (java.util.ArrayList. (concat [xml-file] gis-files))]
+    (.addFiles zip files zip-params)
     {:zip-dir zip-dir :zip-file zip-file}))
 
 (defn checksum
@@ -77,9 +80,10 @@
 (defn upload-to-s3
   "Zips up the xml output file and uploads to the specified S3 bucket if there
    are no fatal errors."
-  [{:keys [fatal-errors? xml-output-file skip-upload?] :as ctx}]
+  [{:keys [fatal-errors? xml-output-file gis-file-paths skip-upload?] :as ctx}]
   (let [zip-name (zip-filename ctx)
-        {:keys [zip-dir zip-file]} (prepare-zip-file zip-name xml-output-file)
+        {:keys [zip-dir zip-file]} (prepare-zip-file zip-name xml-output-file
+                                                     gis-file-paths)
         upload? (not (or fatal-errors? skip-upload?))
         check (when upload?
                 {:checksum (checksum zip-file)})]
