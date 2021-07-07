@@ -2,12 +2,14 @@
   (:require [clojure.string :as str]
             [vip.data-processor.validation.data-spec.v3-0 :as v3-0]
             [vip.data-processor.validation.data-spec.v5-2 :as v5-2]
+            [vip.data-processor.validation.data-spec.v6-0 :as v6-0]
             [vip.data-processor.errors :as errors])
   (:import [org.apache.xerces.util XMLChar]))
 
 (def version-specs
   {"3.0" v3-0/data-specs
-   "5.2" v5-2/data-specs})
+   "5.2" v5-2/data-specs
+   "6.0" v6-0/data-specs})
 
 (defn add-data-specs [data-specs]
   (fn [ctx]

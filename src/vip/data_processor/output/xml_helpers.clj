@@ -56,6 +56,16 @@
           election-date (postgres/find-value-for-simple-path
                          import-id "VipObject.Election.Date")]
       (assoc ctx :output-file-basename
+             (filename* fips state election-date)))
+
+    "6.0"
+    (let [fips (postgres/find-value-for-simple-path
+                import-id "VipObject.Source.VipId")
+          state (postgres/find-value-for-simple-path
+                 import-id "VipObject.State.Name")
+          election-date (postgres/find-value-for-simple-path
+                         import-id "VipObject.Election.Date")]
+      (assoc ctx :output-file-basename
              (filename* fips state election-date)))))
 
 (defn create-xml-file
