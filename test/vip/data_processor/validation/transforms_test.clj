@@ -10,6 +10,7 @@
             [vip.data-processor.validation.db :as db]
             [vip.data-processor.validation.transforms :refer :all]
             [vip.data-processor.db.sqlite :as sqlite]
+            [vip.data-processor.util :as util]
             [clojure.java.io :as io]
             [korma.core :as korma]
             [clojure.core.async :as a])
@@ -47,14 +48,30 @@
                :errors-chan errors-chan}
           results-ctx (remove-invalid-extensions ctx)
           errors (all-errors errors-chan)]
-      (is (= 1 (count (:valid-file-paths results-ctx))))
-      (is (= "good-file.xml" (-> results-ctx :valid-file-paths first .toFile .getName)))
+      (is (= 1 (count (:feed-file-paths results-ctx))))
+      (is (= 0 (count (:gis-file-paths results-ctx))))
+      (is (= "good-file.xml" (-> results-ctx :feed-file-paths first .toFile .getName)))
       (is (contains-error? errors
                            {:severity :warnings
                             :scope :import
                             :identifier :global
                             :error-type :invalid-extensions
                             :error-value '("not-so-good-file.xls" "logo.ai")}))))
+  (testing "accepts SHP files"
+    (let [errors-chan (a/chan 100)
+          ctx {:extracted-file-paths
+               [(Paths/get "good-file.xml" (into-array String []))
+                (Paths/get "lower-case.shp" (into-array String []))
+                (Paths/get "UPPER-CASE.SHP" (into-array String []))]
+               :errors-chan errors-chan}
+          results-ctx (remove-invalid-extensions ctx)
+          errors (all-errors errors-chan)]
+      (is (empty? errors))
+      (is (= 1 (count (:feed-file-paths results-ctx))))
+      (is (= 2 (count (:gis-file-paths results-ctx))))
+      (is (= "good-file.xml" (-> results-ctx :feed-file-paths first util/file-name)))
+      (is (= "lower-case.shp" (-> results-ctx :gis-file-paths first util/file-name)))
+      (is (= "UPPER-CASE.SHP" (-> results-ctx :gis-file-paths second util/file-name)))))
   (testing "allows uppercase file extensions"
     (let [errors-chan (a/chan 100)
           ctx {:extracted-file-paths
@@ -66,7 +83,7 @@
           errors (all-errors errors-chan)]
       (is (= [(Paths/get "this-is-okay.XML" (into-array String []))
               (Paths/get "so-is-this.TXT" (into-array String []))]
-             (:valid-file-paths results-ctx)))
+             (:feed-file-paths results-ctx)))
       (is (contains-error? errors
                            {:severity :warnings
                             :scope :import
