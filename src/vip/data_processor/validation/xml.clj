@@ -260,8 +260,8 @@
                                     (util/version-without-patch version))))))))
 
 (defn set-input-as-xml-output-file
-  [{:keys [extracted-file-paths output-file-basename] :as ctx}]
-  (let [input-path (first extracted-file-paths)
+  [{:keys [feed-file-paths output-file-basename] :as ctx}]
+  (let [input-path (first feed-file-paths)
         output-path (.resolveSibling input-path
                                      (str output-file-basename ".xml"))]
     (assoc ctx :xml-output-file

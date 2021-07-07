@@ -58,3 +58,19 @@
         "5.2" "5.2"
         "6.0" "6.0"))))
 
+(defn file-name
+  "Given a file path, return the file name portion"
+  [file-path]
+  (-> file-path
+      .toFile
+      .getName))
+
+(defn file-extension
+  "Given a file path, return the lowercased, trimmed extension (ie txt, csv, etc)"
+  [file-path]
+  (-> file-path
+      file-name
+      (str/split #"\.")
+      last
+      str/lower-case
+      str/trim))

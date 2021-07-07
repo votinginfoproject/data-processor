@@ -4,6 +4,7 @@
             [turbovote.resource-config :refer [config]]
             [vip.data-processor.db.postgres :as psql]
             [vip.data-processor.queue :as q]
+            [vip.data-processor.util :as util]
             [vip.data-processor.validation.csv :as csv]
             [vip.data-processor.validation.transforms :as t]
             [vip.data-processor.validation.xml :as xml]
@@ -11,8 +12,8 @@
 
 (defn determine-format [ctx]
   (let [file-extensions (->> ctx
-                             :valid-file-paths
-                             (map #(-> % .toFile str (s/split #"\.") last s/lower-case))
+                             :feed-file-paths
+                             (map util/file-extension)
                              set)
         feed-format (condp set/superset? file-extensions
                       #{"txt" "csv"} :csv
@@ -29,10 +30,10 @@
 (defn organize-source-files
   "Places the valid source files in the context into a location according to the
   format of the feed, so that format specific steps can find them."
-  [{:keys [valid-file-paths] :as ctx}]
+  [{:keys [feed-file-paths] :as ctx}]
   (if (= :xml (:format ctx))
-    (assoc ctx :xml-source-file-path (first valid-file-paths))
-    (assoc ctx :csv-source-file-paths valid-file-paths)))
+    (assoc ctx :xml-source-file-path (first feed-file-paths))
+    (assoc ctx :csv-source-file-paths feed-file-paths)))
 
 (def initial-pipeline
   [t/assert-filename-and-bucket
