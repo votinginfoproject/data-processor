@@ -18,7 +18,7 @@
                           :wrapup-f (partial stats/store-stats ctx)})]
     (assoc ctx :processing-chan processing-chan)))
 
-(defn process-v5-validations [{:keys [errors-chan] :as ctx}]
+(defn process-v5-validations [{:keys [errors-chan import-id] :as ctx}]
   (let [processing-chan (util-async/batch-process
                          errors-chan
                          (fn [errors]
@@ -29,5 +29,5 @@
                          {:batch-size 10000
                           :timeout 5000
                           :pool-size 30
-                          :wrapup-f (partial tree-stats/store-tree-stats ctx)})]
+                          :wrapup-f (partial tree-stats/store-tree-stats import-id)})]
     (assoc ctx :processing-chan processing-chan)))

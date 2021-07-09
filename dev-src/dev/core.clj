@@ -44,6 +44,36 @@
    save-zip-to-local-file
    cleanup/cleanup])
 
+(defn migrate
+  "Apply any pending migrations."
+  []
+  (psql/migrate))
+
+(defn pending
+  "List any unapplied migrations."
+  []
+  (psql/pending))
+
+(defn rollback
+  "Rollback migrations. When called with no parameters, it rolls back
+   the last applied migration. When called with a parameter, it will
+   attempt to parse it into an integer, and if successful, rolls back
+   that many migrations. If it's not an integer, it is assumed to be the
+   name/id of a migration, and rolls back all applied migration up to but
+   not including the id."
+  ([]
+   (psql/rollback))
+  ([num-or-id]
+   (psql/rollback num-or-id)))
+
+(defn create
+  "Creates new migration up/down files with the id as a suffix. Automatically
+   addes the date in YYYYMMDD- format before the id, so if you intend to write
+   multiple migrations on the same day that need to be applied in a particular
+   order, it's ideal to start your id with 01-, 02-, 03-, etc"
+  [id]
+  (psql/create id))
+
 (defn -main
   "Runs a modified pipeline that skips downloading from S3 in favor of a :file
   that is provided on the command line. As such, it replaces the common pipeline
@@ -61,11 +91,10 @@
   (let [file (java.nio.file.Paths/get filename (into-array [""]))
         initial-context {:file file
                          :post-process-street-segments? false
-                         :keep-feed-on-complete? false
+                         :keep-feed-on-complete? true
                          :skip-upload? true
                          :save-zip-locally? true}
         result (time (pipeline/process pipeline initial-context))]
     (when-let [xml-output-file (:xml-output-file result)]
       (println "XML:" (.toString xml-output-file)))
     (psql/complete-run result)))
-

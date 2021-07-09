@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [clojure.tools.logging :as log]
             [korma.core :as korma]
+            [korma.db :as korma.db]
             [vip.data-processor.db.postgres :as postgres]
             [vip.data-processor.db.translations.util :as t-util]))
 
@@ -70,21 +71,70 @@
      (keyword (str (camel->snake element) "_completion")) completion}))
 
 (defn stats
-  [{:keys [import-id]}]
+  [import-id]
   (->> (korma/exec-raw [(error-query) [import-id import-id]] :results)
        (map stats-map)
        (reduce merge)))
 
+(defn prepare-temp-data-for-locality-stats
+  "Adds street segment validation data to processing table for faster
+   processing, only used for the locality stats computations and then
+   deleted"
+  [import-id]
+  (log/info "Saving temp data for locality stats")
+  (korma/exec-raw
+   ["insert into v5_street_segment_validations
+       select * from xml_tree_validations
+       where results_id = ?
+             and path ~ 'VipObject.0.StreetSegment.*'" [import-id]]))
+
+(defn cleanup-temp-data-for-locality-stats
+  "Deletes street segment validation data from processing table"
+  [import-id]
+  (log/info "Deleting temp data for locality stats")
+  (korma/exec-raw
+   ["delete from v5_street_segment_validations where results_id = ?"
+    [import-id]]))
+
+(defn locality-ids
+  "Gets all the locality ids for the feed."
+  [import-id]
+  (->> (korma/select postgres/xml-tree-values
+         (korma/fields :value)
+         (korma/where {:simple_path
+                       (postgres/path->ltree "VipObject.Locality.id")})
+         (korma/where {:results_id import-id}))
+       (map :value)))
+
+(defn compute-locality-stats
+  "Runs through each locality and computes the stats for it, logging along
+   progress along the way."
+  [import-id]
+  (log/info "Computing locality stats")
+  (let [locality-ids (locality-ids import-id)
+        loc-count (count locality-ids)]
+    (doall (map-indexed
+            (fn [idx locality-id]
+              (log/info "Processing locality" (inc idx) "of" loc-count
+                        "with id" locality-id)
+              (korma/exec-raw
+               ["insert into v5_dashboard.localities
+                              select * from v5_dashboard.locality_stats(?, ?)"
+                [import-id locality-id]]))
+            locality-ids))))
+
+(defn locality-stats [import-id]
+  (prepare-temp-data-for-locality-stats import-id)
+  (compute-locality-stats import-id)
+  (cleanup-temp-data-for-locality-stats import-id))
+
 (defn store-tree-stats
-  [{:keys [import-id] :as ctx}]
+  [import-id]
   (log/info "Building basic feed stats")
   (korma/insert postgres/v5-statistics
     (korma/values
-     (assoc (stats ctx) :results_id import-id)))
+     (assoc (stats import-id) :results_id import-id)))
   (log/info "Getting additional feed stats")
   (korma/exec-raw
    ["select * from v5_dashboard.polling_locations_by_type(?)" [import-id]])
-  (log/info "Building locality stats")
-  (korma/exec-raw
-   ["select * from v5_dashboard.feed_localities(?)" [import-id]])
-  ctx)
+  (locality-stats import-id))

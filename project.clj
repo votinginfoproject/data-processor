@@ -47,6 +47,10 @@
   :test-selectors {:default (complement :postgres)
                    :postgres :postgres
                    :all (constantly true)}
+  :aliases {"migrate" ["with-profile" "+dev" "run" "-m" "dev.core/migrate"]
+            "rollback" ["with-profile" "+dev" "run" "-m" "dev.core/rollback"]
+            "pending" ["with-profile" "+dev" "run" "-m" "dev.core/pending"]
+            "create" ["with-profile" "+dev" "run" "-m" "dev.core/create"]}
   :repl-options {:init (set! *print-length* 50)}
   :prep-tasks ["javac" "compile"]
   :main vip.data-processor)

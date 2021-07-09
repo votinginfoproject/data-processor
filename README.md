@@ -360,3 +360,54 @@ To delete any but the most recent 5 versions of a feed (where two feeds are cons
 ```sql
 delete from results where id in (select unnest(old_runs) from cleanup.feeds_by_election);
 ```
+
+## Migrations
+
+For development, there are a couple of options for manually running, rolling back, and creating migrations. We now have aliases setup so you can activate these from the command line, or you can also run them from a REPL in the `dev.core` namespace.
+
+### Command Line Migration Interactions
+
+#### Running pending migrations
+`lein migrate`
+
+#### Seeing if there are pending migrations
+`lein pending`
+
+#### Creating new migration up/down files
+`lein create 01-my-cool-new-migration`
+
+With this one, the joplin subsystem automatically prepends the date in YYYYMMDD- format to the value you supply, and creates up/down migration files. If you have multiple migrations on the same day that you want applied in a particular order, our best practice is to start your migrations with 01-, 02-, 03-. That way when the date is prepended, the migrations lexically sort with the 01 first, then 02, 03, etc.
+
+#### Rolling back migrations
+Rollback the most recent migration
+`lein rollback`
+
+Rollback N number of migrations
+`lein rollback N` (where N is some integer between 1 and the total number of migrations applied)
+
+Rollback all migrations after a particular ID
+`lein rollback 20210615-01-my-cool-new-migration`
+(Note that this is the full ID including the date stamp, but minus the up/down parts)
+
+### REPL
+Alternatively to the command line options above, you can call the functions in the `dev.core` namespace directly. The following examples assume you're in the `dev.core` namespace, which is the default when you fire up a REPL.
+
+#### Run all pending migrations
+`(migrate)`
+
+#### List all pending migrations
+`(pending)`
+
+#### Create a new migration
+See the notes about naming migrations under the command line section.
+`(create "01-my-cool-new-migration")`
+
+#### Rollback migrations
+Rollback the last migration
+`(rollback)`
+
+Rollback the last N migrations (where N is an integer between 1 and the number of applied migrations)
+`(rollback N)`
+
+Rollback all migrations applied after a specific migration ID (see notes above in command line section)
+`(rollback "20210605-01-my-cool-new-migration")`
