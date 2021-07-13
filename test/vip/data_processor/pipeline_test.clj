@@ -59,7 +59,7 @@
 
 (deftest process-test
   (testing "Builds the context and executes the pipeline"
-    (let [intial-input {:input 0 :check-stop-flag-fn #(identity %)}
+    (let [intial-input {:input 0 :check-stop-flag-fn identity}
           pipeline [incrementor incrementor incrementor]
           result (process pipeline intial-input)]
       (is (= 3 (:input result)))
