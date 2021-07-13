@@ -23,15 +23,7 @@
                             {:severity :errors
                              :scope :external-file
                              :identifier path})
-      "VipObject.0.ExternalFile.3.Filename")
-    #_(are [path]
-        (is (contains-error? errors
-                             {:severity :errors
-                              :scope :candidates
-                              :identifier path
-                              :error-type :format}))
-      "VipObject.0.Candidate.4.PreElectionStatus.0"
-      "VipObject.0.Candidate.5.PreElectionStatus.0")))
+      "VipObject.0.ExternalFile.3.Filename")))
 
 (deftest ^:postgres validate-no-missing-file-names-failure-test
   (let [errors-chan (a/chan 100)
