@@ -90,8 +90,8 @@
   (psql/initialize)
   (let [file (java.nio.file.Paths/get filename (into-array [""]))
         initial-context {:file file
-                         :post-process-street-segments? false
-                         :keep-feed-on-complete? true
+                         :post-process-street-segments? true
+                         :keep-feed-on-complete? false
                          :skip-upload? true
                          :save-zip-locally? true}
         result (time (pipeline/process pipeline initial-context))]

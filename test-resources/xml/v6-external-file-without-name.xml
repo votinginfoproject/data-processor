@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<VipObject>
+  
+  <ExternalFile id="exfile01">
+    <Checksum>
+      <Algorithm>sha-512</Algorithm>
+      <Value>soisf09s8y8w09ehwe</Value>
+    </Checksum>
+  </ExternalFile>
+
+  <ExternalFile id="exfile02">
+    <Filename></Filename>
+    <Checksum>
+      <Algorithm>sha-512</Algorithm>
+      <Value>soisf09s8y8w09ehwe</Value>
+    </Checksum>
+  </ExternalFile>
+
+  <ExternalFile id="exfile03">
+    <Filename>foo.shp</Filename>
+    <Checksum>
+      <Algorithm>sha-512</Algorithm>
+      <Value>soisf09s8y8w09ehwe</Value>
+    </Checksum>
+  </ExternalFile>
+
+</VipObject>

@@ -29,6 +29,7 @@
             [vip.data-processor.validation.v5.street-segment]
             [vip.data-processor.validation.v5.booleans]
             [vip.data-processor.validation.v5.polling-location]
+            [vip.data-processor.validation.v6.external-file]
             [vip.data-processor.validation.xml]
             [vip.data-processor.validation.xml.v5]))
 
@@ -48,10 +49,10 @@
     vip.data-processor.db.postgres/populate-sources-table
     vip.data-processor.db.postgres/populate-elections-table]
 
-   ;;add validations for the types introduces with 6.0 here
-   []
+   ;;add validations for the types introduced with 6.0 here
+   [vip.data-processor.validation.v6.external-file/validate-no-missing-file-names]
 
-   [vip.data-processor.validation.v5.ballot-measure-contest/validate-ballot-measure-types
+   #_[vip.data-processor.validation.v5.ballot-measure-contest/validate-ballot-measure-types
     vip.data-processor.validation.v5.ballot-measure-contest/validate-no-missing-types
     vip.data-processor.validation.v5.candidate-contest/validate-no-missing-types
     vip.data-processor.validation.v5.candidate/validate-no-missing-ballot-names
