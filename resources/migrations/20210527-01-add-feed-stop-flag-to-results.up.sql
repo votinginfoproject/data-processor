@@ -1,1 +1,1 @@
-ALTER TABLE results ADD COLUMN stop_requested TEXT;
+ALTER TABLE results ADD COLUMN stop_requested TEXT DEFAULT NULL;
