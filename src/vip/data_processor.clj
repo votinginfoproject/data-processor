@@ -35,8 +35,7 @@
      (log/info "New run completed:"
                (psql/get-run result))
      (when stop
-       (q/publish-failure (merge completed-message
-                                 {:stop stop})))
+       (q/publish-failure {:stop stop}))
      (if exception
        (q/publish-failure (merge completed-message
                                  {:exception (.getMessage exception)}))
