@@ -23,7 +23,7 @@
   (log/debug "Checking stop request flag")
   (if-let [stop-requested (psql/get-run-field ctx :stop_requested)]
     (do (log/info "db stop requested by" stop-requested)
-        (assoc ctx :stop (str "Stop requested by" stop-requested)))
+        (assoc ctx :stop (str "Stop requested by " stop-requested)))
     ctx))
 
 (defn run-pipeline
