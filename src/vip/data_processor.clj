@@ -35,7 +35,7 @@
      (log/info "New run completed:"
                (psql/get-run result))
      (when stop
-       (q/publish-failure {:stop stop :start_time (:start_time result)}))
+       (q/publish-failure {:stop stop :filename (.toString (:file ctx))}))
      (if exception
        (q/publish-failure (merge completed-message
                                  {:exception (.getMessage exception)}))
