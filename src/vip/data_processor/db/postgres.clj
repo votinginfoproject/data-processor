@@ -351,7 +351,6 @@
      ["delete from xml_tree_values where results_id = ?" [import-id]]))
   ctx)
 
-
 (defn v5-summary-branch
   [{:keys [spec-family] :as ctx}]
   (log/info "In v5-summary-branch")
@@ -377,9 +376,25 @@
                                    :end_time (korma/sqlfn now)})
                 (korma/where {:id id})))
 
-(defn get-run [ctx]
+(defn get-run
+  "Retrieves a record from the results table that corresponds to the current feed."
+  [ctx]
   (korma/select results
                 (korma/where {:id (:import-id ctx)})))
+
+(defn get-run-field
+  "Retrieves a column of the record from the results table that corresponds to the current feed."
+  [ctx field]
+  (let [response (korma/select results
+                  (korma/fields field)
+                  (korma/where {:id (:import-id ctx)}))]
+    (->> response
+      (first)
+      (field))))
+
+(defn delete-run [id]
+  (korma/delete results
+    (korma/where {:id id})))
 
 (def global-identifier -1)
 (def invalid-identifier -2)

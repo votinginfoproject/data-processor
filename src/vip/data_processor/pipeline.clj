@@ -18,6 +18,14 @@
                  :thrown-by processing-fn
                  :exception e))))
 
+(defn check-stop-flag
+  [ctx]
+  (log/debug "Checking stop request flag")
+  (if-let [stop-requested (psql/get-run-field ctx :stop_requested)]
+    (do (log/info "db stop requested by" stop-requested)
+        (assoc ctx :stop (str "Stop requested by " stop-requested)))
+    ctx))
+
 (defn run-pipeline
   "Run the `pipeline` attached to a processing context. Will return
   the context after all processing functions in the pipeline have
@@ -27,7 +35,10 @@
     (let [[next-step & rest-pipeline] (:pipeline ctx)]
       (if next-step
         (let [ctx-with-rest-pipeline (assoc ctx :pipeline rest-pipeline)
-              next-ctx (try-processing-fn next-step ctx-with-rest-pipeline)]
+              check-stop-flag-fn (:check-stop-flag-fn ctx)
+              next-ctx (cond->> ctx-with-rest-pipeline
+                         true (try-processing-fn next-step)
+                         check-stop-flag-fn (check-stop-flag-fn))]
           (if (:stop next-ctx)
             next-ctx
             (recur next-ctx)))
@@ -49,7 +60,8 @@
    (let [ctx (merge {:spec-version nil
                      :spec-family nil
                      :errors-chan (a/chan 1024)
-                     :pipeline pipeline}
+                     :pipeline pipeline
+                     :check-stop-flag-fn check-stop-flag}
                     initial-input
                     (when-not (nil? delete-callback)
                       {:delete-callback delete-callback}))
@@ -58,7 +70,7 @@
      (log/info (pr-str (select-keys result [:import-id :public-id :db :xml-output-file])))
 
      (when-let [stop (:stop result)]
-       (psql/fail-run import-id nil)
+       (psql/delete-run import-id)
        (log/error "Stopping run of" import-id "due to:" stop))
 
      (when-let [ex (:exception result)]
