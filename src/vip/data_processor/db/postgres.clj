@@ -338,11 +338,15 @@
                                    :end_time (korma/sqlfn now)})
                 (korma/where {:id id})))
 
-(defn get-run [ctx]
+(defn get-run
+  "Retrieves a record from the results table that corresponds to the current feed."
+  [ctx]
   (korma/select results
                 (korma/where {:id (:import-id ctx)})))
 
-(defn get-run-field [ctx field]
+(defn get-run-field
+  "Retrieves a column of the record from the results table that corresponds to the current feed."
+  [ctx field]
   (let [response (korma/select results
                   (korma/fields field)
                   (korma/where {:id (:import-id ctx)}))]

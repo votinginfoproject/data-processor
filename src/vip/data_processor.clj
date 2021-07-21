@@ -27,12 +27,15 @@
                                 message)
          result (pipeline/process pipeline initial-context delete-callback)
          exception (:exception result)
+         stop (:stop result)
          completed-message {:initialInput message
                             :status "complete"
                             :publicId (:public-id result)}]
      (psql/complete-run result)
      (log/info "New run completed:"
                (psql/get-run result))
+     (when stop
+       (q/publish-failure {:stop stop :filename (.toString (:file result))}))
      (if exception
        (q/publish-failure (merge completed-message
                                  {:exception (.getMessage exception)}))
